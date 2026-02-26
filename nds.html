@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Налоговая база · тренажёр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .trainer-card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.12);
+            padding: 1.2rem 1.2rem;
+            border: 1px solid #e0e4ea;
+            max-height: 720px;  /* Ещё больше увеличиваем */
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Заголовок скрыт */
+        h1 {
+            display: none;
+        }
+
+        /* Переключатель заданий */
+        .task-switcher {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            background: #f0f4fa;
+            border-radius: 40px;
+            padding: 0.3rem;
+            border: 1px solid #d0dbea;
+            flex-shrink: 0; /* Не сжимается */
+        }
+
+        .task-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.5rem 0.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #2f4465;
+            cursor: pointer;
+            transition: 0.1s;
+            white-space: nowrap;
+        }
+
+        .task-btn.active {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            color: #0f2b42;
+            font-weight: 600;
+        }
+
+        /* Контейнеры заданий - с прокруткой внутри, но без скролла снаружи */
+        .task-container {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;  /* Внутренняя прокрутка, если контент не помещается */
+            min-height: 0;      /* Важно для flex-контейнера */
+            padding-right: 4px; /* Немного места для скролла */
+        }
+
+        .task-container.active {
+            display: flex;
+        }
+
+        /* Условие с компактными строками */
+        .condition {
+            background: #f7f9fc;
+            border-radius: 18px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.9rem;
+            border: 1px solid #dbe2ec;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #1e2b3c;
+            flex-shrink: 0;
+        }
+
+        .condition p {
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+        }
+
+        .condition ul {
+            list-style: none;
+            margin: 0.2rem 0;
+        }
+
+        .condition li {
+            padding: 0.15rem 0 0.15rem 1.2rem;
+            position: relative;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.8rem;
+        }
+
+        .condition li::before {
+            content: "•";
+            color: #3a6ea5;
+            font-weight: bold;
+            position: absolute;
+            left: 0.2rem;
+        }
+
+        /* Блок задания */
+        .task-block {
+            background: white;
+            border-radius: 18px;
+            padding: 1rem;
+            margin-bottom: 0.9rem;
+            border: 2px solid #e8edf5;
+            flex-shrink: 0;
+        }
+
+        .task-title {
+            font-weight: 500;
+            font-size: 1rem;
+            margin-bottom: 0.6rem;
+            color: #0f2b42;
+        }
+
+        .input-group {
+            margin-bottom: 0.9rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-weight: 500;
+            color: #2c3f5c;
+            min-width: 140px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            background: white;
+            min-width: 0;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #3a6ea5;
+            box-shadow: 0 0 0 3px rgba(58,110,165,0.15);
+        }
+
+        .input-wrapper span {
+            font-weight: 500;
+            color: #3a4f6e;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        /* Кнопка проверки */
+        .check-section {
+            display: flex;
+            justify-content: center;
+            margin: 0.5rem 0 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .check-btn {
+            background: white;
+            border: 2px solid #1e2f40;
+            border-radius: 40px;
+            padding: 0.6rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e2f40;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 3px 0 #d0d8e5;
+            width: 100%;
+            max-width: 240px;
+        }
+
+        .check-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #d0d8e5;
+        }
+
+        /* Результат */
+        .result-card {
+            background: #f8fafd;
+            border-radius: 18px;
+            padding: 0.9rem;
+            border: 2px solid #dde3ed;
+            opacity: 0;
+            transition: opacity 0.2s;
+            margin-top: 0.3rem;
+            margin-bottom: 0.3rem;
+            flex-shrink: 0;
+        }
+
+        .result-card.visible {
+            opacity: 1;
+        }
+
+        .verdict {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+        }
+
+        .verdict.correct {
+            color: #1b7e3f;
+        }
+        .verdict.incorrect {
+            color: #b13e3e;
+        }
+
+        .explanation {
+            background: white;
+            border-radius: 14px;
+            padding: 0.8rem;
+            border: 1px solid #d2ddee;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #1d2b3c;
+        }
+
+        /* Навигация - всегда видна */
+        .navigation {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.6rem;
+            flex-shrink: 0;  /* Не сжимается */
+            background: white; /* Фон, чтобы не сливалась */
+            padding-top: 0.3rem;
+            border-top: 1px solid #e8ecf2; /* Легкий разделитель */
+        }
+
+        .next-btn {
+            background: white;
+            border: 2px solid #3a6ea5;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #3a6ea5;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 2px 0 #b0c8e0;
+        }
+
+        .next-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 0px 0 #b0c8e0;
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 500px) {
+            .trainer-card {
+                padding: 1rem;
+                max-height: 720px;
+            }
+            
+            .condition li {
+                font-size: 0.75rem;
+            }
+            
+            .input-group label {
+                min-width: 120px;
+                font-size: 0.8rem;
+            }
+            
+            .task-btn {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="trainer-card">
+        <!-- Переключатель заданий (всегда вверху) -->
+        <div class="task-switcher">
+            <button class="task-btn active" id="task1Btn">Задание 1</button>
+            <button class="task-btn" id="task2Btn">Задание 2</button>
+        </div>
+
+        <!-- Задание 1 - контейнер с прокруткой -->
+        <div class="task-container active" id="task1Container">
+            <div class="condition">
+                <p>В I квартале 2026 года ООО «Старт»:</p>
+                <ul>
+                    <li>отгрузило товаров по ставке 22% на сумму 2 000 000 ₽ (без НДС)</li>
+                    <li>отгрузило товаров по ставке 10% на сумму 1 000 000 ₽ (без НДС)</li>
+                    <li>получило аванс под поставку по ставке 22% — 600 000 руб.</li>
+                    <li>получило аванс под поставку по ставке 10% — 300 000 руб.</li>
+                </ul>
+            </div>
+
+            <div class="task-block">
+                <div class="task-title">📝 Задание 1:</div>
+                <div style="font-size: 0.85rem; margin-top: -0.3rem; margin-bottom: 0.8rem; color: #2f4465;">
+                    рассчитайте налоговую базу отдельно по каждой ставке
+                </div>
+
+                <div class="input-group">
+                    <label>База по ставке 22%:</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="tax22Input" placeholder="сумма" value="">
+                        <span>₽</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>База по ставке 10%:</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="tax10Input" placeholder="сумма" value="">
+                        <span>₽</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="check-section">
+                <button class="check-btn" id="checkBtn1">Проверить результат</button>
+            </div>
+
+            <div class="result-card" id="resultCard1">
+                <div class="verdict" id="verdict1"></div>
+                <div class="explanation" id="explanation1"></div>
+            </div>
+        </div>
+
+        <!-- Задание 2 - контейнер с прокруткой -->
+        <div class="task-container" id="task2Container">
+            <div class="condition">
+                <p>ООО «Медицинские технологии» (освобождение от НДС по п. 2 ст. 149 НК):</p>
+                <ul>
+                    <li>купило партию медицинских товаров за 360 000 ₽ (с НДС, включён в стоимость)</li>
+                    <li>продало эту партию другому покупателю за 480 000 ₽ (с НДС)</li>
+                </ul>
+            </div>
+
+            <div class="task-block">
+                <div class="task-title">📝 Задание 2:</div>
+                <div style="font-size: 0.85rem; margin-top: -0.3rem; margin-bottom: 0.8rem; color: #2f4465;">
+                    рассчитайте налоговую базу
+                </div>
+
+                <div class="input-group">
+                    <label>Налоговая база:</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="taxBaseInput2" placeholder="сумма" value="">
+                        <span>₽</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="check-section">
+                <button class="check-btn" id="checkBtn2">Проверить результат</button>
+            </div>
+
+            <div class="result-card" id="resultCard2">
+                <div class="verdict" id="verdict2"></div>
+                <div class="explanation" id="explanation2"></div>
+            </div>
+        </div>
+
+        <!-- Кнопка навигации - всегда видна внизу -->
+        <div class="navigation">
+            <button class="next-btn" id="nextTaskBtn">Следующее задание →</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Элементы переключения
+            const task1Btn = document.getElementById('task1Btn');
+            const task2Btn = document.getElementById('task2Btn');
+            const task1Container = document.getElementById('task1Container');
+            const task2Container = document.getElementById('task2Container');
+            const nextBtn = document.getElementById('nextTaskBtn');
+
+            // Поля задания 1
+            const input22 = document.getElementById('tax22Input');
+            const input10 = document.getElementById('tax10Input');
+            const checkBtn1 = document.getElementById('checkBtn1');
+            const resultCard1 = document.getElementById('resultCard1');
+            const verdict1 = document.getElementById('verdict1');
+            const explanation1 = document.getElementById('explanation1');
+
+            // Поля задания 2
+            const inputBase2 = document.getElementById('taxBaseInput2');
+            const checkBtn2 = document.getElementById('checkBtn2');
+            const resultCard2 = document.getElementById('resultCard2');
+            const verdict2 = document.getElementById('verdict2');
+            const explanation2 = document.getElementById('explanation2');
+
+            // Правильные ответы
+            const CORRECT_22 = 2600000;
+            const CORRECT_10 = 1300000;
+            const CORRECT_2 = 120000;
+
+            // Переключение между заданиями
+            function setActiveTask(task) {
+                if (task === 1) {
+                    task1Btn.classList.add('active');
+                    task2Btn.classList.remove('active');
+                    task1Container.classList.add('active');
+                    task2Container.classList.remove('active');
+                    nextBtn.textContent = 'Следующее задание →';
+                    
+                    // Прокручиваем контейнер задания вверх
+                    task1Container.scrollTop = 0;
+                } else {
+                    task1Btn.classList.remove('active');
+                    task2Btn.classList.add('active');
+                    task1Container.classList.remove('active');
+                    task2Container.classList.add('active');
+                    nextBtn.textContent = '← Предыдущее задание';
+                    
+                    // Прокручиваем контейнер задания вверх
+                    task2Container.scrollTop = 0;
+                }
+            }
+
+            task1Btn.addEventListener('click', () => setActiveTask(1));
+            task2Btn.addEventListener('click', () => setActiveTask(2));
+            
+            nextBtn.addEventListener('click', () => {
+                if (task1Container.classList.contains('active')) {
+                    setActiveTask(2);
+                } else {
+                    setActiveTask(1);
+                }
+            });
+
+            // Парсинг чисел
+            function parseNumber(value) {
+                if (value === '' || value === null || value === undefined) return NaN;
+                const cleaned = String(value).replace(/\s/g, '').replace(',', '.');
+                const num = Number(cleaned);
+                return isNaN(num) ? NaN : num;
+            }
+
+            // Задание 1 проверка
+            checkBtn1.addEventListener('click', () => {
+                const val22 = parseNumber(input22.value);
+                const val10 = parseNumber(input10.value);
+
+                if (isNaN(val22) || isNaN(val10)) {
+                    verdict1.textContent = 'Неверно';
+                    verdict1.className = 'verdict incorrect';
+                    explanation1.innerHTML = 'Заполните оба поля числами.';
+                    resultCard1.classList.add('visible');
+                    
+                    // Прокручиваем к результату, но не теряем кнопку
+                    setTimeout(() => {
+                        task1Container.scrollTo({
+                            top: task1Container.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }, 100);
+                    return;
+                }
+
+                const is22Correct = Math.abs(val22 - CORRECT_22) < 0.01;
+                const is10Correct = Math.abs(val10 - CORRECT_10) < 0.01;
+                const allCorrect = is22Correct && is10Correct;
+
+                verdict1.textContent = allCorrect ? 'Верно' : 'Неверно';
+                verdict1.className = allCorrect ? 'verdict correct' : 'verdict incorrect';
+
+                let expl = '';
+                if (allCorrect) {
+                    expl = 'База 22% = 2 000 000 + 600 000 = 2 600 000 руб.<br>' +
+                           'База 10% = 1 000 000 + 300 000 = 1 300 000 руб.';
+                } else {
+                    expl = 'Правильные ответы:<br>' +
+                           '22%: 2 000 000 + 600 000 = 2 600 000 руб.<br>' +
+                           '10%: 1 000 000 + 300 000 = 1 300 000 руб.<br><br>' +
+                           `Ваши ответы: 22% — ${val22.toFixed(0)} ₽, 10% — ${val10.toFixed(0)} ₽`;
+                }
+
+                explanation1.innerHTML = expl;
+                resultCard1.classList.add('visible');
+                
+                // Плавно прокручиваем к результату
+                setTimeout(() => {
+                    task1Container.scrollTo({
+                        top: task1Container.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            });
+
+            // Задание 2 проверка
+            checkBtn2.addEventListener('click', () => {
+                const val2 = parseNumber(inputBase2.value);
+
+                if (isNaN(val2)) {
+                    verdict2.textContent = 'Неверно';
+                    verdict2.className = 'verdict incorrect';
+                    explanation2.innerHTML = 'Введите сумму.';
+                    resultCard2.classList.add('visible');
+                    
+                    setTimeout(() => {
+                        task2Container.scrollTo({
+                            top: task2Container.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }, 100);
+                    return;
+                }
+
+                const isCorrect = Math.abs(val2 - CORRECT_2) < 0.01;
+
+                verdict2.textContent = isCorrect ? 'Верно' : 'Неверно';
+                verdict2.className = isCorrect ? 'verdict correct' : 'verdict incorrect';
+
+                let expl = '';
+                if (isCorrect) {
+                    expl = 'Налоговая база = 480 000 – 360 000 = 120 000 руб.';
+                } else {
+                    expl = 'Правильный ответ: 480 000 – 360 000 = 120 000 руб.<br>' +
+                           `Ваш ответ: ${val2.toFixed(0)} ₽`;
+                }
+
+                explanation2.innerHTML = expl;
+                resultCard2.classList.add('visible');
+                
+                setTimeout(() => {
+                    task2Container.scrollTo({
+                        top: task2Container.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            });
+
+            // Сброс результата при вводе
+            [input22, input10].forEach(inp => {
+                inp.addEventListener('input', () => {
+                    resultCard1.classList.remove('visible');
+                });
+            });
+
+            inputBase2.addEventListener('input', () => {
+                resultCard2.classList.remove('visible');
+            });
+
+            // Защита от букв
+            [input22, input10, inputBase2].forEach(inp => {
+                inp.addEventListener('keydown', (e) => {
+                    if (e.key === 'e' || e.key === 'E' || e.key === '-' || e.key === '+') {
+                        e.preventDefault();
+                    }
+                });
+                inp.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
+            });
+            
+            // При загрузке прокручиваем вверх
+            setActiveTask(1);
+        })();
+    </script>
+</body>
+</html>
