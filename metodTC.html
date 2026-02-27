@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Методы ТЦО · пазлы</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #eef2f5;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+    .card {
+      max-width: 700px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 32px;
+      padding: 1rem 0.8rem;
+      box-shadow: 0 15px 25px -10px rgba(0,0,0,0.1);
+      border: 1px solid #d0d7de;
+    }
+    .sub {
+      color: #3f4f60;
+      font-size: 0.9rem;
+      border-left: 4px solid #8fa5bb;
+      padding-left: 0.6rem;
+      background: #f2f6fb;
+      border-radius: 0 20px 20px 0;
+      padding: 0.4rem 1rem;
+      margin-bottom: 1.2rem;
+      line-height: 1.2;
+    }
+    .columns {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .col {
+      flex: 1 1 240px;
+      background: #f5f9ff;
+      border-radius: 24px;
+      padding: 0.8rem 0.6rem;
+      border: 1px solid #cbd5e1;
+    }
+    .col h2 {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #2b4050;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.8rem;
+    }
+    .puzzle-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    /* базовый стиль карточек */
+    .puzzle-card {
+      background: #ffffff;
+      border: 2px solid #8fa5bb;
+      padding: 1rem 0.9rem;
+      font-size: 1.05rem;
+      line-height: 1.3;
+      color: #1f2c38;
+      box-shadow: 0 3px 6px -4px #7f8c9a;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      word-break: break-word;
+      position: relative;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+    }
+    .puzzle-card.method-card {
+      border-radius: 30px 30px 30px 6px;
+      font-weight: 600;
+      text-align: center;
+      justify-content: center;
+    }
+    .puzzle-card.desc-card {
+      border-radius: 16px 16px 16px 4px;
+    }
+    .puzzle-card:hover:not(.matched) {
+      background: #e3eef9;
+      border-color: #5f7d9c;
+      transform: scale(1.02);
+      z-index: 2;
+    }
+    /* стиль для соединённой пары (пазл) */
+    .puzzle-card.matched {
+      background: #d0ecdf;
+      border: 3px solid #2e7d5e;
+      cursor: default;
+      font-weight: 600;
+      box-shadow: 0 6px 12px -8px #1f4f3d;
+      position: relative;
+      z-index: 3;
+    }
+    .puzzle-card.matched.method-card {
+      border-radius: 30px 30px 30px 6px;
+      border-right: 3px solid #2e7d5e;
+    }
+    .puzzle-card.matched.desc-card {
+      border-radius: 16px 16px 16px 4px;
+      border-left: 3px solid #2e7d5e;
+    }
+    /* эффект выступа/пазла для метода */
+    .puzzle-card.method-card::after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      background: #8fa5bb;
+      border-radius: 50%;
+      opacity: 0;
+      transition: 0.2s;
+      border: 2px solid white;
+    }
+    .puzzle-card.method-card.matched::after {
+      opacity: 1;
+      background: #2e7d5e;
+      right: -12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    /* эффект впадины/пазла для описания */
+    .puzzle-card.desc-card::before {
+      content: '';
+      position: absolute;
+      left: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      background: #f5f9ff;
+      border-radius: 50%;
+      opacity: 0;
+      transition: 0.2s;
+      border: 2px solid #8fa5bb;
+    }
+    .puzzle-card.desc-card.matched::before {
+      opacity: 1;
+      background: #d0ecdf;
+      border-color: #2e7d5e;
+      left: -12px;
+      z-index: 5;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+    /* выделение выбранной карточки */
+    .puzzle-card.selected {
+      background: #d4e2f0;
+      border-color: #2e5a7d;
+    }
+    .puzzle-card.wrong {
+      background: #f9dcdc;
+      border: 3px solid #b33c3c;
+      animation: shake 0.1s;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(3px); }
+      50% { transform: translateX(-3px); }
+      75% { transform: translateX(2px); }
+      100% { transform: translateX(0); }
+    }
+
+    .feedback-area {
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .message {
+      background: #eef2f6;
+      border-radius: 30px;
+      padding: 0.7rem 1.4rem;
+      font-size: 0.9rem;
+      color: #1f2c38;
+      border: 1px solid #c2d1e2;
+      flex: 2;
+      min-width: 200px;
+    }
+    .btn {
+      background: #d0dbe8;
+      border: none;
+      border-radius: 40px;
+      padding: 0.6rem 1.6rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1f2c38;
+      border: 1px solid #b3c3d6;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: #8fa5bb;
+      color: white;
+    }
+    .btn-primary:hover { background: #728da8; }
+    .btn:hover { background: #c2d0e0; }
+    hr {
+      border: 1px solid #cbd5e1;
+      margin: 1rem 0 0.2rem;
+    }
+    @media (max-width: 600px) {
+      .columns { gap: 0.5rem; }
+      .col { padding: 0.6rem 0.4rem; }
+      .puzzle-card { padding: 0.8rem; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="sub">Соедините метод с его описанием — правильные пары сомкнутся как пазлы</div>
+
+  <div class="columns">
+    <div class="col">
+      <h2>Метод</h2>
+      <div class="puzzle-container" id="methodsColumn"></div>
+    </div>
+    <div class="col">
+      <h2>Суть метода</h2>
+      <div class="puzzle-container" id="descriptionsColumn"></div>
+    </div>
+  </div>
+
+  <div class="feedback-area">
+    <div class="message" id="feedbackMessage">⚡ Выберите метод, затем его описание (или наоборот)</div>
+    <button class="btn btn-primary" id="resetBtn">⟲ Перемешать</button>
+  </div>
+  <hr>
+  <div style="text-align:center; color:#5f7485; font-size:0.8rem;">глава 14.3 НК · пять методов</div>
+</div>
+
+<script>
+  (function() {
+    const pairsData = [
+      {
+        method: 'Сопоставимых рыночных цен',
+        description: 'Прямое сравнение вашей цены с ценами на такие же или похожие товары и услуги на открытом рынке.'
+      },
+      {
+        method: 'Цены последующей реализации',
+        description: 'Анализ валовой рентабельности перепродавца. Сопоставление с рыночным интервалом валовой рентабельности.'
+      },
+      {
+        method: 'Затратный',
+        description: 'Сравнение рентабельности ваших затрат с рыночным уровнем. Применяется при типовых услугах/производстве.'
+      },
+      {
+        method: 'Сопоставимой рентабельности',
+        description: 'Сравнение операционной рентабельности участника сделки с рентабельностью независимых компаний (для наименее сложной стороны).'
+      },
+      {
+        method: 'Распределения прибыли',
+        description: 'Распределение общей прибыли от сделки между участниками пропорционально их вкладу (функции, активы, риски).'
+      }
+    ];
+
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    let methods = [];
+    let descriptions = [];
+
+    let selectedType = null;
+    let selectedId = null;
+    let matchedMethods = [];
+    let matchedDescs = [];
+
+    const methodsCol = document.getElementById('methodsColumn');
+    const descCol = document.getElementById('descriptionsColumn');
+    const feedbackEl = document.getElementById('feedbackMessage');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function clearWrong() {
+      document.querySelectorAll('.puzzle-card.wrong').forEach(c => c.classList.remove('wrong'));
+    }
+
+    function render() {
+      methodsCol.innerHTML = '';
+      descCol.innerHTML = '';
+
+      methods.forEach((m, idx) => {
+        const card = document.createElement('div');
+        card.className = `puzzle-card method-card ${matchedMethods.includes(idx) ? 'matched' : ''}`;
+        card.textContent = m;
+        card.dataset.index = idx;
+        card.dataset.type = 'method';
+        methodsCol.appendChild(card);
+      });
+
+      descriptions.forEach((d, idx) => {
+        const card = document.createElement('div');
+        card.className = `puzzle-card desc-card ${matchedDescs.includes(idx) ? 'matched' : ''}`;
+        card.textContent = d;
+        card.dataset.index = idx;
+        card.dataset.type = 'description';
+        descCol.appendChild(card);
+      });
+
+      selectedType = null;
+      selectedId = null;
+    }
+
+    function shuffleAndReset() {
+      const methodList = pairsData.map(p => p.method);
+      const descList = pairsData.map(p => p.description);
+      methods = shuffleArray(methodList);
+      descriptions = shuffleArray(descList);
+      matchedMethods = [];
+      matchedDescs = [];
+      render();
+      feedbackEl.innerHTML = '⚡ Выберите метод, затем его описание (или наоборот)';
+      clearWrong();
+    }
+
+    function isValidPair(methodText, descText) {
+      return pairsData.some(p => p.method === methodText && p.description === descText);
+    }
+
+    function handleCardClick(e) {
+      const card = e.target.closest('.puzzle-card');
+      if (!card) return;
+      if (card.classList.contains('matched')) return;
+
+      clearWrong();
+      const cardType = card.dataset.type;
+      const cardIdx = parseInt(card.dataset.index);
+
+      if (selectedType === null) {
+        document.querySelectorAll('.puzzle-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedType = cardType;
+        selectedId = cardIdx;
+        feedbackEl.innerHTML = `Выбран ${cardType === 'method' ? 'метод' : 'описание'}. Теперь выберите пару.`;
+        return;
+      }
+
+      if (selectedType === cardType && selectedId === cardIdx) {
+        document.querySelectorAll('.puzzle-card').forEach(c => c.classList.remove('selected'));
+        selectedType = null;
+        selectedId = null;
+        feedbackEl.innerHTML = '⚡ Выберите метод, затем его описание (или наоборот)';
+        return;
+      }
+
+      if (selectedType !== cardType) {
+        let methodIdx, descIdx;
+        if (selectedType === 'method') {
+          methodIdx = selectedId;
+          descIdx = cardIdx;
+        } else {
+          methodIdx = cardIdx;
+          descIdx = selectedId;
+        }
+
+        if (matchedMethods.includes(methodIdx) || matchedDescs.includes(descIdx)) {
+          feedbackEl.innerHTML = '⚠️ Одна из карточек уже в паре';
+          document.querySelectorAll('.puzzle-card').forEach(c => c.classList.remove('selected'));
+          selectedType = null;
+          selectedId = null;
+          return;
+        }
+
+        const methodText = methods[methodIdx];
+        const descText = descriptions[descIdx];
+
+        if (isValidPair(methodText, descText)) {
+          matchedMethods.push(methodIdx);
+          matchedDescs.push(descIdx);
+          render();
+          feedbackEl.innerHTML = matchedMethods.length === pairsData.length
+            ? '🎉 Все методы верно соединены! Пазл собран.'
+            : '✅ Правильно! Карточки сомкнулись.';
+        } else {
+          const firstCard = document.querySelector(`.puzzle-card[data-type="${selectedType}"][data-index="${selectedId}"]`);
+          const secondCard = document.querySelector(`.puzzle-card[data-type="${cardType}"][data-index="${cardIdx}"]`);
+          if (firstCard) firstCard.classList.add('wrong');
+          if (secondCard) secondCard.classList.add('wrong');
+          feedbackEl.innerHTML = '❌ Неправильная пара. Попробуйте снова.';
+        }
+
+        document.querySelectorAll('.puzzle-card').forEach(c => c.classList.remove('selected'));
+        selectedType = null;
+        selectedId = null;
+      } else {
+        document.querySelectorAll('.puzzle-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedType = cardType;
+        selectedId = cardIdx;
+        feedbackEl.innerHTML = `Выбран ${cardType === 'method' ? 'метод' : 'описание'}.`;
+      }
+    }
+
+    methodsCol.addEventListener('click', handleCardClick);
+    descCol.addEventListener('click', handleCardClick);
+    resetBtn.addEventListener('click', shuffleAndReset);
+
+    shuffleAndReset();
+  })();
+</script>
+</body>
+</html>
