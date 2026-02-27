@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Раздел 1Б · найти ошибки</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #eef2f5;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+    }
+    .card {
+      max-width: 820px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 32px;
+      padding: 1rem 0.9rem;
+      box-shadow: 0 15px 25px -10px rgba(0,0,0,0.1);
+      border: 1px solid #d0d7de;
+      max-height: 98vh;
+      overflow-y: auto;
+    }
+    .main-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #1e2b39;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+    }
+    .sub {
+      color: #3f4f60;
+      font-weight: 500;
+      font-size: 0.8rem;
+      border-left: 4px solid #9aa9b7;
+      padding-left: 0.6rem;
+      background: #edf2f7;
+      border-radius: 0 20px 20px 0;
+      padding: 0.3rem 0.7rem;
+      margin-bottom: 0.8rem;
+      line-height: 1.2;
+    }
+    .condition {
+      background: #eef2f6;
+      border-radius: 20px;
+      padding: 0.6rem 0.9rem;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 0.8rem;
+      font-size: 0.8rem;
+      line-height: 1.2;
+    }
+    .condition p { 
+      margin: 0.1rem 0; 
+      color: #1f2c38; 
+      font-weight: 400;
+    }
+    .badge {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+      font-weight: 400;
+    }
+    .section-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #2d4355;
+      margin: 0.8rem 0 0.3rem;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 0.2rem;
+    }
+    .legend {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.7rem;
+      margin-bottom: 0.8rem;
+      background: #f2f6fb;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      line-height: 1.2;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .legend-box {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+    }
+    .legend-box.green { background: #d0ecdf; border: 2px solid #2e7d5e; }
+    .legend-box.red { background: #f9dcdc; border: 2px solid #b33c3c; }
+    .legend-box.gray { background: #d1dbe5; border: 2px solid #6b7b8c; }
+    .legend-box.darkgray { background: #a0b0c0; border: 2px solid #4a5a6a; }
+
+    /* таблица */
+    .form-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .form-table td {
+      padding: 0.5rem 0.7rem;
+      border: 1px solid #d2dbe5;
+      vertical-align: middle;
+      line-height: 1.2;
+    }
+    .form-table .label-cell {
+      background: #edf2f7;
+      font-weight: 600;
+      color: #2b4050;
+      width: 30%;
+    }
+    .mark-cell {
+      width: 10%;
+      text-align: center;
+      background: #ffffff;
+      cursor: pointer;
+    }
+    .value-cell {
+      background: #ffffff;
+      color: #1f2c38;
+      width: 30%;
+    }
+    .check-cell {
+      background: #f5f9ff;
+      font-weight: 500;
+      color: #1f2c38;
+      width: 30%;
+    }
+    /* Стили для отмеченной галкой ячейки */
+    .mark-cell.marked {
+      background: #a0b0c0;
+      border: 2px solid #4a5a6a;
+      position: relative;
+    }
+    .mark-cell.marked::after {
+      content: "✓";
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e2b39;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    /* Стили для заполненных полей */
+    .value-cell.filled {
+      background: #d1dbe5;
+      border: 1.5px solid #6b7b8c;
+      font-weight: 600;
+    }
+    /* Подсветка после проверки */
+    .value-cell.correct-check {
+      background: #d0ecdf;
+      border: 3px solid #2e7d5e;
+      font-weight: 700;
+    }
+    .value-cell.incorrect-check {
+      background: #f9dcdc;
+      border: 3px solid #b33c3c;
+      font-weight: 700;
+    }
+    .mark-cell.correct-mark {
+      background: #d0ecdf;
+      border: 3px solid #2e7d5e;
+      position: relative;
+    }
+    .mark-cell.incorrect-mark {
+      background: #f9dcdc;
+      border: 3px solid #b33c3c;
+      position: relative;
+    }
+    .mark-cell.correct-mark::after {
+      content: "✓";
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #2e7d5e;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .mark-cell.incorrect-mark::after {
+      content: "✗";
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #b33c3c;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .check-cell.correct-value {
+      background: #d0ecdf;
+      border: 3px solid #2e7d5e;
+      font-weight: 700;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 1rem 0 0.3rem;
+    }
+    .btn {
+      background: #d0dbe8;
+      border: none;
+      border-radius: 40px;
+      padding: 0.5rem 1.6rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #1f2c38;
+      border: 1px solid #b3c3d6;
+      cursor: pointer;
+      line-height: 1.2;
+    }
+    .btn-primary {
+      background: #8fa5bb;
+      color: white;
+      font-weight: 700;
+    }
+    .btn-primary:hover { background: #728da8; }
+    .feedback {
+      background: #eef2f6;
+      border-radius: 20px;
+      padding: 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: 1px solid #c2d1e2;
+      color: #1f2c38;
+      margin-top: 0.8rem;
+      line-height: 1.5;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-line;
+    }
+    hr {
+      border: 1px solid #cbd5e1;
+      margin: 0.6rem 0 0.1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="main-title">РАЗДЕЛ 1Б: НАЙДИТЕ ОШИБКИ</div>
+  <div class="sub">В заполненном уведомлении есть 5 неверных данных. Отметьте ошибки галками слева, затем нажмите "Проверить"</div>
+
+  <div class="condition">
+    <p><span class="badge">ООО «Альфа»</span> приобрело у Valeo двигатели внутреннего сгорания DV6TED4 — 200 шт. по 637 500 руб., общая сумма 127 500 000 руб.</p>
+    <p>Договор AFM № 625-27001 от 15.07.2024. Код ТН ВЭД: 8407349902, условия поставки: DAT, ОКЕИ: 796, код страны: 250, код стороны (покупатель): 026.</p>
+    <p>Дата сделки: 05.08.2025.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-box green"></span> верно отмеченная ошибка</div>
+    <div class="legend-item"><span class="legend-box red"></span> неверно отмечено / пропущено</div>
+    <div class="legend-item"><span class="legend-box darkgray"></span> отмечено галкой (до проверки)</div>
+    <div class="legend-item"><span class="legend-box gray"></span> заполненное поле</div>
+  </div>
+
+  <div class="section-title">📋 Раздел 1Б. Сведения о предмете сделки</div>
+  <table class="form-table" id="errorTable">
+    <tr>
+      <td class="label-cell">1.2 Тип предмета сделки</td>
+      <td class="mark-cell" id="mark-type"></td>
+      <td class="value-cell filled" id="field-type">1</td>
+      <td class="check-cell" id="check-type"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.1 Наименование предмета сделки</td>
+      <td class="mark-cell" id="mark-name"></td>
+      <td class="value-cell filled" id="field-name">двигатели внутреннего сгорания DV6TED4</td>
+      <td class="check-cell" id="check-name"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.2.1 Код по ТН ВЭД</td>
+      <td class="mark-cell" id="mark-tnved"></td>
+      <td class="value-cell filled" id="field-tnved">8407349901</td>
+      <td class="check-cell" id="check-tnved"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.4.1 Номер договора</td>
+      <td class="mark-cell" id="mark-contractNum"></td>
+      <td class="value-cell filled" id="field-contractNum">AFM № 625-27001</td>
+      <td class="check-cell" id="check-contractNum"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.4.2 Дата договора</td>
+      <td class="mark-cell" id="mark-contractDate"></td>
+      <td class="value-cell filled" id="field-contractDate">16.07.2024</td>
+      <td class="check-cell" id="check-contractDate"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.5 Код условия поставки</td>
+      <td class="mark-cell" id="mark-delivery"></td>
+      <td class="value-cell filled" id="field-delivery">DAT</td>
+      <td class="check-cell" id="check-delivery"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.6.1 Код страны по ОКСМ</td>
+      <td class="mark-cell" id="mark-country"></td>
+      <td class="value-cell filled" id="field-country">250</td>
+      <td class="check-cell" id="check-country"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.7 Код единицы измерения по ОКЕИ</td>
+      <td class="mark-cell" id="mark-okei"></td>
+      <td class="value-cell filled" id="field-okei">796</td>
+      <td class="check-cell" id="check-okei"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.8 Количество</td>
+      <td class="mark-cell" id="mark-qty"></td>
+      <td class="value-cell filled" id="field-qty">210</td>
+      <td class="check-cell" id="check-qty"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.13 Итого стоимость без НДС, руб.</td>
+      <td class="mark-cell" id="mark-amount"></td>
+      <td class="value-cell filled" id="field-amount">127 000 000</td>
+      <td class="check-cell" id="check-amount"></td>
+    </tr>
+    <tr>
+      <td class="label-cell">3.14 Дата совершения сделки</td>
+      <td class="mark-cell" id="mark-dealDate"></td>
+      <td class="value-cell filled" id="field-dealDate">06.08.2025</td>
+      <td class="check-cell" id="check-dealDate"></td>
+    </tr>
+  </table>
+
+  <div class="actions">
+    <button class="btn" id="resetBtn">⟲ сбросить</button>
+    <button class="btn btn-primary" id="checkBtn">✓ проверить</button>
+  </div>
+  <div class="feedback" id="feedback">
+    ⚡ Отметьте галками ячейки с неверными данными. После проверки увидите результат.
+  </div>
+  <hr>
+  <div style="text-align:center; color:#5f7485; font-size:0.65rem;">найдите 5 ошибок в заполнении</div>
+</div>
+
+<script>
+  (function() {
+    // Правильные значения для проверочной колонки
+    const correctValues = {
+      type: '1',
+      name: 'двигатели внутреннего сгорания DV6TED4',
+      tnved: '8407349902',
+      contractNum: 'AFM № 625-27001',
+      contractDate: '15.07.2024',
+      delivery: 'DAT',
+      country: '250',
+      okei: '796',
+      qty: '200',
+      amount: '127500000',
+      dealDate: '05.08.2025'
+    };
+
+    // Поля с ошибками (5 штук)
+    const errorFields = [
+      'field-tnved',      // 8407349901 вместо 8407349902
+      'field-contractDate', // 16.07.2024 вместо 15.07.2024
+      'field-qty',        // 210 вместо 200
+      'field-amount',     // 127 000 000 вместо 127500000
+      'field-dealDate'    // 06.08.2025 вместо 05.08.2025
+    ];
+
+    // Обработка кликов по ячейкам с галками
+    const markCells = document.querySelectorAll('.mark-cell');
+    markCells.forEach(cell => {
+      cell.addEventListener('click', function() {
+        if (this.classList.contains('correct-mark') || this.classList.contains('incorrect-mark')) {
+          return;
+        }
+        this.classList.toggle('marked');
+      });
+    });
+
+    const resetBtn = document.getElementById('resetBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const feedbackEl = document.getElementById('feedback');
+
+    function resetAll() {
+      markCells.forEach(cell => {
+        cell.classList.remove('marked', 'correct-mark', 'incorrect-mark');
+      });
+      
+      document.querySelectorAll('.check-cell').forEach(cell => {
+        cell.innerText = '';
+        cell.classList.remove('correct-value');
+      });
+      
+      document.querySelectorAll('.value-cell').forEach(cell => {
+        cell.classList.remove('correct-check', 'incorrect-check');
+      });
+      
+      // Восстанавливаем исходные значения с 5 ошибками
+      document.getElementById('field-type').innerText = '1';
+      document.getElementById('field-name').innerText = 'двигатели внутреннего сгорания DV6TED4';
+      document.getElementById('field-tnved').innerText = '8407349901';
+      document.getElementById('field-contractNum').innerText = 'AFM № 625-27001';
+      document.getElementById('field-contractDate').innerText = '16.07.2024';
+      document.getElementById('field-delivery').innerText = 'DAT';
+      document.getElementById('field-country').innerText = '250';
+      document.getElementById('field-okei').innerText = '796';
+      document.getElementById('field-qty').innerText = '210';
+      document.getElementById('field-amount').innerText = '127 000 000';
+      document.getElementById('field-dealDate').innerText = '06.08.2025';
+      
+      feedbackEl.innerHTML = '⚡ Отметьте галками ячейки с неверными данными. После проверки увидите результат.';
+    }
+
+    resetBtn.addEventListener('click', resetAll);
+
+    checkBtn.addEventListener('click', function() {
+      // Очищаем предыдущую подсветку
+      document.querySelectorAll('.value-cell').forEach(cell => {
+        cell.classList.remove('correct-check', 'incorrect-check');
+      });
+      document.querySelectorAll('.check-cell').forEach(cell => {
+        cell.innerText = '';
+        cell.classList.remove('correct-value');
+      });
+      markCells.forEach(cell => {
+        cell.classList.remove('correct-mark', 'incorrect-mark');
+      });
+
+      // Заполняем проверочные ячейки ВСЕМИ правильными значениями
+      for (const [key, value] of Object.entries(correctValues)) {
+        const checkCell = document.getElementById(`check-${key}`);
+        if (checkCell) {
+          checkCell.innerText = value;
+          checkCell.classList.add('correct-value');
+        }
+      }
+
+      let correctMarks = 0;
+      const results = [];
+
+      // Проверяем все поля
+      document.querySelectorAll('.value-cell').forEach(cell => {
+        const fieldId = cell.id;
+        const fieldName = fieldId.replace('field-', '');
+        const markId = 'mark-' + fieldName;
+        const markCell = document.getElementById(markId);
+        const correctValue = correctValues[fieldName];
+        const actualValue = cell.innerText.trim().replace(/\s+/g, '');
+        const expected = correctValue ? correctValue.replace(/\s+/g, '') : '';
+        const isError = (actualValue !== expected);
+        const isMarked = markCell && markCell.classList.contains('marked');
+        const fieldLabel = cell.previousElementSibling?.previousElementSibling?.innerText || fieldId;
+        
+        if (isError) {
+          if (isMarked) {
+            correctMarks++;
+            cell.classList.add('correct-check');
+            markCell.classList.add('correct-mark');
+            markCell.classList.remove('marked');
+            results.push(`✅ ${fieldLabel} – ошибка верно отмечена (должно быть "${correctValue}")`);
+          } else {
+            cell.classList.add('incorrect-check');
+            markCell.classList.add('incorrect-mark');
+            markCell.classList.remove('marked');
+            results.push(`⚠️ ${fieldLabel} – ошибка (должно быть "${correctValue}"), но вы не отметили`);
+          }
+        } else {
+          if (isMarked) {
+            cell.classList.add('correct-check');
+            markCell.classList.add('incorrect-mark');
+            markCell.classList.remove('marked');
+            results.push(`❌ ${fieldLabel} – отмечено ошибочно (значение "${actualValue}" верное)`);
+          } else {
+            cell.classList.add('correct-check');
+          }
+        }
+      });
+
+      const actualErrorCount = errorFields.length;
+
+      // Формируем полный отчет
+      let report = `🔎 Найдено верно: ${correctMarks} из ${actualErrorCount}`;
+      if (results.length > 0) {
+        report += `<br><br>` + results.join('<br>');
+      }
+      
+      if (correctMarks === actualErrorCount && results.filter(r => r.includes('✅')).length === actualErrorCount) {
+        feedbackEl.innerHTML = '🎉 Превосходно! Вы нашли все 5 ошибок.' + (results.length > 0 ? `<br><br>` + results.join('<br>') : '');
+      } else {
+        feedbackEl.innerHTML = report;
+      }
+    });
+
+    // Принудительно очищаем и инициализируем
+    resetAll();
+  })();
+</script>
+</body>
+</html>
