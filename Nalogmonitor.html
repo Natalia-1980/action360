@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Налоговый мониторинг: критерии</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #eef2f5;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+    .card {
+      max-width: 650px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 1.2rem;
+      box-shadow: 0 15px 25px -12px rgba(0,0,0,0.1);
+      border: 1px solid #d0d7de;
+      max-height: 600px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+    }
+    h1 {
+      font-weight: 600;
+      font-size: 1.4rem;
+      color: #1e2b39;
+      margin-bottom: 0.1rem;
+      line-height: 1.2;
+    }
+    .subheader {
+      font-weight: 400;
+      font-size: 0.9rem;
+      color: #3f4f60;
+      margin-bottom: 0.8rem;
+      border-left: 3px solid #8fa5bb;
+      padding-left: 0.6rem;
+    }
+    .criteria-block {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 1rem;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 1rem;
+    }
+    .criteria-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #2b4050;
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px dashed #9aa9b7;
+    }
+    .criteria-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .criteria-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .criteria-label {
+      font-weight: 600;
+      color: #1f2c38;
+      font-size: 0.9rem;
+      min-width: 100px;
+    }
+    .dropzone {
+      background: #ffffff;
+      border: 2px dashed #9aa9b7;
+      border-radius: 30px;
+      padding: 0.5rem 1rem;
+      min-width: 120px;
+      text-align: center;
+      font-weight: 500;
+      color: #5f7485;
+      transition: 0.1s;
+    }
+    .dropzone.filled {
+      border: 2px solid #6b7b8c;
+      background: #d1dbe5;
+      color: #1f2c38;
+      font-weight: 600;
+    }
+    .dropzone.correct-check {
+      border: 3px solid #2e7d5e;
+      background: #d0ecdf;
+      font-weight: 700;
+    }
+    .dropzone.incorrect-check {
+      border: 3px solid #b33c3c;
+      background: #f9dcdc;
+      font-weight: 700;
+    }
+    .unit {
+      font-size: 0.75rem;
+      color: #5f7485;
+      margin-left: 0.2rem;
+    }
+    .options-panel {
+      background: #edf2f7;
+      border-radius: 20px;
+      padding: 1rem;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 1rem;
+    }
+    .options-panel h3 {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #2b4050;
+      border-bottom: 1px dashed #9aa9b7;
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.8rem;
+    }
+    .draggable-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .drag-item {
+      background: #ffffff;
+      border-radius: 30px;
+      padding: 0.5rem 1.2rem;
+      border: 2px solid #8fa5bb;
+      color: #1f2c38;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: grab;
+      box-shadow: 0 3px 6px -3px #7f8c9a;
+      transition: 0.1s;
+      user-select: none;
+    }
+    .drag-item:active {
+      cursor: grabbing;
+      opacity: 0.7;
+    }
+    .drag-item.placed {
+      background: #d1dbe5;
+      border: 2px solid #6b7b8c;
+      cursor: default;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+    .btn {
+      background: #d0dbe8;
+      border: none;
+      border-radius: 30px;
+      padding: 0.5rem 2rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #1f2c38;
+      border: 1px solid #b3c3d6;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .btn-primary {
+      background: #8fa5bb;
+      color: white;
+    }
+    .btn-primary:hover { background: #728da8; }
+    .btn:hover { background: #c2d0e0; }
+    .feedback {
+      background: #eef2f6;
+      border-radius: 20px;
+      padding: 0.7rem 1rem;
+      font-size: 0.85rem;
+      color: #1f2c38;
+      border: 1px solid #c2d1e2;
+      margin: 0.5rem 0 0.2rem;
+      min-height: 3.5rem;
+      overflow-y: auto;
+    }
+    hr {
+      border: 1px solid #cbd5e1;
+      margin: 0.5rem 0 0.1rem;
+    }
+    .footer {
+      text-align: center;
+      color: #5f7485;
+      font-size: 0.65rem;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>Налоговый мониторинг</h1>
+  <div class="subheader">Критерии для перехода</div>
+
+  <div class="criteria-block">
+    <div class="criteria-title">Основные критерии</div>
+    <div class="criteria-grid">
+      <div class="criteria-row">
+        <span class="criteria-label">Налоги и взносы</span>
+        <div class="dropzone" id="drop-tax" data-expected="80 млн руб."></div>
+        <span class="unit">в год</span>
+      </div>
+      <div class="criteria-row">
+        <span class="criteria-label">Доходы</span>
+        <div class="dropzone" id="drop-income" data-expected="800 млн руб."></div>
+        <span class="unit">в год</span>
+      </div>
+      <div class="criteria-row">
+        <span class="criteria-label">Активы</span>
+        <div class="dropzone" id="drop-assets" data-expected="800 млн руб."></div>
+        <span class="unit">на 31 декабря</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="options-panel">
+    <h3>Перетащите нужные значения</h3>
+    <div class="draggable-items" id="draggableContainer">
+      <div class="drag-item" draggable="true" data-value="80 млн руб.">80 млн руб.</div>
+      <div class="drag-item" draggable="true" data-value="800 млн руб.">800 млн руб.</div>
+      <div class="drag-item" draggable="true" data-value="1 млрд руб.">1 млрд руб.</div>
+      <div class="drag-item" draggable="true" data-value="10 млрд руб.">10 млрд руб.</div>
+      <div class="drag-item" draggable="true" data-value="100 млн руб.">100 млн руб.</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="resetBtn">⟲ Сбросить</button>
+    <button class="btn btn-primary" id="checkBtn">✓ Проверить</button>
+  </div>
+
+  <div class="feedback" id="feedback">
+    Перетащите правильные значения в ячейки. Затем нажмите «Проверить».
+  </div>
+
+  <hr>
+  <div style="text-align:center; color:#5f7485; font-size:0.65rem;">ст. 105.26 НК</div>
+</div>
+
+<script>
+  (function() {
+    const draggables = document.querySelectorAll('.drag-item');
+    const dropZones = document.querySelectorAll('.dropzone');
+    const resetBtn = document.getElementById('resetBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const feedbackEl = document.getElementById('feedback');
+
+    // Хранилище количества использований для каждого значения
+    let usageCount = {};
+
+    function initUsage() {
+      usageCount = {};
+      draggables.forEach(item => {
+        const value = item.getAttribute('data-value');
+        usageCount[value] = 0; // сколько раз уже использовано
+      });
+    }
+    initUsage();
+
+    // Функция для обновления визуального состояния карточек
+    function updateItems() {
+      draggables.forEach(item => {
+        const value = item.getAttribute('data-value');
+        // Карточка всегда доступна, если не превышен лимит (в данном случае лимит бесконечный)
+        // Но мы не показываем лимиты, поэтому карточки всегда активны
+        item.classList.remove('placed');
+        item.setAttribute('draggable', 'true');
+      });
+    }
+
+    // drag start
+    draggables.forEach(item => {
+      item.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', item.getAttribute('data-value') || item.innerText);
+        item.classList.add('dragging');
+      });
+      item.addEventListener('dragend', e => {
+        item.classList.remove('dragging');
+      });
+    });
+
+    // drop zones
+    dropZones.forEach(zone => {
+      zone.addEventListener('dragover', e => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragenter', e => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', () => {
+        zone.classList.remove('drag-over');
+      });
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        const data = e.dataTransfer.getData('text/plain');
+        if (!data) return;
+
+        if (zone.classList.contains('filled')) {
+          feedbackEl.innerHTML = '⚠️ Эта ячейка уже заполнена. Сбросьте или очистите двойным кликом.';
+          return;
+        }
+
+        // Просто вставляем значение, без ограничений
+        zone.innerText = data;
+        zone.classList.add('filled');
+        zone.classList.remove('correct-check', 'incorrect-check');
+        
+        // Увеличиваем счетчик использования, но не показываем его
+        usageCount[data] = (usageCount[data] || 0) + 1;
+        
+        feedbackEl.innerHTML = '✅ Значение добавлено. Продолжайте или нажмите «Проверить».';
+      });
+    });
+
+    // двойной клик для очистки
+    dropZones.forEach(zone => {
+      zone.addEventListener('dblclick', function() {
+        const value = this.innerText.trim();
+        if (value) {
+          // Уменьшаем счетчик использования
+          if (usageCount[value] > 0) {
+            usageCount[value]--;
+          }
+          this.innerText = '';
+          this.classList.remove('filled', 'correct-check', 'incorrect-check');
+          updateItems();
+          feedbackEl.innerHTML = '⚡ Ячейка очищена. Можно перетащить снова.';
+        }
+      });
+    });
+
+    // сброс
+    resetBtn.addEventListener('click', () => {
+      dropZones.forEach(zone => {
+        zone.innerText = '';
+        zone.classList.remove('filled', 'correct-check', 'incorrect-check', 'drag-over');
+      });
+      initUsage();
+      updateItems();
+      feedbackEl.innerHTML = 'Перетащите правильные значения в ячейки. Затем нажмите «Проверить».';
+    });
+
+    // проверка
+    checkBtn.addEventListener('click', () => {
+      let correctCount = 0;
+      const results = [];
+
+      dropZones.forEach(zone => {
+        const expected = zone.dataset.expected;
+        const actual = zone.innerText.trim();
+        const label = zone.previousElementSibling?.innerText || 'поле';
+
+        zone.classList.remove('correct-check', 'incorrect-check');
+
+        if (actual === expected) {
+          correctCount++;
+          zone.classList.add('correct-check');
+          results.push(`✅ ${label}: ${actual}`);
+        } else {
+          zone.classList.add('incorrect-check');
+          results.push(`❌ ${label}: должно быть "${expected}"`);
+        }
+      });
+
+      if (correctCount === dropZones.length) {
+        feedbackEl.innerHTML = '🎉 Превосходно! Все критерии указаны верно.';
+      } else {
+        feedbackEl.innerHTML = results.join('<br>');
+      }
+    });
+
+    // начальное обновление
+    updateItems();
+  })();
+</script>
+</body>
+</html>
