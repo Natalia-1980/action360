@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Калькулятор штрафов по ст. 126 НК</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #eef2f5;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .card {
+      max-width: 750px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 30px -15px rgba(0,0,0,0.1);
+      border: 1px solid #d0d7de;
+      max-height: 800px;
+      height: 800px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: #1e2b39;
+      margin-bottom: 0.2rem;
+      line-height: 1.2;
+    }
+
+    .sub {
+      color: #3f4f60;
+      font-size: 0.9rem;
+      border-left: 4px solid #8fa5bb;
+      padding-left: 0.8rem;
+      background: #f2f6fb;
+      border-radius: 0 16px 16px 0;
+      padding: 0.4rem 1rem;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+
+    .tasks-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 0.3rem;
+    }
+
+    .task-card {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 1rem;
+      border: 1px solid #cbd5e1;
+    }
+
+    .task-desc {
+      font-size: 0.9rem;
+      color: #1f2c38;
+      margin-bottom: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .input-area {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .fine-input {
+      flex: 1;
+      min-width: 150px;
+      padding: 0.6rem 1rem;
+      border: 2px solid #8fa5bb;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .fine-input:focus {
+      outline: none;
+      border-color: #2b4050;
+    }
+
+    .fine-input.correct-input {
+      border: 3px solid #2e7d5e;
+      background: #d0ecdf;
+    }
+
+    .fine-input.incorrect-input {
+      border: 3px solid #b33c3c;
+      background: #f9dcdc;
+    }
+
+    .currency {
+      font-weight: 600;
+      color: #1f2c38;
+    }
+
+    .feedback {
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 16px;
+      min-height: 2.5rem;
+      background: #f2f6fb;
+      border: 1px solid #c2d1e2;
+    }
+
+    .feedback.correct {
+      background: #d0ecdf;
+      color: #2e7d5e;
+    }
+
+    .feedback.incorrect {
+      background: #f9dcdc;
+      color: #b33c3c;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .btn {
+      background: #d0dbe8;
+      border: none;
+      border-radius: 30px;
+      padding: 0.6rem 2rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1f2c38;
+      border: 1px solid #b3c3d6;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .btn-primary {
+      background: #8fa5bb;
+      color: white;
+    }
+
+    .btn-primary:hover { background: #728da8; }
+    .btn:hover { background: #c2d0e0; }
+
+    .summary {
+      background: #eef2f6;
+      border-radius: 20px;
+      padding: 0.7rem 1.2rem;
+      font-size: 0.9rem;
+      color: #1f2c38;
+      border: 1px solid #c2d1e2;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    hr {
+      border: 1px solid #cbd5e1;
+      margin: 0.8rem 0 0.2rem;
+    }
+
+    .footer {
+      text-align: center;
+      color: #5f7485;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>Калькулятор штрафов</h1>
+  <div class="sub">ст. 126 НК РФ: рассчитайте сумму штрафа</div>
+
+  <div class="tasks-grid" id="tasksContainer"></div>
+
+  <div class="actions">
+    <button class="btn" id="resetBtn">⟲ Сбросить всё</button>
+    <button class="btn btn-primary" id="checkBtn">✓ Проверить все</button>
+  </div>
+
+  <div class="summary" id="summary">
+    Введите ответы для всех задач
+  </div>
+
+  <hr>
+  <div class="footer">ст. 126 НК РФ · расчёт штрафов</div>
+</div>
+
+<script>
+  (function() {
+    const tasks = [
+      {
+        desc: 'Организация не представила по требованию налоговой 25 документов. Рассчитайте сумму штрафа.',
+        correct: '5000',
+        explanation: '200 руб. × 25 документов = 5 000 руб.'
+      },
+      {
+        desc: 'Налоговый агент сдал расчет 6-НДФЛ на 4 месяца позже срока. Какой штраф его ждет?',
+        correct: '4000',
+        explanation: '1 000 руб. × 4 месяца = 4 000 руб.'
+      },
+      {
+        desc: 'Контролирующее лицо не представило документы по КИК. Рассчитайте сумму штрафа.',
+        correct: '500000',
+        explanation: 'За непредставление сведений о КИК штраф 500 000 руб.'
+      },
+      {
+        desc: 'Организация впервые не представила пояснения к декларации по требованию налоговой. Какой штраф?',
+        correct: '5000',
+        explanation: 'За первое нарушение (несообщение сведений) — 5 000 руб.'
+      },
+      {
+        desc: 'Та же организация в течение года снова не представила пояснения. Рассчитайте штраф.',
+        correct: '20000',
+        explanation: 'За повторное нарушение в течение года — 20 000 руб.'
+      }
+    ];
+
+    const container = document.getElementById('tasksContainer');
+    const resetBtn = document.getElementById('resetBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const summaryEl = document.getElementById('summary');
+
+    let userAnswers = new Array(tasks.length).fill('');
+    let taskResults = new Array(tasks.length).fill(false);
+
+    function renderTasks() {
+      container.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const taskCard = document.createElement('div');
+        taskCard.className = 'task-card';
+        taskCard.dataset.index = index;
+
+        const desc = document.createElement('div');
+        desc.className = 'task-desc';
+        desc.textContent = task.desc;
+        taskCard.appendChild(desc);
+
+        const inputArea = document.createElement('div');
+        inputArea.className = 'input-area';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'fine-input';
+        input.placeholder = 'Введите сумму';
+        input.dataset.index = index;
+        
+        input.addEventListener('input', (e) => {
+          if (taskResults[index]) return;
+          userAnswers[index] = e.target.value.trim();
+        });
+
+        inputArea.appendChild(input);
+        
+        const currency = document.createElement('span');
+        currency.className = 'currency';
+        currency.textContent = 'руб.';
+        inputArea.appendChild(currency);
+
+        taskCard.appendChild(inputArea);
+
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.className = 'feedback';
+        feedbackDiv.id = `feedback-${index}`;
+        taskCard.appendChild(feedbackDiv);
+
+        container.appendChild(taskCard);
+      });
+    }
+
+    function resetAll() {
+      userAnswers = new Array(tasks.length).fill('');
+      taskResults = new Array(tasks.length).fill(false);
+      
+      document.querySelectorAll('.fine-input').forEach(input => {
+        input.value = '';
+        input.classList.remove('correct-input', 'incorrect-input');
+        input.disabled = false;
+      });
+      
+      document.querySelectorAll('.feedback').forEach(el => {
+        el.innerHTML = '';
+        el.classList.remove('correct', 'incorrect');
+      });
+      
+      summaryEl.innerHTML = 'Введите ответы для всех задач';
+    }
+
+    function checkAll() {
+      // Проверим, все ли задачи отвечены
+      const unanswered = userAnswers.some(ans => ans === '');
+      if (unanswered) {
+        const answeredCount = userAnswers.filter(ans => ans !== '').length;
+        summaryEl.innerHTML = `⚠️ Заполнено ${answeredCount} из ${tasks.length} задач`;
+        return;
+      }
+
+      let correctCount = 0;
+      
+      tasks.forEach((task, index) => {
+        const userAns = userAnswers[index].replace(/\s+/g, '');
+        const isCorrect = (userAns === task.correct);
+        const feedbackEl = document.getElementById(`feedback-${index}`);
+        const inputEl = document.querySelector(`.fine-input[data-index="${index}"]`);
+        
+        taskResults[index] = true;
+        
+        if (isCorrect) {
+          correctCount++;
+          feedbackEl.innerHTML = `✅ ${task.explanation}`;
+          feedbackEl.classList.add('correct');
+          feedbackEl.classList.remove('incorrect');
+          inputEl.classList.add('correct-input');
+          inputEl.classList.remove('incorrect-input');
+        } else {
+          feedbackEl.innerHTML = `❌ Неправильно. ${task.explanation}`;
+          feedbackEl.classList.add('incorrect');
+          feedbackEl.classList.remove('correct');
+          inputEl.classList.add('incorrect-input');
+          inputEl.classList.remove('correct-input');
+        }
+        
+        inputEl.disabled = true;
+      });
+
+      summaryEl.innerHTML = `🎯 Результат: правильно ${correctCount} из ${tasks.length}`;
+    }
+
+    resetBtn.addEventListener('click', resetAll);
+    checkBtn.addEventListener('click', checkAll);
+
+    renderTasks();
+  })();
+</script>
+</body>
+</html>
