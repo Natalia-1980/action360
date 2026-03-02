@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Налоговый квиз 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3b5c 0%, #2a4b72 100%);
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .quiz-card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            padding: 1.5rem 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            max-height: 750px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .quiz-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            min-height: 0;
+            margin-bottom: 0.5rem;
+            scroll-behavior: smooth;
+        }
+
+        .cover-title {
+            font-size: 3rem;
+            font-weight: 400;
+            color: #1e3b5c;
+            text-align: center;
+            margin: 3rem 0 2rem;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .round-title {
+            font-size: 2rem;
+            font-weight: 400;
+            color: #1e3b5c;
+            margin-bottom: 1rem;
+            border-left: 5px solid #4b7bb8;
+            padding-left: 1.2rem;
+        }
+        .round-sub {
+            font-size: 1rem;
+            color: #4f6f92;
+            margin-bottom: 1.8rem;
+            text-align: center;
+        }
+
+        .btn-center {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        .btn-start {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 60px;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #cbd6e6;
+            transition: 0.1s;
+            width: fit-content;
+        }
+        .btn-start:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #cbd6e6;
+        }
+
+        .question-header {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #1b3a5e;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .timer {
+            background: #f0f5fe;
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            border: 1px solid #b5cef0;
+        }
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin: 0.5rem 0 1rem 0;
+        }
+        .question-image {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 16px;
+            border: 1px solid #d0ddeb;
+            background: #fafcff;
+        }
+        .question-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            background: #f7faff;
+            border-radius: 20px;
+            padding: 1.2rem;
+            border: 1px solid #d9e5f5;
+            margin-bottom: 1rem;
+            white-space: pre-line;
+        }
+        .answers-area {
+            margin-bottom: 1.2rem;
+        }
+        .option {
+            background: white;
+            border: 2px solid #dde3ec;
+            border-radius: 20px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.6rem;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.95rem;
+        }
+        .option:hover {
+            border-color: #8fa8c9;
+            background: #f5faff;
+        }
+        .option.selected {
+            background: #e1eeff;
+            border-color: #1e6bb8;
+        }
+        .option.correct-highlight {
+            background: #c8f0d0;
+            border-color: #1f8b4c;
+        }
+        .free-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 30px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .free-input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .action-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.7rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #cbd6e6;
+            transition: 0.1s;
+            min-width: 140px;
+        }
+        .action-btn.center {
+            margin: 0 auto;
+            display: block;
+        }
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #cbd6e6;
+        }
+        .action-btn.small {
+            padding: 0.5rem 1.2rem;
+            font-size: 1rem;
+            min-width: 120px;
+        }
+        .action-btn.timeout-btn {
+            background: #f0f5fe;
+            border-color: #a0b8d6;
+            color: #1d3f64;
+        }
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #c2d6f0;
+            margin: 0.8rem 0;
+        }
+        .feedback .correct-ans {
+            font-weight: 600;
+            color: #146b3a;
+        }
+        .nav-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .show-answer-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .sticky-next {
+            border-top: 1px solid #e2eaf2;
+            padding-top: 0.8rem;
+            margin-top: 0.3rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .score-badge {
+            background: #e8f0fe;
+            border-radius: 40px;
+            padding: 0.3rem 1.2rem;
+            font-size: 1rem;
+            color: #1e3b5c;
+            border: 1px solid #b5c8e5;
+            margin-left: 0.5rem;
+        }
+        .final-score {
+            text-align: center;
+            font-size: 1.8rem;
+            color: #1e3b5c;
+            margin: 2rem 0 1rem;
+        }
+        .submit-hidden {
+            display: none !important;
+        }
+        @media (max-width: 500px) {
+            .quiz-card { padding: 1rem; }
+            .cover-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-card" id="quizContainer"></div>
+
+    <script>
+        (function(){
+            const rounds = [
+                {
+                    name: "Тур 1. Разминка",
+                    pointsPerQuestion: 50,
+                    questions: [
+                        { text: "От какого слова произошло слово бухгалтер?",
+                          options: [
+                              "1. Старинного русского слова «бучать» (шуметь, кричать)",
+                              "2. Итальянского «bocca» (рот) и «alter» (другой)",
+                              "3. Голландского «boek» (книга) и «galteren» (лить, отсчитывать монеты)",
+                              "4. Немецкого «Buchhalter» (Buch — книга, Halter — держатель)"
+                          ],
+                          correct: "4. Немецкого «Buchhalter» (Buch — книга, Halter — держатель)",
+                          comment: "Слово «бухгалтер» произошло от немецких Buch — «книга» и Halter — «держатель». Дословно получается «держатель книг».",
+                          type: "choice" },
+                        { text: "За что осудили Аль Капоне?",
+                          options: ["1. За убийство", "2. За незаконный оборот алкоголя", "3. За неуплату налогов", "4. За харизму"],
+                          correct: "3. За неуплату налогов",
+                          comment: "Официально Капоне был чист: у суда не было не единой возможности обвинить его в чем-то криминальном. В итоге в тюрьму он попал из-за неуплаты налогов.",
+                          type: "choice" },
+                        { text: "В 1992 году в России был впервые введен НДС. А по какой ставке его начали платить?",
+                          options: ["1. 20%", "2. 22%", "3. 24%", "4. 28%"],
+                          correct: "4. 28%",
+                          comment: "Ставка НДС изначально была установлена на уровне 28%. С 1 января 1993 года ее снизили до 20%.",
+                          type: "choice" },
+                        { text: "Какой профессиональный праздник иллюстрирует рисунок, который вы видите?\nДайте ответ словом из четырех слов",
+                          options: null,
+                          correct: "День работников налоговых органов",
+                          comment: "День работника налоговых органов РФ отмечается ежегодно 21 ноября. Праздник установлен указом президента от 11 ноября 2000 года.",
+                          type: "free",
+                          alt_correct: [
+                              "день работника налоговых органов",
+                              "день работника налоговой инспекции",
+                              "день работников налоговой инспекции"
+                          ],
+                          image: "https://static.1000.menu/img/content-v2/9f/82/44595/pryanyi-zimnii-pirog_1585290204_11_max.jpg" }
+                    ] },
+                {
+                    name: "Тур 2. Виды налогов",
+                    pointsPerQuestion: 50,
+                    questions: [
+                        { text: "Петр I известен как реформатор, но ещё больше известен введенными странными налогами: на бани, на бороду и другие. Какой ещё странный налог, касающийся внешности, ввел Петр I?",
+                          options: ["1. На лишний вес", "2. На цвет глаз", "3. На рост человека", "4. На размер ноги"],
+                          correct: "2. На цвет глаз",
+                          comment: "Налог недолго существовал в Башкирии во времена Петра. Был введён, чтобы предотвратить массовое переселение народа. Больше всех платили голубоглазые, меньше всех кареглазые, так как это цвет глаз кореного населения.",
+                          type: "choice" },
+                        { text: "Какой налог в XVIII веке ввела голландская администрация на острове Ява?",
+                          options: ["1. Налог на роскошь", "2. Налог на взятки", "3. Налог на песок", "4. Налог на дождь"],
+                          correct: "2. Налог на взятки",
+                          comment: "Чиновники часто брали взятки с местного населения. Искоренить это было трудно, поэтому все чиновники должны были фиксировать взятки и платить в казну процент. Чтобы занять такую «золотую» должность, нужно было дать взятку.",
+                          type: "choice" },
+                        { text: "В некоторых странах есть «налог на дождь». Кто его платит?",
+                          options: ["1. Владельцы бассейнов", "2. Собственники крыш и асфальтированных площадок", "3. Фермеры", "4. Пользователи водопровода"],
+                          correct: "2. Собственники крыш и асфальтированных площадок",
+                          comment: "Налог идёт на содержание ливневой канализации: встречается в Германии, Канаде и других странах.",
+                          type: "choice" },
+                        { text: "Сергей Довлатов рассказывает, как положил конверт на стол главного бухгалтера и вскоре освободился от налога. Какого?\nДайте ответ словом из двух слов, одно из которых предлог",
+                          options: null,
+                          correct: "На бездетность",
+                          comment: "Конверт — это ещё и одеяло для пеленания грудных детей. Довлатов принёс на работу новорождённую дочь, и вскоре бухгалтер освободил его от налога на бездетность. Налог был введен с ноября 1941 года, и его платили бездетные мужчины и женщины от 20 до 45 лет.",
+                          type: "free" }
+                    ] },
+                {
+                    name: "Тур 3. Литература и известные люди",
+                    pointsPerQuestion: 50,
+                    questions: [
+                        { text: "По сюжету произведения «Мертвые души» Чичиков скупал умерших крестьян, числящихся по документам живыми. Зачем он это делал?\nДайте ответ двумя словами",
+                          options: null,
+                          correct: "Получить ссуду",
+                          comment: "Опекунский совет выдавал помещикам ссуды под залог крепостных крестьян, чем и планировал воспользоваться Чичиков. В 11 главе поэмы он об этом говорит: «Да накупи я всех этих, которые вымерли, пока еще не подавали новых ревизских сказок, приобрети их, положим, тысячу, да, положим, опекунский совет даст по двести рублей на душу: вот уж двести тысяч капиталу!..»",
+                          type: "free",
+                          alt_correct: ["получить деньги","получить кредит"] },
+                        { text: "Этот будущий писатель-сатирик после октября 1917 года работал в должности помощника бухгалтера Петроградского порта и был уволен за растрату. Впоследствии бухгалтерам досталось в его рассказах. Кто это?",
+                          options: ["1. Михаил Зощенко", "2. Антон Чехов", "3. Михаил Булгаков", "4. Владимир Маяковский"],
+                          correct: "1. Михаил Зощенко",
+                          comment: "Зощенко был уволен с должности помощника бухгалтера. В некоторых источниках указывается, что причиной увольнения стала растрата, хотя другие упоминают просто «неспособность» к финансовой работе. Этот опыт обогатил его жизнь и стал источником сюжетов для его сатирических произведений.",
+                          type: "choice" },
+                        { text: "Алексей Кудрин говорил: «Я начинал свою карьеру после школы с автомеханика. Так что можно начинать с любой специальности и дорасти до НЕГО». Кого?\nДайте ответ двумя словами в родительном падеже",
+                          options: null,
+                          correct: "Министра финансов",
+                          comment: "Алексей Кудрин говорил о себе.",
+                          type: "free" },
+                        { text: "Жан Батист Кольбер, министр финансов Франции, борясь за рост государственных доходов, предостерегал: «Оно — это искусство ощипывать гуся так, чтобы получить максимум перьев с минимум писка». Что такое Оно?\nДайте ответ одним словом",
+                          options: null,
+                          correct: "Налогообложение",
+                          comment: "Налогообложение — это искусство ощипывать гуся так, чтобы получить максимальное количество перьев с минимумом писка, говорил Жан Батист Кольбер.",
+                          type: "free" }
+                    ] },
+                {
+                    name: "Тур 4. Сложный тур",
+                    pointsPerQuestion: 100,
+                    questions: [
+                        { text: "В Древней Греции на земельном участке ставили столб, на котором отмечали все долги собственника земли. Как называли этот столб словом греческого происхождения, которое в переводе означает подпорка, подставка?",
+                          options: null,
+                          correct: "Ипотека",
+                          comment: "Правитель Солон в 594 г. до н.э. предложил ставить на имении должника столб с надписью, что эта земля служит обеспечением претензий на определенную сумму. Такой столб и назвали ипотекой. С течением времени слово стало употребляться для обозначения залога.",
+                          type: "free" },
+                        { text: "Международный герб бухгалтеров, утвержденный в 1946 году, включает солнце, весы и кривую Бернулли на зеленом фоне. Солнце означает прозрачность учета, весы — баланс. А что означает кривая Бернулли?",
+                          options: null,
+                          correct: "Вечность учета",
+                          comment: "Кривая Бернулли (логарифмическая спираль) символизирует вечность и непрерывность бухгалтерского учета, который, возникнув, будет существовать всегда.",
+                          type: "free",
+                          alt_correct: ["непрерывность учета", "вечный учет"],
+                          image: "https://foni.papik.pro/uploads/posts/2024-10/foni-papik-pro-30ft-p-kartinki-gerb-bukhgalterov-na-prozrachnom-3.png" },
+                        { text: "Этот древний счетный инструмент, изобретенный несколько тысяч лет назад, до сих пор используется в некоторых странах. Напоминает счеты. Как он называется?\nДайте ответ словом из четырех букв",
+                          options: null,
+                          correct: "Абак",
+                          comment: "Абак — это старинное счетное устройство, представляющее собой доску или раму с желобами или проволоками, по которым перемещаются косточки.",
+                          type: "free",
+                          image: "https://upload.wikimedia.org/wikipedia/commons/b/b5/RomanAbacusRecon.jpg" },
+                        { text: "Внимание, черный ящик!\n\nВ черном ящике лежит то, кому по мнению японцев, приходится «исправлять задом ошибки головы». Ответ на эту японскую загадку есть на столе у многих людей, в том числе бухгалтеров.\n\nДайте ответ тремя словами, одно из которых предлог",
+                          options: null,
+                          correct: "Карандаш с ластиком",
+                          comment: "Карандаш с ластиком на конце исправляет то, что написали грифелем.",
+                          type: "free",
+                          alt_correct: ["карандаш со стиралкой","карандаш с резинкой"],
+                          image: "https://png.klev.club/uploads/posts/2024-04/png-klev-club-qwr0-p-chernii-yashchik-png-12.png" }
+                    ] }
+            ];
+
+            let currentRound = 0;
+            let currentQ = 0;
+            let timerInterval = null;
+            let timeLeft = 120;
+            let questionActive = true;
+            let roundStarted = false;
+            let answerRevealed = false;
+            let totalScore = 0;
+            let gameStarted = false;
+            let answerSubmitted = false;
+
+            const container = document.getElementById('quizContainer');
+
+            function render() {
+                if (!gameStarted) {
+                    renderCover();
+                } else if (!roundStarted) {
+                    renderRoundStart();
+                } else {
+                    renderQuestionScreen();
+                }
+            }
+
+            function renderCover() {
+                container.innerHTML = `
+                    <div class="quiz-scroll" style="display: flex; flex-direction: column; justify-content: center;">
+                        <div class="cover-title">НАЛОГОВЫЙ КВИЗ</div>
+                        <div class="btn-center">
+                            <button class="btn-start" id="startGameBtn">Начать</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('startGameBtn').addEventListener('click', () => {
+                    gameStarted = true;
+                    currentRound = 0;
+                    totalScore = 0;
+                    roundStarted = false;
+                    render();
+                });
+            }
+
+            function renderRoundStart() {
+                const r = rounds[currentRound];
+                const questionsCount = r.questions.length;
+                const word = questionsCount === 4 ? "4 вопроса" : questionsCount + " вопросов";
+                container.innerHTML = `
+                    <div class="quiz-scroll">
+                        <div class="round-title">${r.name}</div>
+                        <div class="round-sub">${word} · за каждый ${r.pointsPerQuestion} баллов</div>
+                        <div class="btn-center">
+                            <button class="btn-start" id="startRoundBtn">Начать тур</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('startRoundBtn').addEventListener('click', () => {
+                    roundStarted = true;
+                    currentQ = 0;
+                    render();
+                });
+            }
+
+            function renderQuestionScreen() {
+                const r = rounds[currentRound];
+                const q = r.questions[currentQ];
+                const isChoice = q.type === 'choice';
+                answerRevealed = false;
+                answerSubmitted = false;
+
+                let answersHtml = '';
+                if (isChoice) {
+                    q.options.forEach((opt, idx) => {
+                        answersHtml += `<div class="option" data-opt-index="${idx}">${opt}</div>`;
+                    });
+                } else {
+                    answersHtml = `<input class="free-input" id="freeAnswer" placeholder="Ваш ответ" autocomplete="off">`;
+                }
+
+                let imageHtml = '';
+                if (q.image) {
+                    imageHtml = `
+                        <div class="image-container">
+                            <img class="question-image" src="${q.image}" alt="illustration" onerror="this.style.display='none'">
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = `
+                    <div class="quiz-scroll" id="quizScroll">
+                        <div class="question-header">
+                            <span>Вопрос ${currentQ+1} из ${r.questions.length} <span class="score-badge">${r.pointsPerQuestion} баллов</span></span>
+                            <span class="timer" id="timerDisplay">2:00</span>
+                        </div>
+                        ${imageHtml}
+                        <div class="question-text">${q.text.replace(/\n/g, '<br>')}</div>
+                        <div class="answers-area" id="answersArea">
+                            ${answersHtml}
+                        </div>
+                        <div id="feedbackArea" class="feedback hidden"></div>
+                        
+                        <div class="nav-row" id="navRow">
+                            ${isChoice ? '<button class="action-btn center" id="submitChoice">Подтвердить</button>' : '<button class="action-btn center" id="submitFree">Подтвердить ответ</button>'}
+                        </div>
+                        
+                        <div id="showAnswerContainer" class="show-answer-container hidden">
+                            <button class="action-btn timeout-btn" id="showAnswerBtn">Показать ответ</button>
+                        </div>
+                    </div>
+                    <div class="sticky-next">
+                        <button class="action-btn small" id="nextQuestionBtn" disabled>Далее</button>
+                    </div>
+                `;
+
+                timeLeft = 120;
+                questionActive = true;
+                answerRevealed = false;
+                answerSubmitted = false;
+                updateTimerDisplay();
+                startTimer();
+
+                if (isChoice) {
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.addEventListener('click', (e) => {
+                            if (!questionActive || answerSubmitted) return;
+                            document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                            opt.classList.add('selected');
+                        });
+                    });
+
+                    document.getElementById('submitChoice').addEventListener('click', () => {
+                        if (!questionActive || answerSubmitted) {
+                            if (!questionActive) showTimeoutMessage();
+                            return;
+                        }
+                        const selected = document.querySelector('.option.selected');
+                        if (!selected) {
+                            alert('Выберите вариант');
+                            return;
+                        }
+                        const userAnswer = selected.textContent.trim();
+                        const correct = q.correct;
+                        document.querySelectorAll('.option').forEach(opt => {
+                            if (opt.textContent.trim() === correct) {
+                                opt.classList.add('correct-highlight');
+                            }
+                        });
+                        const isCorrect = (userAnswer === correct);
+                        if (isCorrect) totalScore += r.pointsPerQuestion;
+                        showFeedback(isCorrect, correct, q.comment, r.pointsPerQuestion);
+                        disableTimerAndInputs();
+                        answerSubmitted = true;
+                        document.getElementById('submitChoice').classList.add('hidden');
+                    });
+                } else {
+                    document.getElementById('submitFree').addEventListener('click', () => {
+                        if (!questionActive || answerSubmitted) {
+                            if (!questionActive) showTimeoutMessage();
+                            return;
+                        }
+                        const input = document.getElementById('freeAnswer');
+                        const userAnswer = input.value.trim().toLowerCase();
+                        const correct = q.correct.toLowerCase();
+                        let altOk = false;
+                        if (q.alt_correct) {
+                            altOk = q.alt_correct.some(alt => alt.toLowerCase() === userAnswer);
+                        }
+                        const isCorrect = (userAnswer === correct) || altOk;
+                        if (isCorrect) totalScore += r.pointsPerQuestion;
+                        showFeedback(isCorrect, q.correct, q.comment, r.pointsPerQuestion);
+                        disableTimerAndInputs();
+                        answerSubmitted = true;
+                        document.getElementById('submitFree').classList.add('hidden');
+                    });
+                }
+
+                document.getElementById('nextQuestionBtn').addEventListener('click', () => {
+                    const r = rounds[currentRound];
+                    if (currentQ + 1 < r.questions.length) {
+                        currentQ++;
+                        if (timerInterval) clearInterval(timerInterval);
+                        timerInterval = null;
+                        renderQuestionScreen();
+                    } else {
+                        if (timerInterval) clearInterval(timerInterval);
+                        timerInterval = null;
+                        if (currentRound + 1 < rounds.length) {
+                            currentRound++;
+                            roundStarted = false;
+                            render();
+                        } else {
+                            container.innerHTML = `
+                                <div class="quiz-scroll" style="text-align:center; padding:2rem;">
+                                    <div style="font-size:2rem;">🏆</div>
+                                    <div class="final-score">Вы получили ${totalScore} баллов</div>
+                                    <div style="margin:1rem 0;">Спасибо за участие!</div>
+                                    <div class="btn-center">
+                                        <button class="btn-start" id="restartBtn">Начать заново</button>
+                                    </div>
+                                </div>
+                            `;
+                            document.getElementById('restartBtn').addEventListener('click', () => {
+                                gameStarted = false;
+                                render();
+                            });
+                        }
+                    }
+                });
+
+                const showBtn = document.getElementById('showAnswerBtn');
+                if (showBtn) {
+                    showBtn.addEventListener('click', () => {
+                        if (!answerRevealed) {
+                            showCorrectAnswerOnly(q.correct, q.comment);
+                            disableTimerAndInputs();
+                            answerRevealed = true;
+                            showBtn.parentElement.classList.add('hidden');
+                        }
+                    });
+                }
+            }
+
+            function showFeedback(isCorrect, correctAns, comment, points) {
+                const fbDiv = document.getElementById('feedbackArea');
+                fbDiv.classList.remove('hidden');
+                fbDiv.innerHTML = `
+                    <div style="font-weight:600; margin-bottom:6px;">${isCorrect ? '✅ Верно' : '❌ Неверно'}</div>
+                    <div><span class="correct-ans">Правильный ответ: ${correctAns}</span></div>
+                    <div style="margin-top:8px;">${comment}</div>
+                    ${isCorrect ? `<div style="margin-top:6px;">+${points} баллов</div>` : ''}
+                `;
+                document.getElementById('nextQuestionBtn').disabled = false;
+                const showContainer = document.getElementById('showAnswerContainer');
+                if (showContainer) showContainer.classList.add('hidden');
+            }
+
+            function showCorrectAnswerOnly(correctAns, comment) {
+                const fbDiv = document.getElementById('feedbackArea');
+                fbDiv.classList.remove('hidden');
+                fbDiv.innerHTML = `
+                    <div><span class="correct-ans">Правильный ответ: ${correctAns}</span></div>
+                    <div style="margin-top:8px;">${comment}</div>
+                `;
+                document.getElementById('nextQuestionBtn').disabled = false;
+                const showContainer = document.getElementById('showAnswerContainer');
+                if (showContainer) showContainer.classList.add('hidden');
+            }
+
+            function showTimeoutMessage() {
+                const fbDiv = document.getElementById('feedbackArea');
+                fbDiv.classList.remove('hidden');
+                fbDiv.innerHTML = `<div style="color:#b13e3e;">⏱ Время истекло</div>`;
+            }
+
+            function disableTimerAndInputs() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                questionActive = false;
+                document.querySelectorAll('.option').forEach(o => {
+                    o.style.pointerEvents = 'none';
+                });
+                const freeInp = document.getElementById('freeAnswer');
+                if (freeInp) freeInp.disabled = true;
+            }
+
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    if (!questionActive) return;
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft <= 0) {
+                        timeLeft = 0;
+                        updateTimerDisplay();
+                        questionActive = false;
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        const fbDiv = document.getElementById('feedbackArea');
+                        fbDiv.classList.remove('hidden');
+                        fbDiv.innerHTML = `<div style="color:#b13e3e;">⏱ Время истекло</div>`;
+                        const showContainer = document.getElementById('showAnswerContainer');
+                        if (showContainer) {
+                            showContainer.classList.remove('hidden');
+                        }
+                        document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
+                        const freeInp = document.getElementById('freeAnswer');
+                        if (freeInp) freeInp.disabled = true;
+                    }
+                }, 1000);
+            }
+
+            function updateTimerDisplay() {
+                const t = document.getElementById('timerDisplay');
+                if (t) {
+                    const mins = Math.floor(timeLeft / 60);
+                    const secs = timeLeft % 60;
+                    t.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                }
+            }
+
+            render();
+        })();
+    </script>
+</body>
+</html>
