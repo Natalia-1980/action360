@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Как налоговому агенту избежать ответственности</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #eef2f5;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .card {
+      max-width: 650px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 1.2rem;
+      box-shadow: 0 15px 25px -12px rgba(0,0,0,0.1);
+      border: 1px solid #d0d7de;
+      max-height: 850px;
+      height: 850px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 1.4rem;
+      color: #1e2b39;
+      margin-bottom: 0.1rem;
+      line-height: 1.2;
+    }
+
+    .sub {
+      color: #3f4f60;
+      font-size: 0.85rem;
+      border-left: 4px solid #8fa5bb;
+      padding-left: 0.6rem;
+      background: #f2f6fb;
+      border-radius: 0 16px 16px 0;
+      padding: 0.2rem 0.8rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .game-area {
+      display: flex;
+      gap: 1rem;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .left-panel, .right-panel {
+      flex: 1;
+      background: #f8fafc;
+      border-radius: 22px;
+      padding: 0.9rem;
+      border: 1px solid #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .left-panel h3, .right-panel h3 {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #2b4050;
+      border-bottom: 1px dashed #9aa9b7;
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    .conditions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .condition-item {
+      background: #ffffff;
+      border: 2px solid #8fa5bb;
+      border-radius: 28px;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.85rem;
+      line-height: 1.3;
+      color: #1f2c38;
+      cursor: pointer;
+      transition: 0.1s;
+      text-align: left;
+      word-break: break-word;
+      min-height: 3.5rem;
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      width: 100%;
+    }
+
+    .condition-item.selected {
+      background: #8fa5bb;
+      color: white;
+      border-color: #2b4050;
+    }
+
+    .condition-item:hover:not(.selected):not(.correct):not(.incorrect) {
+      background: #e0e8f2;
+    }
+
+    .condition-item.correct {
+      background: #d0ecdf;
+      border: 3px solid #2e7d5e;
+      font-weight: 600;
+    }
+
+    .condition-item.incorrect {
+      background: #f9dcdc;
+      border: 3px solid #b33c3c;
+      font-weight: 600;
+    }
+
+    .slots-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .slot-item {
+      background: #ffffff;
+      border: 2px dashed #9aa9b7;
+      border-radius: 28px;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.85rem;
+      line-height: 1.3;
+      color: #5f7485;
+      min-height: 3.5rem;
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      width: 100%;
+    }
+
+    .slot-item.filled {
+      border: 2px solid #6b7b8c;
+      background: #d1dbe5;
+      color: #1f2c38;
+      font-weight: 600;
+    }
+
+    .slot-item.correct-slot {
+      border: 3px solid #2e7d5e;
+      background: #d0ecdf;
+      font-weight: 700;
+    }
+
+    .slot-item.incorrect-slot {
+      border: 3px solid #b33c3c;
+      background: #f9dcdc;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin: 1rem 0 0.6rem;
+    }
+
+    .btn {
+      background: #d0dbe8;
+      border: none;
+      border-radius: 35px;
+      padding: 0.5rem 2rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1f2c38;
+      border: 1px solid #b3c3d6;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .btn-primary {
+      background: #8fa5bb;
+      color: white;
+    }
+
+    .btn-primary:hover { background: #728da8; }
+    .btn:hover { background: #c2d0e0; }
+
+    .summary {
+      background: #eef2f6;
+      border-radius: 20px;
+      padding: 0.7rem 1rem;
+      font-size: 0.9rem;
+      color: #1f2c38;
+      border: 1px solid #c2d1e2;
+      text-align: center;
+      margin-top: 0.3rem;
+    }
+
+    hr {
+      border: 1px solid #cbd5e1;
+      margin: 0.6rem 0 0.1rem;
+    }
+
+    .footer {
+      text-align: center;
+      color: #5f7485;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>Как налоговому агенту избежать ответственности</h1>
+  <div class="sub">Кликните на условие слева, чтобы перенести в правую колонку</div>
+
+  <div class="game-area">
+    <div class="left-panel">
+      <h3>📋 Все условия</h3>
+      <div class="conditions-container" id="conditionsContainer"></div>
+    </div>
+
+    <div class="right-panel">
+      <h3>✅ Условия освобождения</h3>
+      <div class="slots-container" id="slotsContainer">
+        <div class="slot-item" id="slot1" data-slot="1"></div>
+        <div class="slot-item" id="slot2" data-slot="2"></div>
+        <div class="slot-item" id="slot3" data-slot="3"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="resetBtn">⟲ Сбросить</button>
+    <button class="btn btn-primary" id="checkBtn">✓ Проверить</button>
+  </div>
+
+  <div class="summary" id="summary">
+    Выберите 3 правильных условия
+  </div>
+
+  <hr>
+  <div class="footer">п. 2 ст. 123 НК РФ · условия освобождения от штрафа</div>
+</div>
+
+<script>
+  (function() {
+    // Правильные условия (текст)
+    const correctConditions = [
+      'Налоговый расчет подан в инспекцию без опозданий',
+      'В расчете полностью отражены все сведения и не занижен налог',
+      'Налог перечислен до того, как ИФНС обнаружила недоплату или назначила проверку'
+    ];
+
+    // Все условия с вариантами (правильные + неправильные)
+    const allConditions = [
+      'Налоговый расчет подан в инспекцию без опозданий',
+      'В расчете полностью отражены все сведения и не занижен налог',
+      'Налог перечислен до того, как ИФНС обнаружила недоплату или назначила проверку',
+      'Налог перечислен точно в установленный срок',
+      'Отсутствие других нарушений в течение года',
+      'Компания относится к малому бизнесу',
+      'Добровольное заявление о нарушении до проверки'
+    ];
+
+    // Перемешаем условия для случайного порядка
+    const shuffledConditions = [...allConditions].sort(() => Math.random() - 0.5);
+
+    const conditionsContainer = document.getElementById('conditionsContainer');
+    const slotsContainer = document.getElementById('slotsContainer');
+    const resetBtn = document.getElementById('resetBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const summaryEl = document.getElementById('summary');
+
+    let selectedConditions = [];
+
+    function renderConditions() {
+      conditionsContainer.innerHTML = '';
+      shuffledConditions.forEach((condition) => {
+        const item = document.createElement('div');
+        item.className = 'condition-item';
+        item.textContent = condition;
+        item.dataset.condition = condition;
+        
+        item.addEventListener('click', () => {
+          // Если уже проверено, нельзя менять
+          if (checkBtn.disabled) return;
+          
+          // Проверяем, есть ли уже это условие в правой колонке
+          const isInSlots = selectedConditions.includes(condition);
+          
+          if (isInSlots) {
+            // Убираем из правой колонки
+            selectedConditions = selectedConditions.filter(c => c !== condition);
+            item.classList.remove('selected');
+            
+            // Обновляем слоты
+            updateSlots();
+          } else {
+            // Добавляем в правую колонку, если есть место
+            if (selectedConditions.length < 3) {
+              selectedConditions.push(condition);
+              item.classList.add('selected');
+              updateSlots();
+            } else {
+              summaryEl.innerHTML = '⚠️ Можно выбрать только 3 условия';
+            }
+          }
+          
+          updateSummary();
+        });
+        
+        conditionsContainer.appendChild(item);
+      });
+    }
+
+    function updateSlots() {
+      const slots = document.querySelectorAll('.slot-item');
+      
+      // Очищаем все слоты
+      slots.forEach(slot => {
+        slot.textContent = '';
+        slot.classList.remove('filled', 'correct-slot', 'incorrect-slot');
+      });
+      
+      // Заполняем слоты выбранными условиями
+      selectedConditions.forEach((condition, index) => {
+        if (index < 3) {
+          slots[index].textContent = condition;
+          slots[index].classList.add('filled');
+        }
+      });
+    }
+
+    function updateSummary() {
+      summaryEl.innerHTML = `Выбрано ${selectedConditions.length} из 3 условий`;
+    }
+
+    function resetAll() {
+      selectedConditions = [];
+      
+      document.querySelectorAll('.condition-item').forEach(item => {
+        item.classList.remove('selected', 'correct', 'incorrect');
+      });
+      
+      document.querySelectorAll('.slot-item').forEach(slot => {
+        slot.textContent = '';
+        slot.classList.remove('filled', 'correct-slot', 'incorrect-slot');
+      });
+      
+      summaryEl.innerHTML = 'Выберите 3 правильных условия';
+      checkBtn.disabled = false;
+    }
+
+    function checkAnswers() {
+      if (selectedConditions.length !== 3) {
+        summaryEl.innerHTML = '⚠️ Выберите ровно 3 условия';
+        return;
+      }
+
+      // Подсвечиваем условия в левой колонке
+      document.querySelectorAll('.condition-item').forEach(item => {
+        const condition = item.dataset.condition;
+        const isSelected = selectedConditions.includes(condition);
+        const isCorrect = correctConditions.includes(condition);
+        
+        item.classList.remove('selected', 'correct', 'incorrect');
+        
+        if (isSelected) {
+          if (isCorrect) {
+            item.classList.add('correct');
+          } else {
+            item.classList.add('incorrect');
+          }
+        } else {
+          if (isCorrect) {
+            item.classList.add('incorrect');
+          }
+        }
+      });
+
+      // Подсвечиваем слоты
+      const slots = document.querySelectorAll('.slot-item');
+      slots.forEach((slot, index) => {
+        const condition = slot.textContent;
+        if (condition) {
+          if (correctConditions.includes(condition)) {
+            slot.classList.add('correct-slot');
+          } else {
+            slot.classList.add('incorrect-slot');
+          }
+        }
+      });
+
+      // Считаем правильные ответы
+      const correctCount = selectedConditions.filter(c => correctConditions.includes(c)).length;
+      
+      if (correctCount === 3) {
+        summaryEl.innerHTML = '🎯 Превосходно! Все 3 условия верны.';
+      } else {
+        summaryEl.innerHTML = `❌ Правильно ${correctCount} из 3. Попробуйте снова.`;
+      }
+
+      checkBtn.disabled = true;
+    }
+
+    resetBtn.addEventListener('click', resetAll);
+    checkBtn.addEventListener('click', checkAnswers);
+
+    renderConditions();
+  })();
+</script>
+</body>
+</html>
