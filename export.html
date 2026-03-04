@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Экспортный НДС · тренажёр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1e3b5c 0%, #15344d 100%);
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .trainer-card {
+            max-width: 650px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -10px rgba(0,0,0,0.5);
+            padding: 1.2rem 1.2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            max-height: 700px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .task-switcher {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            border-bottom: 2px solid #e6ecf5;
+            padding-bottom: 0.3rem;
+            flex-wrap: wrap;
+        }
+        .task-btn {
+            flex: 1 1 auto;
+            background: transparent;
+            border: none;
+            padding: 0.5rem 0.2rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #4f658d;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: 0.1s;
+            min-width: 100px;
+        }
+        .task-btn.active {
+            background: #e1ecfe;
+            color: #1e3b5c;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,40,80,0.1);
+        }
+
+        .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-bottom: 0.3rem;
+            scroll-behavior: smooth;
+        }
+
+        .task-container {
+            display: none;
+        }
+        .task-container.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: #1e3b5c;
+            margin: 0 0 0.5rem 0;
+            border-left: 5px solid #2a7faa;
+            padding-left: 0.8rem;
+        }
+
+        .subtitle {
+            font-weight: 500;
+            color: #1e4b6e;
+            margin: 0.7rem 0 0.4rem 0;
+            font-size: 0.95rem;
+            background: #f0f7ff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+        }
+
+        .condition-block {
+            background: #f5faff;
+            border-radius: 18px;
+            padding: 0.8rem;
+            border: 1px solid #d4e2f5;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .question-item {
+            background: #fafdff;
+            border-radius: 18px;
+            padding: 0.8rem;
+            border: 1px solid #dde5f0;
+            margin: 0.8rem 0;
+        }
+
+        .question-text {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #0d3752;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 0.5rem 0;
+        }
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+        .input-wrapper input {
+            flex: 1;
+            padding: 0.4rem 0.8rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            min-width: 140px;
+        }
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-wrapper span {
+            color: #2b5170;
+            font-size: 0.85rem;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: center;
+            margin: 0.8rem 0 0.3rem;
+        }
+        .check-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.4rem 1.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c6dd;
+            transition: 0.1s;
+        }
+        .check-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c6dd;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 16px;
+            padding: 0.8rem;
+            border: 2px solid #b9d3f0;
+            margin: 0.6rem 0;
+            font-size: 0.85rem;
+        }
+        .feedback .verdict {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        .correct { color: #1b7e3f; }
+        .incorrect { color: #b13e3e; }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            border-top: 1px solid #dae2ed;
+            padding-top: 0.5rem;
+        }
+        .nav-btn {
+            background: white;
+            border: 2px solid #2a5f8a;
+            border-radius: 40px;
+            padding: 0.4rem 1.5rem;
+            font-size: 0.9rem;
+            color: #2a5f8a;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b3c9e0;
+            transition: 0.1s;
+        }
+        .nav-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b3c9e0;
+        }
+        .nav-btn:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        .check-btn.hidden {
+            display: none;
+        }
+        @media (max-width: 500px) {
+            .trainer-card { padding: 0.8rem; }
+            .input-group { flex-direction: column; align-items: flex-start; }
+            .input-wrapper { width: 100%; }
+            .task-btn { font-size: 0.85rem; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+</head>
+<body>
+    <div class="trainer-card" id="trainerContainer"></div>
+
+    <script>
+        (function() {
+            const tasks = [
+                {
+                    name: "Задание 1",
+                    questions: [
+                        { type: "text", text: "ООО «Экспортёр» (на ОСН) отгрузило на экспорт в Китай партию оборудования 15.01.2026: 50 000 евро, курс 100 руб/€. Компания собрала полный пакет документов и представила реестр в налоговую 10.03.2026.", isHeader: true },
+                        { id: "a_date", q: "Определите дату, на которую формируется налоговая база (ДД.ММ.ГГГГ):", answer: "31.03.2026", comment: "Последний день квартала, в котором собран пакет документов — 31.03.2026", isDate: true },
+                        { id: "a_base", q: "Рассчитайте налоговую базу в рублях:", answer: "5000000", comment: "50 000 € × 100 = 5 000 000 ₽", suffix: "₽" },
+                        { id: "a_nds", q: "Какова сумма НДС к уплате по данной операции?", answer: "0", comment: "Ставка 0%, НДС = 0 ₽", suffix: "₽" }
+                    ]
+                },
+                {
+                    name: "Задание 2",
+                    questions: [
+                        { type: "text", text: "ООО «Экспортёр» (на ОСН) отгрузило на экспорт в Китай партию оборудования 15.01.2026: 50 000 евро, курс 100 руб/€. Компания не смогла собрать документы в течение 180 дней. Срок истёк 15.07.2026. Ставка НДС для данного товара при реализации внутри РФ — 22%.", isHeader: true },
+                        { id: "b_date", q: "Определите дату, на которую возникает обязанность начислить НДС (ДД.ММ.ГГГГ):", answer: "30.06.2026", comment: "180 дней истекают 15.07 → попадает во II квартал → дата = 30.06.2026", isDate: true },
+                        { id: "b_base", q: "Рассчитайте налоговую базу в рублях:", answer: "5000000", comment: "База та же: 5 000 000 ₽", suffix: "₽" },
+                        { id: "b_nds", q: "Сумма НДС (ставка 22%):", answer: "1100000", comment: "5 000 000 × 22% = 1 100 000 ₽", suffix: "₽" }
+                    ]
+                }
+            ];
+
+            let currentTask = 0;
+
+            const container = document.getElementById('trainerContainer');
+
+            function render() {
+                container.innerHTML = `
+                    <div class="task-switcher">
+                        <button class="task-btn ${currentTask === 0 ? 'active' : ''}" id="task0Btn">Задание 1</button>
+                        <button class="task-btn ${currentTask === 1 ? 'active' : ''}" id="task1Btn">Задание 2</button>
+                    </div>
+                    <div class="scroll-area">
+                        <div class="task-container ${currentTask === 0 ? 'active' : ''}" id="task0Container"></div>
+                        <div class="task-container ${currentTask === 1 ? 'active' : ''}" id="task1Container"></div>
+                    </div>
+                    <div class="nav-buttons">
+                        <button class="nav-btn" id="prevBtn" ${currentTask === 0 ? 'disabled' : ''}>← Назад</button>
+                        <button class="nav-btn" id="nextBtn" ${currentTask === tasks.length-1 ? 'disabled' : ''}>Вперёд →</button>
+                    </div>
+                `;
+
+                renderTaskContent(0, 'task0Container');
+                renderTaskContent(1, 'task1Container');
+
+                document.getElementById('task0Btn').addEventListener('click', () => {
+                    currentTask = 0;
+                    render();
+                });
+                document.getElementById('task1Btn').addEventListener('click', () => {
+                    currentTask = 1;
+                    render();
+                });
+                document.getElementById('prevBtn').addEventListener('click', () => {
+                    if (currentTask > 0) {
+                        currentTask--;
+                        render();
+                    }
+                });
+                document.getElementById('nextBtn').addEventListener('click', () => {
+                    if (currentTask < tasks.length - 1) {
+                        currentTask++;
+                        render();
+                    }
+                });
+            }
+
+            function renderTaskContent(taskIndex, containerId) {
+                const task = tasks[taskIndex];
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                let html = `<h2>${task.name}</h2>`;
+
+                task.questions.forEach((q) => {
+                    if (q.isHeader) {
+                        html += `<div class="subtitle">${q.text}</div>`;
+                    } else {
+                        const valueId = `input_${taskIndex}_${q.id}`;
+                        const feedbackId = `fb_${taskIndex}_${q.id}`;
+                        const suffixHtml = q.suffix ? `<span>${q.suffix}</span>` : '';
+                        const dateAttr = q.isDate ? 'data-datepicker="true"' : '';
+
+                        html += `
+                            <div class="question-item">
+                                <div class="question-text">${q.q}</div>
+                                <div class="input-group">
+                                    <div class="input-wrapper">
+                                        <input type="text" id="${valueId}" ${dateAttr} autocomplete="off">
+                                        ${suffixHtml}
+                                    </div>
+                                </div>
+                                <div id="${feedbackId}" class="feedback hidden"></div>
+                            </div>
+                        `;
+                    }
+                });
+
+                html += `<div class="action-row"><button class="check-btn" id="checkAll_${taskIndex}">Проверить все ответы</button></div>`;
+
+                container.innerHTML = html;
+
+                if (container.querySelectorAll('[data-datepicker="true"]').length > 0) {
+                    flatpickr.l10ns.default.firstDayOfWeek = 1;
+                    flatpickr(container.querySelectorAll('[data-datepicker="true"]'), {
+                        locale: "ru",
+                        dateFormat: "d.m.Y",
+                        allowInput: true
+                    });
+                }
+
+                document.getElementById(`checkAll_${taskIndex}`).addEventListener('click', (e) => {
+                    checkAllAnswers(taskIndex);
+                    e.target.classList.add('hidden');
+                });
+            }
+
+            function normalizeAnswer(str) {
+                if (!str) return '';
+                return str.toString().trim().toLowerCase().replace(/\s+/g, ' ').replace(/[.,/#!$%^&*;:{}=?`~()]/g, '').replace(/\s+/g, ' ').trim();
+            }
+
+            function compareAnswers(user, correct) {
+                const normUser = normalizeAnswer(user);
+                const normCorrect = normalizeAnswer(correct);
+                if (!isNaN(parseFloat(user)) && isFinite(user)) {
+                    return Math.abs(parseFloat(user) - parseFloat(correct)) < 0.01;
+                }
+                return normUser === normCorrect || normUser.includes(normCorrect) || normCorrect.includes(normUser);
+            }
+
+            function checkAllAnswers(taskIndex) {
+                const task = tasks[taskIndex];
+
+                task.questions.forEach((q) => {
+                    if (q.isHeader || !q.id) return;
+                    const input = document.getElementById(`input_${taskIndex}_${q.id}`);
+                    const fbDiv = document.getElementById(`fb_${taskIndex}_${q.id}`);
+                    if (!input || !fbDiv) return;
+
+                    const userVal = input.value.trim();
+                    const isCorrect = compareAnswers(userVal, q.answer);
+
+                    fbDiv.classList.remove('hidden');
+                    fbDiv.innerHTML = `
+                        <div class="verdict ${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? '✅ Верно' : '❌ Неверно'}</div>
+                        <div><strong>Правильный ответ:</strong> ${q.answer}</div>
+                        <div><strong>Пояснение:</strong> ${q.comment}</div>
+                    `;
+                });
+            }
+
+            render();
+        })();
+    </script>
+</body>
+</html>
