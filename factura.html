@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Счет-фактура · компактная таблица</title>
+    <title>Счет-фактура · точная форма</title>
     <style>
         * {
             margin: 0;
@@ -12,37 +12,26 @@
         }
 
         body {
-            background: #2d3e5a;
+            background: #f2f5f9; /* светлый фон */
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 16px;
-            transition: padding 0.2s;
         }
 
-        body.fullscreen-mode {
-            padding: 0;
-        }
-
+        /* Карточка в обычном режиме */
         .card {
-            max-width: 1400px;
+            max-width: 1300px;
             width: 100%;
             background: white;
             border-radius: 24px;
-            box-shadow: 0 20px 40px -8px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.2);
             transition: all 0.2s;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
             position: relative;
-        }
-
-        .fullscreen-mode .card {
-            max-width: 100%;
-            max-height: 100vh;
-            border-radius: 0;
-            height: 100vh;
         }
 
         .invoice {
@@ -52,6 +41,7 @@
             line-height: 1.4;
         }
 
+        /* Кнопка открытия полноэкранного режима */
         .fullscreen-btn {
             position: sticky;
             top: 10px;
@@ -71,6 +61,56 @@
         }
 
         .fullscreen-btn:hover {
+            background: #2a4f78;
+        }
+
+        /* Модальное окно на весь экран */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 95%;
+            height: 95%;
+            max-width: 1400px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            overflow-y: auto;
+            position: relative;
+            padding: 1rem;
+        }
+
+        .modal-close {
+            position: sticky;
+            top: 10px;
+            float: right;
+            background: #1e3b5c;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 101;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-close:hover {
             background: #2a4f78;
         }
 
@@ -102,7 +142,6 @@
             margin-left: 0.2rem;
         }
 
-        /* Длинные строки с переносом */
         .multiline-label {
             white-space: normal;
             line-height: 1.3;
@@ -154,7 +193,7 @@
             border-color: #1e3b5c transparent transparent transparent;
         }
 
-        /* Таблица с компактными колонками */
+        /* Таблица */
         .table-wrapper {
             overflow-x: auto;
             margin: 1rem 0;
@@ -163,11 +202,11 @@
         }
 
         .invoice-table {
-            min-width: 1300px; /* уменьшили минимальную ширину */
+            min-width: 1300px;
             border-collapse: collapse;
-            font-size: 0.65rem; /* чуть меньше шрифт */
+            font-size: 0.65rem;
             background: white;
-            table-layout: fixed; /* фиксированная ширина колонок */
+            table-layout: fixed;
         }
 
         .invoice-table th, .invoice-table td {
@@ -182,11 +221,11 @@
             background: #e1eaf5;
             color: #0d2d4a;
             font-weight: 600;
-            white-space: normal; /* разрешаем перенос */
+            white-space: normal;
             line-height: 1.3;
         }
 
-        /* Ширина колонок (подобрано для компактности) */
+        /* Ширина колонок */
         .invoice-table th:nth-child(1) { width: 35px; }
         .invoice-table th:nth-child(2) { width: 140px; }
         .invoice-table th:nth-child(3) { width: 60px; }
@@ -223,18 +262,6 @@
             gap: 1rem;
         }
 
-        .signature-block {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .signature-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
         .excel-note {
             font-size: 0.7rem;
             color: #3b5f85;
@@ -248,8 +275,9 @@
     </style>
 </head>
 <body>
+    <!-- Обычный режим (карточка) -->
     <div class="card" id="card">
-        <button class="fullscreen-btn" id="fullscreenBtn">⛶ На весь экран</button>
+        <button class="fullscreen-btn" id="openFullscreenBtn">⛶ На весь экран</button>
         <div class="invoice" id="invoice">
             <!-- Заголовки -->
             <div class="header-block">
@@ -261,7 +289,7 @@
                 </div>
                 <div style="font-weight:600; font-size:1rem; margin:0.5rem 0;">I. Форма счета-фактуры, применяемого при расчетах по налогу на добавленную стоимость</div>
 
-                <!-- Шапка -->
+                <!-- Шапка (сокращено для примера, но в коде полная) -->
                 <div class="header-row">
                     <span class="header-label">СЧЕТ-ФАКТУРА №</span>
                     <span class="tooltip-item">__________<span class="tooltip">Дата и уникальный номер</span></span>
@@ -270,7 +298,10 @@
                     <span class="header-label">"</span>
                     <span class="header-number">(1)</span>
                 </div>
-
+                <!-- ... остальные строки как в предыдущей версии ... -->
+                <!-- Для краткости оставим сокращённую версию, но в финале нужно скопировать все строки из предыдущего ответа -->
+                <!-- Здесь вставлен полный код из предыдущего ответа -->
+                <!-- Полная версия шапки из предыдущего ответа -->
                 <div class="header-row">
                     <span class="header-label">ИСПРАВЛЕНИЕ №</span>
                     <span class="tooltip-item">__________<span class="tooltip">Номер исправления</span></span>
@@ -279,37 +310,31 @@
                     <span class="header-label">"</span>
                     <span class="header-number">(1а)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">Продавец</span>
                     <span class="tooltip-item">__________________________________________________<span class="tooltip">Полное наименование продавца</span></span>
                     <span class="header-number">(2)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">Адрес</span>
                     <span class="tooltip-item">__________________________________________________<span class="tooltip">Юридический адрес продавца</span></span>
                     <span class="header-number">(2а)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">ИНН/КПП продавца</span>
                     <span class="tooltip-item">__________________________________________<span class="tooltip">ИНН и КПП продавца</span></span>
                     <span class="header-number">(2б)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">Грузоотправитель и его адрес</span>
                     <span class="tooltip-item">__________________________________________________<span class="tooltip">Сведения о грузоотправителе</span></span>
                     <span class="header-number">(3)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">Грузополучатель и его адрес</span>
                     <span class="tooltip-item">__________________________________________________<span class="tooltip">Сведения о грузополучателе</span></span>
                     <span class="header-number">(4)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">К платежно-расчетному документу №</span>
                     <span class="tooltip-item">_________________<span class="tooltip">Номер платежного документа</span></span>
@@ -317,7 +342,6 @@
                     <span class="tooltip-item">__________<span class="tooltip">Дата платежного документа</span></span>
                     <span class="header-number">(5)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">Документ об отгрузке: наименование, №</span>
                     <span class="tooltip-item">________________________________________<span class="tooltip">Наименование, номер отгрузочного документа</span></span>
@@ -325,8 +349,6 @@
                     <span class="tooltip-item">__________<span class="tooltip">Дата отгрузочного документа</span></span>
                     <span class="header-number">(5а)</span>
                 </div>
-
-                <!-- Длинная строка 5б с переносом -->
                 <div class="header-row" style="flex-wrap: wrap;">
                     <span class="header-label multiline-label">К счету-фактуре (счетам-фактурам), выставленному (выставленным) при получении оплаты, частичной оплаты или иных платежей в счет предстоящих поставок товаров (выполнения работ, оказания услуг), передачи имущественных прав №</span>
                     <span class="tooltip-item">__________<span class="tooltip">Номер авансового счета-фактуры</span></span>
@@ -338,31 +360,26 @@
                     <span class="tooltip-item">__________<span class="tooltip">Дата исправления</span></span>
                     <span class="header-number">(5б)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">Покупатель</span>
                     <span class="tooltip-item">__________________________________________________<span class="tooltip">Наименование покупателя</span></span>
                     <span class="header-number">(6)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">Адрес</span>
                     <span class="tooltip-item">__________________________________________________<span class="tooltip">Адрес покупателя</span></span>
                     <span class="header-number">(6а)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">ИНН/КПП покупателя</span>
                     <span class="tooltip-item">__________________________________________<span class="tooltip">ИНН/КПП покупателя</span></span>
                     <span class="header-number">(6б)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">Валюта: наименование, код</span>
                     <span class="tooltip-item">__________________________________________<span class="tooltip">Наименование и код валюты</span></span>
                     <span class="header-number">(7)</span>
                 </div>
-
                 <div class="header-row">
                     <span class="header-label">Идентификатор государственного контракта, договора (соглашения) (при наличии)</span>
                     <span class="tooltip-item">__________________________________________<span class="tooltip">Идентификатор госконтракта</span></span>
@@ -370,7 +387,7 @@
                 </div>
             </div>
 
-            <!-- Таблица с компактными колонками и пустыми ячейками -->
+            <!-- Таблица (пустые ячейки) -->
             <div class="table-wrapper">
                 <table class="invoice-table">
                     <thead>
@@ -502,18 +519,38 @@
         </div>
     </div>
 
-    <script>
-        const btn = document.getElementById('fullscreenBtn');
-        const body = document.body;
-        const card = document.getElementById('card');
+    <!-- Модальное окно на весь экран -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeFullscreenBtn">✕ Закрыть</button>
+            <div class="invoice" id="modalInvoice">
+                <!-- Здесь будет скопирован тот же контент -->
+                <!-- Для простоты используем JS, чтобы скопировать содержимое -->
+            </div>
+        </div>
+    </div>
 
-        btn.addEventListener('click', () => {
-            if (body.classList.contains('fullscreen-mode')) {
-                body.classList.remove('fullscreen-mode');
-                btn.textContent = '⛶ На весь экран';
-            } else {
-                body.classList.add('fullscreen-mode');
-                btn.textContent = '✕ Свернуть';
+    <script>
+        const openBtn = document.getElementById('openFullscreenBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeBtn = document.getElementById('closeFullscreenBtn');
+        const modalInvoice = document.getElementById('modalInvoice');
+        const originalInvoice = document.getElementById('invoice');
+
+        openBtn.addEventListener('click', () => {
+            // Копируем содержимое из обычного invoice в модальное окно
+            modalInvoice.innerHTML = originalInvoice.innerHTML;
+            modalOverlay.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+        });
+
+        // Закрытие по клику на фон
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
             }
         });
     </script>
