@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Счет-фактура · компактная таблица</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2d3e5a;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            transition: padding 0.2s;
+        }
+
+        body.fullscreen-mode {
+            padding: 0;
+        }
+
+        .card {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -8px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .fullscreen-mode .card {
+            max-width: 100%;
+            max-height: 100vh;
+            border-radius: 0;
+            height: 100vh;
+        }
+
+        .invoice {
+            background: #ffffff;
+            padding: 1.5rem 1.2rem;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .fullscreen-btn {
+            position: sticky;
+            top: 10px;
+            right: 10px;
+            float: right;
+            background: #1e3b5c;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: 0.1s;
+            margin-bottom: 0.5rem;
+        }
+
+        .fullscreen-btn:hover {
+            background: #2a4f78;
+        }
+
+        /* Шапка */
+        .header-block {
+            border: 1px solid #a0b8d0;
+            padding: 0.5rem;
+            margin-bottom: 0.8rem;
+            background: #fcfdff;
+        }
+
+        .header-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.5rem 1rem;
+            margin: 0.2rem 0;
+        }
+
+        .header-label {
+            font-weight: 600;
+            color: #1d3a5c;
+            white-space: nowrap;
+        }
+
+        .header-number {
+            color: #4f6b8a;
+            font-size: 0.7rem;
+            margin-left: 0.2rem;
+        }
+
+        /* Длинные строки с переносом */
+        .multiline-label {
+            white-space: normal;
+            line-height: 1.3;
+            max-width: 600px;
+        }
+
+        .tooltip-item {
+            position: relative;
+            border-bottom: 1px dashed #1e6bb8;
+            cursor: help;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .tooltip-item:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            z-index: 2000;
+            bottom: 140%;
+            left: 0;
+            background: #1e3b5c;
+            color: #fff;
+            padding: 0.5rem 0.8rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            width: 240px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: opacity 0.15s, transform 0.15s;
+            transform: translateY(5px);
+            pointer-events: none;
+            white-space: normal;
+            line-height: 1.4;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 15px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #1e3b5c transparent transparent transparent;
+        }
+
+        /* Таблица с компактными колонками */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 2px solid #2d5082;
+            border-radius: 4px;
+        }
+
+        .invoice-table {
+            min-width: 1300px; /* уменьшили минимальную ширину */
+            border-collapse: collapse;
+            font-size: 0.65rem; /* чуть меньше шрифт */
+            background: white;
+            table-layout: fixed; /* фиксированная ширина колонок */
+        }
+
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #7a9bcb;
+            padding: 0.4rem 0.2rem;
+            vertical-align: top;
+            text-align: left;
+            word-wrap: break-word;
+        }
+
+        .invoice-table th {
+            background: #e1eaf5;
+            color: #0d2d4a;
+            font-weight: 600;
+            white-space: normal; /* разрешаем перенос */
+            line-height: 1.3;
+        }
+
+        /* Ширина колонок (подобрано для компактности) */
+        .invoice-table th:nth-child(1) { width: 35px; }
+        .invoice-table th:nth-child(2) { width: 140px; }
+        .invoice-table th:nth-child(3) { width: 60px; }
+        .invoice-table th:nth-child(4) { width: 55px; }
+        .invoice-table th:nth-child(5) { width: 55px; }
+        .invoice-table th:nth-child(6) { width: 55px; }
+        .invoice-table th:nth-child(7) { width: 60px; }
+        .invoice-table th:nth-child(8) { width: 70px; }
+        .invoice-table th:nth-child(9) { width: 60px; }
+        .invoice-table th:nth-child(10) { width: 60px; }
+        .invoice-table th:nth-child(11) { width: 70px; }
+        .invoice-table th:nth-child(12) { width: 70px; }
+        .invoice-table th:nth-child(13) { width: 55px; }
+        .invoice-table th:nth-child(14) { width: 70px; }
+        .invoice-table th:nth-child(15) { width: 90px; }
+        .invoice-table th:nth-child(16) { width: 55px; }
+        .invoice-table th:nth-child(17) { width: 55px; }
+        .invoice-table th:nth-child(18) { width: 70px; }
+        .invoice-table th:nth-child(19) { width: 80px; }
+
+        .empty-cell {
+            min-width: 30px;
+            height: 1.5rem;
+        }
+
+        .footer-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 1.5rem;
+            border-top: 2px solid #2d5082;
+            padding-top: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .signature-block {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .signature-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .excel-note {
+            font-size: 0.7rem;
+            color: #3b5f85;
+            margin-top: 0.8rem;
+            text-align: center;
+        }
+
+        @media (max-width: 700px) {
+            .fullscreen-btn { position: relative; float: none; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="card">
+        <button class="fullscreen-btn" id="fullscreenBtn">⛶ На весь экран</button>
+        <div class="invoice" id="invoice">
+            <!-- Заголовки -->
+            <div class="header-block">
+                <div style="font-size:0.7rem; color:#1d3a5c; margin-bottom:0.3rem;">
+                    Приложение № 1 к постановлению Правительства Российской Федерации от 26 декабря 2011 г. № 1137
+                </div>
+                <div style="font-size:0.7rem; color:#1d3a5c; margin-bottom:0.5rem;">
+                    (в ред. Постановления Правительства РФ от 23.01.2026 № 26)
+                </div>
+                <div style="font-weight:600; font-size:1rem; margin:0.5rem 0;">I. Форма счета-фактуры, применяемого при расчетах по налогу на добавленную стоимость</div>
+
+                <!-- Шапка -->
+                <div class="header-row">
+                    <span class="header-label">СЧЕТ-ФАКТУРА №</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Дата и уникальный номер</span></span>
+                    <span class="header-label">от "</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Дата составления</span></span>
+                    <span class="header-label">"</span>
+                    <span class="header-number">(1)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">ИСПРАВЛЕНИЕ №</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Номер исправления</span></span>
+                    <span class="header-label">от "</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Дата исправления</span></span>
+                    <span class="header-label">"</span>
+                    <span class="header-number">(1а)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">Продавец</span>
+                    <span class="tooltip-item">__________________________________________________<span class="tooltip">Полное наименование продавца</span></span>
+                    <span class="header-number">(2)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">Адрес</span>
+                    <span class="tooltip-item">__________________________________________________<span class="tooltip">Юридический адрес продавца</span></span>
+                    <span class="header-number">(2а)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">ИНН/КПП продавца</span>
+                    <span class="tooltip-item">__________________________________________<span class="tooltip">ИНН и КПП продавца</span></span>
+                    <span class="header-number">(2б)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">Грузоотправитель и его адрес</span>
+                    <span class="tooltip-item">__________________________________________________<span class="tooltip">Сведения о грузоотправителе</span></span>
+                    <span class="header-number">(3)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">Грузополучатель и его адрес</span>
+                    <span class="tooltip-item">__________________________________________________<span class="tooltip">Сведения о грузополучателе</span></span>
+                    <span class="header-number">(4)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">К платежно-расчетному документу №</span>
+                    <span class="tooltip-item">_________________<span class="tooltip">Номер платежного документа</span></span>
+                    <span class="header-label">от</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Дата платежного документа</span></span>
+                    <span class="header-number">(5)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">Документ об отгрузке: наименование, №</span>
+                    <span class="tooltip-item">________________________________________<span class="tooltip">Наименование, номер отгрузочного документа</span></span>
+                    <span class="header-label">от</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Дата отгрузочного документа</span></span>
+                    <span class="header-number">(5а)</span>
+                </div>
+
+                <!-- Длинная строка 5б с переносом -->
+                <div class="header-row" style="flex-wrap: wrap;">
+                    <span class="header-label multiline-label">К счету-фактуре (счетам-фактурам), выставленному (выставленным) при получении оплаты, частичной оплаты или иных платежей в счет предстоящих поставок товаров (выполнения работ, оказания услуг), передачи имущественных прав №</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Номер авансового счета-фактуры</span></span>
+                    <span class="header-label">от</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Дата авансового счета-фактуры</span></span>
+                    <span class="header-label">, исправление №</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Номер исправления авансового</span></span>
+                    <span class="header-label">от</span>
+                    <span class="tooltip-item">__________<span class="tooltip">Дата исправления</span></span>
+                    <span class="header-number">(5б)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">Покупатель</span>
+                    <span class="tooltip-item">__________________________________________________<span class="tooltip">Наименование покупателя</span></span>
+                    <span class="header-number">(6)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">Адрес</span>
+                    <span class="tooltip-item">__________________________________________________<span class="tooltip">Адрес покупателя</span></span>
+                    <span class="header-number">(6а)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">ИНН/КПП покупателя</span>
+                    <span class="tooltip-item">__________________________________________<span class="tooltip">ИНН/КПП покупателя</span></span>
+                    <span class="header-number">(6б)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">Валюта: наименование, код</span>
+                    <span class="tooltip-item">__________________________________________<span class="tooltip">Наименование и код валюты</span></span>
+                    <span class="header-number">(7)</span>
+                </div>
+
+                <div class="header-row">
+                    <span class="header-label">Идентификатор государственного контракта, договора (соглашения) (при наличии)</span>
+                    <span class="tooltip-item">__________________________________________<span class="tooltip">Идентификатор госконтракта</span></span>
+                    <span class="header-number">(8)</span>
+                </div>
+            </div>
+
+            <!-- Таблица с компактными колонками и пустыми ячейками -->
+            <div class="table-wrapper">
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>№ п/п</th>
+                            <th>Наименование товара (описание выполненных работ, оказанных услуг), имущественного права</th>
+                            <th>Код вида товара</th>
+                            <th colspan="2">Единица измерения</th>
+                            <th>Количество (объем)</th>
+                            <th>Цена (тариф) за единицу измерения</th>
+                            <th>Стоимость товаров (работ, услуг), имущественных прав без налога - всего</th>
+                            <th>В том числе сумма акциза</th>
+                            <th>Налоговая ставка</th>
+                            <th>Сумма налога, предъявляемая покупателю</th>
+                            <th>Стоимость товаров (работ, услуг), имущественных прав с налогом - всего</th>
+                            <th colspan="2">Страна происхождения товара</th>
+                            <th>Регистрационный номер декларации на товары или регистрационный номер партии товара, подлежащего прослеживаемости</th>
+                            <th colspan="2">Количественная единица измерения товара, используемая в целях осуществления прослеживаемости</th>
+                            <th>Количество товара, подлежащего прослеживаемости, в количественной единице измерения товара, используемой в целях осуществления прослеживаемости</th>
+                            <th>Стоимость товара, подлежащего прослеживаемости, без налога на добавленную стоимость, в рублях и копейках</th>
+                        </tr>
+                        <tr>
+                            <th>1</th>
+                            <th>1а</th>
+                            <th>1б</th>
+                            <th>2 (код)</th>
+                            <th>2а (условное обозначение)</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                            <th>6</th>
+                            <th>7</th>
+                            <th>8</th>
+                            <th>9</th>
+                            <th>10 (цифровой код)</th>
+                            <th>10а (краткое наименование)</th>
+                            <th>11</th>
+                            <th>12 (код)</th>
+                            <th>12а (условное обозначение)</th>
+                            <th>13</th>
+                            <th>14</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                            <td><div class="empty-cell"></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Всего к оплате -->
+            <div class="header-row" style="margin-top:1rem;">
+                <span class="header-label">Всего к оплате</span>
+                <span class="tooltip-item">_________________________<span class="tooltip">Общая сумма по счету-фактуре</span></span>
+                <span class="header-number">(9)</span>
+            </div>
+
+            <!-- Подписи -->
+            <div class="footer-section">
+                <div style="flex:1;">
+                    <div class="header-row">Руководитель организации или иное уполномоченное лицо</div>
+                    <div class="header-row" style="margin-top:0.3rem;">
+                        <span class="tooltip-item">_______________ (подпись)<span class="tooltip">Подпись руководителя</span></span>
+                        <span class="tooltip-item">_______________ (ф.и.о.)<span class="tooltip">Фамилия и инициалы</span></span>
+                    </div>
+                </div>
+                <div style="flex:1;">
+                    <div class="header-row">Главный бухгалтер или иное уполномоченное лицо</div>
+                    <div class="header-row" style="margin-top:0.3rem;">
+                        <span class="tooltip-item">_______________ (подпись)<span class="tooltip">Подпись главного бухгалтера</span></span>
+                        <span class="tooltip-item">_______________ (ф.и.о.)<span class="tooltip">Фамилия и инициалы</span></span>
+                    </div>
+                </div>
+                <div style="flex:1;">
+                    <div class="header-row">Индивидуальный предприниматель или иное уполномоченное лицо</div>
+                    <div class="header-row" style="margin-top:0.3rem;">
+                        <span class="tooltip-item">_______________ (подпись)<span class="tooltip">Подпись ИП</span></span>
+                        <span class="tooltip-item">_______________ (ф.и.о.)<span class="tooltip">Фамилия и инициалы</span></span>
+                    </div>
+                    <div class="header-row" style="margin-top:0.3rem;">
+                        <span class="tooltip-item">(основной государственный регистрационный номер индивидуального предпринимателя и дата присвоения такого номера)<span class="tooltip">ОГРНИП и дата</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="excel-note">
+                ⓘ Наведите на подчёркнутые поля — появится подсказка. Все ячейки таблицы пустые.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.getElementById('fullscreenBtn');
+        const body = document.body;
+        const card = document.getElementById('card');
+
+        btn.addEventListener('click', () => {
+            if (body.classList.contains('fullscreen-mode')) {
+                body.classList.remove('fullscreen-mode');
+                btn.textContent = '⛶ На весь экран';
+            } else {
+                body.classList.add('fullscreen-mode');
+                btn.textContent = '✕ Свернуть';
+            }
+        });
+    </script>
+</body>
+</html>
