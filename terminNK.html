@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Термины НК</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #eef2f5;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        .game-card {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            padding: 1.2rem 1.2rem;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.1);
+            border: 1px solid #d0d7de;
+            max-height: 650px;
+            height: 650px;
+            display: flex;
+            flex-direction: column;
+        }
+        h1 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #1e2b39;
+            margin-bottom: 0.1rem;
+            line-height: 1.2;
+        }
+        .sub {
+            color: #3f4f60;
+            font-size: 0.9rem;
+            border-left: 4px solid #8fa5bb;
+            padding-left: 0.7rem;
+            background: #f2f6fb;
+            border-radius: 0 20px 20px 0;
+            padding: 0.2rem 1rem;
+            margin-bottom: 0.8rem;
+        }
+        .play-area {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+            min-height: 0;
+        }
+        .col {
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 0.8rem;
+            border: 1px solid #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .col h2 {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #2b4050;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 0.4rem;
+            margin-bottom: 0.6rem;
+            flex-shrink: 0;
+        }
+        .items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 2px;
+        }
+        .term-item {
+            background: white;
+            border: 2px solid #8fa5bb;
+            border-radius: 30px;
+            padding: 0.6rem 0.9rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1f2c38;
+            cursor: grab;
+            box-shadow: 0 2px 6px -3px #7f8c9a;
+            transition: 0.1s;
+            user-select: none;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .term-item:active {
+            cursor: grabbing;
+            opacity: 0.7;
+        }
+        .term-item.dragging {
+            opacity: 0.3;
+        }
+        .term-item.matched {
+            display: none;
+        }
+        .def-item {
+            background: white;
+            border: 2px dashed #9aa9b7;
+            border-radius: 30px;
+            padding: 0.6rem 0.9rem;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            color: #1f2c38;
+            transition: 0.1s;
+            cursor: pointer;
+            box-shadow: 0 2px 5px -3px #7f8c9a;
+            flex-shrink: 0;
+        }
+        .def-item.drag-over {
+            border-color: #1f4f3d;
+            background: #dee9f2;
+        }
+        .def-item.matched {
+            display: none;
+        }
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 0.8rem 0 0.4rem;
+        }
+        .btn {
+            background: #d0dbe8;
+            border: none;
+            border-radius: 30px;
+            padding: 0.5rem 2rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1f2c38;
+            border: 1px solid #b3c3d6;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #8fa5bb;
+            color: white;
+        }
+        .btn-primary:hover { background: #728da8; }
+        .btn:hover { background: #c2d0e0; }
+        .feedback {
+            background: #eef2f6;
+            border-radius: 24px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: #1f2c38;
+            border: 1px solid #c2d1e2;
+            text-align: center;
+            margin-top: 0.2rem;
+        }
+        hr {
+            border: 1px solid #cbd5e1;
+            margin: 0.4rem 0 0.1rem;
+        }
+        .footer {
+            text-align: center;
+            color: #5f7485;
+            font-size: 0.65rem;
+        }
+    </style>
+</head>
+<body>
+<div class="game-card">
+    <h1>Термины НК</h1>
+    <div class="sub">Перетащите термин на определение. Верная пара исчезает.</div>
+
+    <div class="play-area">
+        <div class="col">
+            <h2>Термины</h2>
+            <div class="items-container" id="termsContainer"></div>
+        </div>
+        <div class="col">
+            <h2>Определения</h2>
+            <div class="items-container" id="defsContainer"></div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn" id="resetBtn">⟲ Сбросить</button>
+    </div>
+
+    <div class="feedback" id="feedback">
+        ⚡ Перетащите термин на нужное определение.
+    </div>
+
+    <hr>
+    <div class="footer">ст. 11 НК РФ · спецтермины</div>
+</div>
+
+<script>
+    (function() {
+        const pairsData = [
+            { term: 'Лица', definition: 'Обобщенное понятие, объединяющее организации и физических лиц для формулирования общих налоговых обязанностей и прав.' },
+            { term: 'Организации', definition: 'Российские и иностранные юридические лица, а также корпоративные образования, обладающие правоспособностью.' },
+            { term: 'Физические лица', definition: 'Граждане РФ, иностранные граждане и лица без гражданства. Фактическое ведение предпринимательской деятельности без регистрации не освобождает от налоговых обязанностей.' },
+            { term: 'Индивидуальные предприниматели', definition: 'Физические лица, зарегистрированные в установленном порядке и осуществляющие предпринимательскую деятельность без образования юридического лица.' },
+            { term: 'Иностранные структуры без образования юрлица', definition: 'Фонды, партнерства, трасты и иные образования, которые могут извлекать доход в интересах участников или бенефициаров.' },
+            { term: 'Банки', definition: 'Кредитные организации, обладающие лицензией Банка России.' },
+            { term: 'Счета (в целях налогообложения)', definition: 'Расчетные, текущие, лицевые, казначейские счета, счета в драгметаллах и счета цифрового рубля.' },
+            { term: 'Недоимка', definition: 'Сумма налога, сбора или страховых взносов, не уплаченная в установленный срок.' },
+            { term: 'Совокупная обязанность', definition: 'Общий объем обязательств налогоплательщика перед бюджетной системой (налоги, взносы, пени, штрафы).' },
+            { term: 'Обособленное подразделение', definition: 'Любое территориально обособленное подразделение организации, где оборудовано стационарное рабочее место на срок более месяца.' },
+            { term: 'Учетная политика для целей налогообложения', definition: 'Совокупность выбранных налогоплательщиком методов учета доходов и расходов, применяемая последовательно.' },
+            { term: 'Источник выплаты дохода', definition: 'Лицо, от которого налогоплательщик получает доход; используется для целей контроля и удержания налогов налоговыми агентами.' }
+        ];
+
+        let terms = [];
+        let definitions = [];
+        let termMatched = [];
+        let defMatched = [];
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function resetGame() {
+            terms = shuffleArray(pairsData.map(p => p.term));
+            definitions = shuffleArray(pairsData.map(p => p.definition));
+            termMatched = new Array(terms.length).fill(false);
+            defMatched = new Array(definitions.length).fill(false);
+        }
+
+        const termsContainer = document.getElementById('termsContainer');
+        const defsContainer = document.getElementById('defsContainer');
+        const resetBtn = document.getElementById('resetBtn');
+        const feedbackEl = document.getElementById('feedback');
+
+        function renderTerms() {
+            termsContainer.innerHTML = '';
+            terms.forEach((term, idx) => {
+                if (termMatched[idx]) return;
+                const card = document.createElement('div');
+                card.className = 'term-item';
+                card.textContent = term;
+                card.setAttribute('draggable', 'true');
+                card.dataset.term = term;
+                card.dataset.index = idx;
+                card.id = `term-${idx}`;
+                termsContainer.appendChild(card);
+            });
+        }
+
+        function renderDefs() {
+            defsContainer.innerHTML = '';
+            definitions.forEach((def, idx) => {
+                if (defMatched[idx]) return;
+                const defDiv = document.createElement('div');
+                defDiv.className = 'def-item';
+                defDiv.textContent = def;
+                defDiv.dataset.defIndex = idx;
+                defDiv.dataset.expectedTerm = pairsData.find(p => p.definition === def).term;
+                defsContainer.appendChild(defDiv);
+            });
+        }
+
+        function renderAll() {
+            renderTerms();
+            renderDefs();
+        }
+
+        let draggedTerm = null;
+        let draggedIndex = null;
+
+        termsContainer.addEventListener('dragstart', (e) => {
+            const card = e.target.closest('.term-item');
+            if (!card) return;
+            draggedTerm = card.dataset.term;
+            draggedIndex = parseInt(card.dataset.index);
+            e.dataTransfer.setData('text/plain', draggedTerm);
+            card.classList.add('dragging');
+        });
+
+        termsContainer.addEventListener('dragend', (e) => {
+            const card = e.target.closest('.term-item');
+            if (card) card.classList.remove('dragging');
+        });
+
+        defsContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const defDiv = e.target.closest('.def-item');
+            if (defDiv && !defMatched[defDiv.dataset.defIndex]) {
+                defDiv.classList.add('drag-over');
+            }
+        });
+
+        defsContainer.addEventListener('dragleave', (e) => {
+            const defDiv = e.target.closest('.def-item');
+            if (defDiv) defDiv.classList.remove('drag-over');
+        });
+
+        defsContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const defDiv = e.target.closest('.def-item');
+            if (!defDiv) return;
+            defDiv.classList.remove('drag-over');
+
+            const defIndex = parseInt(defDiv.dataset.defIndex);
+            if (defMatched[defIndex]) {
+                feedbackEl.innerHTML = '⚠️ Это определение уже сопоставлено.';
+                return;
+            }
+
+            const termText = e.dataTransfer.getData('text/plain');
+            if (!termText) return;
+
+            const termIdx = terms.findIndex(t => t === termText);
+            if (termIdx === -1 || termMatched[termIdx]) {
+                feedbackEl.innerHTML = '⚠️ Этот термин уже использован.';
+                return;
+            }
+
+            const expectedTerm = defDiv.dataset.expectedTerm;
+
+            if (termText === expectedTerm) {
+                termMatched[termIdx] = true;
+                defMatched[defIndex] = true;
+                renderAll();
+                feedbackEl.innerHTML = '✅ Правильно! Пара исчезла.';
+
+                // Проверка на завершение
+                if (termMatched.every(v => v) && defMatched.every(v => v)) {
+                    feedbackEl.innerHTML = '🎉 Поздравляем! Все термины сопоставлены верно.';
+                }
+            } else {
+                defDiv.style.backgroundColor = '#f9dcdc';
+                defDiv.style.borderColor = '#b33c3c';
+                setTimeout(() => {
+                    defDiv.style.backgroundColor = '';
+                    defDiv.style.borderColor = '';
+                }, 300);
+                feedbackEl.innerHTML = '❌ Неправильная пара. Попробуйте другой термин.';
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            resetGame();
+            renderAll();
+            feedbackEl.innerHTML = '⚡ Перетащите термин на нужное определение.';
+        });
+
+        resetGame();
+        renderAll();
+    })();
+</script>
+</body>
+</html>
