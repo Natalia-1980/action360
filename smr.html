@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>НДС при СМР хозспособом</title>
+    <!-- Flatpickr для календаря -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f4fa;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 15px 25px -10px rgba(0,0,0,0.1);
+            padding: 1.2rem 1rem;
+            border: 1px solid #d9e2ef;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        /* Компактная таблица */
+        .costs-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin: 0.5rem 0;
+        }
+        .costs-table th {
+            background: #e2ecfe;
+            padding: 0.3rem;
+            text-align: left;
+            border: 1px solid #b9cfec;
+            font-weight: 500;
+        }
+        .costs-table td {
+            padding: 0.3rem;
+            border: 1px solid #d6e3f5;
+        }
+
+        .cost-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            padding: 0.2rem 0;
+        }
+        .cost-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .question-block {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 0.8rem;
+            border: 2px solid #e1eaf5;
+            margin: 0.8rem 0;
+        }
+
+        .question-title {
+            font-weight: 600;
+            color: #1d3b5e;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin: 0.5rem 0;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 0.4rem 0.8rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            min-width: 120px;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+        .btn-check, .btn-next {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #bccde0;
+            transition: 0.1s;
+        }
+        .btn-check:active, .btn-next:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #bccde0;
+        }
+        .btn-check:disabled, .btn-next:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 16px;
+            padding: 0.6rem;
+            border: 2px solid #b9d3f0;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .info-note {
+            font-size: 0.7rem;
+            color: #4f6f8f;
+            margin-top: 0.2rem;
+        }
+
+        .date-input {
+            background: white;
+        }
+
+        /* Убираем подсветку flatpickr */
+        .flatpickr-day.selected {
+            background: #1e3b5c !important;
+            border-color: #1e3b5c !important;
+        }
+        .flatpickr-day.today {
+            border-color: #aaa !important;
+            background: transparent !important;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Заголовок убран -->
+
+        <!-- Условие задачи (компактное) -->
+        <div class="costs-table">
+            <table class="costs-table">
+                <tr><th>Статья затрат</th><th>Сумма, руб.</th><th>Примечание</th></tr>
+                <tr><td>Строительные материалы</td><td>450 000</td><td>своими силами</td></tr>
+                <tr><td>Зарплата рабочих</td><td>280 000</td><td>своими силами</td></tr>
+                <tr><td>Услуги подрядчика (фундамент)</td><td>350 000</td><td>подряд</td></tr>
+                <tr><td>Проектная документация</td><td>120 000</td><td>своими силами</td></tr>
+                <tr><td>Аренда техники</td><td>90 000</td><td>своими силами</td></tr>
+                <tr><td>Услуги подрядчика (вентиляция)</td><td>180 000</td><td>подряд</td></tr>
+                <tr><td>Электроэнергия</td><td>25 000</td><td>своими силами</td></tr>
+            </table>
+        </div>
+
+        <!-- Вопрос 1 -->
+        <div id="question1" class="question-block">
+            <div class="question-title">1. Какие затраты включаются в базу?</div>
+            <div class="cost-item"><input type="checkbox" id="mat"> Строительные материалы — 450 000</div>
+            <div class="cost-item"><input type="checkbox" id="salary"> Зарплата рабочих — 280 000</div>
+            <div class="cost-item"><input type="checkbox" id="podr1"> Услуги подрядчика (фундамент) — 350 000 (подряд)</div>
+            <div class="cost-item"><input type="checkbox" id="proj"> Проектная документация (свои) — 120 000</div>
+            <div class="cost-item"><input type="checkbox" id="arend"> Аренда техники — 90 000</div>
+            <div class="cost-item"><input type="checkbox" id="podr2"> Услуги подрядчика (вентиляция) — 180 000 (подряд)</div>
+            <div class="cost-item"><input type="checkbox" id="electro"> Электроэнергия — 25 000</div>
+            <div class="button-row">
+                <button class="btn-check" id="check1">Проверить</button>
+                <button class="btn-next" id="next1" disabled>Далее</button>
+            </div>
+            <div id="feedback1" class="feedback hidden"></div>
+        </div>
+
+        <!-- Вопрос 2 -->
+        <div id="question2" class="question-block hidden">
+            <div class="question-title">2. Налоговая база (руб.)</div>
+            <div class="input-group">
+                <input type="number" id="baseInput" placeholder="Сумма">
+                <span>₽</span>
+            </div>
+            <div class="button-row">
+                <button class="btn-check" id="check2">Проверить</button>
+                <button class="btn-next" id="next2" disabled>Далее</button>
+            </div>
+            <div id="feedback2" class="feedback hidden"></div>
+        </div>
+
+        <!-- Вопрос 3 -->
+        <div id="question3" class="question-block hidden">
+            <div class="question-title">3. Сумма НДС (ставка 22%)</div>
+            <div class="input-group">
+                <input type="number" id="ndsInput" placeholder="Сумма НДС">
+                <span>₽</span>
+            </div>
+            <div class="button-row">
+                <button class="btn-check" id="check3">Проверить</button>
+                <button class="btn-next" id="next3" disabled>Далее</button>
+            </div>
+            <div id="feedback3" class="feedback hidden"></div>
+        </div>
+
+        <!-- Вопрос 4 -->
+        <div id="question4" class="question-block hidden">
+            <div class="question-title">4. Дата начисления НДС и счёт-фактура</div>
+            <div class="input-group">
+                <input type="text" id="dateInput" class="date-input" placeholder="дд.мм.гггг">
+            </div>
+            <div class="button-row">
+                <button class="btn-check" id="check4">Проверить</button>
+                <button class="btn-next" id="next4" disabled>Далее</button>
+            </div>
+            <div id="feedback4" class="feedback hidden"></div>
+        </div>
+
+        <!-- Кнопка рестарта -->
+        <div class="button-row" style="justify-content: center; margin-top: 0.8rem;">
+            <button class="btn-next" id="restartBtn">Начать заново</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Правильные ответы
+            const correctBase = 965000;
+            const correctNds = 212300;
+            const correctDate = '30.06.2026';
+
+            // Элементы
+            const q1 = document.getElementById('question1');
+            const q2 = document.getElementById('question2');
+            const q3 = document.getElementById('question3');
+            const q4 = document.getElementById('question4');
+            const next1 = document.getElementById('next1');
+            const next2 = document.getElementById('next2');
+            const next3 = document.getElementById('next3');
+            const next4 = document.getElementById('next4');
+            const check1 = document.getElementById('check1');
+            const check2 = document.getElementById('check2');
+            const check3 = document.getElementById('check3');
+            const check4 = document.getElementById('check4');
+            const restartBtn = document.getElementById('restartBtn');
+
+            const baseInput = document.getElementById('baseInput');
+            const ndsInput = document.getElementById('ndsInput');
+            const dateInput = document.getElementById('dateInput');
+
+            const feedback1 = document.getElementById('feedback1');
+            const feedback2 = document.getElementById('feedback2');
+            const feedback3 = document.getElementById('feedback3');
+            const feedback4 = document.getElementById('feedback4');
+
+            // Чекбоксы
+            const mat = document.getElementById('mat');
+            const salary = document.getElementById('salary');
+            const podr1 = document.getElementById('podr1');
+            const proj = document.getElementById('proj');
+            const arend = document.getElementById('arend');
+            const podr2 = document.getElementById('podr2');
+            const electro = document.getElementById('electro');
+
+            // Инициализация календаря (без подсветки сегодняшнего дня)
+            flatpickr(dateInput, {
+                locale: "ru",
+                dateFormat: "d.m.Y",
+                defaultDate: null,
+                allowInput: true,
+                disable: [], // ничего не запрещаем
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    // убираем подсветку сегодняшнего дня
+                    dayElem.classList.remove('today');
+                }
+            });
+
+            // Состояние шагов (можно ли нажать далее)
+            let step1Done = false;
+            let step2Done = false;
+            let step3Done = false;
+            let step4Done = false;
+
+            // Проверка 1
+            check1.addEventListener('click', () => {
+                const selected = {
+                    mat: mat.checked,
+                    salary: salary.checked,
+                    podr1: podr1.checked,
+                    proj: proj.checked,
+                    arend: arend.checked,
+                    podr2: podr2.checked,
+                    electro: electro.checked
+                };
+
+                const correctSelection = 
+                    selected.mat && selected.salary && !selected.podr1 && 
+                    selected.proj && selected.arend && !selected.podr2 && selected.electro;
+
+                feedback1.classList.remove('hidden', 'correct', 'incorrect');
+                feedback1.className = 'feedback ' + (correctSelection ? 'correct' : 'incorrect');
+                feedback1.innerHTML = correctSelection 
+                    ? '✅ Верно! В базу включаются все затраты, кроме подрядных работ.'
+                    : '❌ Неверно. В базу включаются: материалы, зарплата, проектные (свои), аренда техники, электроэнергия. Подрядчики (фундамент, вентиляция) не входят.';
+
+                step1Done = true;
+                next1.disabled = false;
+            });
+
+            // Переход ко 2 вопросу
+            next1.addEventListener('click', () => {
+                if (!step1Done) return;
+                q1.classList.add('hidden');
+                q2.classList.remove('hidden');
+            });
+
+            // Проверка 2
+            check2.addEventListener('click', () => {
+                const baseVal = parseFloat(baseInput.value.replace(/\s/g, '')) || 0;
+                const correct = Math.abs(baseVal - correctBase) < 0.01;
+
+                feedback2.classList.remove('hidden', 'correct', 'incorrect');
+                feedback2.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+                feedback2.innerHTML = correct 
+                    ? '✅ Налоговая база верна.'
+                    : `❌ Неверно. Правильная база: ${correctBase.toLocaleString('ru')} руб. (материалы 450 000 + зарплата 280 000 + проектные 120 000 + аренда 90 000 + электроэнергия 25 000)`;
+
+                step2Done = true;
+                next2.disabled = false;
+            });
+
+            next2.addEventListener('click', () => {
+                if (!step2Done) return;
+                q2.classList.add('hidden');
+                q3.classList.remove('hidden');
+            });
+
+            // Проверка 3
+            check3.addEventListener('click', () => {
+                const ndsVal = parseFloat(ndsInput.value.replace(/\s/g, '')) || 0;
+                const correct = Math.abs(ndsVal - correctNds) < 0.01;
+
+                feedback3.classList.remove('hidden', 'correct', 'incorrect');
+                feedback3.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+                feedback3.innerHTML = correct 
+                    ? '✅ Сумма НДС верна.'
+                    : `❌ Неверно. Правильная сумма НДС: ${correctNds.toLocaleString('ru')} руб. (965 000 × 22%)`;
+
+                step3Done = true;
+                next3.disabled = false;
+            });
+
+            next3.addEventListener('click', () => {
+                if (!step3Done) return;
+                q3.classList.add('hidden');
+                q4.classList.remove('hidden');
+            });
+
+            // Проверка 4
+            check4.addEventListener('click', () => {
+                const dateVal = dateInput.value.trim();
+                const correct = (dateVal === correctDate);
+
+                feedback4.classList.remove('hidden', 'correct', 'incorrect');
+                feedback4.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+                feedback4.innerHTML = correct 
+                    ? '✅ Дата верна.'
+                    : `❌ Неверно. Правильная дата: 30.06.2026 (последний день II квартала).`;
+
+                step4Done = true;
+                next4.disabled = false;
+            });
+
+            next4.addEventListener('click', () => {
+                if (!step4Done) return;
+                q4.classList.add('hidden');
+                // Можно показать поздравление
+                feedback4.classList.remove('hidden');
+                feedback4.className = 'feedback correct';
+                feedback4.innerHTML = '🎉 Все шаги пройдены! Вы можете начать заново.';
+            });
+
+            // Рестарт
+            restartBtn.addEventListener('click', () => {
+                // Сброс чекбоксов
+                mat.checked = false;
+                salary.checked = false;
+                podr1.checked = false;
+                proj.checked = false;
+                arend.checked = false;
+                podr2.checked = false;
+                electro.checked = false;
+
+                baseInput.value = '';
+                ndsInput.value = '';
+                dateInput.value = '';
+
+                // Сброс блоков
+                q1.classList.remove('hidden');
+                q2.classList.add('hidden');
+                q3.classList.add('hidden');
+                q4.classList.add('hidden');
+
+                // Сброс фидбеков
+                feedback1.classList.add('hidden');
+                feedback2.classList.add('hidden');
+                feedback3.classList.add('hidden');
+                feedback4.classList.add('hidden');
+
+                // Сброс кнопок
+                step1Done = false;
+                step2Done = false;
+                step3Done = false;
+                step4Done = false;
+                next1.disabled = true;
+                next2.disabled = true;
+                next3.disabled = true;
+                next4.disabled = true;
+            });
+        })();
+    </script>
+</body>
+</html>
