@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ЕНП · какие налоги включает</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem;
+        }
+
+        .card {
+            width: 650px;
+            max-width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.08);
+            padding: 1.5rem 1.2rem 1.5rem 1.2rem;
+            border: 1px solid #e0e4e9;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+
+        h1 {
+            font-weight: 400;
+            font-size: 1.8rem;
+            letter-spacing: -0.02em;
+            color: #1e1e1e;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e8ecf0;
+            padding-bottom: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        h1 span {
+            font-weight: 500;
+            background: #f2f5f9;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 1rem;
+            margin-left: 0.8rem;
+            color: #3a4a5e;
+            white-space: nowrap;
+        }
+
+        /* Карусель */
+        .carousel-area {
+            background: #fafbfc;
+            border-radius: 24px;
+            padding: 1.5rem 0.8rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #dee4ea;
+            flex-shrink: 0;
+        }
+
+        .carousel-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7e8b9c;
+            margin-bottom: 0.8rem;
+            margin-left: 0.3rem;
+        }
+
+        .carousel-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .carousel-btn {
+            background: white;
+            border: 1px solid #d0d8e2;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: #3e5368;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .carousel-btn:hover:not(:disabled) {
+            background: #f0f4fa;
+        }
+        .carousel-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .tax-card {
+            width: 300px;
+            background: white;
+            border: 2px solid #bcc9d9;
+            border-radius: 20px;
+            padding: 1.2rem 0.8rem;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #111;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            cursor: grab;
+            user-select: none;
+            line-height: 1.3;
+        }
+
+        .tax-card[draggable="true"]:hover {
+            border-color: #8f9fb2;
+            background: #fbfdff;
+        }
+
+        .tax-card:active {
+            cursor: grabbing;
+        }
+
+        .carousel-counter {
+            font-size: 0.9rem;
+            color: #6b7d94;
+            margin-top: 0.6rem;
+            text-align: center;
+        }
+
+        /* Три колонки */
+        .categories-row {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .category-col {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .category-header {
+            background: white;
+            border: 2px solid #dbe1e9;
+            border-radius: 18px;
+            padding: 1rem 0.2rem;
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.2rem;
+            color: #1f2a36;
+            margin-bottom: 0.8rem;
+            background: #f8fafd;
+            line-height: 1.2;
+            word-break: break-word;
+            flex-shrink: 0;
+        }
+
+        .dropzone-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .dropzone {
+            background: #f2f5f9;
+            border: 2px dashed #b9c4d2;
+            border-radius: 18px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8d9aa8;
+            font-size: 1rem;
+            transition: 0.1s;
+            padding: 0.5rem 0.3rem;
+            text-align: center;
+            word-break: break-word;
+            line-height: 1.3;
+            font-weight: 500;
+        }
+
+        .dropzone.filled {
+            background: white;
+            border: 2px solid #b1c0d2;
+            color: #111;
+            font-weight: 500;
+            border-style: solid;
+        }
+
+        .dropzone.correct {
+            border: 3px solid #2b8c4a !important;
+            background: #f0faf2;
+        }
+        .dropzone.incorrect {
+            border: 3px solid #c93a3a !important;
+            background: #fff6f6;
+        }
+
+        .check-section {
+            display: flex;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .check-btn {
+            background: white;
+            border: 2px solid #222;
+            border-radius: 60px;
+            padding: 0.8rem 2.4rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #111;
+            cursor: pointer;
+            transition: 0.15s;
+            letter-spacing: 0.3px;
+            box-shadow: 0 5px 0 #e0e4ea;
+        }
+
+        .check-btn:hover {
+            background: #f5f7f9;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #d0d8e2;
+        }
+        .check-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #d0d8e2;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Какие налоги включает ЕНП <span>Перетащите</span></h1>
+
+    <!-- Карусель -->
+    <div class="carousel-area">
+        <div class="carousel-label">ПЛАТЕЖ</div>
+        <div class="carousel-container">
+            <button class="carousel-btn" id="prevTaxBtn" aria-label="предыдущий">←</button>
+            <div id="activeTaxContainer" class="tax-card" draggable="true">НДС</div>
+            <button class="carousel-btn" id="nextTaxBtn" aria-label="следующий">→</button>
+        </div>
+        <div class="carousel-counter" id="taxCounter">1 / 18</div>
+    </div>
+
+    <!-- Три колонки по 10 ячеек в каждой -->
+    <div class="categories-row">
+        <!-- группа 1: ЕНП (10 ячеек) -->
+        <div class="category-col">
+            <div class="category-header">ЕНП</div>
+            <div class="dropzone-container" id="group1Container">
+                <div class="dropzone" data-index="0"></div>
+                <div class="dropzone" data-index="1"></div>
+                <div class="dropzone" data-index="2"></div>
+                <div class="dropzone" data-index="3"></div>
+                <div class="dropzone" data-index="4"></div>
+                <div class="dropzone" data-index="5"></div>
+                <div class="dropzone" data-index="6"></div>
+                <div class="dropzone" data-index="7"></div>
+                <div class="dropzone" data-index="8"></div>
+                <div class="dropzone" data-index="9"></div>
+            </div>
+        </div>
+        <!-- группа 2: ЕНП или отдельные КБК (10 ячеек) -->
+        <div class="category-col">
+            <div class="category-header">ЕНП или отдельные КБК</div>
+            <div class="dropzone-container" id="group2Container">
+                <div class="dropzone" data-index="0"></div>
+                <div class="dropzone" data-index="1"></div>
+                <div class="dropzone" data-index="2"></div>
+                <div class="dropzone" data-index="3"></div>
+                <div class="dropzone" data-index="4"></div>
+                <div class="dropzone" data-index="5"></div>
+                <div class="dropzone" data-index="6"></div>
+                <div class="dropzone" data-index="7"></div>
+                <div class="dropzone" data-index="8"></div>
+                <div class="dropzone" data-index="9"></div>
+            </div>
+        </div>
+        <!-- группа 3: отдельные КБК (10 ячеек) -->
+        <div class="category-col">
+            <div class="category-header">Отдельные КБК</div>
+            <div class="dropzone-container" id="group3Container">
+                <div class="dropzone" data-index="0"></div>
+                <div class="dropzone" data-index="1"></div>
+                <div class="dropzone" data-index="2"></div>
+                <div class="dropzone" data-index="3"></div>
+                <div class="dropzone" data-index="4"></div>
+                <div class="dropzone" data-index="5"></div>
+                <div class="dropzone" data-index="6"></div>
+                <div class="dropzone" data-index="7"></div>
+                <div class="dropzone" data-index="8"></div>
+                <div class="dropzone" data-index="9"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кнопка проверки -->
+    <div class="check-section">
+        <button class="check-btn" id="checkBtn">Проверить результат</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Исходные платежи с правильными группами
+        const paymentsBase = [
+            { name: "НДС", group: 1 },
+            { name: "Налог на прибыль", group: 1 },
+            { name: "Страховые взносы", group: 1 },
+            { name: "Налог на УСН", group: 1 },
+            { name: "ПСН", group: 1 },
+            { name: "ЕСХН", group: 1 },
+            { name: "НДФЛ", group: 1 },
+            { name: "Акцизы", group: 1 },
+            { name: "Имущественные налоги", group: 1 },
+            { name: "Туристический налог", group: 1 },
+            { name: "Налог на профессиональный доход (НПД)", group: 2 },
+            { name: "Сборы за объекты животного мира", group: 2 },
+            { name: "Сборы за водные биоресурсы", group: 2 },
+            { name: "НДФЛ с выплат иностранцам с патентом", group: 3 },
+            { name: "Государственные пошлины", group: 3 },
+            { name: "Административные штрафы", group: 3 },
+            { name: "Доп. соцобеспечение летных экипажей", group: 3 },
+            { name: "Доп. соцобеспечение работников угольной промышленности", group: 3 }
+        ];
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        let allPayments = shuffleArray([...paymentsBase]);
+
+        let remainingPayments = [...allPayments];
+        let currentCarouselIndex = 0;
+
+        const assignments = {
+            1: new Array(10).fill(null),
+            2: new Array(10).fill(null),
+            3: new Array(10).fill(null)
+        };
+
+        const activeTaxDiv = document.getElementById('activeTaxContainer');
+        const prevBtn = document.getElementById('prevTaxBtn');
+        const nextBtn = document.getElementById('nextTaxBtn');
+        const taxCounter = document.getElementById('taxCounter');
+        const group1Container = document.getElementById('group1Container');
+        const group2Container = document.getElementById('group2Container');
+        const group3Container = document.getElementById('group3Container');
+        const checkBtn = document.getElementById('checkBtn');
+
+        function getAllDropZones() {
+            return document.querySelectorAll('.dropzone');
+        }
+
+        function renderDropZones() {
+            const zones = getAllDropZones();
+            zones.forEach(z => {
+                z.classList.remove('filled', 'correct', 'incorrect');
+                z.textContent = '';
+            });
+
+            const drops1 = group1Container.querySelectorAll('.dropzone');
+            assignments[1].forEach((payment, idx) => {
+                if (payment) {
+                    drops1[idx].textContent = payment.name;
+                    drops1[idx].classList.add('filled');
+                }
+            });
+
+            const drops2 = group2Container.querySelectorAll('.dropzone');
+            assignments[2].forEach((payment, idx) => {
+                if (payment) {
+                    drops2[idx].textContent = payment.name;
+                    drops2[idx].classList.add('filled');
+                }
+            });
+
+            const drops3 = group3Container.querySelectorAll('.dropzone');
+            assignments[3].forEach((payment, idx) => {
+                if (payment) {
+                    drops3[idx].textContent = payment.name;
+                    drops3[idx].classList.add('filled');
+                }
+            });
+        }
+
+        function updateCarousel() {
+            if (remainingPayments.length === 0) {
+                activeTaxDiv.textContent = '✓ все распределены';
+                activeTaxDiv.style.background = '#f0f4f9';
+                activeTaxDiv.style.border = '2px solid #a0b8cf';
+                activeTaxDiv.removeAttribute('draggable');
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                taxCounter.textContent = '0 / 18';
+                return;
+            }
+
+            if (currentCarouselIndex >= remainingPayments.length) {
+                currentCarouselIndex = remainingPayments.length - 1;
+            }
+            if (currentCarouselIndex < 0) currentCarouselIndex = 0;
+
+            activeTaxDiv.textContent = remainingPayments[currentCarouselIndex].name;
+            activeTaxDiv.setAttribute('draggable', 'true');
+            activeTaxDiv.style.background = 'white';
+            activeTaxDiv.style.border = '2px solid #bcc9d9';
+
+            prevBtn.disabled = (currentCarouselIndex === 0);
+            nextBtn.disabled = (currentCarouselIndex === remainingPayments.length - 1);
+
+            const total = allPayments.length;
+            const placed = total - remainingPayments.length;
+            taxCounter.textContent = `${placed + 1} / ${total}`;
+        }
+
+        function locateDropZone(dropEl) {
+            if (!dropEl.classList.contains('dropzone')) return null;
+            const parent = dropEl.parentNode;
+            let group = null;
+            if (parent.id === 'group1Container') group = 1;
+            else if (parent.id === 'group2Container') group = 2;
+            else if (parent.id === 'group3Container') group = 3;
+            else return null;
+
+            const index = Array.from(parent.children).indexOf(dropEl);
+            return { group, index };
+        }
+
+        activeTaxDiv.addEventListener('dragstart', (e) => {
+            if (remainingPayments.length === 0) {
+                e.preventDefault();
+                return;
+            }
+            e.dataTransfer.setData('text/plain', activeTaxDiv.textContent);
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        document.querySelectorAll('.dropzone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const taxName = e.dataTransfer.getData('text/plain');
+                if (!taxName) return;
+
+                const paymentObj = remainingPayments.find(p => p.name === taxName);
+                if (!paymentObj) {
+                    alert('Этот платёж уже распределён');
+                    return;
+                }
+
+                const targetZone = e.currentTarget;
+                if (targetZone.classList.contains('filled')) {
+                    alert('Эта ячейка уже занята');
+                    return;
+                }
+
+                const loc = locateDropZone(targetZone);
+                if (!loc) return;
+
+                if (assignments[loc.group][loc.index] !== null) {
+                    alert('Ячейка занята');
+                    return;
+                }
+
+                const idxInRemaining = remainingPayments.findIndex(p => p.name === taxName);
+                if (idxInRemaining !== -1) remainingPayments.splice(idxInRemaining, 1);
+
+                assignments[loc.group][loc.index] = paymentObj;
+
+                renderDropZones();
+
+                if (remainingPayments.length > 0) {
+                    if (currentCarouselIndex >= remainingPayments.length) {
+                        currentCarouselIndex = remainingPayments.length - 1;
+                    } else if (idxInRemaining < currentCarouselIndex) {
+                        currentCarouselIndex--;
+                    }
+                    if (currentCarouselIndex < 0) currentCarouselIndex = 0;
+                }
+                updateCarousel();
+
+                document.querySelectorAll('.dropzone').forEach(z => z.classList.remove('correct', 'incorrect'));
+            });
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentCarouselIndex > 0) {
+                currentCarouselIndex--;
+                updateCarousel();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentCarouselIndex < remainingPayments.length - 1) {
+                currentCarouselIndex++;
+                updateCarousel();
+            }
+        });
+
+        function checkResult() {
+            document.querySelectorAll('.dropzone').forEach(z => z.classList.remove('correct', 'incorrect'));
+
+            for (let group = 1; group <= 3; group++) {
+                const container = group === 1 ? group1Container : group === 2 ? group2Container : group3Container;
+                const drops = container.querySelectorAll('.dropzone');
+                assignments[group].forEach((payment, idx) => {
+                    if (!payment) return;
+                    const dropElement = drops[idx];
+                    if (payment.group === group) {
+                        dropElement.classList.add('correct');
+                    } else {
+                        dropElement.classList.add('incorrect');
+                    }
+                });
+            }
+        }
+
+        checkBtn.addEventListener('click', checkResult);
+
+        document.addEventListener('dragover', (e) => e.preventDefault());
+        document.addEventListener('drop', (e) => e.preventDefault());
+
+        renderDropZones();
+        updateCarousel();
+    })();
+</script>
+</body>
+</html>
