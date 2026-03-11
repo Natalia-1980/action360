@@ -35,27 +35,11 @@
             border: 1px solid #dee6f0;
         }
 
-        h1 {
-            font-weight: 400;
-            font-size: 1.6rem;
-            color: #1a344c;
-            margin-bottom: 1.2rem;
-            border-left: 5px solid #2e7ab3;
-            padding-left: 1rem;
-        }
-
-        .subtitle {
-            font-size: 0.95rem;
-            color: #3f5e7a;
-            margin-bottom: 1.8rem;
-            line-height: 1.5;
-        }
-
         /* Переключатель режимов */
         .mode-switch {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             background: #f0f5fc;
             border-radius: 60px;
             padding: 0.4rem;
@@ -81,13 +65,47 @@
             font-weight: 600;
         }
 
+        /* Блок с правилами для активной вкладки */
+        .rules-panel {
+            background: #f0f7fe;
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #c7daf5;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .rules-title {
+            font-weight: 600;
+            color: #0d2f4e;
+            margin-bottom: 0.5rem;
+        }
+
+        .rules-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .rules-list li {
+            margin-bottom: 0.3rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        .rules-list li::before {
+            content: "•";
+            color: #2e7ab3;
+            font-weight: bold;
+            position: absolute;
+            left: 0.2rem;
+        }
+
         /* Календарный блок */
         .calendar-panel {
             background: #f9fcff;
             border-radius: 28px;
             padding: 1.5rem;
             border: 1px solid #d2e0f0;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .date-selector {
@@ -159,15 +177,19 @@
 </head>
 <body>
     <div class="card">
-        <h1>📅 Налоговые периоды</h1>
-        <div class="subtitle">
-            Правила определения первого и последнего налогового периода для вновь созданных и ликвидируемых организаций
-        </div>
-
         <!-- Переключатель: регистрация / ликвидация -->
         <div class="mode-switch" id="modeSwitch">
             <button class="mode-btn active" data-mode="registration">🆕 Регистрация</button>
             <button class="mode-btn" data-mode="liquidation">⚰️ Ликвидация</button>
+        </div>
+
+        <!-- Динамический блок с правилами для текущего режима -->
+        <div class="rules-panel" id="rulesPanel">
+            <div class="rules-title">📌 Правила при регистрации</div>
+            <ul class="rules-list">
+                <li>если до конца квартала <strong>10 и более дней</strong> — первый период до конца этого квартала.</li>
+                <li>если <strong>менее 10 дней</strong> — первый период до конца следующего квартала.</li>
+            </ul>
         </div>
 
         <!-- Панель с календарем и результатом -->
@@ -182,16 +204,6 @@
                 <div class="period-hint" id="periodHint"></div>
             </div>
         </div>
-
-        <!-- Краткое описание правил (без примеров) -->
-        <div style="background: #f7faff; border-radius: 20px; padding: 1rem; border: 1px solid #d2e0f0; font-size: 0.9rem; color: #2f4a6b;">
-            <p>📌 <strong>Правила:</strong></p>
-            <ul style="margin-left: 1.2rem; line-height: 1.6;">
-                <li>При регистрации: если до конца квартала <strong>10 и более дней</strong> — первый период до конца этого квартала.</li>
-                <li>Если <strong>менее 10 дней</strong> — первый период до конца следующего квартала.</li>
-                <li>При ликвидации: последний период — с начала квартала до даты ликвидации.</li>
-            </ul>
-        </div>
     </div>
 
     <script>
@@ -202,6 +214,7 @@
             const periodDates = document.getElementById('periodDates');
             const periodHint = document.getElementById('periodHint');
             const dateLabel = document.getElementById('dateLabel');
+            const rulesPanel = document.getElementById('rulesPanel');
             const modeBtns = document.querySelectorAll('.mode-btn');
 
             // Инициализация flatpickr
@@ -215,6 +228,26 @@
                 }
             });
 
+            // Функция обновления панели правил
+            function updateRulesPanel(mode) {
+                if (mode === 'registration') {
+                    rulesPanel.innerHTML = `
+                        <div class="rules-title">📌 Правила при регистрации</div>
+                        <ul class="rules-list">
+                            <li>если до конца квартала <strong>10 и более дней</strong> — первый период до конца этого квартала.</li>
+                            <li>если <strong>менее 10 дней</strong> — первый период до конца следующего квартала.</li>
+                        </ul>
+                    `;
+                } else {
+                    rulesPanel.innerHTML = `
+                        <div class="rules-title">📌 Правила при ликвидации</div>
+                        <ul class="rules-list">
+                            <li><strong>Последний период</strong> — с начала квартала до даты ликвидации.</li>
+                        </ul>
+                    `;
+                }
+            }
+
             // Переключение режима
             modeBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -222,6 +255,7 @@
                     btn.classList.add('active');
                     currentMode = btn.dataset.mode;
                     
+                    // Меняем подписи
                     if (currentMode === 'registration') {
                         dateLabel.textContent = 'Дата регистрации:';
                         periodTitle.textContent = 'Первый налоговый период';
@@ -230,10 +264,15 @@
                         periodTitle.textContent = 'Последний налоговый период';
                     }
                     
+                    // Обновляем панель правил
+                    updateRulesPanel(currentMode);
+                    
+                    // Обновить результат с текущей датой
                     updatePeriod(dateInput.value, currentMode);
                 });
             });
 
+            // Вспомогательные функции
             function getQuarterEnd(date) {
                 const year = date.getFullYear();
                 const month = date.getMonth() + 1;
@@ -284,17 +323,22 @@
 
                 if (mode === 'registration') {
                     const quarterEnd = getQuarterEnd(eventDate);
-                    const daysToQuarterEnd = Math.round((quarterEnd - eventDate) / (1000 * 60 * 60 * 24));
+                    // Разница в днях (округлённо)
+                    const diffTime = quarterEnd - eventDate;
+                    const daysToQuarterEnd = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     
                     let startDate, endDate;
                     let rule = '';
 
+                    // Проверяем, меньше ли 10 дней до конца квартала (включительно)
                     if (daysToQuarterEnd < 10) {
+                        // Менее 10 дней до конца квартала
                         const nextQuarterEnd = getQuarterEnd(new Date(year, month + 3, day));
                         startDate = eventDate;
                         endDate = nextQuarterEnd;
                         rule = 'менее 10 дней до конца квартала → период до конца следующего квартала';
                     } else {
+                        // 10 и более дней
                         startDate = eventDate;
                         endDate = quarterEnd;
                         rule = '10 и более дней до конца квартала → период до конца этого квартала';
@@ -304,12 +348,14 @@
                     periodHint.innerHTML = `<span class="rule-badge">правило</span> ${rule}`;
 
                 } else {
+                    // Ликвидация
                     const quarterStart = getQuarterStart(eventDate);
                     periodDates.textContent = `${formatDateFull(quarterStart)} — ${formatDateFull(eventDate)}`;
                     periodHint.innerHTML = `<span class="rule-badge">правило</span> с начала квартала до даты ликвидации`;
                 }
             }
 
+            // Установить начальное состояние
             updatePeriod('18.02.2026', 'registration');
         })();
     </script>
