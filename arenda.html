@@ -33,12 +33,15 @@
             overflow-y: auto;
         }
 
-        /* Индикатор прогресса */
+        /* Индикатор прогресса с цветовой маркировкой */
         .progress {
             display: flex;
             justify-content: space-between;
             margin-bottom: 1.5rem;
             color: #3f5e7a;
+        }
+        .step-wrapper {
+            text-align: center;
         }
         .step {
             width: 36px;
@@ -51,19 +54,23 @@
             font-weight: 500;
             color: #1e3b5c;
             font-size: 1rem;
+            margin: 0 auto 0.2rem;
         }
         .step.active {
             background: #1e3b5c;
             color: white;
         }
-        .step.completed {
+        .step.correct {
             background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
             color: white;
         }
         .step-label {
             font-size: 0.8rem;
-            text-align: center;
-            margin-top: 0.2rem;
+            color: #1e3b5c;
         }
 
         /* Контейнер вопроса */
@@ -119,7 +126,7 @@
         .button-row {
             display: flex;
             gap: 0.8rem;
-            justify-content: center; /* кнопка проверки по центру */
+            justify-content: center;
             margin-top: 0.5rem;
         }
         .btn {
@@ -232,17 +239,17 @@
 </head>
 <body>
     <div class="card">
-        <!-- Индикатор шагов -->
+        <!-- Индикатор прогресса -->
         <div class="progress">
-            <div>
+            <div class="step-wrapper">
                 <div class="step active" id="step1">1</div>
                 <div class="step-label">Базовый</div>
             </div>
-            <div>
+            <div class="step-wrapper">
                 <div class="step" id="step2">2</div>
                 <div class="step-label">Средний</div>
             </div>
-            <div>
+            <div class="step-wrapper">
                 <div class="step" id="step3">3</div>
                 <div class="step-label">Продвинутый</div>
             </div>
@@ -253,12 +260,12 @@
             <!-- динамически заполняется -->
         </div>
 
-        <!-- Кнопка "Далее" (изначально скрыта, появляется после ответа) -->
+        <!-- Кнопка "Далее" -->
         <div style="display: flex; justify-content: flex-end;">
             <button class="btn primary" id="nextBtn" disabled>Далее →</button>
         </div>
 
-        <!-- Итоговая таблица (появляется после прохождения всех вопросов) -->
+        <!-- Итоговая таблица -->
         <div id="summaryContainer" class="hidden">
             <div class="congrats">✅ Все вопросы пройдены!</div>
             <div class="summary-title">Верные ответы</div>
@@ -344,7 +351,7 @@
             let currentLevel = 1;
             let selectedOption = null;
             let answered = false;
-            let completed = {1: false, 2: false, 3: false};
+            let results = {1: null, 2: null, 3: null}; // null - не отвечен, true - верно, false - неверно
 
             const container = document.getElementById('questionContainer');
             const nextBtn = document.getElementById('nextBtn');
@@ -357,11 +364,14 @@
 
             function updateSteps() {
                 steps.forEach((step, idx) => {
-                    step.classList.remove('active', 'completed');
-                    if (completed[idx+1]) {
-                        step.classList.add('completed');
-                    } else if (idx+1 === currentLevel) {
+                    step.classList.remove('active', 'correct', 'incorrect');
+                    const level = idx + 1;
+                    if (level === currentLevel && results[level] === null) {
                         step.classList.add('active');
+                    } else if (results[level] === true) {
+                        step.classList.add('correct');
+                    } else if (results[level] === false) {
+                        step.classList.add('incorrect');
                     }
                 });
             }
@@ -424,12 +434,13 @@
                 }
 
                 const isCorrect = (selectedOption === q.correct);
+                results[level] = isCorrect;
+
                 feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
                 feedbackDiv.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
                 feedbackDiv.innerHTML = q.explanations[selectedOption];
 
                 answered = true;
-                completed[level] = true;
                 updateSteps();
 
                 // Активируем кнопку "Далее"
@@ -452,7 +463,7 @@
                     container.classList.add('hidden');
                     nextBtn.classList.add('hidden');
                     summaryContainer.classList.remove('hidden');
-                    steps.forEach(step => step.classList.add('completed'));
+                    // Отмечаем все шаги завершёнными (но цвета сохраняются)
                 }
             });
 
@@ -461,7 +472,7 @@
                 currentLevel = 1;
                 selectedOption = null;
                 answered = false;
-                completed = {1: false, 2: false, 3: false};
+                results = {1: null, 2: null, 3: null};
                 
                 container.classList.remove('hidden');
                 nextBtn.classList.remove('hidden');
