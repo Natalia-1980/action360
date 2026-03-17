@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>НДФЛ: объект и база · карусель</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #eef2f5;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+    }
+
+    .trainer-card {
+      max-width: 650px; /* фиксированная ширина 650px */
+      width: 100%;
+      background: #ffffff;
+      border-radius: 40px;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.2);
+      padding: 1.2rem 1rem 0.8rem; /* уменьшено */
+      border: 1px solid #d0dceb;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1e3b5c;
+      text-align: center;
+      margin-bottom: 0.2rem; /* уменьшено */
+      letter-spacing: -0.3px;
+    }
+
+    .sub {
+      color: #2b4b6e;
+      font-size: 0.9rem;
+      background: #e9f1fa;
+      border-radius: 30px;
+      padding: 0.3rem 0.9rem; /* уменьшено */
+      margin-bottom: 0.8rem; /* уменьшено */
+      line-height: 1.3;
+      border: 1px solid #b9d3f0;
+      text-align: center;
+    }
+
+    /* Карусель */
+    .carousel-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0.1rem 0 0.5rem; /* уменьшено */
+    }
+
+    .card-wrapper {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .card-slide {
+      display: flex;
+      transition: transform 0.25s ease-in-out;
+    }
+
+    .card-item {
+      flex: 0 0 100%;
+      padding: 0 0rem;
+      box-sizing: border-box;
+    }
+
+    /* Карточка-задание (drag-and-drop) */
+    .task-card {
+      background: #f8fbfe;
+      border-radius: 24px; /* уменьшен */
+      padding: 1rem 0.9rem 0.8rem; /* уменьшено */
+      border: 2px solid #d4e2f5;
+      box-shadow: 0 6px 10px -6px rgba(0,35,70,0.1);
+    }
+
+    .card-header {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #04335b;
+      background: #e1ecfe;
+      display: inline-block;
+      padding: 0.2rem 1rem; /* уменьшено */
+      border-radius: 30px;
+      margin-bottom: 0.7rem; /* уменьшено */
+    }
+
+    .scenario {
+      background: #ffffff;
+      border-radius: 16px; /* уменьшен */
+      padding: 0.7rem 0.9rem; /* уменьшено */
+      border: 1px dashed #8fa5bb;
+      margin-bottom: 0.8rem; /* уменьшено */
+      font-size: 0.9rem;
+      line-height: 1.4; /* плотнее */
+      color: #1f2c38;
+    }
+
+    .criteria-block {
+      background: #f0f7ff;
+      border-radius: 16px; /* уменьшен */
+      padding: 0.8rem 0.7rem; /* уменьшено */
+      border: 1px solid #cbd5e1;
+      margin-bottom: 0.8rem; /* уменьшено */
+    }
+
+    .criteria-title {
+      font-weight: 700;
+      font-size: 0.9rem; /* чуть меньше */
+      color: #1e3b5c;
+      margin-bottom: 0.5rem; /* уменьшено */
+      padding-bottom: 0.2rem; /* уменьшено */
+      border-bottom: 1px dashed #9aa9b7;
+    }
+
+    .criteria-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem; /* уменьшено */
+    }
+
+    .criteria-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem; /* уменьшено */
+      flex-wrap: wrap;
+    }
+
+    .criteria-label {
+      font-weight: 600;
+      color: #1f2c38;
+      font-size: 0.85rem;
+      min-width: 90px; /* чуть уже */
+    }
+
+    .dropzone {
+      background: #ffffff;
+      border: 2px dashed #9aa9b7;
+      border-radius: 30px;
+      padding: 0.4rem 0.8rem; /* уменьшено */
+      min-width: 110px; /* чуть уже */
+      text-align: center;
+      font-weight: 500;
+      color: #5f7485;
+      transition: 0.1s;
+      cursor: pointer;
+      font-size: 0.8rem; /* чуть меньше */
+    }
+
+    .dropzone.filled {
+      border: 2px solid #6b7b8c;
+      background: #d1dbe5;
+      color: #1f2c38;
+      font-weight: 600;
+    }
+
+    .dropzone.correct-check {
+      border: 3px solid #2e7d5e;
+      background: #d0ecdf;
+      font-weight: 700;
+    }
+
+    .dropzone.incorrect-check {
+      border: 3px solid #b13e3e;
+      background: #ffeae5;
+      font-weight: 700;
+    }
+
+    .unit {
+      font-size: 0.65rem; /* меньше */
+      color: #5f7485;
+      margin-left: 0.1rem;
+    }
+
+    .options-panel {
+      background: #edf2f7;
+      border-radius: 16px; /* уменьшен */
+      padding: 0.8rem 0.7rem; /* уменьшено */
+      border: 1px solid #cbd5e1;
+      margin-bottom: 0.6rem; /* уменьшено */
+    }
+
+    .options-panel h3 {
+      font-weight: 600;
+      font-size: 0.85rem; /* меньше */
+      color: #2b4050;
+      border-bottom: 1px dashed #9aa9b7;
+      padding-bottom: 0.3rem; /* уменьшено */
+      margin-bottom: 0.5rem; /* уменьшено */
+      text-align: center;
+    }
+
+    .draggable-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px; /* уменьшено */
+      justify-content: center;
+    }
+
+    .drag-item {
+      background: #ffffff;
+      border-radius: 40px;
+      padding: 0.3rem 1rem; /* уменьшено */
+      border: 2px solid #1a5d8f;
+      color: #1a5d8f;
+      font-weight: 600;
+      font-size: 0.75rem; /* меньше */
+      cursor: grab;
+      box-shadow: 0 2px 4px -2px #7f8c9a;
+      transition: 0.1s;
+      user-select: none;
+    }
+
+    .drag-item:active {
+      cursor: grabbing;
+      opacity: 0.7;
+    }
+
+    .drag-item.placed {
+      background: #d1dbe5;
+      border: 2px solid #6b7b8c;
+      color: #4a5f73;
+      cursor: default;
+      opacity: 0.5;
+      pointer-events: none;
+      text-decoration: line-through;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.6rem; /* уменьшено */
+      justify-content: center;
+      margin: 0.3rem 0 0.5rem; /* уменьшено */
+    }
+
+    .btn {
+      background: white;
+      border: 2px solid #1a5d8f;
+      border-radius: 60px;
+      padding: 0.3rem 1.5rem; /* уменьшено */
+      font-weight: 600;
+      font-size: 0.75rem; /* меньше */
+      color: #1a5d8f;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #b3c9e0; /* тоньше */
+      transition: 0.1s;
+    }
+
+    .btn-primary {
+      background: #1a5d8f;
+      color: white;
+      border: 2px solid #0e3b5c;
+      box-shadow: 0 2px 0 #0a2a40; /* тоньше */
+    }
+
+    .btn-primary:hover { background: #0e4a77; }
+    .btn:hover { background: #e1ecfe; }
+    .btn:active, .btn-primary:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #b3c9e0;
+    }
+
+    .carousel-arrows {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0.2rem 0 0.3rem; /* уменьшено */
+    }
+
+    .arrow-btn {
+      background: white;
+      border: 2px solid #2a5f8a;
+      border-radius: 50%;
+      width: 38px; /* меньше */
+      height: 38px; /* меньше */
+      font-size: 1.3rem; /* меньше */
+      font-weight: 600;
+      color: #2a5f8a;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #b3c9e0; /* тоньше */
+      transition: 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .arrow-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #b3c9e0;
+    }
+
+    .arrow-btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .counter {
+      font-size: 0.85rem; /* меньше */
+      font-weight: 600;
+      color: #1e3b5c;
+      background: #e6f0fa;
+      padding: 0.3rem 1rem; /* уменьшено */
+      border-radius: 60px;
+    }
+
+    .feedback {
+      background: #f2f8fd;
+      border-radius: 16px; /* уменьшен */
+      padding: 0.5rem 0.8rem; /* уменьшено */
+      font-size: 0.75rem; /* меньше */
+      color: #1e3b5c;
+      border: 1px solid #b9d3f0;
+      margin: 0.2rem 0 0.3rem; /* уменьшено */
+      min-height: 2.5rem; /* меньше */
+      overflow-y: auto;
+    }
+
+    .reset-area {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.1rem; /* уменьшено */
+    }
+
+    .reset-link {
+      background: transparent;
+      border: none;
+      color: #2a5f8a;
+      font-size: 0.7rem; /* меньше */
+      text-decoration: underline dotted;
+      cursor: pointer;
+      padding: 0.2rem 0.8rem; /* уменьшено */
+    }
+
+    hr {
+      border: 1px solid #d4e2f5;
+      margin: 0.2rem 0 0.1rem; /* уменьшено */
+    }
+
+    .footer {
+      text-align: center;
+      color: #4f658d;
+      font-size: 0.6rem; /* меньше */
+    }
+  </style>
+</head>
+<body>
+<div class="trainer-card" id="trainerContainer"></div>
+
+<script>
+  (function() {
+    // ----- Карточки с drag-and-drop (налоговая база резидента/нерезидента) -----
+    const cardsData = [
+      { // карточка 0
+        title: '💼 Резидент Петров',
+        scenario: 'Менеджер Петров — налоговый резидент РФ. Он получает зарплату 100 000 руб. в месяц и гонорар от финского издателя 300 000 руб. в год.',
+        question: 'Какая общая налоговая база Петрова за год?',
+        dropZones: [
+          { label: 'Сумма дохода', expected: '1 500 000 руб.', unit: 'руб.' }
+        ],
+        draggableValues: ['1 200 000 руб.', '1 500 000 руб.', '300 000 руб.', '1 800 000 руб.'],
+        explanation: 'Резидент: все доходы = (100 000 × 12) + 300 000 = 1 500 000 руб.'
+      },
+      { // карточка 1 (исправленный текст)
+        title: '🌍 Нерезидент Джон',
+        scenario: 'Иностранец Джон работает в России, получает зарплату 90 000 руб. в месяц. Также получает доход от аренды квартиры в Лондоне — 600 000 руб. в год. Джон — нерезидент.',
+        question: 'Какая налоговая база для НДФЛ в России?',
+        dropZones: [
+          { label: 'Налоговая база', expected: '1 080 000 руб.', unit: 'руб.' }
+        ],
+        draggableValues: ['1 080 000 руб.', '600 000 руб.', '1 680 000 руб.', '90 000 руб.'],
+        explanation: 'Нерезидент: только доходы от источников в РФ = 90 000 × 12 = 1 080 000 руб.'
+      },
+      { // карточка 2
+        title: '📊 Резидент Анна',
+        scenario: 'Анна — резидент. За год: зарплата 950 000 руб., дивиденды от российской компании 150 000 руб., проценты по вкладу в Швейцарии 80 000 руб.',
+        question: 'Общая налоговая база Анны?',
+        dropZones: [
+          { label: 'Сумма доходов', expected: '1 180 000 руб.', unit: 'руб.' }
+        ],
+        draggableValues: ['950 000 руб.', '1 100 000 руб.', '1 180 000 руб.', '1 030 000 руб.'],
+        explanation: 'Резидент: все доходы = 950 000 + 150 000 + 80 000 = 1 180 000 руб.'
+      },
+      { // карточка 3 (исправленный текст)
+        title: '🏠 Нерезидент Мария',
+        scenario: 'Мария — нерезидент. Работает в России, зарплата 700 000 руб. в год и получает алименты от бывшего мужа из Германии — 240 000 руб. в год.',
+        question: 'Налоговая база в РФ?',
+        dropZones: [
+          { label: 'База для НДФЛ', expected: '700 000 руб.', unit: 'руб.' }
+        ],
+        draggableValues: ['700 000 руб.', '940 000 руб.', '240 000 руб.', '460 000 руб.'],
+        explanation: 'Нерезидент: облагаются только доходы от источников в РФ (зарплата 700 000 руб.). Алименты не облагаются.'
+      }
+    ];
+
+    // Состояние карточек: для каждой карточки храним заполнение дроп-зон и использованные значения
+    let cardState = cardsData.map(() => ({
+      dropValues: [],          // массив значений для каждой дроп-зоны (пустая строка, если не заполнено)
+      usedValues: [],          // массив использованных строк (значений)
+      disabled: false,         // заблокирована ли карточка после проверки
+      feedbackText: '',
+      feedbackClass: ''
+    }));
+
+    let currentIndex = 0;      // индекс текущей карточки в карусели
+
+    const container = document.getElementById('trainerContainer');
+
+    function render() {
+      const total = cardsData.length;
+      if (currentIndex >= total) currentIndex = total - 1;
+      if (currentIndex < 0) currentIndex = 0;
+
+      container.innerHTML = `
+        <div class="main-title">НДФЛ: объект и база</div>
+        <div class="sub">Заполните пропуски — перетащите нужную сумму</div>
+
+        <!-- Карусель -->
+        <div class="carousel-container">
+          <div class="card-wrapper">
+            <div class="card-slide" style="transform: translateX(0%);">
+              <div class="card-item" id="carouselCard"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-arrows">
+          <button class="arrow-btn" id="prevCard" ${total <= 1 || currentIndex === 0 ? 'disabled' : ''}>←</button>
+          <span class="counter">${currentIndex+1} / ${total}</span>
+          <button class="arrow-btn" id="nextCard" ${total <= 1 || currentIndex === total-1 ? 'disabled' : ''}>→</button>
+        </div>
+
+        <div class="reset-area">
+          <button class="reset-link" id="resetCardBtn">🔄 сбросить эту карточку</button>
+          <span style="margin:0 8px">|</span>
+          <button class="reset-link" id="resetAllBtn">⟲ сбросить всё</button>
+        </div>
+
+        <div class="feedback" id="cardFeedback"></div>
+
+        <hr>
+        <div class="footer">НДФЛ · объект и налоговая база (ст. 208, 209 НК)</div>
+      `;
+
+      renderCurrentCard();
+
+      document.getElementById('prevCard').addEventListener('click', () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          render();
+        }
+      });
+
+      document.getElementById('nextCard').addEventListener('click', () => {
+        if (currentIndex < total - 1) {
+          currentIndex++;
+          render();
+        }
+      });
+
+      document.getElementById('resetCardBtn').addEventListener('click', () => {
+        resetSingleCard(currentIndex);
+        render();
+      });
+
+      document.getElementById('resetAllBtn').addEventListener('click', () => {
+        cardState = cardsData.map(() => ({
+          dropValues: [],
+          usedValues: [],
+          disabled: false,
+          feedbackText: '',
+          feedbackClass: ''
+        }));
+        render();
+      });
+    }
+
+    function resetSingleCard(idx) {
+      cardState[idx] = {
+        dropValues: [],
+        usedValues: [],
+        disabled: false,
+        feedbackText: '',
+        feedbackClass: ''
+      };
+    }
+
+    function renderCurrentCard() {
+      const card = cardsData[currentIndex];
+      const state = cardState[currentIndex];
+      const containerDiv = document.getElementById('carouselCard');
+      if (!containerDiv) return;
+
+      // Подготовим dropValues, если пусто
+      if (state.dropValues.length === 0) {
+        state.dropValues = card.dropZones.map(() => '');
+      }
+
+      let html = `
+        <div class="task-card">
+          <div class="card-header">${card.title}</div>
+          <div class="scenario">${card.scenario}</div>
+          <div class="question-text" style="font-weight:600; margin-bottom:0.5rem; color:#021c30;">${card.question}</div>
+          
+          <div class="criteria-block" id="dropzones-${currentIndex}">
+            <div class="criteria-title">⬇️ Перетащите значение</div>
+            <div class="criteria-grid">
+      `;
+
+      card.dropZones.forEach((zone, zIdx) => {
+        const currentVal = state.dropValues[zIdx] || '';
+        const filledClass = currentVal ? 'filled' : '';
+        const correctClass = (state.disabled && currentVal === zone.expected) ? 'correct-check' : '';
+        const incorrectClass = (state.disabled && currentVal && currentVal !== zone.expected) ? 'incorrect-check' : '';
+        html += `
+          <div class="criteria-row">
+            <span class="criteria-label">${zone.label}</span>
+            <div class="dropzone ${filledClass} ${correctClass} ${incorrectClass}" 
+                 id="drop-${currentIndex}-${zIdx}" 
+                 data-expected="${zone.expected}"
+                 data-zone-index="${zIdx}">${currentVal}</div>
+            <span class="unit">${zone.unit}</span>
+          </div>
+        `;
+      });
+
+      html += `</div></div>`;
+
+      // Панель с перетаскиваемыми элементами
+      html += `
+        <div class="options-panel">
+          <h3>📦 Доступные суммы</h3>
+          <div class="draggable-items" id="draggable-${currentIndex}">
+      `;
+
+      card.draggableValues.forEach(val => {
+        const isUsed = state.usedValues.includes(val);
+        html += `<div class="drag-item ${isUsed ? 'placed' : ''}" draggable="${!isUsed && !state.disabled}" data-value="${val}">${val}</div>`;
+      });
+
+      html += `</div></div>`;
+
+      // Кнопки действий
+      html += `
+        <div class="actions">
+          <button class="btn" id="clearCardBtn">Очистить поля</button>
+          <button class="btn btn-primary" id="checkCardBtn" ${state.disabled ? 'disabled' : ''}>Проверить</button>
+        </div>
+      `;
+
+      if (state.feedbackText) {
+        html += `<div class="feedback ${state.feedbackClass}">${state.feedbackText}</div>`;
+      }
+
+      html += `</div>`; // закрыть task-card
+
+      containerDiv.innerHTML = html;
+
+      // Навесить обработчики drag-and-drop
+      setupDragAndDrop(currentIndex);
+
+      // Кнопки
+      document.getElementById('clearCardBtn').addEventListener('click', () => {
+        if (state.disabled) return;
+        // Очистить дроп-зоны и usedValues
+        state.dropValues = card.dropZones.map(() => '');
+        state.usedValues = [];
+        state.feedbackText = '';
+        state.feedbackClass = '';
+        renderCurrentCard();
+      });
+
+      document.getElementById('checkCardBtn').addEventListener('click', () => {
+        checkCard(currentIndex);
+      });
+    }
+
+    function setupDragAndDrop(cardIdx) {
+      const card = cardsData[cardIdx];
+      const state = cardState[cardIdx];
+
+      const draggables = document.querySelectorAll(`#draggable-${cardIdx} .drag-item`);
+      const dropZones = document.querySelectorAll(`[id^="drop-${cardIdx}-"]`);
+
+      // drag start
+      draggables.forEach(item => {
+        if (item.getAttribute('draggable') !== 'true') return;
+
+        item.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', item.getAttribute('data-value') || item.innerText);
+          item.classList.add('dragging');
+        });
+        item.addEventListener('dragend', (e) => {
+          item.classList.remove('dragging');
+        });
+      });
+
+      // drop zones
+      dropZones.forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragenter', (e) => {
+          e.preventDefault();
+          zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragleave', () => {
+          zone.classList.remove('drag-over');
+        });
+        zone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          zone.classList.remove('drag-over');
+
+          if (state.disabled) {
+            document.getElementById('cardFeedback').innerText = 'Карточка уже проверена, сбросьте её.';
+            return;
+          }
+
+          const data = e.dataTransfer.getData('text/plain');
+          if (!data) return;
+
+          const zoneIndex = zone.dataset.zoneIndex;
+          if (zoneIndex === undefined) return;
+
+          // Проверим, не занята ли уже эта зона
+          if (state.dropValues[zoneIndex]) {
+            document.getElementById('cardFeedback').innerText = '⚠️ Эта ячейка уже заполнена. Очистите двойным кликом.';
+            return;
+          }
+
+          // Проверим, не использовано ли уже это значение
+          if (state.usedValues.includes(data)) {
+            document.getElementById('cardFeedback').innerText = '⚠️ Эта сумма уже использована. Выберите другую.';
+            return;
+          }
+
+          // Всё ок, ставим
+          state.dropValues[zoneIndex] = data;
+          state.usedValues.push(data);
+
+          // Обновим отображение
+          renderCurrentCard();
+        });
+
+        // двойной клик для очистки зоны
+        zone.addEventListener('dblclick', () => {
+          if (state.disabled) return;
+          const zoneIndex = zone.dataset.zoneIndex;
+          const currentVal = state.dropValues[zoneIndex];
+          if (currentVal) {
+            // Удаляем из usedValues
+            state.usedValues = state.usedValues.filter(v => v !== currentVal);
+            state.dropValues[zoneIndex] = '';
+            renderCurrentCard();
+          }
+        });
+      });
+    }
+
+    function checkCard(cardIdx) {
+      const card = cardsData[cardIdx];
+      const state = cardState[cardIdx];
+
+      // Проверим, все ли поля заполнены
+      if (state.dropValues.some(v => !v)) {
+        document.getElementById('cardFeedback').innerText = '❌ Заполните все поля перед проверкой.';
+        return;
+      }
+
+      let allCorrect = true;
+      card.dropZones.forEach((zone, idx) => {
+        if (state.dropValues[idx] !== zone.expected) {
+          allCorrect = false;
+        }
+      });
+
+      state.disabled = true;
+      if (allCorrect) {
+        state.feedbackText = '✅ Верно! ' + card.explanation;
+        state.feedbackClass = 'correct';
+      } else {
+        state.feedbackText = '❌ Ошибка. ' + card.explanation;
+        state.feedbackClass = 'incorrect';
+      }
+
+      renderCurrentCard();
+    }
+
+    render();
+  })();
+</script>
+</body>
+</html>
