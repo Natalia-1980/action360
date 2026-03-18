@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>НДФЛ с ценных бумаг · верно/неверно</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+        }
+
+        .card {
+            max-width: 520px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 15px 25px -12px rgba(0,0,0,0.1);
+            padding: 1rem 1rem 0.8rem;
+            border: 1px solid #d0d7de;
+        }
+
+        .main-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3b5c;
+            text-align: center;
+            margin-bottom: 0.1rem;
+        }
+
+        .sub {
+            color: #3f4f60;
+            font-size: 0.7rem;
+            text-align: center;
+            background: #f2f6fb;
+            border-radius: 30px;
+            padding: 0.2rem 0.6rem;
+            margin-bottom: 0.6rem;
+            border: 1px solid #b9d3f0;
+        }
+
+        .progress-bar {
+            background: #e6f0fa;
+            border-radius: 60px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.65rem;
+            color: #1e3b5c;
+            text-align: center;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+        }
+
+        .statement-card {
+            background: #f8fbfe;
+            border: 2px solid #d4e2f5;
+            border-radius: 20px;
+            padding: 0.7rem 1rem;
+            margin-bottom: 0.8rem;
+            text-align: center;
+            font-size: 1rem;
+            line-height: 1.4;
+            color: #1f2c38;
+            font-weight: 500;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .buttons-row {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .answer-btn {
+            flex: 1;
+            background: #e9ecef;
+            border: 2px solid #6c757d;
+            border-radius: 40px;
+            padding: 0.4rem 0.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #495057;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 2px 0 #adb5bd;
+            min-width: 80px;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            background: #dee2e6;
+        }
+
+        .answer-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 0px 0 #adb5bd;
+        }
+
+        .answer-btn.selected {
+            background: #6c757d !important;
+            border: 3px solid #495057 !important;
+            color: white !important;
+        }
+
+        .answer-btn:disabled {
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        .explanation {
+            background: #f2f8fd;
+            border-radius: 16px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.75rem;
+            color: #1e3b5c;
+            border: 1px solid #b9d3f0;
+            margin-bottom: 0.8rem;
+            line-height: 1.3;
+        }
+
+        .explanation.correct {
+            background: #d0ecdf;
+            border-color: #2e7d5e;
+        }
+
+        .explanation.incorrect {
+            background: #ffeae5;
+            border-color: #b13e3e;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 0.2rem;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 2px solid #1a5d8f;
+            border-radius: 60px;
+            padding: 0.3rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #1a5d8f;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b3c9e0;
+            transition: 0.1s;
+            flex: 1;
+            max-width: 100px;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #e1ecfe;
+        }
+
+        .nav-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b3c9e0;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: none;
+            color: #2a5f8a;
+            font-size: 0.65rem;
+            text-decoration: underline dotted;
+            cursor: pointer;
+            padding: 0.2rem;
+            margin-top: 0.1rem;
+        }
+
+        hr {
+            border: 1px solid #d4e2f5;
+            margin: 0.4rem 0 0.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: #4f658d;
+            font-size: 0.55rem;
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="trainerContainer"></div>
+
+<script>
+    (function() {
+        // Отобранные утверждения (1,3,4,5,7,8 по списку)
+        const statements = [
+            {
+                text: 'При продаже акций налог платится со всей выручки, а не с прибыли.',
+                correct: false,
+                explanation: 'НДФЛ уплачивается только с прибыли (финансовый результат): доходы минус расходы.'
+            },
+            {
+                text: 'Метод ФИФО позволяет списывать расходы на приобретение ценных бумаг в той последовательности, в которой они были куплены.',
+                correct: true,
+                explanation: 'При реализации ценных бумаг расходы списывают по методу ФИФО — первые по времени приобретения продаются первыми.'
+            },
+            {
+                text: 'При продаже валютных бумаг курсовая разница не учитывается при расчете налога.',
+                correct: false,
+                explanation: 'Доходы и расходы в инвалюте пересчитываются в рубли по курсу на дату операции, курсовая разница учитывается.'
+            },
+            {
+                text: 'Замещение еврооблигаций на замещающие облигации не приводит к возникновению налоговой базы.',
+                correct: true,
+                explanation: 'При замещении налоговая база не возникает, расходы учитываются в рублях по курсу на дату продажи замещающих облигаций.'
+            },
+            {
+                text: 'Прекращение обязательств зачетом однородных требований не признается реализацией ценных бумаг.',
+                correct: false,
+                explanation: 'Зачет признается реализацией, если требования однородны (ценные бумаги одного эмитента, вида, категории).'
+            },
+            {
+                text: 'Продажа акций, которыми физлицо владело более 5 лет, всегда освобождается от налога.',
+                correct: false,
+                explanation: 'Освобождение действует только если недвижимость эмитента в России ≤ 50% активов и налоговая база ≤ 50 млн руб.'
+            }
+        ];
+
+        let currentIndex = 0;
+        let userAnswers = new Array(statements.length).fill(null);
+        let answeredStatus = new Array(statements.length).fill(false);
+
+        const container = document.getElementById('trainerContainer');
+
+        function render() {
+            const total = statements.length;
+            const answered = userAnswers.filter(a => a !== null).length;
+
+            container.innerHTML = `
+                <div class="main-title">НДФЛ с ценных бумаг</div>
+                <div class="sub">Верно или неверно?</div>
+
+                <div class="progress-bar">${answered} из ${total}</div>
+
+                <div class="statement-card" id="statementText">${statements[currentIndex].text}</div>
+
+                <div class="buttons-row">
+                    <button class="answer-btn" id="trueBtn" ${answeredStatus[currentIndex] ? 'disabled' : ''}>✓ ВЕРНО</button>
+                    <button class="answer-btn" id="falseBtn" ${answeredStatus[currentIndex] ? 'disabled' : ''}>✗ НЕВЕРНО</button>
+                </div>
+
+                <div id="explanationBlock" class="explanation" style="${!answeredStatus[currentIndex] ? 'display: none;' : ''}"></div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn" id="prevBtn" ${currentIndex === 0 ? 'disabled' : ''}>← Назад</button>
+                    <button class="nav-btn" id="nextBtn" ${currentIndex === total - 1 ? 'disabled' : ''}>Вперед →</button>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="reset-btn" id="resetBtn">🔄 начать заново</button>
+                </div>
+
+                <hr>
+                <div class="footer">ст. 214.1 НК РФ · операции с ценными бумагами</div>
+            `;
+
+            // Сброс классов у кнопок
+            const trueBtn = document.getElementById('trueBtn');
+            const falseBtn = document.getElementById('falseBtn');
+
+            // Убираем все классы выделения
+            trueBtn.classList.remove('selected');
+            falseBtn.classList.remove('selected');
+
+            if (answeredStatus[currentIndex]) {
+                const userAnswer = userAnswers[currentIndex];
+                const isCorrect = (userAnswer === statements[currentIndex].correct);
+                const explanationEl = document.getElementById('explanationBlock');
+                explanationEl.style.display = 'block';
+                explanationEl.className = `explanation ${isCorrect ? 'correct' : 'incorrect'}`;
+                explanationEl.innerHTML = `
+                    <strong>${isCorrect ? '✅ Правильно!' : '❌ Ошибка'}</strong><br>
+                    ${statements[currentIndex].explanation}
+                `;
+
+                // Подсвечиваем выбранный ответ темно-серым
+                if (userAnswer === true) {
+                    trueBtn.classList.add('selected');
+                } else if (userAnswer === false) {
+                    falseBtn.classList.add('selected');
+                }
+            }
+
+            document.getElementById('trueBtn').addEventListener('click', () => handleAnswer(true));
+            document.getElementById('falseBtn').addEventListener('click', () => handleAnswer(false));
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    render();
+                }
+            });
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                if (currentIndex < total - 1) {
+                    currentIndex++;
+                    render();
+                }
+            });
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                userAnswers = new Array(statements.length).fill(null);
+                answeredStatus = new Array(statements.length).fill(false);
+                currentIndex = 0;
+                render();
+            });
+        }
+
+        function handleAnswer(answer) {
+            if (answeredStatus[currentIndex]) return;
+
+            userAnswers[currentIndex] = answer;
+            answeredStatus[currentIndex] = true;
+            render();
+        }
+
+        render();
+    })();
+</script>
+</body>
+</html>
