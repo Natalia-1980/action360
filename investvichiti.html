@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>НДФЛ: вычеты с ИИС · карточки</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #d9e4ee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 12px;
+        }
+        /* ширина фрейма ровно 560px */
+        .flip-carousel {
+            max-width: 560px;
+            width: 100%;
+            background: transparent;
+        }
+        h1 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: #0b2b3d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            line-height: 1.2;
+            padding: 0 4px;
+        }
+        h1 span {
+            background: #cde0ef;
+            color: #094d6b;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 4px 14px;
+            border-radius: 40px;
+        }
+        /* контейнер с 3D */
+        .flip-wrapper {
+            background: transparent;
+            width: 100%;
+            height: auto;
+            perspective: 1600px;
+            margin-bottom: 18px;
+        }
+        .flip-card {
+            position: relative;
+            width: 100%;
+            min-height: 360px;
+            transition: transform 0.4s ease;
+            transform-style: preserve-3d;
+            border-radius: 32px;
+            box-shadow: 0 15px 25px -8px rgba(0, 35, 55, 0.3);
+        }
+        .flip-card.flipped {
+            transform: rotateY(180deg);
+        }
+        .face {
+            position: absolute;
+            width: 100%;
+            min-height: 100%;
+            backface-visibility: hidden;
+            border-radius: 32px;
+            padding: 24px 22px 26px 22px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 -1px 0 #dee9f2;
+        }
+        .face.front {
+            transform: rotateY(0deg);
+            background: #ffffff;
+        }
+        .face.back {
+            transform: rotateY(180deg);
+            background: #f2f9ff;
+            border-left: 6px solid #216f94;
+        }
+        .question-number {
+            background: #dae9f5;
+            color: #13445c;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 4px 14px;
+            border-radius: 30px;
+            display: inline-block;
+            width: fit-content;
+            margin-bottom: 16px;
+            letter-spacing: 0.2px;
+        }
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 520;
+            color: #103242;
+            line-height: 1.35;
+            margin-bottom: 18px;
+        }
+        /* варианты кликабельные */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            background: #f3f9ff;
+            border-radius: 40px;
+            border: 2px solid transparent;
+            transition: 0.08s;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .option:hover {
+            background: #e3effa;
+        }
+        .option.selected-correct {
+            background: #c8f0e4;
+            border-color: #1b9e85;
+        }
+        .option.selected-wrong {
+            background: #ffe1e1;
+            border-color: #c53a3a;
+        }
+        .option input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #7f9eb5;
+            border-radius: 50%;
+            margin: 0 12px 0 18px;
+            transition: 0.1s;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .option input[type="radio"]:checked {
+            border-color: #0d5f8b;
+            background-color: #0d5f8b;
+            box-shadow: inset 0 0 0 4px white, 0 0 0 1px #0d5f8b;
+        }
+        .option input[type="radio"]:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+        .option span {
+            flex: 1;
+            padding: 10px 18px 10px 0;
+            color: #1a3f55;
+            font-weight: 450;
+            font-size: 1rem;
+            line-height: 1.3;
+        }
+        /* обратная сторона */
+        .back-title {
+            font-weight: 650;
+            font-size: 1.1rem;
+            color: #0c3d58;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-title span {
+            background: #216f94;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+        }
+        .correct-answer {
+            background: #d6f0e8;
+            border-radius: 40px;
+            padding: 12px 20px;
+            margin-bottom: 18px;
+            border-left: 6px solid #1c8278;
+            font-weight: 500;
+            color: #00594c;
+            font-size: 1.05rem;
+        }
+        .explanation {
+            background: #ffffffcc;
+            border-radius: 20px;
+            padding: 14px 18px;
+            color: #043545;
+            font-size: 0.96rem;
+            line-height: 1.45;
+            border: 1px solid #c2d9ec;
+        }
+        /* навигация и кнопки */
+        .nav-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 8px 0 12px;
+        }
+        .nav-btn {
+            background: white;
+            border: 1.8px solid #9cb9d2;
+            color: #1d577b;
+            font-size: 1.4rem;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(35, 80, 110, 0.1);
+        }
+        .nav-btn:hover:not(:disabled) {
+            background: #deecf7;
+            border-color: #216f94;
+        }
+        .nav-btn:disabled {
+            opacity: 0.3;
+            border-color: #b0c4d6;
+            cursor: default;
+        }
+        .counter-pill {
+            background: #d7e5f1;
+            color: #113e59;
+            font-weight: 600;
+            padding: 7px 26px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+        }
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0 10px;
+        }
+        .reset-btn {
+            background: transparent;
+            border: 1.8px solid #96b2c9;
+            color: #1d4d69;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 6px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .reset-btn:hover {
+            background: #e4ecf3;
+        }
+        .score-badge {
+            font-size: 0.9rem;
+            background: #c7ddee;
+            padding: 6px 20px;
+            border-radius: 40px;
+            color: #0c3346;
+            font-weight: 600;
+            border: 1px solid #9cb9d2;
+        }
+        hr {
+            border: none;
+            border-top: 2px dashed #bfd6e7;
+            margin: 10px 0 6px;
+        }
+        .hint {
+            color: #406e88;
+            font-size: 0.75rem;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .legend {
+            display: flex;
+            gap: 12px;
+        }
+        .green-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background: #c8f0e4;
+            border: 2px solid #1b9e85;
+            border-radius: 20px;
+            margin-right: 3px;
+        }
+        .red-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background: #ffe1e1;
+            border: 2px solid #c53a3a;
+            border-radius: 20px;
+            margin-right: 3px;
+        }
+    </style>
+</head>
+<body>
+<div class="flip-carousel">
+    <h1>НДФЛ: вычеты с ИИС</h1>
+
+    <div class="flip-wrapper" id="flipWrapper">
+        <div class="flip-card" id="flipCard">
+            <!-- лицевая сторона с выбором -->
+            <div class="face front" id="frontFace"></div>
+            <!-- обратная сторона (ответ) -->
+            <div class="face back" id="backFace"></div>
+        </div>
+    </div>
+
+    <!-- навигация -->
+    <div class="nav-row">
+        <button class="nav-btn" id="prevBtn" disabled>←</button>
+        <span class="counter-pill" id="counter">1 / 5</span>
+        <button class="nav-btn" id="nextBtn">→</button>
+    </div>
+
+    <!-- сброс и статистика -->
+    <div class="action-row">
+        <button class="reset-btn" id="resetBtn">Сброс</button>
+        <div class="score-badge" id="progressCounter">0 / 5</div>
+    </div>
+    <hr>
+    <div class="hint">
+        <span class="legend"><span class="green-dot"></span> верно</span>
+        <span class="legend"><span class="red-dot"></span> неверно</span>
+        <span>⚪ ответь — карточка перевернется</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const questions = [
+            {
+                text: "Иван открыл ИИС 15 марта 2025 года. Какие налоговые вычеты он может применять?",
+                options: [
+                    "Только инвестиционные вычеты (тип А или Б)",
+                    "Только вычеты на долгосрочные сбережения",
+                    "Любой из двух типов по своему выбору",
+                    "Никакие, так как с 2025 года вычеты отменили"
+                ],
+                correct: 1,
+                correctText: "Только вычеты на долгосрочные сбережения",
+                comment: "Для счетов, открытых с 1 января 2025 года, применяются только вычеты на долгосрочные сбережения (ст. 219.2 НК). Альтернативы нет."
+            },
+            {
+                text: "Елена открыла ИИС в 2023 году. Она хочет получать ежегодный возврат части внесенных средств. Какой вычет ей нужно выбрать?",
+                options: [
+                    "Инвестиционный вычет в сумме взноса (тип А)",
+                    "Инвестиционный вычет в сумме прибыли (тип Б)",
+                    "Вычет на долгосрочные сбережения на прибыль",
+                    "Социальный вычет"
+                ],
+                correct: 0,
+                correctText: "Инвестиционный вычет в сумме взноса (тип А)",
+                comment: "Для счетов, открытых до 31.12.2023, по умолчанию действуют старые инвестиционные вычеты. Вычет в сумме взноса (до 400 тыс. руб. в год) — это тип А."
+            },
+            {
+                text: "Максим в 2025 году внес на ИИС 500 000 рублей. Его зарплата за год — 1 000 000 рублей, ставка НДФЛ — 13%. Сколько денег он сможет вернуть?",
+                options: [
+                    "65 000 рублей (13% от 500 000)",
+                    "52 000 рублей",
+                    "0 рублей, так как с 2025 года вычет на взнос отменен",
+                    "60 000 рублей"
+                ],
+                correct: 1,
+                correctText: "52 000 рублей",
+                comment: "Лимит для вычета на взнос — 400 000 рублей в год, независимо от фактической суммы взноса. 13% от 400 000 = 52 000 рублей."
+            },
+            {
+                text: "Алексей открыл ИИС в 2025 году, получал вычет на взнос, но закрыл счет через 3 года. Что ему грозит?",
+                options: [
+                    "Ничего, он уже получил вычет и может его не возвращать",
+                    "Придется вернуть только сумму вычета",
+                    "Придется вернуть вычет + заплатить пени",
+                    "Штраф 20% от суммы вычета"
+                ],
+                correct: 2,
+                correctText: "Придется вернуть вычет + заплатить пени",
+                comment: "Если закрыть ИИС до истечения минимального срока (для 2025 года — 5 лет), полученный вычет нужно вернуть в бюджет вместе с пенями."
+            },
+            {
+                text: "В 2025 году ИИС можно закрыть без потери права на вычет на прибыль не ранее чем через:",
+                options: [
+                    "3 года",
+                    "5 лет",
+                    "10 лет",
+                    "Срок не важен"
+                ],
+                correct: 1,
+                correctText: "5 лет",
+                comment: "Для счетов, открытых в 2024–2026 годах, минимальный срок владения для вычета на прибыль (и чтобы не возвращать вычет на взнос) — 5 лет."
+            }
+        ];
+
+        let currentIndex = 0;
+        let isFlipped = false;
+        let selectedIndex = null;
+        // статистика правильных ответов
+        let correctCount = new Array(questions.length).fill(null);
+
+        const flipCard = document.getElementById('flipCard');
+        const frontFace = document.getElementById('frontFace');
+        const backFace = document.getElementById('backFace');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const counterSpan = document.getElementById('counter');
+        const resetBtn = document.getElementById('resetBtn');
+        const progressSpan = document.getElementById('progressCounter');
+
+        // лицевая сторона
+        function renderFront() {
+            const q = questions[currentIndex];
+            let html = `
+                <div class="question-number">вопрос ${currentIndex+1} из ${questions.length}</div>
+                <div class="question-text">${q.text}</div>
+                <div class="options-grid" id="optionsGrid">
+            `;
+
+            for (let i = 0; i < q.options.length; i++) {
+                let optionClass = 'option';
+                if (isFlipped && selectedIndex !== null) {
+                    if (i === q.correct) {
+                        optionClass += ' selected-correct';
+                    } else if (i === selectedIndex && selectedIndex !== q.correct) {
+                        optionClass += ' selected-wrong';
+                    }
+                }
+                const checked = (selectedIndex === i) ? 'checked' : '';
+                const disabledAttr = isFlipped ? 'disabled' : '';
+
+                html += `
+                    <label class="${optionClass}" data-optidx="${i}">
+                        <input type="radio" name="q-option" value="${i}" ${checked} ${disabledAttr} data-optidx="${i}">
+                        <span>${q.options[i]}</span>
+                    </label>
+                `;
+            }
+            html += `</div>`;
+            frontFace.innerHTML = html;
+
+            if (!isFlipped) {
+                document.querySelectorAll('.option input[type="radio"]').forEach(radio => {
+                    radio.addEventListener('change', function(e) {
+                        if (isFlipped) return;
+                        const optIdx = parseInt(this.dataset.optidx);
+                        if (!isNaN(optIdx)) {
+                            handleAnswer(optIdx);
+                        }
+                    });
+                });
+                document.querySelectorAll('.option').forEach(label => {
+                    label.addEventListener('click', function(e) {
+                        if (isFlipped) return;
+                        const radio = this.querySelector('input[type="radio"]');
+                        if (radio && !radio.checked) {
+                            radio.checked = true;
+                            const ev = new Event('change', { bubbles: true });
+                            radio.dispatchEvent(ev);
+                        }
+                    });
+                });
+            }
+        }
+
+        // обратная сторона
+        function renderBack() {
+            const q = questions[currentIndex];
+            let verdict = '';
+            if (selectedIndex !== null) {
+                verdict = (selectedIndex === q.correct) ? '✅ верно' : '❌ неверно';
+            } else {
+                verdict = '⚪ ответ не выбран';
+            }
+            let backHtml = `
+                <div class="back-title"><span>${verdict}</span></div>
+                <div class="correct-answer">✓ ${q.correctText}</div>
+                <div class="explanation">${q.comment}</div>
+            `;
+            backFace.innerHTML = backHtml;
+        }
+
+        // выбор ответа
+        function handleAnswer(optIdx) {
+            if (isFlipped) return;
+            const q = questions[currentIndex];
+            selectedIndex = optIdx;
+            const isCorrect = (optIdx === q.correct);
+            correctCount[currentIndex] = isCorrect;
+
+            isFlipped = true;
+            flipCard.classList.add('flipped');
+
+            renderFront();
+            renderBack();
+            updateProgress();
+        }
+
+        // переключение карточки
+        function changeCard(newIndex) {
+            currentIndex = newIndex;
+            selectedIndex = null;
+            isFlipped = false;
+            flipCard.classList.remove('flipped');
+            renderFront();
+            renderBack();
+            updateNav();
+            updateProgress();
+        }
+
+        function updateNav() {
+            counterSpan.innerText = `${currentIndex+1} / ${questions.length}`;
+            prevBtn.disabled = (currentIndex === 0);
+            nextBtn.disabled = (currentIndex === questions.length - 1);
+        }
+
+        function updateProgress() {
+            const correctTotal = correctCount.filter(v => v === true).length;
+            progressSpan.innerText = `${correctTotal} / ${questions.length}`;
+        }
+
+        function goPrev() {
+            if (currentIndex > 0) changeCard(currentIndex - 1);
+        }
+        function goNext() {
+            if (currentIndex < questions.length - 1) changeCard(currentIndex + 1);
+        }
+
+        function resetAll() {
+            correctCount = new Array(questions.length).fill(null);
+            currentIndex = 0;
+            selectedIndex = null;
+            isFlipped = false;
+            flipCard.classList.remove('flipped');
+            renderFront();
+            renderBack();
+            updateNav();
+            updateProgress();
+        }
+
+        prevBtn.addEventListener('click', goPrev);
+        nextBtn.addEventListener('click', goNext);
+        resetBtn.addEventListener('click', resetAll);
+
+        // инициализация
+        renderFront();
+        renderBack();
+        updateNav();
+        updateProgress();
+    })();
+</script>
+</body>
+</html>
