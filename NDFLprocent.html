@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>НДФЛ с процентов по вкладам</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #eef2f5;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+    }
+
+    .trainer-card {
+      max-width: 650px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 36px;
+      box-shadow: 0 20px 30px -15px rgba(0,0,0,0.15);
+      padding: 1rem 0.9rem 0.8rem;
+      border: 1px solid #d0dceb;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1e3b5c;
+      text-align: center;
+      margin-bottom: 0.1rem;
+    }
+
+    .sub {
+      color: #3f4f60;
+      font-size: 0.75rem;
+      border-left: 3px solid #8fa5bb;
+      padding-left: 0.5rem;
+      background: #f2f6fb;
+      border-radius: 0 16px 16px 0;
+      padding: 0.3rem 0.8rem;
+      margin-bottom: 0.6rem;
+      line-height: 1.2;
+    }
+
+    /* Карусель */
+    .carousel-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0.2rem 0 0.4rem;
+    }
+
+    .card-wrapper {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .card-slide {
+      display: flex;
+      transition: transform 0.25s ease-in-out;
+    }
+
+    .card-item {
+      flex: 0 0 100%;
+      padding: 0 0rem;
+      box-sizing: border-box;
+    }
+
+    .task-card {
+      background: #f8fbfe;
+      border-radius: 24px;
+      padding: 0.9rem 0.9rem 0.7rem;
+      border: 2px solid #d4e2f5;
+      box-shadow: 0 6px 10px -6px rgba(0,35,70,0.1);
+    }
+
+    .task-header {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #04335b;
+      background: #e1ecfe;
+      display: inline-block;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      margin-bottom: 0.5rem;
+    }
+
+    .task-desc {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 0.6rem 0.8rem;
+      border: 1px dashed #8fa5bb;
+      margin-bottom: 0.7rem;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      color: #1f2c38;
+    }
+
+    .calc-block {
+      background: #f0f7ff;
+      border-radius: 16px;
+      padding: 0.6rem 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .calc-row {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      margin: 0.3rem 0;
+    }
+
+    .calc-label {
+      font-weight: 600;
+      color: #1f2c38;
+      font-size: 0.75rem;
+      min-width: 110px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      flex: 1;
+    }
+
+    .calc-input {
+      flex: 1;
+      padding: 0.4rem 0.6rem;
+      border: 2px solid #8fa5bb;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      min-width: 100px;
+    }
+
+    .calc-input:focus {
+      outline: none;
+      border-color: #1e6bb8;
+    }
+
+    .calc-input.correct {
+      border: 3px solid #2e7d5e;
+      background: #d0ecdf;
+    }
+
+    .calc-input.incorrect {
+      border: 3px solid #b13e3e;
+      background: #ffeae5;
+    }
+
+    .unit {
+      font-size: 0.7rem;
+      color: #5f7485;
+    }
+
+    .hint {
+      font-size: 0.7rem;
+      color: #2e7ab3;
+      background: #e3f0fd;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      margin: 0.2rem 0 0.2rem 0;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 0.4rem 0 0.3rem;
+    }
+
+    .btn {
+      background: white;
+      border: 2px solid #1a5d8f;
+      border-radius: 60px;
+      padding: 0.3rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.7rem;
+      color: #1a5d8f;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #b3c9e0;
+      transition: 0.1s;
+    }
+
+    .btn-primary {
+      background: #1a5d8f;
+      color: white;
+      border: 2px solid #0e3b5c;
+      box-shadow: 0 2px 0 #0a2a40;
+    }
+
+    .btn-primary:hover { background: #0e4a77; }
+    .btn:hover { background: #e1ecfe; }
+    .btn:active, .btn-primary:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #b3c9e0;
+    }
+
+    .carousel-arrows {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0.2rem 0 0.2rem;
+    }
+
+    .arrow-btn {
+      background: white;
+      border: 2px solid #2a5f8a;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #2a5f8a;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #b3c9e0;
+      transition: 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .arrow-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #b3c9e0;
+    }
+
+    .arrow-btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .counter {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1e3b5c;
+      background: #e6f0fa;
+      padding: 0.2rem 0.8rem;
+      border-radius: 60px;
+    }
+
+    .reset-area {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.2rem;
+    }
+
+    .reset-link {
+      background: transparent;
+      border: none;
+      color: #2a5f8a;
+      font-size: 0.7rem;
+      text-decoration: underline dotted;
+      cursor: pointer;
+      padding: 0.2rem 0.8rem;
+    }
+
+    .summary {
+      background: #eef2f6;
+      border-radius: 30px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.7rem;
+      color: #1e3b5c;
+      text-align: center;
+      margin: 0.3rem 0 0.2rem;
+      font-weight: 500;
+    }
+
+    hr {
+      border: 1px solid #d4e2f5;
+      margin: 0.3rem 0 0.1rem;
+    }
+
+    .footer {
+      text-align: center;
+      color: #4f658d;
+      font-size: 0.6rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+<div class="trainer-card" id="trainerContainer"></div>
+
+<script>
+  (function() {
+    // Три задачи по вкладам с обновленными условиями
+    const tasks = [
+      {
+        title: 'Задача 1. Вклад в рублях',
+        desc: 'Физлицо открыло вклад на 1 200 000 рублей под 20 процентов годовых. Ключевая ставка на весь период — 16,5 процентов. Срок вклада — 1 год, проценты в конце срока.',
+        questions: [
+          { label: 'Проценты за 1 год', formula: '1 200 000 × 0,20 × 1', answer: '240000', unit: 'рубли' },
+          { label: 'Необлагаемая сумма', formula: '1 000 000 × 0,165 × 1', answer: '165000', unit: 'рубли' },
+          { label: 'Налоговая база', formula: '240 000 – 165 000', answer: '75000', unit: 'рубли' },
+          { label: 'НДФЛ (13%)', formula: '(240 000 – 165 000) × 0,13', answer: '9750', unit: 'рубли' }
+        ]
+      },
+      {
+        title: 'Задача 2. Долгосрочный вклад',
+        desc: '31 декабря 2024 года физлицо разместило 4 000 000 рублей на 3 года под 15 процентов годовых. Проценты в конце срока. Максимальная ключевая ставка — 17,5 процентов.',
+        questions: [
+          { label: 'Доход за 3 года', formula: '4 000 000 × 0,15 × 3', answer: '1800000', unit: 'рубли' },
+          { label: 'Необлагаемая сумма', formula: '1 000 000 × 0,175 × 3', answer: '525000', unit: 'рубли' },
+          { label: 'Налоговая база', formula: '1 800 000 – 525 000', answer: '1275000', unit: 'рубли' },
+          { label: 'НДФЛ (13%)', formula: '(1 800 000 – 525 000) × 0,13', answer: '165750', unit: 'рубли' }
+        ]
+      },
+      {
+        title: 'Задача 3. Вклад с учетом использованного минимума',
+        desc: 'Вклад 2 500 000 рублей под 15 процентов годовых на 1 год. Необлагаемый минимум физическое лицо использовало в сумме 70 000 рублей по другому вкладу. Ключевая ставка — 14 процентов. Фактически полученные проценты за год — 280 000 рублей.',
+        questions: [
+          { label: 'Необлагаемая сумма', formula: '(1 000 000 × 0,14) – 70 000', answer: '70000', unit: 'рубли' },
+          { label: 'Проценты по вкладу', formula: '2 500 000 × 0,15', answer: '375000', unit: 'рубли' },
+          { label: 'Налоговая база', formula: '375 000 – 70 000', answer: '305000', unit: 'рубли' },
+          { label: 'НДФЛ (13%)', formula: '305 000 × 0,13', answer: '39650', unit: 'рубли' }
+        ]
+      }
+    ];
+
+    // Состояние
+    let currentIndex = 0;
+    let userAnswers = {};
+    let taskResults = {};
+
+    const container = document.getElementById('trainerContainer');
+
+    function render() {
+      const total = tasks.length;
+      if (currentIndex >= total) currentIndex = total - 1;
+      if (currentIndex < 0) currentIndex = 0;
+
+      container.innerHTML = `
+        <div class="main-title">НДФЛ с процентов по вкладам</div>
+        <div class="sub">Впишите числа — подсказка появится при ошибке</div>
+
+        <div class="carousel-container">
+          <div class="card-wrapper">
+            <div class="card-slide" style="transform: translateX(0%);">
+              <div class="card-item" id="carouselCard"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-arrows">
+          <button class="arrow-btn" id="prevCard" ${total <= 1 || currentIndex === 0 ? 'disabled' : ''}>←</button>
+          <span class="counter">${currentIndex+1} / ${total}</span>
+          <button class="arrow-btn" id="nextCard" ${total <= 1 || currentIndex === total-1 ? 'disabled' : ''}>→</button>
+        </div>
+
+        <div class="reset-area">
+          <button class="reset-link" id="resetCardBtn">🔄 сбросить эту карточку</button>
+          <span style="margin:0 5px">|</span>
+          <button class="reset-link" id="resetAllBtn">⟲ сбросить все</button>
+        </div>
+
+        <div class="summary" id="summary">Заполните все поля</div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="checkCardBtn">✓ Проверить эту задачу</button>
+        </div>
+
+        <hr>
+        <div class="footer">ст. 214.2 НК РФ · проценты по вкладам</div>
+      `;
+
+      renderCurrentCard();
+
+      document.getElementById('prevCard').addEventListener('click', () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          render();
+        }
+      });
+
+      document.getElementById('nextCard').addEventListener('click', () => {
+        if (currentIndex < total - 1) {
+          currentIndex++;
+          render();
+        }
+      });
+
+      document.getElementById('resetCardBtn').addEventListener('click', () => {
+        resetCurrentCard();
+        render();
+      });
+
+      document.getElementById('resetAllBtn').addEventListener('click', () => {
+        userAnswers = {};
+        taskResults = {};
+        render();
+      });
+
+      document.getElementById('checkCardBtn').addEventListener('click', () => {
+        checkCurrentCard();
+      });
+    }
+
+    function resetCurrentCard() {
+      const task = tasks[currentIndex];
+      task.questions.forEach((_, qIdx) => {
+        const fieldId = `task_${currentIndex}_q${qIdx}`;
+        delete userAnswers[fieldId];
+        delete taskResults[fieldId];
+      });
+    }
+
+    function renderCurrentCard() {
+      const task = tasks[currentIndex];
+      const containerDiv = document.getElementById('carouselCard');
+      if (!containerDiv) return;
+
+      let html = `
+        <div class="task-card">
+          <div class="task-header">${task.title}</div>
+          <div class="task-desc">${task.desc}</div>
+          <div class="calc-block" id="calcBlock">
+      `;
+
+      task.questions.forEach((q, qIdx) => {
+        const fieldId = `task_${currentIndex}_q${qIdx}`;
+        const savedValue = userAnswers[fieldId] || '';
+        const isCorrect = taskResults[fieldId] === true;
+        const isIncorrect = taskResults[fieldId] === false;
+
+        html += `
+          <div class="calc-row">
+            <span class="calc-label">${q.label}</span>
+            <div class="input-wrapper">
+              <input type="text" class="calc-input ${isCorrect ? 'correct' : ''} ${isIncorrect ? 'incorrect' : ''}" 
+                     id="${fieldId}" value="${savedValue}" placeholder="число">
+              <span class="unit">${q.unit}</span>
+            </div>
+          </div>
+        `;
+
+        // Подсказка появляется только если ответ неверный
+        if (isIncorrect) {
+          html += `<div class="hint">📌 Подсказка: ${q.formula}</div>`;
+        }
+      });
+
+      html += `</div></div>`;
+      containerDiv.innerHTML = html;
+
+      // Добавить обработчики ввода
+      task.questions.forEach((_, qIdx) => {
+        const fieldId = `task_${currentIndex}_q${qIdx}`;
+        const input = document.getElementById(fieldId);
+        if (input) {
+          input.addEventListener('input', function(e) {
+            userAnswers[fieldId] = this.value.trim();
+            // Сброс подсветки при изменении
+            if (taskResults[fieldId] !== undefined) {
+              delete taskResults[fieldId];
+              this.classList.remove('correct', 'incorrect');
+              // Убрать подсказку, если она была
+              const hint = this.closest('.calc-row')?.nextElementSibling;
+              if (hint && hint.classList.contains('hint')) {
+                hint.remove();
+              }
+            }
+            updateSummary();
+          });
+        }
+      });
+
+      updateSummary();
+    }
+
+    function normalizeNumber(str) {
+      if (!str) return '';
+      return str.toString().replace(/\s+/g, '').replace(/,/g, '');
+    }
+
+    function compareNumbers(user, correct) {
+      const userNum = parseFloat(normalizeNumber(user));
+      const correctNum = parseFloat(correct);
+      if (isNaN(userNum) || isNaN(correctNum)) return false;
+      return Math.abs(userNum - correctNum) < 0.01;
+    }
+
+    function checkCurrentCard() {
+      const task = tasks[currentIndex];
+      let allFilled = true;
+      let correctCount = 0;
+      let totalCount = task.questions.length;
+
+      // Проверить каждое поле
+      task.questions.forEach((q, qIdx) => {
+        const fieldId = `task_${currentIndex}_q${qIdx}`;
+        const input = document.getElementById(fieldId);
+        if (!input) return;
+
+        const userValue = input.value.trim();
+        if (!userValue) {
+          allFilled = false;
+          return;
+        }
+
+        const isCorrect = compareNumbers(userValue, q.answer);
+        taskResults[fieldId] = isCorrect;
+        if (isCorrect) correctCount++;
+      });
+
+      if (!allFilled) {
+        document.getElementById('summary').innerHTML = '⚠️ Заполните все поля в этой задаче';
+      } else {
+        document.getElementById('summary').innerHTML = `🎯 В этой задаче: правильно ${correctCount} из ${totalCount}`;
+      }
+
+      // Перерисовать карточку, чтобы показать подсказки для неверных ответов
+      renderCurrentCard();
+    }
+
+    function updateSummary() {
+      const inputs = document.querySelectorAll('.calc-input');
+      const filled = Array.from(inputs).filter(i => i.value.trim()).length;
+      const total = inputs.length;
+      const summaryEl = document.getElementById('summary');
+      if (summaryEl) {
+        summaryEl.innerHTML = `Заполнено ${filled} из ${total} полей`;
+      }
+    }
+
+    render();
+  })();
+</script>
+</body>
+</html>
