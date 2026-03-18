@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ИИС · типы и расчёт</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+        }
+
+        .card {
+            max-width: 600px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 15px 25px -12px rgba(0,0,0,0.1);
+            padding: 1rem 0.9rem 0.7rem;
+            border: 1px solid #d0d7de;
+        }
+
+        .main-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3b5c;
+            text-align: center;
+            margin-bottom: 0.1rem;
+        }
+
+        .sub {
+            color: #3f4f60;
+            font-size: 0.7rem;
+            text-align: center;
+            background: #f2f6fb;
+            border-radius: 30px;
+            padding: 0.2rem 0.6rem;
+            margin-bottom: 0.6rem;
+            border: 1px solid #b9d3f0;
+        }
+
+        /* Вкладки */
+        .tab-switcher {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 0.7rem;
+            border-bottom: 2px solid #e6ecf5;
+            padding-bottom: 0.2rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.4rem 0.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4f658d;
+            cursor: pointer;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .tab-btn.active {
+            background: #e1ecfe;
+            color: #1e3b5c;
+        }
+
+        /* Карусель */
+        .carousel-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.1rem 0 0.6rem;
+        }
+
+        .card-wrapper {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .card-slide {
+            display: flex;
+            transition: transform 0.25s ease-in-out;
+        }
+
+        .card-item {
+            flex: 0 0 100%;
+            padding: 0;
+        }
+
+        .task-card {
+            background: #f8fbfe;
+            border: 2px solid #d4e2f5;
+            border-radius: 22px;
+            padding: 0.8rem 0.8rem 0.6rem;
+            box-shadow: 0 4px 8px -6px rgba(0,35,70,0.1);
+        }
+
+        .task-desc {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 0.7rem 0.8rem;
+            border: 1px dashed #8fa5bb;
+            margin-bottom: 0.7rem;
+            font-size: 0.95rem;
+            line-height: 1.3;
+            color: #1f2c38;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin: 0.4rem 0 0.6rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #8fa5bb;
+            border-radius: 40px;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1f2c38;
+            cursor: pointer;
+            transition: 0.1s;
+            text-align: left;
+            width: 100%;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #e3eef9;
+            border-color: #5f7d9c;
+        }
+
+        .option-btn.selected-correct {
+            background: #d0ecdf;
+            border: 3px solid #2e7d5e;
+            font-weight: 600;
+        }
+
+        .option-btn.selected-incorrect {
+            background: #ffeae5;
+            border: 3px solid #b13e3e;
+            font-weight: 600;
+        }
+
+        .option-btn:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .explanation {
+            background: #f2f8fd;
+            border-radius: 14px;
+            padding: 0.5rem 0.7rem;
+            font-size: 0.8rem;
+            color: #1e3b5c;
+            border: 1px solid #b9d3f0;
+            margin: 0.4rem 0 0.2rem;
+            line-height: 1.3;
+        }
+
+        .carousel-arrows {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.1rem 0 0.3rem;
+        }
+
+        .arrow-btn {
+            background: white;
+            border: 2px solid #2a5f8a;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2a5f8a;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b3c9e0;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arrow-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b3c9e0;
+        }
+
+        .arrow-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .counter {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            background: #e6f0fa;
+            padding: 0.2rem 0.6rem;
+            border-radius: 60px;
+        }
+
+        .reset-area {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.1rem;
+        }
+
+        .reset-link {
+            background: transparent;
+            border: none;
+            color: #2a5f8a;
+            font-size: 0.65rem;
+            text-decoration: underline dotted;
+            cursor: pointer;
+            padding: 0.2rem 0.6rem;
+        }
+
+        hr {
+            border: 1px solid #d4e2f5;
+            margin: 0.4rem 0 0.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: #4f658d;
+            font-size: 0.55rem;
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="trainerContainer"></div>
+
+<script>
+    (function() {
+        // Данные для двух вкладок (без заголовков карточек)
+        const tabsData = {
+            type: {
+                title: 'Типы ИИС',
+                tasks: [
+                    {
+                        desc: 'Физлицо открыло ИИС в 2023 году. Какие правила действуют для этого счета?',
+                        options: [
+                            { text: 'Можно вносить не более 1 млн руб. в год', value: 'limit1', correct: false },
+                            { text: 'Минимальный срок — 3 года, можно иметь только один', value: 'old3', correct: true },
+                            { text: 'Можно одновременно иметь несколько ИИС', value: 'multi', correct: false }
+                        ],
+                        explanation: 'ИИС старого типа: минимальный срок 3 года, можно иметь только один счет, при досрочном закрытии возвращаются все льготы + проценты.'
+                    },
+                    {
+                        desc: 'Физлицо открыло ИИС в 2025 году. Какой минимальный срок действия счета?',
+                        options: [
+                            { text: '3 года', value: '3years', correct: false },
+                            { text: '5 лет', value: '5years', correct: true },
+                            { text: '10 лет', value: '10years', correct: false }
+                        ],
+                        explanation: 'Для ИИС нового типа, открытого в 2024–2026 годах, минимальный срок составляет 5 лет.'
+                    },
+                    {
+                        desc: 'Физлицо хочет конвертировать старый ИИС (открыт в 2022) в новый. Что нужно сделать?',
+                        options: [
+                            { text: 'Просто закрыть старый и открыть новый', value: 'simple', correct: false },
+                            { text: 'Подать уведомление в инспекцию, срок владения учитывается', value: 'notify', correct: true },
+                            { text: 'Конвертация невозможна', value: 'impossible', correct: false }
+                        ],
+                        explanation: 'Для конвертации нужно подать уведомление в инспекцию. Срок владения старым ИИС учитывается, но не более срока нового.'
+                    }
+                ]
+            },
+            calc: {
+                title: 'Расчет финансового результата',
+                tasks: [
+                    {
+                        desc: 'Как определяется налоговая база по операциям на ИИС?',
+                        options: [
+                            { text: 'Ежегодно отдельно по каждому году', value: 'yearly', correct: false },
+                            { text: 'Нарастающим итогом за весь период существования ИИС', value: 'total', correct: true },
+                            { text: 'Только при закрытии счета, без учета промежуточных результатов', value: 'closeonly', correct: false }
+                        ],
+                        explanation: 'Налоговая база — положительный финансовый результат по операциям на ИИС нарастающим итогом за весь период существования счета.'
+                    },
+                    {
+                        desc: 'Можно ли учесть убытки по операциям на ИИС при расчете налога по обычным брокерским счетам?',
+                        options: [
+                            { text: 'Да, любые убытки можно переносить', value: 'yesall', correct: false },
+                            { text: 'Нет, убытки по ИИС не уменьшают налоговую базу по другим счетам', value: 'no', correct: true },
+                            { text: 'Можно, но только убытки от обращающихся бумаг', value: 'onlytraded', correct: false }
+                        ],
+                        explanation: 'Убытки по операциям на ИИС не уменьшают налоговую базу по другим счетам. Но внутри ИИС можно переносить убытки прошлых периодов.'
+                    },
+                    {
+                        desc: 'Физлицо получило убыток по операциям с акциями на ИИС в 2024 году. В 2025 году получена прибыль. Может ли налоговый агент учесть убыток прошлого года?',
+                        options: [
+                            { text: 'Нет, убытки сгорают', value: 'lost', correct: false },
+                            { text: 'Да, можно уменьшить положительный результат на убытки прошлых периодов', value: 'carry', correct: true },
+                            { text: 'Можно, но только если убыток был по обращающимся бумагам', value: 'tradeloss', correct: false }
+                        ],
+                        explanation: 'Налоговый агент вправе уменьшить положительный финансовый результат по ИИС на сумму убытков прошлых периодов внутри этого же ИИС.'
+                    }
+                ]
+            }
+        };
+
+        let currentTab = 'type';
+        let currentIndex = 0;
+        let userAnswers = {};
+        let taskLocked = {};
+
+        const container = document.getElementById('trainerContainer');
+
+        function render() {
+            const tabData = tabsData[currentTab];
+            const tasks = tabData.tasks;
+            const total = tasks.length;
+
+            if (currentIndex >= total) currentIndex = total - 1;
+            if (currentIndex < 0) currentIndex = 0;
+
+            container.innerHTML = `
+                <div class="main-title">Индивидуальный инвестиционный счет</div>
+                <div class="sub">Выберите правильный ответ</div>
+
+                <div class="tab-switcher">
+                    <button class="tab-btn ${currentTab === 'type' ? 'active' : ''}" id="tabTypeBtn">Типы ИИС</button>
+                    <button class="tab-btn ${currentTab === 'calc' ? 'active' : ''}" id="tabCalcBtn">Расчет налога</button>
+                </div>
+
+                <div class="carousel-container">
+                    <div class="card-wrapper">
+                        <div class="card-slide" style="transform: translateX(0%);">
+                            <div class="card-item" id="carouselCard"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-arrows">
+                    <button class="arrow-btn" id="prevCard" ${total <= 1 || currentIndex === 0 ? 'disabled' : ''}>←</button>
+                    <span class="counter">${currentIndex+1} / ${total}</span>
+                    <button class="arrow-btn" id="nextCard" ${total <= 1 || currentIndex === total-1 ? 'disabled' : ''}>→</button>
+                </div>
+
+                <div class="reset-area">
+                    <button class="reset-link" id="resetTabBtn">🔄 сбросить эту вкладку</button>
+                </div>
+
+                <hr>
+                <div class="footer">ст. 214.9 НК РФ · ИИС старого и нового типа</div>
+            `;
+
+            renderCurrentCard();
+
+            document.getElementById('tabTypeBtn').addEventListener('click', () => {
+                currentTab = 'type';
+                currentIndex = 0;
+                render();
+            });
+
+            document.getElementById('tabCalcBtn').addEventListener('click', () => {
+                currentTab = 'calc';
+                currentIndex = 0;
+                render();
+            });
+
+            document.getElementById('prevCard').addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    render();
+                }
+            });
+
+            document.getElementById('nextCard').addEventListener('click', () => {
+                if (currentIndex < total - 1) {
+                    currentIndex++;
+                    render();
+                }
+            });
+
+            document.getElementById('resetTabBtn').addEventListener('click', () => {
+                resetCurrentTab();
+                render();
+            });
+        }
+
+        function resetCurrentTab() {
+            const tasks = tabsData[currentTab].tasks;
+            tasks.forEach((_, idx) => {
+                const taskId = `${currentTab}_${idx}`;
+                delete userAnswers[taskId];
+                delete taskLocked[taskId];
+            });
+        }
+
+        function renderCurrentCard() {
+            const tabData = tabsData[currentTab];
+            const task = tabData.tasks[currentIndex];
+            const containerDiv = document.getElementById('carouselCard');
+            if (!containerDiv) return;
+
+            const taskId = `${currentTab}_${currentIndex}`;
+            const selectedValue = userAnswers[taskId];
+            const isLocked = taskLocked[taskId] === true;
+
+            let html = `
+                <div class="task-card">
+                    <div class="task-desc">${task.desc}</div>
+                    <div class="options" id="options">
+            `;
+
+            task.options.forEach((opt, idx) => {
+                const isSelected = selectedValue === opt.value;
+                let selectedClass = '';
+                if (isLocked && isSelected) {
+                    selectedClass = opt.correct ? 'selected-correct' : 'selected-incorrect';
+                }
+
+                html += `
+                    <button class="option-btn ${selectedClass}" data-value="${opt.value}" ${isLocked ? 'disabled' : ''}>
+                        ${opt.text}
+                    </button>
+                `;
+            });
+
+            html += `</div>`;
+
+            if (isLocked) {
+                const isCorrect = selectedValue === task.options.find(o => o.correct).value;
+                html += `<div class="explanation">
+                    <strong>${isCorrect ? '✅ Правильно!' : '❌ Ошибка'}</strong><br>
+                    ${task.explanation}
+                </div>`;
+            }
+
+            html += `</div>`;
+            containerDiv.innerHTML = html;
+
+            if (!isLocked) {
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const selectedValue = e.target.dataset.value;
+                        
+                        userAnswers[taskId] = selectedValue;
+                        taskLocked[taskId] = true;
+                        
+                        renderCurrentCard();
+                    });
+                });
+            }
+        }
+
+        render();
+    })();
+</script>
+</body>
+</html>
