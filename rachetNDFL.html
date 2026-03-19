@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Считаем НДФЛ · тренажер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 30px -8px rgba(0,0,0,0.1);
+            padding: 1rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .main-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e3b5c;
+            text-align: center;
+            margin-bottom: 0.6rem;
+            border-bottom: 2px solid #c7daf0;
+            padding-bottom: 0.3rem;
+        }
+
+        .instruction-box {
+            background: #e6f0fe;
+            border-radius: 16px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #2e7ab3;
+        }
+
+        .instruction-title {
+            font-weight: 700;
+            color: #1d4b77;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .instruction-text {
+            font-size: 0.85rem;
+            color: #1d4b77;
+            line-height: 1.4;
+        }
+
+        .instruction-text ul {
+            margin: 0.3rem 0 0 1.2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #2e7ab3;
+            color: white;
+            border-radius: 40px;
+            padding: 0.1rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .conditions-box {
+            background: #f0f7fe;
+            border-radius: 16px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #c7daf5;
+            font-size: 0.9rem;
+            color: #02243b;
+        }
+
+        .conditions-title {
+            font-weight: 700;
+            color: #1d4b77;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+
+        .task-text {
+            background: #f0f7fe;
+            border-radius: 16px;
+            padding: 0.9rem;
+            border: 1px solid #c7daf5;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #02243b;
+            margin-bottom: 0.8rem;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 75px;
+            background: white;
+            border: 2px solid #8f9fb0;
+            border-radius: 30px;
+            padding: 0.1rem 0.6rem;
+            margin: 0.1rem 0.2rem;
+            font-weight: 600;
+            color: #1d4b77;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .blank.filled {
+            background: #505050;
+            border-color: #404040;
+            color: white;
+        }
+
+        .blank.correct {
+            background: #2e7d32;
+            border-color: #1b5e20;
+            color: white;
+        }
+
+        .blank.incorrect {
+            background: #c62828;
+            border-color: #8b0000;
+            color: white;
+        }
+
+        .options-panel {
+            background: #e6f0fe;
+            border-radius: 16px;
+            padding: 0.7rem;
+            margin: 0.5rem 0;
+            border: 1px solid #b6cbe5;
+        }
+
+        .options-title {
+            font-weight: 600;
+            color: #1d4b77;
+            margin-bottom: 0.4rem;
+            font-size: 0.8rem;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: center;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #2e7ab3;
+            border-radius: 30px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1d4b77;
+            cursor: pointer;
+            transition: 0.1s;
+            user-select: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .option-btn:hover {
+            background: #d4e4fc;
+            border-color: #1a5d8f;
+        }
+
+        .option-btn.selected {
+            background: #2e7ab3;
+            color: white;
+            border-color: #1a5d8f;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .primary-btn {
+            background: #2e7ab3;
+            border: none;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            flex: 2;
+            transition: 0.1s;
+        }
+
+        .primary-btn:hover {
+            background: #1d5d8f;
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .secondary-btn {
+            background: #e0e7f0;
+            border: 2px solid #8f9fb0;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1d4b77;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.1s;
+        }
+
+        .secondary-btn:hover {
+            background: #d0dae8;
+        }
+
+        .result-message {
+            background: #fef7e0;
+            border-radius: 14px;
+            padding: 0.6rem;
+            border-left: 4px solid #fcb34b;
+            font-size: 0.8rem;
+            color: #4f3f1a;
+            margin-top: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .result-message.correct {
+            background: #e2f3de;
+            border-left-color: #5cb377;
+            color: #176b2c;
+        }
+
+        /* Footnote скрыт */
+        .footnote {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="app"></div>
+
+    <script>
+        (function() {
+            const app = document.getElementById('app');
+
+            const taskTemplate = {
+                conditions: [
+                    'Доход Иванова И.И. за 2026 год составил 14 000 000 рублей, из них:',
+                    '• зарплата и премии — 9 000 000 рублей;',
+                    '• дивиденды — 3 000 000 рублей;',
+                    '• северные надбавки и коэффициенты — 2 000 000 рублей.'
+                ],
+                text: [
+                    { type: 'text', value: '1. Налог с зарплаты:' },
+                    { type: 'br' },
+                    { type: 'text', value: '2 400 000 × 0,13 + (' },
+                    { type: 'blank', id: 1, options: ['5 000 000', '2 400 000', '9 000 000'], correct: '5 000 000', userAnswer: null },
+                    { type: 'text', value: ' – 2 400 000) × 0,15 + (9 000 000 – 5 000 000 – 2 400 000) × 0,' },
+                    { type: 'blank', id: 2, options: ['18', '15', '20'], correct: '18', userAnswer: null },
+                    { type: 'text', value: ' = ' },
+                    { type: 'blank', id: 3, options: ['990 000', '950 000', '1 020 000'], correct: '990 000', userAnswer: null },
+                    { type: 'text', value: ' рублей.' },
+                    { type: 'br' }, { type: 'br' },
+
+                    { type: 'text', value: '2. Налог с дивидендов:' },
+                    { type: 'br' },
+                    { type: 'text', value: '2 400 000 × 0,13 + (' },
+                    { type: 'blank', id: 4, options: ['3 000 000', '2 400 000', '5 000 000'], correct: '3 000 000', userAnswer: null },
+                    { type: 'text', value: ' – 2 400 000) × 0,15 = ' },
+                    { type: 'blank', id: 5, options: ['402 000', '390 000', '420 000'], correct: '402 000', userAnswer: null },
+                    { type: 'text', value: ' рублей.' },
+                    { type: 'br' }, { type: 'br' },
+
+                    { type: 'text', value: '3. Налог с северных надбавок:' },
+                    { type: 'br' },
+                    { type: 'text', value: '2 000 000 × 0,' },
+                    { type: 'blank', id: 6, options: ['13', '15', '18'], correct: '13', userAnswer: null },
+                    { type: 'text', value: ' = ' },
+                    { type: 'blank', id: 7, options: ['260 000', '300 000', '240 000'], correct: '260 000', userAnswer: null },
+                    { type: 'text', value: ' рублей.' },
+                    { type: 'br' }, { type: 'br' },
+
+                    { type: 'text', value: '4. Общая сумма налога:' },
+                    { type: 'br' },
+                    { type: 'text', value: '990 000 + ' },
+                    { type: 'blank', id: 8, options: ['402 000', '410 000', '390 000'], correct: '402 000', userAnswer: null },
+                    { type: 'text', value: ' + ' },
+                    { type: 'blank', id: 9, options: ['260 000', '250 000', '270 000'], correct: '260 000', userAnswer: null },
+                    { type: 'text', value: ' = ' },
+                    { type: 'blank', id: 10, options: ['1 652 000', '1 600 000', '1 700 000'], correct: '1 652 000', userAnswer: null },
+                    { type: 'text', value: ' рублей.' }
+                ]
+            };
+
+            let task = JSON.parse(JSON.stringify(taskTemplate));
+            let selectedBlankId = null;
+            let checkPerformed = false;
+
+            function render() {
+                let textHtml = '';
+                task.text.forEach(item => {
+                    if (item.type === 'text') {
+                        textHtml += item.value;
+                    } else if (item.type === 'blank') {
+                        const answer = item.userAnswer;
+                        let blankClass = 'blank';
+                        if (answer) {
+                            if (checkPerformed) {
+                                blankClass += answer === item.correct ? ' correct' : ' incorrect';
+                            } else {
+                                blankClass += ' filled';
+                            }
+                        }
+                        textHtml += `<span class="${blankClass}" data-blank-id="${item.id}">${answer || '_____'}</span>`;
+                    } else if (item.type === 'br') {
+                        textHtml += '<br>';
+                    }
+                });
+
+                const currentBlank = task.text.find(item => item.type === 'blank' && item.id === selectedBlankId);
+                let optionsHtml = '';
+                
+                if (currentBlank && !checkPerformed) {
+                    optionsHtml = `
+                        <div class="options-panel">
+                            <div class="options-title">Выберите значение:</div>
+                            <div class="options-grid">
+                                ${currentBlank.options.map(opt => `
+                                    <button class="option-btn" data-option="${opt}">${opt}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const allFilled = task.text.every(item => item.type !== 'blank' || item.userAnswer !== null);
+
+                app.innerHTML = `
+                    <div class="main-title">Считаем НДФЛ · прогрессивная шкала</div>
+                    
+                    <div class="instruction-box">
+                        <div class="instruction-title">🧮 Что делаем</div>
+                        <div class="instruction-text">
+                            Отрабатываем расчет НДФЛ по прогрессивной шкале для разных видов доходов.
+                        </div>
+                        <div class="instruction-title" style="margin-top:0.5rem;">📝 Как пользоваться</div>
+                        <div class="instruction-text">
+                            <ul>
+                                <li>Нажимайте на пропуски <span class="blank" style="display:inline-block; min-width:50px; padding:0.1rem 0.4rem;">_____</span> в решении</li>
+                                <li>Выбирайте правильный вариант из появившихся кнопок</li>
+                                <li>После заполнения всех пропусков нажмите «Проверить»</li>
+                                <li>Верные ответы станут зелёными, неверные — красными</li>
+                                <li>Кнопка «Сброс» позволяет начать заново</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="conditions-box">
+                        <div class="conditions-title">📌 Условия задачи:</div>
+                        ${task.conditions.map(c => `<div>${c}</div>`).join('')}
+                    </div>
+                    
+                    <div class="task-text" id="taskText">${textHtml}</div>
+                    
+                    ${optionsHtml}
+                    
+                    <div class="button-group">
+                        <button class="primary-btn" id="checkBtn" ${!allFilled || checkPerformed ? 'disabled' : ''}>Проверить</button>
+                        <button class="secondary-btn" id="resetBtn">Сброс</button>
+                    </div>
+                    
+                    <div id="resultArea"></div>
+                `;
+
+                document.querySelectorAll('.blank').forEach(blank => {
+                    blank.addEventListener('click', () => {
+                        if (checkPerformed) return;
+                        const blankId = parseInt(blank.dataset.blankId);
+                        selectedBlankId = blankId;
+                        render();
+                    });
+                });
+
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const option = btn.dataset.option;
+                        const blank = task.text.find(item => item.type === 'blank' && item.id === selectedBlankId);
+                        if (blank) {
+                            blank.userAnswer = option;
+                            selectedBlankId = null;
+                            render();
+                        }
+                    });
+                });
+
+                document.getElementById('checkBtn')?.addEventListener('click', () => {
+                    checkPerformed = true;
+                    render();
+                    
+                    const blanks = task.text.filter(item => item.type === 'blank');
+                    const correctCount = blanks.filter(b => b.userAnswer === b.correct).length;
+                    const allCorrect = correctCount === blanks.length;
+                    
+                    document.getElementById('resultArea').innerHTML = allCorrect
+                        ? `<div class="result-message correct">✅ Все верно! Расчёт выполнен правильно.</div>`
+                        : `<div class="result-message">❌ Ошибки (правильно: ${correctCount}/${blanks.length})</div>`;
+                });
+
+                document.getElementById('resetBtn')?.addEventListener('click', () => {
+                    task.text.forEach(item => { if (item.type === 'blank') item.userAnswer = null; });
+                    selectedBlankId = null;
+                    checkPerformed = false;
+                    render();
+                });
+            }
+
+            render();
+        })();
+    </script>
+</body>
+</html>
