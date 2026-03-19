@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Налоговый кешбэк · тренажер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 30px -8px rgba(0,0,0,0.1);
+            padding: 1rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .main-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e3b5c;
+            text-align: center;
+            margin-bottom: 0.4rem;
+            border-bottom: 2px solid #c7daf0;
+            padding-bottom: 0.2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #2e7ab3;
+            color: white;
+            border-radius: 40px;
+            padding: 0.1rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-text {
+            background: #f0f7fe;
+            border-radius: 16px;
+            padding: 0.8rem;
+            border: 1px solid #c7daf5;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #02243b;
+            margin-bottom: 0.8rem;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 70px;
+            background: white;
+            border: 2px solid #8f9fb0;
+            border-radius: 30px;
+            padding: 0.1rem 0.6rem;
+            margin: 0.1rem 0.2rem;
+            font-weight: 600;
+            color: #1d4b77;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .blank.filled {
+            background: #505050;  /* темно-серый */
+            border-color: #404040;
+            color: white;
+        }
+
+        .blank.correct {
+            background: #2e7d32;  /* зеленый */
+            border-color: #1b5e20;
+            color: white;
+        }
+
+        .blank.incorrect {
+            background: #c62828;  /* красный */
+            border-color: #8b0000;
+            color: white;
+        }
+
+        .options-panel {
+            background: #e6f0fe;
+            border-radius: 16px;
+            padding: 0.7rem;
+            margin: 0.5rem 0;
+            border: 1px solid #b6cbe5;
+        }
+
+        .options-title {
+            font-weight: 600;
+            color: #1d4b77;
+            margin-bottom: 0.4rem;
+            font-size: 0.8rem;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: center;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #2e7ab3;
+            border-radius: 30px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1d4b77;
+            cursor: pointer;
+            transition: 0.1s;
+            user-select: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .option-btn:hover {
+            background: #d4e4fc;
+            border-color: #1a5d8f;
+        }
+
+        .option-btn.selected {
+            background: #2e7ab3;
+            color: white;
+            border-color: #1a5d8f;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .primary-btn {
+            background: #2e7ab3;
+            border: none;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            flex: 2;
+            transition: 0.1s;
+        }
+
+        .primary-btn:hover {
+            background: #1d5d8f;
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .secondary-btn {
+            background: #e0e7f0;
+            border: 2px solid #8f9fb0;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1d4b77;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.1s;
+        }
+
+        .secondary-btn:hover {
+            background: #d0dae8;
+        }
+
+        .result-message {
+            background: #fef7e0;
+            border-radius: 14px;
+            padding: 0.6rem;
+            border-left: 4px solid #fcb34b;
+            font-size: 0.8rem;
+            color: #4f3f1a;
+            margin-top: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .result-message.correct {
+            background: #e2f3de;
+            border-left-color: #5cb377;
+            color: #176b2c;
+        }
+
+        .footnote {
+            text-align: center;
+            margin-top: 0.5rem;
+            color: #4f658d;
+            font-size: 0.6rem;
+            border-top: 1px dashed #cbd6e4;
+            padding-top: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="app"></div>
+
+    <script>
+        (function() {
+            const app = document.getElementById('app');
+
+            const taskTemplate = {
+                text: [
+                    { type: 'text', value: 'Если в семье ' },
+                    { type: 'blank', id: 1, options: ['двое', 'трое', 'четверо'], correct: 'двое', userAnswer: null },
+                    { type: 'text', value: ' и более детей, налогоплательщик может получить ' },
+                    { type: 'blank', id: 2, options: ['кешбэк', 'вычет', 'льготу'], correct: 'кешбэк', userAnswer: null },
+                    { type: 'text', value: '. Инспекция пересчитает НДФЛ по ставке ' },
+                    { type: 'blank', id: 3, options: ['6%', '13%', '7%'], correct: '6%', userAnswer: null },
+                    { type: 'text', value: ', а лишние ' },
+                    { type: 'blank', id: 4, options: ['7%', '13%', '5%'], correct: '7%', userAnswer: null },
+                    { type: 'text', value: ' вернет. ' },
+                    { type: 'text', value: 'Средний доход на человека не должен превышать ' },
+                    { type: 'blank', id: 5, options: ['1,5-кратный', '2-кратный', 'прожиточный'], correct: '1,5-кратный', userAnswer: null },
+                    { type: 'text', value: ' региональный прожиточный минимум. Возраст детей — до ' },
+                    { type: 'blank', id: 6, options: ['18 лет', '16 лет', '23 лет'], correct: '18 лет', userAnswer: null },
+                    { type: 'text', value: ' (или до ' },
+                    { type: 'blank', id: 7, options: ['23', '25', '20'], correct: '23', userAnswer: null },
+                    { type: 'text', value: ' лет на очной форме). ' },
+                    { type: 'text', value: 'Отсутствие долгов по ' },
+                    { type: 'blank', id: 8, options: ['алиментам', 'налогам', 'кредитам'], correct: 'алиментам', userAnswer: null },
+                    { type: 'text', value: '. Заявление подают через МФЦ, Госуслуги или ' },
+                    { type: 'blank', id: 9, options: ['СФР', 'ФНС', 'ЦБ'], correct: 'СФР', userAnswer: null },
+                    { type: 'text', value: '.' }
+                ]
+            };
+
+            let task = JSON.parse(JSON.stringify(taskTemplate));
+            let selectedBlankId = null;
+            let checkPerformed = false;
+
+            function render() {
+                let textHtml = '';
+                task.text.forEach(item => {
+                    if (item.type === 'text') {
+                        textHtml += item.value;
+                    } else if (item.type === 'blank') {
+                        const answer = item.userAnswer;
+                        let blankClass = 'blank';
+                        if (answer) {
+                            if (checkPerformed) {
+                                blankClass += answer === item.correct ? ' correct' : ' incorrect';
+                            } else {
+                                blankClass += ' filled';
+                            }
+                        }
+                        textHtml += `<span class="${blankClass}" data-blank-id="${item.id}">${answer || '_____'}</span>`;
+                    }
+                });
+
+                const currentBlank = task.text.find(item => item.type === 'blank' && item.id === selectedBlankId);
+                let optionsHtml = '';
+                
+                if (currentBlank && !checkPerformed) {
+                    optionsHtml = `
+                        <div class="options-panel">
+                            <div class="options-title">Выберите значение:</div>
+                            <div class="options-grid">
+                                ${currentBlank.options.map(opt => `
+                                    <button class="option-btn" data-option="${opt}">${opt}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const allFilled = task.text.every(item => item.type !== 'blank' || item.userAnswer !== null);
+
+                app.innerHTML = `
+                    <div class="main-title">Налоговый кешбэк семьям с детьми</div>
+                    <div class="badge">заполните пропуски</div>
+                    
+                    <div class="task-text" id="taskText">${textHtml}</div>
+                    
+                    ${optionsHtml}
+                    
+                    <div class="button-group">
+                        <button class="primary-btn" id="checkBtn" ${!allFilled || checkPerformed ? 'disabled' : ''}>Проверить</button>
+                        <button class="secondary-btn" id="resetBtn">Сброс</button>
+                    </div>
+                    
+                    <div id="resultArea"></div>
+                    
+                    <div class="footnote">ст. 224 НК РФ · Закон № 179-ФЗ</div>
+                `;
+
+                document.querySelectorAll('.blank').forEach(blank => {
+                    blank.addEventListener('click', () => {
+                        if (checkPerformed) return;
+                        const blankId = parseInt(blank.dataset.blankId);
+                        selectedBlankId = blankId;
+                        render();
+                    });
+                });
+
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const option = btn.dataset.option;
+                        const blank = task.text.find(item => item.type === 'blank' && item.id === selectedBlankId);
+                        if (blank) {
+                            blank.userAnswer = option;
+                            selectedBlankId = null;
+                            render();
+                        }
+                    });
+                });
+
+                document.getElementById('checkBtn')?.addEventListener('click', () => {
+                    checkPerformed = true;
+                    render();
+                    
+                    const blanks = task.text.filter(item => item.type === 'blank');
+                    const correctCount = blanks.filter(b => b.userAnswer === b.correct).length;
+                    const allCorrect = correctCount === blanks.length;
+                    
+                    document.getElementById('resultArea').innerHTML = allCorrect
+                        ? `<div class="result-message correct">✅ Все верно! Вы правильно заполнили все пропуски.</div>`
+                        : `<div class="result-message">❌ Ошибки (правильно: ${correctCount}/${blanks.length})</div>`;
+                });
+
+                document.getElementById('resetBtn')?.addEventListener('click', () => {
+                    task.text.forEach(item => { if (item.type === 'blank') item.userAnswer = null; });
+                    selectedBlankId = null;
+                    checkPerformed = false;
+                    render();
+                });
+            }
+
+            render();
+        })();
+    </script>
+</body>
+</html>
