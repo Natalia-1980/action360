@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>НДФЛ. Вычеты</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .trainer-card {
+            max-width: 400px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.2);
+            padding: 1rem 0.8rem 0.8rem;
+            border: 1px solid #d0dceb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e3b5c;
+            text-align: center;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.3px;
+            border-bottom: 2px solid #c7daf0;
+            padding-bottom: 0.3rem;
+        }
+
+        .carousel-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.2rem 0 0.4rem;
+        }
+
+        .card-wrapper {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .card-slide {
+            display: flex;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card-item {
+            flex: 0 0 100%;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .card-compact {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 2px solid #dbe6f2;
+            padding: 0.7rem 0.8rem 0.6rem;
+            box-shadow: 0 5px 10px -5px rgba(0,35,70,0.1);
+            width: 100%;
+            min-height: 400px; /* чуть меньше, но текст не уменьшен */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #0b263e;
+        }
+
+        .card-scenario {
+            background: #f5faff;
+            border-radius: 14px;
+            padding: 0.6rem 0.8rem;
+            border-left: 4px solid #2e7ab3;
+            margin-bottom: 0.6rem;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            color: #04335b;
+        }
+
+        .card-scenario ul {
+            margin: 0.1rem 0 0.1rem 1.2rem;
+        }
+
+        .card-scenario li {
+            margin-bottom: 0.15rem;
+        }
+
+        .question-text {
+            font-weight: 600;
+            color: #021c30;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin: 0.3rem 0 0.5rem;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f3f9ff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            border: 2px solid transparent;
+            transition: 0.1s;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .option:hover {
+            background: #e3f0fd;
+            border-color: #8fb7da;
+        }
+        .option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1e6eb5;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        .option label {
+            font-size: 0.8rem;
+            color: #02243b;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .feedback-compact {
+            background: #f2f8fd;
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #b9d3f0;
+            margin: 0.4rem 0 0.1rem;
+            font-size: 0.75rem;
+            line-height: 1.3;
+        }
+        .feedback-compact.correct {
+            background: #e2f3de;
+            color: #176b2c;
+            border-color: #5cb377;
+        }
+        .feedback-compact.incorrect {
+            background: #ffeae5;
+            color: #b13e3e;
+            border-color: #e09b9b;
+        }
+
+        .check-mini {
+            background: white;
+            border: 2px solid #1a5d8f;
+            border-radius: 60px;
+            padding: 0.3rem 1.4rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1a5d8f;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c6dd;
+            transition: 0.1s;
+            width: fit-content;
+            margin: 0.2rem 0 0.1rem;
+            align-self: flex-end;
+        }
+        .check-mini:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c6dd;
+        }
+        .check-mini:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .carousel-arrows {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.4rem;
+            margin-bottom: 0.2rem;
+        }
+        .arrow-btn {
+            background: white;
+            border: 2px solid #2a5f8a;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2a5f8a;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b3c9e0;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .arrow-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b3c9e0;
+        }
+        .arrow-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .counter {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            background: #e6f0fa;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+        }
+
+        .reset-area {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.2rem;
+        }
+        .reset-link {
+            background: transparent;
+            border: none;
+            color: #2a5f8a;
+            font-size: 0.75rem;
+            text-decoration: underline dotted;
+            cursor: pointer;
+            padding: 0.4rem;
+        }
+
+        .footnote {
+            text-align: center;
+            margin-top: 0.3rem;
+            color: #4f658d;
+            font-size: 0.65rem;
+            border-top: 1px dashed #cbd6e4;
+            padding-top: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="trainer-card" id="trainerContainer"></div>
+
+    <script>
+        (function() {
+            // 5 карточек с актуальными данными
+            const cardsData = [
+                {
+                    title: '🙏 Благотворительность',
+                    conditions: [
+                        'Религиозные организации, СОНКО, НКО',
+                        'Не более 25% от годового дохода',
+                        'Не суммируется с другими социальными вычетами',
+                        'Подтверждение: платежные документы'
+                    ],
+                    question: 'Можно ли получить вычет за помощь другу?',
+                    options: [
+                        { text: 'Да, всегда', value: 'wrong1' },
+                        { text: 'Только если есть расписка', value: 'wrong2' },
+                        { text: 'Нет, только организациям', value: 'correct' }
+                    ],
+                    correct: 'correct',
+                    explanation: 'Верно! Вычет дают только при перечислении благотворительным организациям.'
+                },
+                {
+                    title: '💊 Лечение',
+                    conditions: [
+                        'На себя, супруга, родителей, детей до 18 лет и 24 лет, если очник',
+                        'Обычное лечение — лимит 150 000 руб.',
+                        'Дорогостоящее лечение — без лимита',
+                        'Медицинская организация должна иметь лицензию'
+                    ],
+                    question: 'Что подтверждает дорогостоящее лечение?',
+                    options: [
+                        { text: 'Обычный чек об оплате', value: 'wrong1' },
+                        { text: 'Справка с кодом "2"', value: 'correct' },
+                        { text: 'Договор с клиникой', value: 'wrong2' }
+                    ],
+                    correct: 'correct',
+                    explanation: 'Да, справка с кодом 2 означает дорогостоящее лечение (безлимитный вычет).'
+                },
+                {
+                    title: '⛹️ Спорт',
+                    conditions: [
+                        'На себя и детей',
+                        'С 2026 года — можно за родителей',
+                        'Лимит — 150 000 руб.',
+                        'Спортивная организация из списка Минспорта'
+                    ],
+                    question: 'До какого возраста детей дают вычет на спорт?',
+                    options: [
+                        { text: 'Только до 18 лет', value: 'wrong1' },
+                        { text: 'До 18 лет, и до 24 если учатся очно', value: 'correct' },
+                        { text: 'До 24 лет в любом случае', value: 'wrong2' }
+                    ],
+                    correct: 'correct',
+                    explanation: 'Правильно: до 18 лет, и до 24 лет при очном обучении.'
+                },
+                {
+                    title: '📚 Обучение',
+                    conditions: [
+                        'Свое обучение — 150 000 руб.',
+                        'Дети — 110 000 руб. на каждого',
+                        'Братья/сестры — 150 000 руб. при очной форме обучения',
+                        'Супруг может получить вычет'
+                    ],
+                    question: 'Можно ли получить вычет супругу, если обучение оплатила супруга?',
+                    options: [
+                        { text: 'Да, так как это совместно нажитое имущество', value: 'correct' },
+                        { text: 'Нет', value: 'wrong1' },
+                        { text: 'Только если очное', value: 'wrong2' }
+                    ],
+                    correct: 'correct',
+                    explanation: 'Если обучение физлица оплатила его супруга, физлицо вправе обратиться за вычетом (письмо Минфина России от 16.06.2025 № 03-04-05/58218).'
+                },
+                {
+                    title: '🛡️ Страхование',
+                    conditions: [
+                        'Добровольное пенсионное страхование',
+                        'Добровольное страхование жизни',
+                        'Дополнительные взносы на накопительную пенсию',
+                        'Лимит 150 000 руб.'
+                    ],
+                    question: 'Входит ли страхование жизни в социальные вычеты?',
+                    options: [
+                        { text: 'Да, с лимитом 150 000 руб.', value: 'correct' },
+                        { text: 'Нет, это отдельный вычет', value: 'wrong1' },
+                        { text: 'Только до 2025 года', value: 'wrong2' }
+                    ],
+                    correct: 'correct',
+                    explanation: 'Да, добровольное страхование жизни входит в лимит 150 000 руб.'
+                }
+            ];
+
+            let cardState = cardsData.map(() => ({
+                disabled: false,
+                selectedOption: null,
+                feedbackText: '',
+                feedbackClass: ''
+            }));
+
+            let currentIndex = 0;
+
+            const container = document.getElementById('trainerContainer');
+
+            function render() {
+                const total = cardsData.length;
+                if (currentIndex >= total) currentIndex = total - 1;
+                if (currentIndex < 0) currentIndex = 0;
+
+                container.innerHTML = `
+                    <div class="main-title">НДФЛ. Вычеты</div>
+
+                    <div class="carousel-container">
+                        <div class="card-wrapper">
+                            <div class="card-slide" style="transform: translateX(0%);">
+                                <div class="card-item" id="carouselCard"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="carousel-arrows">
+                        <button class="arrow-btn" id="prevCard" ${total <= 1 || currentIndex === 0 ? 'disabled' : ''}>←</button>
+                        <span class="counter">${currentIndex+1} / ${total}</span>
+                        <button class="arrow-btn" id="nextCard" ${total <= 1 || currentIndex === total-1 ? 'disabled' : ''}>→</button>
+                    </div>
+
+                    <div class="reset-area">
+                        <button class="reset-link" id="resetAll">🔄 сбросить ответы</button>
+                    </div>
+                    <div class="footnote">ст. 219 НК РФ · актуально на 2026</div>
+                `;
+
+                renderSingleCard(currentIndex);
+
+                document.getElementById('prevCard')?.addEventListener('click', () => {
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        render();
+                    }
+                });
+                document.getElementById('nextCard')?.addEventListener('click', () => {
+                    if (currentIndex < total - 1) {
+                        currentIndex++;
+                        render();
+                    }
+                });
+
+                document.getElementById('resetAll')?.addEventListener('click', () => {
+                    cardState = cardsData.map(() => ({
+                        disabled: false,
+                        selectedOption: null,
+                        feedbackText: '',
+                        feedbackClass: ''
+                    }));
+                    render();
+                });
+            }
+
+            function renderSingleCard(idx) {
+                const card = cardsData[idx];
+                const state = cardState[idx];
+                const containerDiv = document.getElementById('carouselCard');
+                if (!containerDiv) return;
+
+                const conditionsHtml = card.conditions.map(cond => `<li>${cond}</li>`).join('');
+
+                let html = `
+                    <div class="card-compact">
+                        <div class="card-header">
+                            <div class="card-title">${card.title}</div>
+                        </div>
+                        <div class="card-scenario">
+                            <ul style="margin: 0; padding-left: 1.2rem;">
+                                ${conditionsHtml}
+                            </ul>
+                        </div>
+                        <div class="question-text">${card.question}</div>
+                        <div class="options" id="options-${idx}"></div>
+                        <button class="check-mini" id="check-${idx}" ${state.disabled ? 'disabled' : ''}>Проверить</button>
+                `;
+
+                if (state.feedbackText) {
+                    html += `<div class="feedback-compact ${state.feedbackClass}">${state.feedbackText}</div>`;
+                }
+                html += `</div>`;
+
+                containerDiv.innerHTML = html;
+
+                const optionsDiv = document.getElementById(`options-${idx}`);
+                if (optionsDiv) {
+                    card.options.forEach((opt, optIdx) => {
+                        const optDiv = document.createElement('div');
+                        optDiv.className = 'option';
+
+                        const radio = document.createElement('input');
+                        radio.type = 'radio';
+                        radio.name = `card_${idx}`;
+                        radio.value = opt.value;
+                        radio.id = `card_${idx}_opt_${optIdx}`;
+                        radio.disabled = state.disabled;
+                        if (state.selectedOption === opt.value) {
+                            radio.checked = true;
+                        }
+
+                        radio.addEventListener('change', () => {
+                            cardState[idx].selectedOption = opt.value;
+                        });
+
+                        const label = document.createElement('label');
+                        label.htmlFor = radio.id;
+                        label.textContent = opt.text;
+
+                        optDiv.appendChild(radio);
+                        optDiv.appendChild(label);
+                        optionsDiv.appendChild(optDiv);
+                    });
+                }
+
+                const checkBtn = document.getElementById(`check-${idx}`);
+                if (checkBtn) {
+                    checkBtn.addEventListener('click', () => {
+                        const selected = cardState[idx].selectedOption;
+                        if (!selected) {
+                            alert('Выберите вариант ответа');
+                            return;
+                        }
+
+                        let feedbackText = '';
+                        let feedbackClass = '';
+                        if (selected === card.correct) {
+                            feedbackText = '✅ ' + card.explanation;
+                            feedbackClass = 'correct';
+                            cardState[idx].disabled = true;
+                        } else {
+                            feedbackText = '❌ Неправильно. Попробуйте еще раз.';
+                            feedbackClass = 'incorrect';
+                        }
+
+                        cardState[idx].feedbackText = feedbackText;
+                        cardState[idx].feedbackClass = feedbackClass;
+
+                        renderSingleCard(idx);
+                    });
+                }
+            }
+
+            render();
+        })();
+    </script>
+</body>
+</html>
