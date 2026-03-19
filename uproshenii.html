@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Упрощенный порядок · тренажер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.1);
+            padding: 1.2rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .main-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1e3b5c;
+            text-align: center;
+            margin-bottom: 0.8rem;
+            border-bottom: 2px solid #c7daf0;
+            padding-bottom: 0.4rem;
+        }
+
+        .content-panel {
+            background: #f9fcff;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 1px solid #d2e0f0;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #2e7ab3;
+            color: white;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.8rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .deduction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .deduction-item {
+            background: #f0f7fe;
+            border-radius: 40px;
+            padding: 0.6rem 0.3rem;
+            border: 2px solid #c7daf5;
+            cursor: pointer;
+            transition: 0.1s;
+            text-align: center;
+            font-weight: 600;
+            color: #0d2f4e;
+            font-size: 0.85rem;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            line-height: 1.3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .deduction-item:hover {
+            background: #e3f0fd;
+            border-color: #8fb7da;
+        }
+
+        .deduction-item.selected {
+            background: #d4e4fc;
+            border-color: #2e7ab3;
+        }
+
+        .details-section {
+            background: #e6f0fe;
+            border-radius: 16px;
+            padding: 1rem;
+        }
+
+        .details-title {
+            font-weight: 700;
+            color: #1d4b77;
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        .details-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #b6cbe5;
+        }
+
+        .details-label {
+            font-weight: 600;
+            color: #1d4b77;
+            min-width: 110px;
+            font-size: 0.9rem;
+            padding: 0.2rem 0 0 0.3rem;
+            line-height: 1.3;
+        }
+
+        .dropzone {
+            flex: 1;
+            min-width: 180px;
+            background: #f9fcff;
+            border: 2px dashed #8fb7da;
+            border-radius: 14px;
+            padding: 0.6rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .dropzone.filled {
+            background: #e9ecf0;
+            border-color: #8f9fb0;
+            border-style: solid;
+        }
+
+        .drop-item {
+            background: white;
+            border: 2px solid #2e7ab3;
+            border-radius: 30px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1d4b77;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: default;
+            line-height: 1.4;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        .drop-item .remove {
+            color: #b16262;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0 0.3rem;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .options-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 0.8rem;
+            margin-top: 0.8rem;
+            border: 1px solid #c7daf5;
+        }
+
+        .options-title {
+            font-weight: 600;
+            color: #0d2f4e;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+        }
+
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .section-header {
+            font-weight: 600;
+            width: 100%;
+            font-size: 0.85rem;
+            color: #1d4b77;
+            margin-top: 0.4rem;
+        }
+
+        .option-btn {
+            background: #f0f7fe;
+            border: 2px solid #8fb7da;
+            border-radius: 30px;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1d4b77;
+            cursor: grab;
+            transition: 0.1s;
+            user-select: none;
+            word-break: break-word;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .option-btn:active {
+            cursor: grabbing;
+            opacity: 0.8;
+        }
+
+        .option-btn.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+
+        .check-btn {
+            background: #2e7ab3;
+            border: none;
+            border-radius: 40px;
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            flex: 2;
+        }
+
+        .reset-btn {
+            background: #e0e7f0;
+            border: 2px solid #8f9fb0;
+            border-radius: 40px;
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1d4b77;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .result-message {
+            margin-top: 0.8rem;
+            padding: 0.6rem;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .result-message.correct {
+            background: #e2f3de;
+            color: #176b2c;
+            border: 1px solid #5cb377;
+        }
+
+        .result-message.incorrect {
+            background: #ffeae5;
+            color: #b13e3e;
+            border: 1px solid #e09b9b;
+        }
+
+        .error-detail {
+            margin-top: 0.4rem;
+            font-size: 0.8rem;
+            border-top: 1px dashed #e09b9b;
+            padding-top: 0.4rem;
+            word-break: break-word;
+        }
+
+        @media (max-width: 550px) {
+            .details-row {
+                flex-direction: column;
+            }
+            .dropzone {
+                width: 100%;
+            }
+            .deduction-item {
+                font-size: 0.8rem;
+                min-height: 55px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="app"></div>
+
+    <script>
+        (function() {
+            const app = document.getElementById('app');
+            const deductions = [
+                { id: 'property', name: 'Покупка недвижимости' },
+                { id: 'property_percent', name: 'Проценты по ипотеке' },
+                { id: 'education', name: 'Обучение' },
+                { id: 'medical', name: 'Лечение' },
+                { id: 'sport', name: 'Спорт' },
+                { id: 'pension', name: 'Пенсионные взносы' },
+                { id: 'investment', name: 'ИИС' },
+                { id: 'savings', name: 'Долгосрочные сбережения' }
+            ];
+
+            const correctAnswers = {
+                property: {
+                    source: ['Росреестр', 'банки'],
+                    limit: '2 000 000 рублей',
+                    features: 'Сведения компания даст, если есть обмен с ФНС'
+                },
+                property_percent: {
+                    source: ['банки'],
+                    limit: '3 000 000 рублей',
+                    features: 'Сведения компания даст, если есть обмен с ФНС'
+                },
+                education: {
+                    source: ['образовательные организации'],
+                    limit: '150 000 рублей',
+                    features: 'Поставщики услуг дадут справку об оплате по заявлению физлица'
+                },
+                medical: {
+                    source: ['медицинские организации'],
+                    limit: '150 000 рублей',
+                    features: 'Поставщики услуг дадут справку об оплате по заявлению физлица'
+                },
+                sport: {
+                    source: ['спортивные организации'],
+                    limit: '150 000 рублей',
+                    features: 'Поставщики услуг дадут справку об оплате по заявлению физлица'
+                },
+                pension: {
+                    source: ['НПФ', 'страховщики'],
+                    limit: '150 000 рублей',
+                    features: 'Поставщики услуг дадут справку об оплате по заявлению физлица'
+                },
+                investment: {
+                    source: ['брокеры'],
+                    limit: 'до 400 000 рублей',
+                    features: 'В сумме внесенных средств по данным брокера'
+                },
+                savings: {
+                    source: ['НПФ', 'страховщики'],
+                    limit: 'до 400 000 рублей',
+                    features: 'Вычет дадут по данным НПФ об уплаченных взносах'
+                }
+            };
+
+            const allOptions = ['Росреестр','банки','образовательные организации','медицинские организации','спортивные организации','НПФ','страховщики','брокеры'];
+            const limitOptions = ['2 000 000 рублей','3 000 000 рублей','150 000 рублей','до 400 000 рублей'];
+            const featuresOptions = [
+                'Сведения компания даст, если есть обмен с ФНС',
+                'Поставщики услуг дадут справку об оплате по заявлению физлица',
+                'В сумме внесенных средств по данным брокера',
+                'Вычет дадут по данным НПФ об уплаченных взносах'
+            ];
+
+            let selectedDeduction = deductions[0];
+            let currentState = { source: [], limit: '', features: '' };
+            let showResult = false;
+
+            function resetState() {
+                currentState = { source: [], limit: '', features: '' };
+                showResult = false;
+            }
+
+            function isOptionUsed(opt) { return currentState.source.includes(opt); }
+            function arraysEqual(a,b) {
+                if(a.length!==b.length) return false;
+                for(let i=0;i<a.length;i++) if(a[i]!==b[i]) return false;
+                return true;
+            }
+
+            function getErrors(correct) {
+                const e=[];
+                if(!arraysEqual([...currentState.source].sort(),[...correct.source].sort()))
+                    e.push(`❌ Кто передает: должно "${correct.source.join(', ')}", у вас "${currentState.source.join(', ')||'не выбрано'}"`);
+                if(currentState.limit!==correct.limit)
+                    e.push(`❌ Лимит: должно "${correct.limit}", у вас "${currentState.limit||'не выбрано'}"`);
+                if(currentState.features!==correct.features)
+                    e.push(`❌ Особенности: должно "${correct.features}", у вас "${currentState.features||'не выбрано'}"`);
+                return e;
+            }
+
+            function render() {
+                const correct = correctAnswers[selectedDeduction.id];
+                const isComplete = currentState.source.length>0 && currentState.limit && currentState.features;
+                let isCorrect=false, errors=[];
+                if(showResult && isComplete) {
+                    const srcMatch=arraysEqual([...currentState.source].sort(),[...correct.source].sort());
+                    isCorrect = srcMatch && currentState.limit===correct.limit && currentState.features===correct.features;
+                    if(!isCorrect) errors=getErrors(correct);
+                }
+
+                app.innerHTML = `
+                    <div class="main-title">Упрощенный порядок вычетов по НДФЛ</div>
+                    <div class="content-panel">
+                        <div class="badge">выберите вычет</div>
+                        <div class="deduction-grid">
+                            ${deductions.map(d=>`
+                                <div class="deduction-item ${selectedDeduction.id===d.id?'selected':''}" data-id="${d.id}">${d.name}</div>
+                            `).join('')}
+                        </div>
+                        <div class="details-section">
+                            <div class="details-title">📋 ${selectedDeduction.name}</div>
+                            
+                            <div class="details-row">
+                                <span class="details-label">Кто передает данные:</span>
+                                <div class="dropzone ${currentState.source.length?'filled':''}" id="dropzone-source">
+                                    ${currentState.source.map(s=>`<span class="drop-item">${s}<span class="remove" data-remove="${s}">✕</span></span>`).join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="details-row">
+                                <span class="details-label">Лимит:</span>
+                                <div class="dropzone ${currentState.limit?'filled':''}" id="dropzone-limit">
+                                    ${currentState.limit?`<span class="drop-item">${currentState.limit}<span class="remove" data-remove="limit">✕</span></span>`:''}
+                                </div>
+                            </div>
+                            
+                            <div class="details-row">
+                                <span class="details-label">Особенности:</span>
+                                <div class="dropzone ${currentState.features?'filled':''}" id="dropzone-features">
+                                    ${currentState.features?`<span class="drop-item">${currentState.features}<span class="remove" data-remove="features">✕</span></span>`:''}
+                                </div>
+                            </div>
+                            
+                            <div class="options-panel">
+                                <div class="options-title">🎯 Перетащите правильные варианты:</div>
+                                <div class="options-container">
+                                    <div class="section-header">Источники:</div>
+                                    ${allOptions.map(o=>`<div class="option-btn ${isOptionUsed(o)?'disabled':''}" draggable="${!isOptionUsed(o)}" data-option="${o}">${o}</div>`).join('')}
+                                    <div class="section-header">Лимиты:</div>
+                                    ${limitOptions.map(o=>`<div class="option-btn ${currentState.limit?'disabled':''}" draggable="${!currentState.limit}" data-option="limit:${o}">${o}</div>`).join('')}
+                                    <div class="section-header">Особенности:</div>
+                                    ${featuresOptions.map(o=>`<div class="option-btn ${currentState.features?'disabled':''}" draggable="${!currentState.features}" data-option="features:${o}">${o}</div>`).join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="button-group">
+                                <button class="check-btn" id="checkBtn" ${!isComplete?'disabled':''}>Проверить</button>
+                                <button class="reset-btn" id="resetBtn">Сбросить все</button>
+                            </div>
+                            
+                            ${showResult?`
+                                <div class="result-message ${isCorrect?'correct':'incorrect'}">
+                                    ${isCorrect?'✅ Все верно!':'❌ Есть ошибки:'}
+                                    ${!isCorrect && errors.length?errors.map(e=>`<div class="error-detail">${e}</div>`).join(''):''}
+                                </div>
+                            `:''}
+                        </div>
+                    </div>
+                `;
+
+                document.querySelectorAll('.deduction-item').forEach(item=>{
+                    item.addEventListener('click',()=>{
+                        const found=deductions.find(d=>d.id===item.dataset.id);
+                        if(found){ selectedDeduction=found; resetState(); render(); }
+                    });
+                });
+
+                const options = document.querySelectorAll('.option-btn[draggable="true"]');
+                const drops = {
+                    source:document.getElementById('dropzone-source'),
+                    limit:document.getElementById('dropzone-limit'),
+                    features:document.getElementById('dropzone-features')
+                };
+
+                options.forEach(opt=>{
+                    opt.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',opt.dataset.option));
+                });
+
+                Object.entries(drops).forEach(([key,zone])=>{
+                    if(!zone) return;
+                    zone.addEventListener('dragover',e=>{ e.preventDefault(); zone.classList.add('drag-over'); });
+                    zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+                    zone.addEventListener('drop',e=>{
+                        e.preventDefault(); zone.classList.remove('drag-over');
+                        const data=e.dataTransfer.getData('text/plain');
+                        if(key==='source' && allOptions.includes(data) && !currentState.source.includes(data)){
+                            currentState.source.push(data); showResult=false;
+                        } else if(key==='limit' && data.startsWith('limit:')){
+                            currentState.limit=data.replace('limit:',''); showResult=false;
+                        } else if(key==='features' && data.startsWith('features:')){
+                            currentState.features=data.replace('features:',''); showResult=false;
+                        }
+                        render();
+                    });
+                });
+
+                document.querySelectorAll('.remove').forEach(btn=>{
+                    btn.addEventListener('click',e=>{
+                        e.stopPropagation();
+                        const val=btn.dataset.remove;
+                        if(val==='limit' || val==='features') currentState[val]='';
+                        else currentState.source=currentState.source.filter(s=>s!==val);
+                        showResult=false; render();
+                    });
+                });
+
+                document.getElementById('checkBtn')?.addEventListener('click',()=>{ showResult=true; render(); });
+                document.getElementById('resetBtn')?.addEventListener('click',()=>{ resetState(); render(); });
+            }
+            render();
+        })();
+    </script>
+</body>
+</html>
