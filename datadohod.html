@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>НДФЛ · дата дохода</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            background:#eef2f5;
+            font-family:'Segoe UI','Inter',sans-serif;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:8px;
+        }
+        .card{
+            max-width:620px;
+            width:100%;
+            background:white;
+            border-radius:24px;
+            box-shadow:0 15px 30px -8px rgba(0,0,0,0.1);
+            padding:1.2rem;
+            border:1px solid #dee6f0;
+        }
+        .mode-switch{
+            display:flex;
+            gap:0.4rem;
+            margin-bottom:1rem;
+            background:#f0f5fc;
+            border-radius:40px;
+            padding:0.25rem;
+        }
+        .mode-btn{
+            flex:1;
+            background:transparent;
+            border:none;
+            padding:0.5rem 0.3rem;
+            border-radius:40px;
+            font-size:0.9rem;
+            font-weight:500;
+            color:#2a4d70;
+            cursor:pointer;
+            white-space:nowrap;
+        }
+        .mode-btn.active{
+            background:white;
+            box-shadow:0 2px 6px rgba(0,0,0,0.04);
+            color:#1a344c;
+            font-weight:600;
+        }
+        .rules-panel{
+            background:#f0f7fe;
+            border-radius:16px;
+            padding:0.7rem 1rem;
+            margin-bottom:1rem;
+            border:1px solid #c7daf5;
+            font-size:0.85rem;
+            line-height:1.4;
+        }
+        .rules-title{
+            font-weight:600;
+            color:#0d2f4e;
+            margin-bottom:0.3rem;
+            font-size:0.9rem;
+        }
+        .rules-list{
+            list-style:none;
+            padding-left:0;
+        }
+        .rules-list li{
+            margin-bottom:0.1rem;
+            padding-left:1rem;
+            position:relative;
+        }
+        .rules-list li::before{
+            content:"•";
+            color:#2e7ab3;
+            position:absolute;
+            left:0.1rem;
+        }
+        .calendar-panel{
+            background:#f9fcff;
+            border-radius:20px;
+            padding:1rem;
+            border:1px solid #d2e0f0;
+        }
+        .selector-row{
+            display:flex;
+            align-items:center;
+            gap:0.5rem;
+            flex-wrap:wrap;
+            margin-bottom:0.8rem;
+        }
+        .selector-label{
+            font-weight:500;
+            color:#1e3b5c;
+            font-size:0.9rem;
+            min-width:150px;
+        }
+        .selector-select{
+            flex:1;
+            padding:0.4rem 0.8rem;
+            border:2px solid #cbd5e1;
+            border-radius:40px;
+            font-size:0.9rem;
+            min-width:200px;
+            background:white;
+            cursor:pointer;
+        }
+        .date-input{
+            flex:1;
+            padding:0.4rem 0.8rem;
+            border:2px solid #cbd5e1;
+            border-radius:40px;
+            font-size:0.9rem;
+            min-width:140px;
+            background:white;
+        }
+        .period-result{
+            background:#e6f0fe;
+            border-radius:16px;
+            padding:0.8rem 1rem;
+            margin:0.5rem 0 0;
+        }
+        .info-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            flex-wrap:wrap;
+            gap:0.5rem;
+            border-bottom:1px dashed #a0bbd9;
+            padding:0.5rem 0;
+        }
+        .info-row:last-child{border-bottom:none;}
+        .info-label{
+            font-weight:600;
+            color:#1d4b77;
+            font-size:0.9rem;
+            min-width:130px;
+        }
+        .info-value{
+            font-size:1rem;
+            font-weight:500;
+            color:#0a2942;
+            background:#ffffffcc;
+            padding:0.1rem 1rem;
+            border-radius:40px;
+            border:1px solid #b6cbe5;
+        }
+        .info-hint{
+            font-size:0.75rem;
+            color:#4d688b;
+            margin-left:0.3rem;
+            font-style:italic;
+        }
+        .rule-badge{
+            display:inline-block;
+            background:#2e7ab3;
+            color:white;
+            border-radius:40px;
+            padding:0.1rem 0.8rem;
+            font-size:0.7rem;
+        }
+        .month-highlight{
+            background:#e9ecf0;
+            border-radius:12px;
+            padding:0.1rem 0.6rem;
+            font-weight:500;
+            font-size:0.9rem;
+        }
+        #periodDescription{
+            font-size:0.8rem;
+            color:#346792;
+            margin-top:0.4rem;
+            padding-left:0.2rem;
+        }
+        @media (max-width:500px){
+            .selector-row{flex-direction:column;align-items:flex-start;}
+            .info-row{flex-direction:column;align-items:flex-start;}
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="mode-switch" id="modeSwitch">
+        <button class="mode-btn active" data-mode="standard">Обычные доходы</button>
+        <button class="mode-btn" data-mode="special">Особые случаи</button>
+    </div>
+
+    <div class="rules-panel" id="rulesPanel"></div>
+
+    <div class="calendar-panel">
+        <div class="selector-row">
+            <span class="selector-label">Вид дохода / события:</span>
+            <select class="selector-select" id="incomeTypeSelect"></select>
+        </div>
+
+        <div id="dynamicFields"></div>
+
+        <div class="selector-row" id="mainDateRow">
+            <span class="selector-label" id="mainDateLabel">Дата выплаты:</span>
+            <input type="text" class="date-input" id="mainDateInput" value="18.02.2026" placeholder="дд.мм.гггг">
+        </div>
+
+        <div class="period-result" id="deductionResult">
+            <div style="display:flex; align-items:center; gap:0.3rem; margin-bottom:0.5rem;">
+                <span class="rule-badge">дата дохода</span>
+                <span style="font-size:0.9rem;">для</span>
+                <span class="month-highlight" id="selectedType">зарплата</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Дата получения дохода</span>
+                <span><span class="info-value" id="incomeDateResult">18.02.2026</span><span class="info-hint" id="incomeHint"></span></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Налоговая база (период)</span>
+                <span><span class="info-value" id="taxBasePeriod">февраль 2026</span></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Уплата налоговым агентом</span>
+                <span><span class="info-value" id="paymentDeadline">28.02.2026</span><span class="info-hint" id="paymentHint"></span></span>
+            </div>
+            <div class="info-row" id="extraInfoRow" style="display:none;">
+                <span class="info-label">Дополнительно</span>
+                <span><span class="info-value" id="extraInfo"></span></span>
+            </div>
+        </div>
+        <div id="periodDescription">дата дохода = день выплаты</div>
+    </div>
+</div>
+
+<script>
+(function(){
+    let currentMode = 'standard';
+    
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    const rulesPanel = document.getElementById('rulesPanel');
+    const incomeTypeSelect = document.getElementById('incomeTypeSelect');
+    const dynamicFields = document.getElementById('dynamicFields');
+    const mainDateInput = document.getElementById('mainDateInput');
+    const mainDateLabel = document.getElementById('mainDateLabel');
+    const selectedType = document.getElementById('selectedType');
+    const incomeDateResult = document.getElementById('incomeDateResult');
+    const incomeHint = document.getElementById('incomeHint');
+    const taxBaseSpan = document.getElementById('taxBasePeriod');
+    const paySpan = document.getElementById('paymentDeadline');
+    const payHint = document.getElementById('paymentHint');
+    const extraRow = document.getElementById('extraInfoRow');
+    const extraInfo = document.getElementById('extraInfo');
+    const periodDesc = document.getElementById('periodDescription');
+
+    const standardTypes = [
+        { id: 'salary', name: 'Зарплата, премии, отпускные', 
+          rule: 'день выплаты', fields: ['mainDate'], 
+          calc: (fields) => ({ date: fields.mainDate, desc: 'день выплаты' }) },
+        { id: 'gift', name: 'Подарки дороже 4000 рублей — дата передачи', 
+          rule: 'дата передачи', fields: ['mainDate'],
+          calc: (fields) => ({ date: fields.mainDate, desc: 'дата передачи' }) },
+        { id: 'travel', name: 'Командировки (суточные сверх норм)', 
+          rule: 'последний день месяца утверждения авансового отчета', 
+          fields: ['approveDate'],
+          calc: (fields) => {
+              let d = fields.approveDate;
+              let lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+              return { date: lastDay, desc: 'посл. день месяца утверждения' };
+          } },
+        { id: 'loan', name: 'Матвыгода по займам', 
+          rule: 'последний день каждого месяца', 
+          fields: ['monthDate'],
+          calc: (fields) => {
+              let d = fields.monthDate;
+              let lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+              return { date: lastDay, desc: 'посл. день месяца' };
+          } },
+        { id: 'gpc', name: 'Гонорары по ГПД, дивиденды', 
+          rule: 'день выплаты', fields: ['mainDate'],
+          calc: (fields) => ({ date: fields.mainDate, desc: 'день выплаты' }) }
+    ];
+
+    const specialTypes = [
+        { id: 'setoff', name: 'Зачет встречных требований', 
+          rule: 'день зачета', fields: ['mainDate'],
+          calc: (fields) => ({ date: fields.mainDate, desc: 'день зачета' }) },
+        { id: 'debt', name: 'Списанный долг', 
+          rule: 'день прекращения обязательства', fields: ['mainDate'],
+          calc: (fields) => ({ date: fields.mainDate, desc: 'день списания' }) },
+        { id: 'pledge', name: 'Обеспечительный платеж (зачет)', 
+          rule: 'день зачета в счет исполнения', fields: ['mainDate'],
+          calc: (fields) => ({ date: fields.mainDate, desc: 'день зачета' }) },
+        { id: 'ip', name: 'Доходы ИП', 
+          rule: 'день поступления денег', fields: ['mainDate'],
+          calc: (fields) => ({ date: fields.mainDate, desc: 'день поступления' }) },
+        { id: 'securities', name: 'Матвыгода от покупки ценных бумаг', 
+          rule: 'день приобретения', fields: ['mainDate'],
+          calc: (fields) => ({ date: fields.mainDate, desc: 'день приобретения' }) }
+    ];
+
+    function fillSelect() {
+        const types = currentMode === 'standard' ? standardTypes : specialTypes;
+        incomeTypeSelect.innerHTML = types.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    }
+
+    function updateRulesPanel() {
+        const types = currentMode === 'standard' ? standardTypes : specialTypes;
+        const title = currentMode === 'standard' ? 'Обычные доходы (ст. 223 НК)' : 'Особые случаи (ст. 223 НК)';
+        let listHtml = '';
+        types.forEach(t => {
+            listHtml += `<li>${t.name} — ${t.rule}</li>`;
+        });
+        rulesPanel.innerHTML = `
+            <div class="rules-title">${title}</div>
+            <ul class="rules-list">${listHtml}</ul>
+        `;
+    }
+
+    function getCurrentType() {
+        const id = incomeTypeSelect.value;
+        const types = currentMode === 'standard' ? standardTypes : specialTypes;
+        return types.find(t => t.id === id) || types[0];
+    }
+
+    function rebuildDynamicFields() {
+        const type = getCurrentType();
+        if (type.id === 'travel') {
+            mainDateLabel.textContent = 'Дата утверждения авансового отчета:';
+        } else if (type.id === 'loan') {
+            mainDateLabel.textContent = 'Любая дата в месяце:';
+        } else {
+            mainDateLabel.textContent = 'Дата выплаты/события:';
+        }
+        dynamicFields.innerHTML = '';
+    }
+
+    function parseDate(str) {
+        if (!str) return null;
+        let p = str.split('.');
+        if (p.length !== 3) return null;
+        let d = new Date(+p[2], +p[1] - 1, +p[0]);
+        return isNaN(d) ? null : d;
+    }
+
+    function formatDate(d) {
+        return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;
+    }
+    function monthName(m) { 
+        return ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'][m]; 
+    }
+
+    function getPaymentDeadline(incomeDate) {
+        let d = incomeDate;
+        let day = d.getDate(), mon = d.getMonth(), yr = d.getFullYear();
+        let payDate;
+        if (day <= 22) {
+            payDate = new Date(yr, mon, 28);
+            payHint.textContent = '1–22 число';
+        } else {
+            let nextMon = mon + 1, nextY = nextMon > 11 ? yr + 1 : yr, nextM = nextMon % 12;
+            payDate = new Date(nextY, nextM, 5);
+            payHint.textContent = '23–31 число';
+        }
+        if (mon === 11 && day >= 23) {
+            let lastDay = new Date(yr, 11, 31);
+            let w = lastDay.getDay();
+            if (w === 0) lastDay = new Date(yr, 11, 30);
+            else if (w === 6) lastDay = new Date(yr, 11, 29);
+            payDate = lastDay;
+            payHint.textContent = 'посл. раб. день года';
+        }
+        return payDate;
+    }
+
+    function updateAll() {
+        const type = getCurrentType();
+        // Убираем запятую в отображаемом названии
+        let displayName = type.name;
+        if (displayName.includes(',')) {
+            displayName = displayName.replace(',', '');
+        }
+        selectedType.textContent = displayName.split(' ')[0] || displayName;
+
+        const mainDate = parseDate(mainDateInput.value);
+        if (!mainDate) return;
+
+        let fields = { mainDate };
+        if (type.id === 'travel') {
+            fields.approveDate = mainDate;
+        }
+        if (type.id === 'loan') {
+            fields.monthDate = mainDate;
+        }
+
+        let result = type.calc(fields);
+        let incomeDate = result.date;
+        let incomeDesc = result.desc;
+
+        incomeDateResult.textContent = formatDate(incomeDate);
+        incomeHint.textContent = incomeDesc;
+
+        taxBaseSpan.textContent = `${monthName(incomeDate.getMonth())} ${incomeDate.getFullYear()}`;
+
+        let payDate = getPaymentDeadline(incomeDate);
+        paySpan.textContent = formatDate(payDate);
+
+        let day = incomeDate.getDate();
+        let mon = incomeDate.getMonth();
+        let yr = incomeDate.getFullYear();
+        if (day <= 22) {
+            periodDesc.textContent = `дата дохода ${formatDate(incomeDate)} → уплата до 28.${(mon+1).toString().padStart(2,'0')}`;
+        } else {
+            let nextMon = mon+1, nextY = nextMon>11?yr+1:yr, nextM = nextMon%12;
+            periodDesc.textContent = `дата дохода ${formatDate(incomeDate)} → уплата до 05.${(nextM+1).toString().padStart(2,'0')}.${nextY}`;
+        }
+        if (mon === 11 && day >= 23) {
+            periodDesc.textContent = `дата дохода ${formatDate(incomeDate)} (декабрь после 23) → уплата до послед. раб. дня года`;
+        }
+
+        if (type.id === 'gift') {
+            extraRow.style.display = 'flex';
+            extraInfo.textContent = 'подарки дороже 4000 ₽';
+        } else if (type.id === 'loan') {
+            extraRow.style.display = 'flex';
+            extraInfo.textContent = 'матвыгода: последний день месяца';
+        } else {
+            extraRow.style.display = 'none';
+        }
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        modeBtns.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+        fillSelect();
+        updateRulesPanel();
+        rebuildDynamicFields();
+        updateAll();
+    }
+
+    modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+    });
+
+    incomeTypeSelect.addEventListener('change', () => {
+        rebuildDynamicFields();
+        updateAll();
+    });
+
+    mainDateInput.addEventListener('change', updateAll);
+
+    flatpickr(mainDateInput, {
+        locale: 'ru', dateFormat: 'd.m.Y', defaultDate: '18.02.2026', allowInput: true,
+        onChange: updateAll
+    });
+
+    switchMode('standard');
+})();
+</script>
+</body>
+</html>
