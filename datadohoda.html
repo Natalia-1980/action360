@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>НДФЛ · дата дохода</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            background:#eef2f5;
+            font-family:'Segoe UI','Inter',sans-serif;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:8px;
+        }
+        .card{
+            max-width:580px;
+            width:100%;
+            background:white;
+            border-radius:24px;
+            box-shadow:0 15px 30px -8px rgba(0,0,0,0.1);
+            padding:1.2rem;
+            border:1px solid #dee6f0;
+        }
+        .mode-switch{
+            display:flex;
+            gap:0.4rem;
+            margin-bottom:1rem;
+            background:#f0f5fc;
+            border-radius:40px;
+            padding:0.25rem;
+        }
+        .mode-btn{
+            flex:1;
+            background:transparent;
+            border:none;
+            padding:0.5rem 0.3rem;
+            border-radius:40px;
+            font-size:0.9rem;
+            font-weight:500;
+            color:#2a4d70;
+            cursor:pointer;
+            white-space:nowrap;
+        }
+        .mode-btn.active{
+            background:white;
+            box-shadow:0 2px 6px rgba(0,0,0,0.04);
+            color:#1a344c;
+            font-weight:600;
+        }
+        .rules-panel{
+            background:#f0f7fe;
+            border-radius:16px;
+            padding:0.7rem 1rem;
+            margin-bottom:1rem;
+            border:1px solid #c7daf5;
+            font-size:0.85rem;
+            line-height:1.4;
+        }
+        .rules-title{
+            font-weight:600;
+            color:#0d2f4e;
+            margin-bottom:0.3rem;
+            font-size:0.9rem;
+        }
+        .rules-list{
+            list-style:none;
+            padding-left:0;
+        }
+        .rules-list li{
+            margin-bottom:0.1rem;
+            padding-left:1rem;
+            position:relative;
+        }
+        .rules-list li::before{
+            content:"•";
+            color:#2e7ab3;
+            position:absolute;
+            left:0.1rem;
+        }
+        .calendar-panel{
+            background:#f9fcff;
+            border-radius:20px;
+            padding:1rem;
+            border:1px solid #d2e0f0;
+        }
+        .date-selector{
+            display:flex;
+            align-items:center;
+            gap:0.5rem;
+            flex-wrap:wrap;
+            margin-bottom:0.8rem;
+        }
+        .date-label{
+            font-weight:500;
+            color:#1e3b5c;
+            font-size:0.9rem;
+            min-width:115px;
+        }
+        .date-input{
+            flex:1;
+            padding:0.4rem 0.8rem;
+            border:2px solid #cbd5e1;
+            border-radius:40px;
+            font-size:0.9rem;
+            min-width:140px;
+            background:white;
+        }
+        .period-result{
+            background:#e6f0fe;
+            border-radius:16px;
+            padding:0.8rem 1rem;
+            margin:0.5rem 0 0;
+        }
+        .deadline-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            flex-wrap:wrap;
+            gap:0.5rem;
+            border-bottom:1px dashed #a0bbd9;
+            padding:0.5rem 0;
+        }
+        .deadline-row:last-child{border-bottom:none;}
+        .deadline-label{
+            font-weight:600;
+            color:#1d4b77;
+            font-size:0.9rem;
+            min-width:130px;
+        }
+        .deadline-value{
+            font-size:1rem;
+            font-weight:500;
+            color:#0a2942;
+            background:#ffffffcc;
+            padding:0.1rem 1rem;
+            border-radius:40px;
+            border:1px solid #b6cbe5;
+        }
+        .deadline-hint{
+            font-size:0.75rem;
+            color:#4d688b;
+            margin-left:0.3rem;
+            font-style:italic;
+        }
+        .rule-badge{
+            display:inline-block;
+            background:#2e7ab3;
+            color:white;
+            border-radius:40px;
+            padding:0.1rem 0.8rem;
+            font-size:0.7rem;
+        }
+        .month-highlight{
+            background:#e9ecf0;
+            border-radius:12px;
+            padding:0.1rem 0.6rem;
+            font-weight:500;
+            font-size:0.9rem;
+        }
+        #periodDescription{
+            font-size:0.8rem;
+            color:#346792;
+            margin-top:0.4rem;
+            padding-left:0.2rem;
+        }
+        @media (max-width:450px){
+            .date-selector{flex-direction:column;align-items:flex-start;}
+            .deadline-row{flex-direction:column;align-items:flex-start;}
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="mode-switch" id="modeSwitch">
+        <button class="mode-btn active" data-mode="standard">💼 Обычные доходы</button>
+        <button class="mode-btn" data-mode="special">📌 Особые случаи</button>
+    </div>
+
+    <div class="rules-panel" id="rulesPanel">
+        <div class="rules-title">📌 Дата получения дохода: основные правила</div>
+        <ul class="rules-list">
+            <li>Зарплата, премии, отпускные — день выплаты</li>
+            <li>Командировки (суточные сверх норм) — последний день месяца утверждения авансового отчета</li>
+            <li>Матвыгода по займам — последний день каждого месяца</li>
+            <li>Подарки дороже 4000 рублей — дата передачи</li>
+        </ul>
+    </div>
+
+    <div class="calendar-panel">
+        <div class="date-selector">
+            <span class="date-label">📅 Дата события:</span>
+            <input type="text" class="date-input" id="incomeDateInput" value="18.02.2026" placeholder="дд.мм.гггг">
+        </div>
+
+        <div class="period-result" id="deadlineResult">
+            <div style="display:flex; align-items:center; gap:0.3rem; margin-bottom:0.5rem;">
+                <span class="rule-badge">дата дохода</span>
+                <span style="font-size:0.9rem;">для события</span>
+                <span class="month-highlight" id="selectedDateDisplay">18.02.2026</span>
+            </div>
+            <div class="deadline-row">
+                <span class="deadline-label">📅 Дата дохода</span>
+                <span><span class="deadline-value" id="incomeDateResult">18.02.2026</span><span class="deadline-hint" id="incomeHint"></span></span>
+            </div>
+            <div class="deadline-row">
+                <span class="deadline-label">📋 Налоговая база</span>
+                <span><span class="deadline-value" id="taxBasePeriod">февраль 2026</span></span>
+            </div>
+            <div class="deadline-row">
+                <span class="deadline-label">💸 Уплата налоговым агентом</span>
+                <span><span class="deadline-value" id="paymentDeadline">28.02.2026</span><span class="deadline-hint" id="paymentHint"></span></span>
+            </div>
+            <div class="deadline-row" id="extraDeadlineRow" style="display:none;">
+                <span class="deadline-label">⏳ Особый срок</span>
+                <span><span class="deadline-value" id="extraDeadline"></span></span>
+            </div>
+        </div>
+        <div id="periodDescription">выплата зарплаты → дата дохода = день выплаты</div>
+    </div>
+</div>
+
+<script>
+(function(){
+    let currentMode='standard';
+    const incInput=document.getElementById('incomeDateInput');
+    const selDisplay=document.getElementById('selectedDateDisplay');
+    const incomeResult=document.getElementById('incomeDateResult');
+    const taxBaseSpan=document.getElementById('taxBasePeriod');
+    const paySpan=document.getElementById('paymentDeadline');
+    const incomeHint=document.getElementById('incomeHint');
+    const payHint=document.getElementById('paymentHint');
+    const extraRow=document.getElementById('extraDeadlineRow');
+    const extraSpan=document.getElementById('extraDeadline');
+    const periodDesc=document.getElementById('periodDescription');
+    const rulesPanel=document.getElementById('rulesPanel');
+    const modeBtns=document.querySelectorAll('.mode-btn');
+
+    const fp=flatpickr(incInput, {
+        locale:'ru', dateFormat:'d.m.Y', defaultDate:'18.02.2026', allowInput:true,
+        onChange:(sel,str)=>updateDeadlines(str,currentMode)
+    });
+
+    function updateRulesPanel(mode){
+        if(mode==='standard'){
+            rulesPanel.innerHTML=`
+                <div class="rules-title">📌 Обычные доходы (ст. 223 НК)</div>
+                <ul class="rules-list">
+                    <li>Зарплата, премии, отпускные, больничные — день выплаты</li>
+                    <li>Гонорары по ГПД, дивиденды — день выплаты</li>
+                    <li>Командировки (сверхнормативные суточные) — последний день месяца утверждения авансового отчета</li>
+                    <li>Матвыгода по займам — последний день каждого месяца</li>
+                    <li>Подарки дороже 4000 рублей — дата передачи</li>
+                </ul>
+            `;
+        } else {
+            rulesPanel.innerHTML=`
+                <div class="rules-title">📌 Особые случаи</div>
+                <ul class="rules-list">
+                    <li>Зачет встречных требований — день зачета</li>
+                    <li>Списанный долг — день прекращения обязательства</li>
+                    <li>Обеспечительный платеж — день зачета в счет исполнения</li>
+                    <li>Доходы ИП — день поступления денег</li>
+                    <li>Матвыгода от покупки ценных бумаг — день приобретения</li>
+                </ul>
+            `;
+        }
+    }
+
+    modeBtns.forEach(btn=>{
+        btn.addEventListener('click',()=>{
+            modeBtns.forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMode=btn.dataset.mode;
+            updateRulesPanel(currentMode);
+            updateDeadlines(incInput.value,currentMode);
+        });
+    });
+
+    function formatDate(d){ return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`; }
+    function monthName(m){ return ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'][m]; }
+    function lastDayOfMonth(m,y){ return new Date(y,m+1,0).getDate(); }
+
+    function updateDeadlines(str,mode){
+        if(!str){ clear(); return; }
+        let p=str.split('.');
+        if(p.length!==3) return;
+        let d=new Date(+p[2],+p[1]-1,+p[0]);
+        if(isNaN(d)) return;
+        selDisplay.textContent=str;
+        let day=d.getDate(), mon=d.getMonth(), yr=d.getFullYear();
+
+        if(mode==='standard'){
+            // Для обычных доходов дата дохода = выбранная дата (выплата)
+            incomeResult.textContent=str;
+            incomeHint.textContent='день выплаты';
+            
+            // Определяем период для налоговой базы (месяц)
+            taxBaseSpan.textContent=`${monthName(mon)} ${yr}`;
+            
+            // Срок уплаты зависит от даты выплаты
+            let payDate;
+            if(day<=22){
+                payDate=new Date(yr,mon,28);
+                payHint.textContent='1–22 число';
+                periodDesc.textContent=`выплата ${day} ${monthName(mon)} → дата дохода ${str}, уплата налоговым агентом до 28.${(mon+1).toString().padStart(2,'0')}`;
+            } else {
+                let nextMon=mon+1, nextY=nextMon>11?yr+1:yr, nextM=nextMon%12;
+                payDate=new Date(nextY,nextM,5);
+                payHint.textContent='23–31 число';
+                periodDesc.textContent=`выплата ${day} ${monthName(mon)} → дата дохода ${str}, уплата налоговым агентом до 05.${(nextM+1).toString().padStart(2,'0')}.${nextY}`;
+            }
+            
+            // Особый случай для декабря
+            if(mon===11 && day>=23){
+                extraRow.style.display='flex';
+                extraSpan.textContent='до последнего рабочего дня года';
+                periodDesc.textContent=`декабрьская выплата после 23.12 → уплата налоговым агентом до последнего рабочего дня`;
+            } else extraRow.style.display='none';
+            
+            paySpan.textContent=formatDate(payDate);
+            
+        } else {
+            // Особые случаи: дата дохода может отличаться
+            if(day<=15){
+                incomeResult.textContent=str;
+                incomeHint.textContent='дата операции';
+                taxBaseSpan.textContent=`${monthName(mon)} ${yr}`;
+                payDate=new Date(yr,mon,28);
+                payHint.textContent='до 15 числа';
+                periodDesc.textContent=`операция в первой половине месяца → дата дохода ${str}, уплата налоговым агентом до 28.${(mon+1).toString().padStart(2,'0')}`;
+            } else {
+                // Для операций после 15 числа иногда дата дохода переносится на следующий месяц
+                let nextMon=mon+1, nextY=nextMon>11?yr+1:yr, nextM=nextMon%12;
+                incomeResult.textContent=formatDate(new Date(nextY,nextM,1));
+                incomeHint.textContent='перенос на след. месяц';
+                taxBaseSpan.textContent=`${monthName(nextM)} ${nextY}`;
+                payDate=new Date(nextY,nextM,5);
+                payHint.textContent='после 15 числа';
+                periodDesc.textContent=`операция после 15.${(mon+1).toString().padStart(2,'0')} → дата дохода 01.${(nextM+1).toString().padStart(2,'0')}.${nextY}, уплата налоговым агентом до 05.${(nextM+1).toString().padStart(2,'0')}.${nextY}`;
+            }
+            paySpan.textContent=formatDate(payDate);
+            extraRow.style.display='none';
+        }
+    }
+    
+    function clear(){
+        selDisplay.textContent='—'; 
+        incomeResult.textContent='—'; 
+        taxBaseSpan.textContent='—'; 
+        paySpan.textContent='—';
+        periodDesc.textContent='Выберите дату'; 
+        extraRow.style.display='none';
+    }
+    
+    updateRulesPanel('standard');
+    updateDeadlines('18.02.2026','standard');
+})();
+</script>
+</body>
+</html>
