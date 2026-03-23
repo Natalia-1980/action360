@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Тренажер: НДФЛ при страховой выплате</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #e8eef2;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .trainer-container {
+            max-width: 850px;
+            width: 100%;
+            background: #f5f7f9;
+            border-radius: 24px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        /* Верхняя панель с заданием */
+        .task-header {
+            background: #e6edf4;
+            padding: 14px 24px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e5a7a;
+            border-bottom: 1px solid #d4dee8;
+        }
+
+        .status-badge {
+            display: none;
+        }
+
+        .question-card {
+            padding: 20px 24px 24px;
+        }
+
+        .case-block {
+            background: #eef2f5;
+            padding: 14px 18px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            border-left: 4px solid #9bb0c2;
+        }
+
+        .case-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1e4a6e;
+            margin-bottom: 10px;
+            letter-spacing: -0.2px;
+        }
+
+        .case-text {
+            font-size: 0.88rem;
+            line-height: 1.45;
+            color: #2c3e50;
+        }
+
+        .calculation-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .calc-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #2c5a7a;
+            margin-bottom: 14px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .calc-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        .calc-label {
+            width: 190px;
+            font-weight: 500;
+            color: #4a5b6e;
+        }
+
+        .select-input {
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            border: 1.5px solid #cfdde8;
+            border-radius: 10px;
+            background: white;
+            font-family: monospace;
+            font-weight: 500;
+            cursor: pointer;
+            width: 130px;
+        }
+
+        .formula-block {
+            background: #f8fafc;
+            border-radius: 18px;
+            padding: 14px;
+            margin-top: 14px;
+            border: 1px solid #e2edf5;
+        }
+
+        .formula-title {
+            font-weight: 600;
+            color: #2c5a7a;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+        }
+
+        .formula-expression {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: #ffffff;
+            padding: 10px 14px;
+            border-radius: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .formula-select {
+            padding: 5px 8px;
+            font-size: 0.8rem;
+            border: 1.5px solid #cfdde8;
+            border-radius: 8px;
+            background: white;
+            font-family: monospace;
+            font-weight: 500;
+            cursor: pointer;
+            width: 85px;
+        }
+
+        .result-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2c7a4b;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            border: none;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #e2f0ff;
+            color: #2c5a7a;
+        }
+
+        .btn-primary {
+            background: #d4eaff;
+            color: #1e6a8f;
+        }
+
+        .btn-primary:hover {
+            background: #c2e0ff;
+        }
+
+        .btn-secondary {
+            background: #d4eaff;
+            color: #1e6a8f;
+        }
+
+        .btn-secondary:hover {
+            background: #c2e0ff;
+        }
+
+        .commentary {
+            background: #f0f4f8;
+            border-radius: 16px;
+            padding: 12px 16px;
+            border-left: 4px solid #b8ccdc;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: #2c3e50;
+        }
+
+        .commentary.correct-comment {
+            border-left-color: #2ecc71;
+            background: #e8f5e9;
+            color: #1e5a2e;
+        }
+
+        .commentary.wrong-comment {
+            border-left-color: #e74c3c;
+            background: #fee9e7;
+            color: #a23b2e;
+        }
+
+        .commentary p {
+            margin: 0 0 6px 0;
+        }
+
+        @media (max-width: 600px) {
+            .question-card {
+                padding: 14px;
+            }
+            .calc-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            .calc-label {
+                width: auto;
+            }
+            .formula-expression {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="trainer-container">
+    <!-- Верхняя панель с заданием -->
+    <div class="task-header">
+        Задание: выберите верные значения для расчета и рассчитайте НДФЛ
+    </div>
+    
+    <div class="question-card">
+        <div class="case-block">
+            <div class="case-title">Условие</div>
+            <div class="case-text">
+                У Владимира был поврежден гараж. Страховая организация отказала в выплате. Суд присудил Владимиру страховую выплату в сумме 700 000 руб., а также обязал возместить судебные расходы 30 000 руб. и моральный ущерб 20 000 руб. Расходы на ремонт гаража составили 600 000 руб. Страховая премия по договору — 10 000 руб. Других доходов нет.
+            </div>
+        </div>
+
+        <div class="calculation-card">
+            <div class="calc-title">Исходные данные для контроля</div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Страховая выплата по решению суда:</span>
+                <select id="insurancePay" class="select-input">
+                    <option value="">-- выбрать --</option>
+                    <option value="700000">700 000 руб.</option>
+                    <option value="600000">600 000 руб.</option>
+                    <option value="30000">30 000 руб.</option>
+                    <option value="20000">20 000 руб.</option>
+                    <option value="10000">10 000 руб.</option>
+                </select>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Расходы на ремонт гаража:</span>
+                <select id="repairCost" class="select-input">
+                    <option value="">-- выбрать --</option>
+                    <option value="700000">700 000 руб.</option>
+                    <option value="600000">600 000 руб.</option>
+                    <option value="30000">30 000 руб.</option>
+                    <option value="20000">20 000 руб.</option>
+                    <option value="10000">10 000 руб.</option>
+                </select>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Уплаченная страховая премия:</span>
+                <select id="insurancePremium" class="select-input">
+                    <option value="">-- выбрать --</option>
+                    <option value="700000">700 000 руб.</option>
+                    <option value="600000">600 000 руб.</option>
+                    <option value="30000">30 000 руб.</option>
+                    <option value="20000">20 000 руб.</option>
+                    <option value="10000">10 000 руб.</option>
+                </select>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Компенсация морального вреда:</span>
+                <select id="moralDamage" class="select-input">
+                    <option value="">-- выбрать --</option>
+                    <option value="700000">700 000 руб.</option>
+                    <option value="600000">600 000 руб.</option>
+                    <option value="30000">30 000 руб.</option>
+                    <option value="20000">20 000 руб.</option>
+                    <option value="10000">10 000 руб.</option>
+                </select>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Возмещение судебных расходов:</span>
+                <select id="courtCosts" class="select-input">
+                    <option value="">-- выбрать --</option>
+                    <option value="700000">700 000 руб.</option>
+                    <option value="600000">600 000 руб.</option>
+                    <option value="30000">30 000 руб.</option>
+                    <option value="20000">20 000 руб.</option>
+                    <option value="10000">10 000 руб.</option>
+                </select>
+            </div>
+
+            <div class="formula-block">
+                <div class="formula-title">Формула расчета НДФЛ (ст. 213 НК РФ)</div>
+                <div class="formula-expression">
+                    <span>НДФЛ = (</span>
+                    <select id="formulaVal1" class="formula-select">
+                        <option value="">___</option>
+                        <option value="700000">700 000</option>
+                        <option value="600000">600 000</option>
+                        <option value="30000">30 000</option>
+                        <option value="20000">20 000</option>
+                        <option value="10000">10 000</option>
+                    </select>
+                    <span> – </span>
+                    <select id="formulaVal2" class="formula-select">
+                        <option value="">___</option>
+                        <option value="700000">700 000</option>
+                        <option value="600000">600 000</option>
+                        <option value="30000">30 000</option>
+                        <option value="20000">20 000</option>
+                        <option value="10000">10 000</option>
+                    </select>
+                    <span> – </span>
+                    <select id="formulaVal3" class="formula-select">
+                        <option value="">___</option>
+                        <option value="700000">700 000</option>
+                        <option value="600000">600 000</option>
+                        <option value="30000">30 000</option>
+                        <option value="20000">20 000</option>
+                        <option value="10000">10 000</option>
+                    </select>
+                    <span>) × 0,13 = </span>
+                    <span id="dynamicResult" class="result-value">???</span>
+                    <span>руб.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" id="checkBtn">Проверить расчет</button>
+            <button class="btn btn-secondary" id="showCorrectBtn">Показать верные значения</button>
+        </div>
+
+        <div id="commentaryBlock" class="commentary" style="display: none;"></div>
+    </div>
+</div>
+
+<script>
+    // Правильные суммы для формулы (набор чисел, порядок не важен)
+    const correctNumbers = new Set(["700000", "600000", "10000"]);
+    
+    function getFormulaValues() {
+        return [
+            document.getElementById("formulaVal1").value,
+            document.getElementById("formulaVal2").value,
+            document.getElementById("formulaVal3").value
+        ];
+    }
+    
+    function isFormulaCorrect() {
+        const values = getFormulaValues();
+        if (values[0] === "" || values[1] === "" || values[2] === "") return false;
+        
+        const selectedSet = new Set(values);
+        if (selectedSet.size !== 3) return false;
+        
+        for (let val of selectedSet) {
+            if (!correctNumbers.has(val)) return false;
+        }
+        return true;
+    }
+    
+    function calculateNDFL() {
+        const values = getFormulaValues();
+        if (values[0] === "" || values[1] === "" || values[2] === "") return null;
+        
+        const nums = values.map(v => parseInt(v, 10));
+        const insurancePay = nums.find(n => n === 700000);
+        const repairCost = nums.find(n => n === 600000);
+        const premium = nums.find(n => n === 10000);
+        
+        if (insurancePay && repairCost && premium) {
+            const taxableBase = insurancePay - repairCost - premium;
+            if (taxableBase < 0) return 0;
+            return taxableBase * 0.13;
+        }
+        
+        if (nums.length === 3) {
+            const taxableBase = nums[0] - nums[1] - nums[2];
+            if (taxableBase < 0) return 0;
+            return taxableBase * 0.13;
+        }
+        return null;
+    }
+    
+    function updateResult() {
+        const result = calculateNDFL();
+        const resultSpan = document.getElementById("dynamicResult");
+        if (result !== null && !isNaN(result) && result >= 0) {
+            resultSpan.textContent = Math.round(result).toLocaleString('ru-RU');
+        } else {
+            resultSpan.textContent = "???";
+        }
+    }
+    
+    document.getElementById("formulaVal1").addEventListener("change", updateResult);
+    document.getElementById("formulaVal2").addEventListener("change", updateResult);
+    document.getElementById("formulaVal3").addEventListener("change", updateResult);
+    
+    function showCommentary(isCorrect) {
+        const commentaryDiv = document.getElementById("commentaryBlock");
+        
+        if (isCorrect) {
+            commentaryDiv.className = "commentary correct-comment";
+            commentaryDiv.innerHTML = `
+                <p><strong>Верно! Сумма НДФЛ = 11 700 руб.</strong></p>
+                <p>Расчет: (700 000 − 600 000 − 10 000) × 0,13 = 90 000 × 0,13 = 11 700 руб.</p>
+                <p>Судебные расходы (30 000 руб.) и моральный вред (20 000 руб.) не облагаются налогом (ст. 217 НК РФ).</p>
+            `;
+        } else {
+            commentaryDiv.className = "commentary wrong-comment";
+            commentaryDiv.innerHTML = `
+                <p><strong>Неверно.</strong> В формуле должны быть выбраны: 700 000 руб., 600 000 руб. и 10 000 руб. Страховую выплату можно уменьшить на расходы на ремонт гаража и уплаченную страховую премию.</p>
+                <p>Судебные расходы — 30 000 руб. и моральный вред — 20 000 руб. не участвуют в расчете, так как освобождаются от налога (ст. 217 НК).</p>
+                <p>Правильный расчет: (700 000 − 600 000 − 10 000) × 0,13 = 11 700 руб.</p>
+            `;
+        }
+        commentaryDiv.style.display = "block";
+    }
+    
+    function handleCheck() {
+        const values = getFormulaValues();
+        
+        if (values[0] === "" || values[1] === "" || values[2] === "") {
+            const commentaryDiv = document.getElementById("commentaryBlock");
+            commentaryDiv.className = "commentary wrong-comment";
+            commentaryDiv.innerHTML = `
+                <p><strong>Неверно.</strong> В формуле должны быть выбраны: 700 000 руб., 600 000 руб. и 10 000 руб. Страховую выплату можно уменьшить на расходы на ремонт гаража и уплаченную страховую премию.</p>
+                <p>Судебные расходы — 30 000 руб. и моральный вред — 20 000 руб. не участвуют в расчете, так как освобождаются от налога (ст. 217 НК).</p>
+                <p>Правильный расчет: (700 000 − 600 000 − 10 000) × 0,13 = 11 700 руб.</p>
+            `;
+            commentaryDiv.style.display = "block";
+            return;
+        }
+        
+        if (isFormulaCorrect()) {
+            showCommentary(true);
+        } else {
+            showCommentary(false);
+        }
+    }
+    
+    function handleShowCorrect() {
+        document.getElementById("insurancePay").value = "700000";
+        document.getElementById("repairCost").value = "600000";
+        document.getElementById("insurancePremium").value = "10000";
+        document.getElementById("moralDamage").value = "20000";
+        document.getElementById("courtCosts").value = "30000";
+        
+        document.getElementById("formulaVal1").value = "700000";
+        document.getElementById("formulaVal2").value = "600000";
+        document.getElementById("formulaVal3").value = "10000";
+        
+        updateResult();
+        
+        const commentaryDiv = document.getElementById("commentaryBlock");
+        commentaryDiv.className = "commentary correct-comment";
+        commentaryDiv.innerHTML = `
+            <p><strong>Верные значения подставлены</strong></p>
+            <p>НДФЛ = (700 000 − 600 000 − 10 000) × 0,13 = 11 700 руб.</p>
+            <p>Судебные расходы (30 000 руб.) и моральный вред (20 000 руб.) не облагаются налогом (ст. 217 НК).</p>
+        `;
+        commentaryDiv.style.display = "block";
+    }
+    
+    updateResult();
+    document.getElementById("checkBtn").addEventListener("click", handleCheck);
+    document.getElementById("showCorrectBtn").addEventListener("click", handleShowCorrect);
+</script>
+</body>
+</html>
