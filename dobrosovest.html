@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Тренажер: Налоговая добросовестность</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #e8eef2;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        /* Карточка тренажера — светло-серая */
+        .trainer-container {
+            max-width: 800px;
+            width: 100%;
+            background: #f5f7f9;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* Прогресс — светлый фон */
+        .progress-area {
+            background: #f0f3f6;
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid #e0e4e8;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #4a5b6e;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .question-counter {
+            background: #e4e9ef;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            background: #eef2f6;
+            border-radius: 30px;
+            padding: 4px 14px;
+            font-size: 0.8rem;
+            color: #2c3e50;
+            box-shadow: inset 0 0 0 1px #dce2e8;
+        }
+
+        /* Основной контент */
+        .question-card {
+            padding: 24px 28px 28px;
+        }
+
+        /* Карточка с вопросом — чуть потемнее */
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #1e2f3f;
+            background: #eef2f5;
+            padding: 18px 22px;
+            border-radius: 24px;
+            border-left: 5px solid #a0b8cc;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        /* Поле ввода */
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #4a5b6e;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 12px 18px;
+            font-size: 1rem;
+            border: 1.5px solid #cfdde8;
+            border-radius: 48px;
+            background: white;
+            transition: 0.2s;
+            font-family: 'Segoe UI', monospace;
+        }
+
+        .answer-input:focus {
+            border-color: #8bb5d0;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 181, 208, 0.2);
+        }
+
+        /* Кнопки — светло-голубые */
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            border: none;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 48px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #e2f0ff;
+            color: #2c5a7a;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .btn-primary {
+            background: #d4eaff;
+            color: #1e6a8f;
+        }
+
+        .btn-primary:hover {
+            background: #c2e0ff;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #d4eaff;
+            color: #1e6a8f;
+        }
+
+        .btn-secondary:hover {
+            background: #c2e0ff;
+        }
+
+        .btn-next {
+            background: #d4eaff;
+            color: #1e6a8f;
+        }
+
+        .btn-next:hover {
+            background: #c2e0ff;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Комментарий: базовая светло-серая */
+        .commentary {
+            background: #f0f4f8;
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-top: 8px;
+            border-left: 5px solid #b8ccdc;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #2c3e50;
+        }
+
+        /* Верный ответ — зелёная подсветка */
+        .commentary.correct-comment {
+            border-left-color: #2ecc71;
+            background: #e8f5e9;
+            color: #1e5a2e;
+        }
+
+        /* Неверный ответ — красная подсветка */
+        .commentary.wrong-comment {
+            border-left-color: #e74c3c;
+            background: #fee9e7;
+            color: #a23b2e;
+        }
+
+        .commentary p {
+            margin: 0;
+        }
+
+        /* Адаптив */
+        @media (max-width: 550px) {
+            .question-card {
+                padding: 18px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            .btn {
+                text-align: center;
+            }
+            .question-text {
+                font-size: 0.95rem;
+                padding: 14px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="trainer-container" id="trainerApp">
+    <!-- Заголовок полностью убран -->
+    <div class="progress-area">
+        <span class="question-counter" id="counterText">Вопрос 1 из 4</span>
+        <span class="status-badge" id="statusBadge">✏️ Ожидает ответа</span>
+    </div>
+    <div class="question-card">
+        <div class="question-text" id="questionText"></div>
+        <div class="input-group">
+            <label for="answerField">📝 Ответ (да / нет):</label>
+            <input type="text" id="answerField" class="answer-input" placeholder="Введите «да» или «нет»" autocomplete="off">
+        </div>
+        <div class="button-group">
+            <button class="btn btn-primary" id="checkBtn">✅ Проверить</button>
+            <button class="btn btn-secondary" id="showCorrectBtn">🔍 Показать верный ответ</button>
+            <button class="btn btn-next" id="nextBtn">➡️ Следующий вопрос</button>
+        </div>
+        <div id="commentaryBlock" class="commentary" style="display: none;"></div>
+    </div>
+    <!-- Футер полностью убран -->
+</div>
+
+<script>
+    // ----- ДАННЫЕ ТРЕНАЖЕРА (4 вопроса) -----
+    const questionsData = [
+        {
+            text: "Супруги-ИП занимались пошивом и реализацией верхней одежды. Оба супруга применяли упрощенку, а чтобы не потерять право на спецрежим, разделили между собой функционал. Супруг взял на себя роль модельера, занимался подготовкой тканей к раскрою и упаковкой готовых изделий. Супруга оказывала услуги по пошиву. Можно ли назвать супругов добросовестными налогоплательщиками?",
+            correctAnswer: "нет",
+            correctComment: "Несмотря на разные виды деятельности, налоговики увидели схему, так как фактически супруги вели единый бизнес, а его дробление связано исключительно с оптимизацией налогов. Если участники бизнес-схемы ведут единый производственный процесс, который разделен между ними искусственно, то это может указывать на схему (определение Верховного суда от 10.11.2022 № 308-ЭС22-15224).",
+            wrongComment: "Сам факт, что родственники вместе ведут бизнес, не дает оснований считать их участниками схемы. В таких случаях налоговики должны проверять, кто и когда принимал бизнес-решения. Если выяснится, что кто-то из родни выполнял свою роль формально, то суд сочтет, что родственники решили сэкономить на налогах неправомерно (определение Верховного суда от 05.05.2022 № 310-ЭС22-6431)."
+        },
+        {
+            text: "Компания взяла в лизинг транспорт и сдала автомобили в аренду на весь период лизинга. Общая сумма платежей по лизингу составила 3 891 587,20 руб. По договору аренды — 4 041 034,14 руб. При этом компания несла расходы на ремонт и страхование транспортных средств в сумме 434 663 руб. Имела ли деловую цель такая деятельность?",
+            correctAnswer: "нет",
+            correctComment: "При проверке инспекторы решили, что оплата ремонта и страхования не имела деловой цели, так как возник убыток, а расходы на содержание автомобилей, страхование, ремонт, как правило, возложены на арендатора. Судьи исключили расходы на ремонт, а на страхование оставили. По договору лизинга компания обязана нести эти затраты (постановление Четырнадцатого ААС от 28.07.2022 № А66-14192/2021).",
+            wrongComment: "При проверке инспекторы решили, что оплата ремонта и страхования не имела деловой цели, так как возник убыток, а расходы на содержание автомобилей, страхование, ремонт, как правило, возложены на арендатора. Судьи исключили расходы на ремонт, а на страхование оставили. По договору лизинга компания обязана нести эти затраты (постановление Четырнадцатого ААС от 28.07.2022 № А66-14192/2021)."
+        },
+        {
+            text: "Компания приобрела оборудование для производства картофельных чипсов у взаимозависимой фирмы, но не могла его использовать, так как не было очистных сооружений, необходимых для эксплуатации. Руководитель знал об этом еще до покупки. Через два года это оборудование продали прежнему владельцу. Цена продажи отличалась от цены покупки на 10%. Сочтет ли инспекция или суд такое поведение налогоплательщика добросовестным?",
+            correctAnswer: "нет",
+            correctComment: "Стороны заключили договор купли-продажи, чтобы создать видимость хозяйственной деятельности. Налоговики посчитали документооборот между сторонами фиктивным. У компании исключили расходы на амортизацию (постановление Четырнадцатого ААС от 22.09.2022 № А66-9635/2021).",
+            wrongComment: "Стороны заключили договор купли-продажи, чтобы создать видимость хозяйственной деятельности. Налоговики посчитали документооборот между сторонами фиктивным. У компании исключили расходы на амортизацию (постановление Четырнадцатого ААС от 22.09.2022 № А66-9635/2021)."
+        },
+        {
+            text: "Компания решила продать принадлежащую ей фирму за 250 млн руб. У фирмы были долги, которые следовало погасить, чтобы фирму купили. Уставный капитал фирмы увеличили с 10 000 руб. до 147 770 000 руб. Но клиент от сделки отказался. Тогда компания продала фирму физлицам за 40 млн руб. Разницу между ценой продажи и взносом в уставный капитал учли в расходах. Можно ли назвать такое поведение налогоплательщика добросовестным?",
+            correctAnswer: "да",
+            correctComment: "Инспекторы решили, что уставный капитал увеличили номинально и деловой цели не было. Но компания убедила судей в обратном. Она планировала продать фирму за 250 млн руб., поэтому увеличила уставный капитал. Если бы сделка состоялась, компания получила прибыль. Продажа по более низкой цене – обычный предпринимательский риск (постановление АС Уральского округа от 17.05.2022 № А76-50335/2020).",
+            wrongComment: "Инспекторы решили, что уставный капитал увеличили номинально и деловой цели не было. Но компания убедила судей в обратном. Она планировала продать фирму за 250 млн руб., поэтому увеличила уставный капитал. Если бы сделка состоялась, компания получила прибыль. Продажа по более низкой цене – обычный предпринимательский риск (постановление АС Уральского округа от 17.05.2022 № А76-50335/2020)."
+        }
+    ];
+
+    let currentIndex = 0;
+    const totalQuestions = questionsData.length;
+    let answerChecked = false;
+    let lastUserAnswerRaw = "";
+
+    const questionTextEl = document.getElementById("questionText");
+    const answerField = document.getElementById("answerField");
+    const checkBtn = document.getElementById("checkBtn");
+    const showCorrectBtn = document.getElementById("showCorrectBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const commentaryBlock = document.getElementById("commentaryBlock");
+    const counterText = document.getElementById("counterText");
+    const statusBadge = document.getElementById("statusBadge");
+
+    function normalizeAnswer(value) {
+        let trimmed = value.trim().toLowerCase();
+        if (trimmed === "да" || trimmed === "нет") return trimmed;
+        return "";
+    }
+
+    function loadQuestion() {
+        answerChecked = false;
+        answerField.value = "";
+        commentaryBlock.style.display = "none";
+        commentaryBlock.innerHTML = "";
+        commentaryBlock.className = "commentary";
+        const qData = questionsData[currentIndex];
+        questionTextEl.innerText = qData.text;
+        counterText.innerText = `Вопрос ${currentIndex+1} из ${totalQuestions}`;
+        statusBadge.innerHTML = "✏️ Ожидает ответа";
+        statusBadge.style.background = "#eef2f6";
+        statusBadge.style.color = "#2c3e50";
+        answerField.style.borderColor = "#cfdde8";
+        if (currentIndex === totalQuestions - 1) {
+            nextBtn.innerText = "🏁 Завершить";
+        } else {
+            nextBtn.innerText = "➡️ Следующий вопрос";
+        }
+        lastUserAnswerRaw = "";
+        nextBtn.disabled = false;
+        checkBtn.disabled = false;
+        answerField.disabled = false;
+    }
+
+    function showCommentary(isCorrect, userAnswerRaw, questionIdx) {
+        const q = questionsData[questionIdx];
+        let commentText = "";
+        let additionalClass = "";
+
+        if (isCorrect) {
+            commentText = q.correctComment;
+            additionalClass = "correct-comment";
+            statusBadge.innerHTML = "✅ Верно";
+            statusBadge.style.background = "#e8f5e9";
+            statusBadge.style.color = "#1e5a2e";
+        } else {
+            let wrongText = q.wrongComment;
+            const norm = normalizeAnswer(userAnswerRaw);
+            if (norm === "") {
+                wrongText = `⚠️ Введите «да» или «нет». ${q.wrongComment}`;
+            } else {
+                wrongText = q.wrongComment;
+            }
+            commentText = wrongText;
+            additionalClass = "wrong-comment";
+            statusBadge.innerHTML = "❌ Неверно";
+            statusBadge.style.background = "#fee9e7";
+            statusBadge.style.color = "#a23b2e";
+        }
+        commentaryBlock.className = `commentary ${additionalClass}`;
+        commentaryBlock.innerHTML = `<p>${commentText}</p>`;
+        commentaryBlock.style.display = "block";
+    }
+
+    function handleCheck() {
+        const rawAnswer = answerField.value;
+        if (rawAnswer === "") {
+            commentaryBlock.className = "commentary wrong-comment";
+            commentaryBlock.innerHTML = `<p>⚠️ Пожалуйста, введите ответ «да» или «нет».</p>`;
+            commentaryBlock.style.display = "block";
+            answerChecked = false;
+            statusBadge.innerHTML = "✏️ Ожидает ответа";
+            statusBadge.style.background = "#eef2f6";
+            statusBadge.style.color = "#2c3e50";
+            return;
+        }
+
+        const normalized = normalizeAnswer(rawAnswer);
+        if (normalized !== "да" && normalized !== "нет") {
+            commentaryBlock.className = "commentary wrong-comment";
+            commentaryBlock.innerHTML = `<p>❌ Некорректный ввод. Введите строго «да» или «нет» (по-русски).</p>`;
+            commentaryBlock.style.display = "block";
+            answerChecked = false;
+            statusBadge.innerHTML = "⚠️ Ошибка";
+            statusBadge.style.background = "#ffe6cc";
+            statusBadge.style.color = "#b65c00";
+            return;
+        }
+
+        const currentQ = questionsData[currentIndex];
+        const isCorrect = (normalized === currentQ.correctAnswer);
+        lastUserAnswerRaw = rawAnswer;
+        answerChecked = true;
+
+        if (isCorrect) {
+            showCommentary(true, rawAnswer, currentIndex);
+            answerField.style.borderColor = "#2ecc71";
+        } else {
+            showCommentary(false, rawAnswer, currentIndex);
+            answerField.style.borderColor = "#e74c3c";
+        }
+    }
+
+    function handleShowCorrect() {
+        const currentQ = questionsData[currentIndex];
+        const commentHtml = `<p>🔍 ${currentQ.correctComment}</p>`;
+        commentaryBlock.className = "commentary correct-comment";
+        commentaryBlock.innerHTML = commentHtml;
+        commentaryBlock.style.display = "block";
+        if (!answerChecked) {
+            statusBadge.innerHTML = "📖 Показан верный ответ";
+            statusBadge.style.background = "#e8f5e9";
+            statusBadge.style.color = "#1e5a2e";
+        }
+        answerField.style.borderColor = "#8bb5d0";
+    }
+
+    function handleNext() {
+        if (!answerChecked) {
+            commentaryBlock.className = "commentary wrong-comment";
+            commentaryBlock.innerHTML = `<p>⚠️ Сначала проверьте ответ (кнопка «✅ Проверить»). После проверки станет доступен переход.</p>`;
+            commentaryBlock.style.display = "block";
+            return;
+        }
+
+        if (currentIndex === totalQuestions - 1) {
+            commentaryBlock.className = "commentary correct-comment";
+            commentaryBlock.innerHTML = `<p>🏆 Тренажёр завершён! Вы прошли все 4 вопроса. Обновите страницу, чтобы пройти заново.</p>`;
+            commentaryBlock.style.display = "block";
+            nextBtn.disabled = true;
+            checkBtn.disabled = true;
+            answerField.disabled = true;
+            statusBadge.innerHTML = "🎉 Завершено";
+            statusBadge.style.background = "#e0f0e5";
+            statusBadge.style.color = "#2c6e4a";
+            return;
+        }
+
+        currentIndex++;
+        answerChecked = false;
+        loadQuestion();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function init() {
+        loadQuestion();
+        checkBtn.addEventListener("click", handleCheck);
+        showCorrectBtn.addEventListener("click", handleShowCorrect);
+        nextBtn.addEventListener("click", handleNext);
+        answerField.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                handleCheck();
+            }
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
