@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Тренажер: НДФЛ для ИП - выбор варианта налогообложения</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #e8eef2;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .trainer-container {
+            max-width: 650px;
+            width: 100%;
+            background: #f5f7f9;
+            border-radius: 24px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .task-header {
+            background: #e6edf4;
+            padding: 12px 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1e5a7a;
+            border-bottom: 1px solid #d4dee8;
+        }
+
+        .question-card {
+            padding: 16px 20px 20px;
+        }
+
+        .case-block {
+            background: #eef2f5;
+            padding: 12px 14px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #9bb0c2;
+        }
+
+        .case-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1e4a6e;
+            margin-bottom: 8px;
+        }
+
+        .case-text {
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #2c3e50;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .table-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #2c5a7a;
+            margin-bottom: 12px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .option-card {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .option-title {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #1e4a6e;
+            margin-bottom: 10px;
+            text-align: center;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #dce5ec;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .calc-label {
+            font-weight: 500;
+            color: #4a5b6e;
+        }
+
+        .select-input {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            border: 1.5px solid #cfdde8;
+            border-radius: 8px;
+            background: white;
+            font-weight: 500;
+            cursor: pointer;
+            width: 115px;
+            transition: all 0.2s;
+        }
+
+        .select-input.correct-highlight {
+            border-color: #2ecc71;
+            background-color: #e8f5e9;
+        }
+
+        .select-input.wrong-highlight {
+            border-color: #e74c3c;
+            background-color: #fee9e7;
+        }
+
+        .calc-value {
+            font-weight: 600;
+            color: #2c3e50;
+            background: #eef2f6;
+            padding: 3px 8px;
+            border-radius: 6px;
+            min-width: 85px;
+            text-align: right;
+            font-size: 0.7rem;
+        }
+
+        .result-row {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 2px solid #cbd5e1;
+            font-weight: 700;
+        }
+
+        .result-row .calc-label {
+            font-weight: 700;
+            color: #1e6a8f;
+        }
+
+        .result-row .calc-value {
+            background: #e6f0fa;
+            color: #1e6a8f;
+            font-size: 0.75rem;
+        }
+
+        .choice-block {
+            background: #f0f4fa;
+            border-radius: 14px;
+            padding: 12px;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .choice-title {
+            font-weight: 600;
+            color: #1e4a6e;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+        }
+
+        .choice-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .choice-btn {
+            padding: 6px 16px;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            background: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2c5a7a;
+        }
+
+        .choice-btn:hover {
+            background: #e2f0ff;
+            border-color: #8bb5d0;
+        }
+
+        .choice-btn.selected {
+            background: #2c7a4b;
+            border-color: #2c7a4b;
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 16px 0 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            border: none;
+            font-weight: 600;
+            padding: 7px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #d4eaff;
+            color: #1e6a8f;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            background: #c2e0ff;
+            transform: translateY(-1px);
+        }
+
+        .commentary {
+            background: #f0f4f8;
+            border-radius: 14px;
+            padding: 10px 14px;
+            border-left: 4px solid #b8ccdc;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            color: #2c3e50;
+            margin-top: 12px;
+        }
+
+        .commentary.correct-comment {
+            border-left-color: #2ecc71;
+            background: #e8f5e9;
+            color: #1e5a2e;
+        }
+
+        .commentary.wrong-comment {
+            border-left-color: #e74c3c;
+            background: #fee9e7;
+            color: #a23b2e;
+        }
+
+        .commentary p {
+            margin: 0 0 4px 0;
+        }
+
+        @media (max-width: 550px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            .trainer-container {
+                max-width: 100%;
+            }
+            .question-card {
+                padding: 12px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="trainer-container">
+    <div class="task-header">
+        Задание: посчитайте варианты налоговой нагрузки и выберите наиболее выгодный для ИП
+    </div>
+    
+    <div class="question-card">
+        <div class="case-block">
+            <div class="case-title">Условие</div>
+            <div class="case-text">
+                Павел является ИП и занимается ремонтом велосипедов. Уплачивает НДФЛ и освобожден от уплаты НДС. За 2026 год Павел выполнил заказов на 2,2 млн рублей, из которых на расчетный счет поступило 2 млн рублей. Его расходы на ремонт составили 380 тыс. рублей, из которых документально он может подтвердить только расходы на 350 тыс. рублей.<br>
+                Страховые взносы ИП в 2026 году: фиксированная часть — 57 390 рублей, переменная часть — 1% с дохода свыше 300 000 руб.
+            </div>
+        </div>
+
+        <div class="comparison-table">
+            <div class="table-title">Сравнение вариантов профессионального вычета</div>
+            <div class="comparison-grid">
+                <!-- Вариант 1: норматив 20% -->
+                <div class="option-card">
+                    <div class="option-title">Вариант 1: норматив 20%</div>
+                    <div class="calc-row">
+                        <span class="calc-label">Доход:</span>
+                        <select id="income1" class="select-input" data-correct="2000000">
+                            <option value="2000000">2 000 000 руб.</option>
+                            <option value="2200000">2 200 000 руб.</option>
+                        </select>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Профвычет (20%):</span>
+                        <span class="calc-value" id="normativeDeduction">400 000 руб.</span>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Фиксированные взносы:</span>
+                        <select id="fixed1" class="select-input" data-correct="57390">
+                            <option value="57390">57 390 руб.</option>
+                            <option value="0">0 руб.</option>
+                        </select>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Переменные взносы (1%):</span>
+                        <select id="variable1" class="select-input" data-correct="17000">
+                            <option value="17000">17 000 руб.</option>
+                            <option value="19000">19 000 руб.</option>
+                            <option value="0">0 руб.</option>
+                        </select>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Налоговая база:</span>
+                        <span class="calc-value" id="base1">???</span>
+                    </div>
+                    <div class="calc-row result-row">
+                        <span class="calc-label">НДФЛ (13%):</span>
+                        <span class="calc-value" id="ndfl1">???</span>
+                    </div>
+                    <div class="calc-row result-row">
+                        <span class="calc-label">Итого нагрузка:</span>
+                        <span class="calc-value" id="total1">???</span>
+                    </div>
+                </div>
+
+                <!-- Вариант 2: документальные расходы + взносы -->
+                <div class="option-card">
+                    <div class="option-title">Вариант 2: документальные расходы + взносы</div>
+                    <div class="calc-row">
+                        <span class="calc-label">Доход:</span>
+                        <select id="income2" class="select-input" data-correct="2000000">
+                            <option value="2000000">2 000 000 руб.</option>
+                            <option value="2200000">2 200 000 руб.</option>
+                        </select>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Документальные расходы:</span>
+                        <select id="docExpenses" class="select-input" data-correct="350000">
+                            <option value="350000">350 000 руб.</option>
+                            <option value="380000">380 000 руб.</option>
+                            <option value="300000">300 000 руб.</option>
+                        </select>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Фиксированные взносы:</span>
+                        <select id="fixed2" class="select-input" data-correct="57390">
+                            <option value="57390">57 390 руб.</option>
+                            <option value="0">0 руб.</option>
+                        </select>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Переменные взносы (1%):</span>
+                        <select id="variable2" class="select-input" data-correct="17000">
+                            <option value="17000">17 000 руб.</option>
+                            <option value="19000">19 000 руб.</option>
+                            <option value="0">0 руб.</option>
+                        </select>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Общий вычет:</span>
+                        <span class="calc-value" id="totalDeduction">???</span>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Налоговая база:</span>
+                        <span class="calc-value" id="base2">???</span>
+                    </div>
+                    <div class="calc-row result-row">
+                        <span class="calc-label">НДФЛ (13%):</span>
+                        <span class="calc-value" id="ndfl2">???</span>
+                    </div>
+                    <div class="calc-row result-row">
+                        <span class="calc-label">Итого нагрузка:</span>
+                        <span class="calc-value" id="total2">???</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="choice-block">
+                <div class="choice-title">Какой вариант выгоднее для Павла?</div>
+                <div class="choice-buttons">
+                    <button class="choice-btn" data-choice="1">Вариант 1 (норматив 20%)</button>
+                    <button class="choice-btn" data-choice="2">Вариант 2 (документальные расходы)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" id="checkBtn">Проверить выбор и расчет</button>
+            <button class="btn btn-secondary" id="showCorrectBtn">Показать верные значения</button>
+        </div>
+
+        <div id="commentaryBlock" class="commentary" style="display: none;"></div>
+    </div>
+</div>
+
+<script>
+    let selectedChoice = null;
+    
+    // Функция расчета для варианта 1
+    function calculateVariant1() {
+        const income = parseInt(document.getElementById("income1").value) || 0;
+        const fixed = parseInt(document.getElementById("fixed1").value) || 0;
+        const variable = parseInt(document.getElementById("variable1").value) || 0;
+        const normativeDeduction = income * 0.2;
+        const taxBase = income - normativeDeduction - fixed - variable;
+        const ndfl = Math.max(0, taxBase * 0.13);
+        const totalLoad = ndfl + fixed + variable;
+        
+        document.getElementById("normativeDeduction").innerText = normativeDeduction.toLocaleString() + " руб.";
+        document.getElementById("base1").innerText = Math.max(0, taxBase).toLocaleString() + " руб.";
+        document.getElementById("ndfl1").innerText = Math.round(ndfl).toLocaleString() + " руб.";
+        document.getElementById("total1").innerText = Math.round(totalLoad).toLocaleString() + " руб.";
+        
+        return { totalLoad: Math.round(totalLoad) };
+    }
+    
+    // Функция расчета для варианта 2
+    function calculateVariant2() {
+        const income = parseInt(document.getElementById("income2").value) || 0;
+        const docExp = parseInt(document.getElementById("docExpenses").value) || 0;
+        const fixed = parseInt(document.getElementById("fixed2").value) || 0;
+        const variable = parseInt(document.getElementById("variable2").value) || 0;
+        const totalDeduction = docExp + fixed + variable;
+        const taxBase = income - totalDeduction;
+        const ndfl = Math.max(0, taxBase * 0.13);
+        const totalLoad = ndfl + fixed + variable;
+        
+        document.getElementById("totalDeduction").innerText = totalDeduction.toLocaleString() + " руб.";
+        document.getElementById("base2").innerText = Math.max(0, taxBase).toLocaleString() + " руб.";
+        document.getElementById("ndfl2").innerText = Math.round(ndfl).toLocaleString() + " руб.";
+        document.getElementById("total2").innerText = Math.round(totalLoad).toLocaleString() + " руб.";
+        
+        return { totalLoad: Math.round(totalLoad) };
+    }
+    
+    // Обновление всех расчетов
+    function updateCalculations() {
+        calculateVariant1();
+        calculateVariant2();
+    }
+    
+    // Функция подсветки селектов (только по кнопке проверки)
+    function highlightSelects() {
+        const selects = document.querySelectorAll('.select-input');
+        selects.forEach(select => {
+            const correctValue = select.getAttribute('data-correct');
+            if (select.value === correctValue) {
+                select.classList.add('correct-highlight');
+                select.classList.remove('wrong-highlight');
+            } else {
+                select.classList.add('wrong-highlight');
+                select.classList.remove('correct-highlight');
+            }
+        });
+    }
+    
+    // Функция снятия подсветки
+    function clearHighlights() {
+        const selects = document.querySelectorAll('.select-input');
+        selects.forEach(select => {
+            select.classList.remove('correct-highlight', 'wrong-highlight');
+        });
+    }
+    
+    // Проверка, все ли значения в таблице верные
+    function isAllDataCorrect() {
+        const income1Val = document.getElementById("income1").value;
+        const fixed1Val = document.getElementById("fixed1").value;
+        const variable1Val = document.getElementById("variable1").value;
+        const income2Val = document.getElementById("income2").value;
+        const docExpVal = document.getElementById("docExpenses").value;
+        const fixed2Val = document.getElementById("fixed2").value;
+        const variable2Val = document.getElementById("variable2").value;
+        
+        return (income1Val === "2000000" &&
+                fixed1Val === "57390" &&
+                variable1Val === "17000" &&
+                income2Val === "2000000" &&
+                docExpVal === "350000" &&
+                fixed2Val === "57390" &&
+                variable2Val === "17000");
+    }
+    
+    // Привязываем обновление расчетов к изменению селектов (без подсветки)
+    const allSelects = ["income1", "fixed1", "variable1", "income2", "docExpenses", "fixed2", "variable2"];
+    allSelects.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("change", function() {
+            updateCalculations();
+            clearHighlights(); // убираем подсветку при изменении
+        });
+    });
+    
+    // Обработка выбора варианта
+    document.querySelectorAll(".choice-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(".choice-btn").forEach(b => b.classList.remove("selected"));
+            this.classList.add("selected");
+            selectedChoice = parseInt(this.getAttribute("data-choice"));
+        });
+    });
+    
+    function showCommentary(isDataCorrect, isChoiceCorrect) {
+        const commentaryDiv = document.getElementById("commentaryBlock");
+        
+        if (!isDataCorrect) {
+            commentaryDiv.className = "commentary wrong-comment";
+            commentaryDiv.innerHTML = `
+                <p><strong>Внимание!</strong> В таблице выбраны неверные значения. Неверные ячейки подсвечены красным, верные — зеленым.</p>
+                <p><strong>Правильные значения:</strong><br>
+                • Доход: 2 000 000 руб.<br>
+                • Профессиональный вычет (20%): 400 000 руб.<br>
+                • Фиксированные взносы: 57 390 руб.<br>
+                • Переменные взносы: 17 000 руб.<br>
+                • Документальные расходы: 350 000 руб.</p>
+                <p>Нажмите "Показать верные значения" для автоматической подстановки.</p>
+            `;
+        } else if (!isChoiceCorrect) {
+            commentaryDiv.className = "commentary wrong-comment";
+            commentaryDiv.innerHTML = `
+                <p><strong>Неверно.</strong> Выбран не самый выгодный вариант.</p>
+                <p>Правильный выбор: <strong>Вариант 1 (норматив 20%)</strong></p>
+                <p><strong>Расчет по варианту 1:</strong> (2 000 000 − 400 000 − 57 390 − 17 000) × 13% + 57 390 + 17 000 = 272 719,3 руб.<br>
+                <strong>Расчет по варианту 2:</strong> (2 000 000 − 350 000 − 57 390 − 17 000) × 13% + 57 390 + 17 000 = 279 219,3 руб.</p>
+                <p>Вариант 1 выгоднее, так как итоговая налоговая нагрузка ниже.</p>
+            `;
+        } else {
+            commentaryDiv.className = "commentary correct-comment";
+            commentaryDiv.innerHTML = `
+                <p><strong>Верно! Выбран наиболее выгодный вариант и все значения верны.</strong></p>
+                <p><strong>Вариант 1 (норматив 20%):</strong> итоговая нагрузка = 272 719,3 руб.<br>
+                <strong>Вариант 2 (документальные расходы):</strong> итоговая нагрузка = 279 219,3 руб.</p>
+                <p><strong>Вывод:</strong> Вариант 1 выгоднее, налоговая нагрузка ниже на 6 500 руб.</p>
+                <p>Согласно п. 1 ст. 221 НК РФ, ИП может выбрать: либо норматив 20% от дохода, либо документально подтвержденные расходы. Доходы определяются кассовым методом (пп. 1 п. 1 ст. 223 НК РФ).</p>
+            `;
+        }
+        commentaryDiv.style.display = "block";
+    }
+    
+    function handleCheck() {
+        const isDataCorrect = isAllDataCorrect();
+        
+        // Подсвечиваем селекты
+        highlightSelects();
+        
+        if (!isDataCorrect) {
+            showCommentary(false, false);
+            return;
+        }
+        
+        if (selectedChoice === null) {
+            const commentaryDiv = document.getElementById("commentaryBlock");
+            commentaryDiv.className = "commentary wrong-comment";
+            commentaryDiv.innerHTML = `<p>Пожалуйста, выберите вариант ответа (какой вариант выгоднее).</p>`;
+            commentaryDiv.style.display = "block";
+            return;
+        }
+        
+        // Правильный ответ: вариант 1 (норматив 20%) выгоднее
+        const isChoiceCorrect = (selectedChoice === 1);
+        showCommentary(true, isChoiceCorrect);
+    }
+    
+    function handleShowCorrect() {
+        // Устанавливаем правильные значения в селекты
+        document.getElementById("income1").value = "2000000";
+        document.getElementById("fixed1").value = "57390";
+        document.getElementById("variable1").value = "17000";
+        document.getElementById("income2").value = "2000000";
+        document.getElementById("docExpenses").value = "350000";
+        document.getElementById("fixed2").value = "57390";
+        document.getElementById("variable2").value = "17000";
+        
+        updateCalculations();
+        
+        // Снимаем подсветку
+        clearHighlights();
+        
+        // Подсвечиваем правильный выбор
+        document.querySelectorAll(".choice-btn").forEach(b => b.classList.remove("selected"));
+        document.querySelector(".choice-btn[data-choice='1']").classList.add("selected");
+        selectedChoice = 1;
+        
+        const commentaryDiv = document.getElementById("commentaryBlock");
+        commentaryDiv.className = "commentary correct-comment";
+        commentaryDiv.innerHTML = `
+            <p><strong>Верные значения подставлены</strong></p>
+            <p><strong>Вариант 1 (норматив 20%):</strong> итоговая нагрузка = 272 719,3 руб.<br>
+            <strong>Вариант 2 (документальные расходы):</strong> итоговая нагрузка = 279 219,3 руб.</p>
+            <p>Наиболее выгодный вариант — <strong>Вариант 1 (норматив 20%)</strong>.</p>
+        `;
+        commentaryDiv.style.display = "block";
+    }
+    
+    // Инициализация
+    updateCalculations();
+    document.getElementById("checkBtn").addEventListener("click", handleCheck);
+    document.getElementById("showCorrectBtn").addEventListener("click", handleShowCorrect);
+</script>
+</body>
+</html>
