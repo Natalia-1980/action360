@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>НДФЛ с недвижимости · тренажёр</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #d0ddee;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+        /* ширина 650px, высота автоматическая - максимально компактно */
+        .carousel-container {
+            max-width: 650px;
+            width: 100%;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(6px);
+            border-radius: 28px;
+            padding: 12px 12px 12px;
+            box-shadow: 0 18px 28px -12px #1b3853;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+        h2 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            color: #0f2d44;
+            padding-left: 4px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.2px;
+        }
+        h2 span {
+            background: #b7d3ec;
+            font-size: 1.0rem;
+            padding: 2px 10px;
+            border-radius: 40px;
+            color: #102c40;
+            font-weight: 500;
+        }
+        .carousel {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+        .cards-wrapper {
+            flex: 1;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+        .cards-track {
+            display: flex;
+            transition: transform 0.25s ease;
+        }
+        /* карточка — увеличенный шрифт, без card-header, минимальные отступы */
+        .scenario-card {
+            flex: 0 0 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 12px 12px 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #f0f5fc;
+        }
+        /* заголовок карточки скрыт */
+        .card-header {
+            display: none;
+        }
+        .fact-block {
+            background: #ecf5fd;
+            border-radius: 14px;
+            padding: 8px 12px;
+            margin: 0 0 6px 0;
+        }
+        .fact-item {
+            display: flex;
+            gap: 6px;
+            margin: 4px 0;
+            font-size: 1.1rem;
+            color: #152f42;
+            align-items: baseline;
+        }
+        .fact-text {
+            line-height: 1.3;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 2px 0 2px;
+        }
+        .option {
+            background: #f4faff;
+            border-radius: 40px;
+            padding: 8px 14px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.05rem;
+            color: #0a2a40;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.1s;
+        }
+        .option:hover {
+            background: #e3effb;
+            border-color: #98bbd8;
+        }
+        .option.selected-correct {
+            background: #c6f0d1;
+            border-color: #117a4e;
+            color: #003320;
+        }
+        .option.selected-incorrect {
+            background: #ffdbd4;
+            border-color: #b3402b;
+            color: #510f00;
+        }
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        .option-letter {
+            background: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1d4b74;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .btn-row {
+            display: flex;
+            gap: 6px;
+            margin: 4px 0 2px;
+        }
+        .btn {
+            background: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.0rem;
+            box-shadow: 0 2px 5px rgba(0, 35, 60, 0.05);
+            cursor: pointer;
+            border: 1px solid #c7ddef;
+            color: #103f60;
+            transition: 0.1s;
+            flex: 1;
+        }
+        .btn-primary {
+            background: #1b5480;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #266d9e;
+        }
+        .btn-outline:hover {
+            background: #dbeafe;
+        }
+        .explain-card {
+            background: #cbe3fe;
+            border-radius: 14px;
+            padding: 6px 12px;
+            margin-top: 4px;
+            border-left: 4px solid #1060a0;
+            font-size: 1.0rem;
+            color: #003158;
+            line-height: 1.3;
+            max-height: 70px;
+            overflow-y: auto;
+        }
+        .arrow-btn {
+            background: white;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            border: none;
+            box-shadow: 0 2px 6px #9bb2cc;
+            cursor: pointer;
+            color: #1d4b74;
+            transition: 0.1s;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .arrow-btn:hover {
+            background: #e1efff;
+        }
+        .counter {
+            text-align: center;
+            margin-top: 2px;
+            color: #1f4b70;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        .footer-note {
+            margin-top: 2px;
+            color: #386988;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="carousel-container">
+    <h2>🏠 НДФЛ: дарение / продажа</h2>
+
+    <div class="carousel">
+        <button class="arrow-btn" id="prevBtn" aria-label="предыдущий">←</button>
+        <div class="cards-wrapper" id="cardsWrapper">
+            <div class="cards-track" id="cardsTrack"></div>
+        </div>
+        <button class="arrow-btn" id="nextBtn" aria-label="следующий">→</button>
+    </div>
+    <div class="counter" id="counter">1 / 4</div>
+
+    <div class="explain-card" id="explanationBox" style="display: none;"></div>
+
+    <div class="btn-row">
+        <button class="btn btn-primary" id="submitBtn">✓ Проверить</button>
+        <button class="btn btn-outline" id="resetCardBtn">↺ Сброс</button>
+    </div>
+    <div class="footer-note">* буква «е» используется вместо «ё»</div>
+</div>
+
+<script>
+(function() {
+    // 4 карточки (удалена четвертая про семью с детьми), иконки 📌 убраны
+    const scenarios = [
+        {
+            id: 1,
+            facts: [
+                'Даритель: дядя (родной брат отца)',
+                'Одаряемый — не иноагент',
+                'Кадастровая стоимость на 1 января = 4 200 000 рублей'
+            ],
+            options: [
+                'НДФЛ = 0 (близкий родственник)',
+                'НДФЛ 13% с кадастра (546 000 рублей)',
+                'НДФЛ = 0 (член семьи)'
+            ],
+            correct: 1,
+            explanation: 'Дядя — не близкий родственник (нет в перечне СК). Племянник платит НДФЛ с кадастровой стоимости (п. 18.1 ст. 217 НК).'
+        },
+        {
+            id: 2,
+            facts: [
+                'Внук получил дар от бабушки в марте 2022',
+                'Продал в мае 2025 года за 5,3 млн рублей',
+                'Кадастр 5 млн, других объектов нет'
+            ],
+            options: [
+                'Налог = 0 (>3 лет, близкий родственник)',
+                'Налог 13% (срок менее 5 лет)',
+                'Налог = 0 (мин. срок 3 года)'
+            ],
+            correct: 0,
+            explanation: 'Бабушка — близкий родственник, срок более 3 лет → освобождение (п.2 ст.217.1 НК).'
+        },
+        {
+            id: 3,
+            facts: [
+                'Полная оплата ДДУ: 20 апреля 2019',
+                'Акт приема-передачи: 20 апреля 2021',
+                'Продажа: 24 июня 2024'
+            ],
+            options: [
+                'Налог платится (право менее 3 лет)',
+                'Освобождается: срок с даты оплаты',
+                'Налог платится (нет владения)'
+            ],
+            correct: 1,
+            explanation: 'Для ДДУ срок — с даты полной оплаты. Апрель 2019 → июнь 2024 = более 3 лет, налог = 0.'
+        },
+        {
+            id: 4,
+            facts: [
+                'Участок куплен в 2018',
+                'В 2022 разделен на два',
+                'Один из новых продан в 2024'
+            ],
+            options: [
+                'Налог с продажи (срок с 2022)',
+                'Освобождается (срок с 2018)',
+                'Зависит от кадастра'
+            ],
+            correct: 1,
+            explanation: 'При разделе срок считается от исходного участка (п.3 ст.217.1 НК). С 2018 более 5 лет → налог = 0.'
+        }
+    ];
+
+    let currentIndex = 0;
+    let selectedOption = null;
+    let submitted = false;
+
+    const track = document.getElementById('cardsTrack');
+    const counterEl = document.getElementById('counter');
+    const explanationBox = document.getElementById('explanationBox');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetCardBtn = document.getElementById('resetCardBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function renderAllCards() {
+        let htmlStr = '';
+        scenarios.forEach((s, idx) => {
+            const isActiveCard = (idx === currentIndex);
+            let optsHtml = '';
+            const letters = ['А', 'Б', 'В'];
+            s.options.forEach((opt, optIdx) => {
+                let additionalClasses = 'option';
+                if (!isActiveCard) additionalClasses += ' disabled';
+                if (isActiveCard && submitted) {
+                    if (optIdx === s.correct) additionalClasses += ' selected-correct';
+                    else if (optIdx === selectedOption && optIdx !== s.correct) additionalClasses += ' selected-incorrect';
+                } else if (isActiveCard && !submitted && optIdx === selectedOption) {
+                    additionalClasses += ' selected-correct';
+                }
+                optsHtml += `
+                    <div class="${additionalClasses}" data-opt-index="${optIdx}" data-card-idx="${idx}">
+                        <span class="option-letter">${letters[optIdx]}</span>
+                        <span>${opt}</span>
+                    </div>
+                `;
+            });
+
+            // Факты рендерятся без иконок 📌, просто текст
+            const factsHtml = s.facts.map(f => `<div class="fact-item"><span class="fact-text">${f}</span></div>`).join('');
+
+            htmlStr += `
+                <div class="scenario-card" data-card-index="${idx}">
+                    <div class="card-header"></div>
+                    <div class="fact-block">
+                        ${factsHtml}
+                    </div>
+                    <div class="options">
+                        ${optsHtml}
+                    </div>
+                </div>
+            `;
+        });
+        track.innerHTML = htmlStr;
+        updateTrackPosition();
+        attachOptionListeners();
+        updateCounter();
+        if (!submitted) explanationBox.style.display = 'none';
+    }
+
+    function updateTrackPosition() {
+        const cardWidth = track.firstElementChild?.offsetWidth || 0;
+        if (cardWidth) {
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+    }
+
+    function updateCounter() {
+        counterEl.innerText = `${currentIndex+1} / ${scenarios.length}`;
+    }
+
+    function attachOptionListeners() {
+        if (!track) return;
+        const activeCard = track.children[currentIndex];
+        if (!activeCard) return;
+        const options = activeCard.querySelectorAll('.option[data-opt-index]');
+        options.forEach(opt => {
+            opt.removeEventListener('click', optionClickHandler);
+            if (!submitted) {
+                opt.addEventListener('click', optionClickHandler);
+            }
+        });
+    }
+
+    function optionClickHandler(e) {
+        if (submitted) return;
+        const target = e.currentTarget;
+        const optIdx = target.dataset.optIndex;
+        const parentCard = target.closest('.scenario-card');
+        if (!parentCard) return;
+        parentCard.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected-correct'));
+        target.classList.add('selected-correct');
+        selectedOption = parseInt(optIdx);
+    }
+
+    function handleSubmit() {
+        if (submitted) return;
+        if (selectedOption === null) {
+            alert('Выберите вариант');
+            return;
+        }
+        submitted = true;
+        renderAllCards();
+        const s = scenarios[currentIndex];
+        const isCorrect = (selectedOption === s.correct);
+        const icon = isCorrect ? '✅ Верно!' : '❌ Ошибка';
+        explanationBox.style.display = 'block';
+        explanationBox.innerHTML = `<strong>${icon}</strong> ${s.explanation}`;
+    }
+
+    function resetCurrentCard() {
+        selectedOption = null;
+        submitted = false;
+        explanationBox.style.display = 'none';
+        renderAllCards();
+    }
+
+    function goToIndex(newIndex) {
+        if (newIndex < 0) newIndex = scenarios.length - 1;
+        if (newIndex >= scenarios.length) newIndex = 0;
+        currentIndex = newIndex;
+        selectedOption = null;
+        submitted = false;
+        explanationBox.style.display = 'none';
+        renderAllCards();
+    }
+
+    renderAllCards();
+
+    submitBtn.addEventListener('click', handleSubmit);
+    resetCardBtn.addEventListener('click', resetCurrentCard);
+    prevBtn.addEventListener('click', () => goToIndex(currentIndex - 1));
+    nextBtn.addEventListener('click', () => goToIndex(currentIndex + 1));
+
+    window.addEventListener('resize', () => {
+        updateTrackPosition();
+    });
+})();
+</script>
+</body>
+</html>
