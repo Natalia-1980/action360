@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Аренда · ставка дисконтирования</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Индикатор прогресса */
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .step-wrapper {
+            text-align: center;
+        }
+        .step {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 1rem;
+            margin: 0 auto 0.2rem;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.correct {
+            background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
+            color: white;
+        }
+        .step-label {
+            font-size: 0.75rem;
+            color: #1e3b5c;
+        }
+
+        /* Контейнер вопроса */
+        .question-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #0a2942;
+            margin-bottom: 1.2rem;
+            font-weight: 500;
+        }
+
+        .answers-area {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border: 2px solid #d8e2f2;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.95rem;
+        }
+        .answer-option:hover {
+            background: #f0f7ff;
+            border-color: #8da9cc;
+        }
+        .answer-option.selected {
+            background: #e1ecfe;
+            border-color: #1e6bb8;
+        }
+        .answer-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: #1e6bb8;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 2rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 3px 0 #b0c4dd;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin: 1rem 0 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .congrats {
+            text-align: center;
+            margin: 1.5rem 0 0.5rem;
+            font-size: 1.2rem;
+            color: #1e3b5c;
+        }
+
+        .restart-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .answer-option { font-size: 0.9rem; }
+            .progress { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Индикатор прогресса (просто цифры 1, 2, 3) -->
+        <div class="progress">
+            <div class="step-wrapper">
+                <div class="step active" id="step1">1</div>
+            </div>
+            <div class="step-wrapper">
+                <div class="step" id="step2">2</div>
+            </div>
+            <div class="step-wrapper">
+                <div class="step" id="step3">3</div>
+            </div>
+        </div>
+
+        <!-- Контейнер для текущего вопроса -->
+        <div id="questionContainer" class="question-container">
+            <!-- динамически заполняется -->
+        </div>
+
+        <!-- Кнопка "Далее" -->
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="btn primary" id="nextBtn" disabled>Далее →</button>
+        </div>
+
+        <!-- Блок завершения -->
+        <div id="completionContainer" class="hidden">
+            <div class="congrats">✅ Все задачи решены!</div>
+            <div class="restart-btn">
+                <button class="btn" id="restartBtn">🔄 Пройти заново</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Данные задач
+            const tasks = {
+                1: {
+                    text: 'ООО «ТоргСнаб» (арендатор) заключило договор аренды складского помещения сроком на 5 лет. Условия: ежемесячные платежи 200 000 руб. (без НДС), фиксированные. Выкуп не предусмотрен. Аванс отсутствует. Справедливую стоимость определить не удалось. Бухгалтер использовал ставку заимствования 18% годовых (средняя ставка по кредитам на 5 лет). Расчет: годовая ставка 18%, срок 5 лет, ежегодный платеж 2 400 000 руб., приведенная стоимость = 2 400 000 × 3,127 = 7 504 800 руб. Оцените расчет бухгалтера.',
+                    options: [
+                        'А. Ошибка в том, что бухгалтер использовал ставку заимствования, хотя мог определить встроенную ставку. Следовало привлечь оценщика.',
+                        'Б. Ошибка в том, что бухгалтер не перевел годовую ставку в ставку периода платежа. При ежемесячных платежах нужно использовать месячную ставку (18%/12 = 1,5%) и 60 периодов.',
+                        'В. Ошибки нет. Использование годовой ставки для ежемесячных платежей допустимо, если годовую ставку применить к годовым суммам.'
+                    ],
+                    correct: 1,
+                    explanations: [
+                        '❌ В условии сказано, что справедливую стоимость определить не удалось, а заказывать оценку руководство посчитало избыточным. В этой ситуации применение ставки заимствования — это правильный и предусмотренный стандартом подход. Ошибка не в этом.',
+                        '✅ Бухгалтер допустил классическую техническую ошибку: он использовал годовую ставку, но привел платежи к годовым суммам, проигнорировав ежемесячный характер платежей. Правильно: месячная ставка = 18% / 12 = 1,5%. Тогда приведенная стоимость = 200 000 × [1 - (1 + 0,015)^(-60)] / 0,015 = 200 000 × 39,38 = 7 876 000 руб. Разница с расчетом бухгалтера составляет около 371 000 руб.',
+                        '❌ Это опасное заблуждение. При ежемесячных платежах проценты начисляются чаще, что увеличивает эффективную ставку и влияет на распределение процентных расходов. ФСБУ 25 требует, чтобы ставка соответствовала периодичности платежей.'
+                    ]
+                },
+                2: {
+                    text: 'ООО «СтройИнвест» (арендатор) заключило договор аренды строительной техники сроком на 3 года. Ежемесячные платежи фиксированные — 180 000 руб. (без НДС). Выкуп не предусмотрен. Бухгалтер использовал ключевую ставку ЦБ РФ — 21% годовых, так как, по его мнению, «это самая надежная и публичная ставка». При этом у компании есть действующие кредитные договоры: два года назад кредит на 5 лет под 18%, полгода назад — кредит на 3 года под 24%. Справедливую стоимость определить не удалось. Ошибся ли бухгалтер?',
+                    options: [
+                        'А. Ошибки нет. Ключевая ставка ЦБ — это публичный и надежный ориентир, который можно использовать в качестве ставки дисконтирования при отсутствии других данных.',
+                        'Б. Ошибка в том, что бухгалтер не использовал встроенную ставку. Следовало рассчитать встроенную ставку исходя из справедливой стоимости предмета аренды, даже если для этого нужно привлечь оценщика.',
+                        'В. Ошибка в том, что бухгалтер использовал ключевую ставку, которая не отражает кредитный риск компании, срок и сумму. Следовало применить ставку заимствования — например, ставку по недавнему кредиту на сопоставимый срок (24% годовых).'
+                    ],
+                    correct: 2,
+                    explanations: [
+                        '❌ Ключевая ставка ЦБ не является допустимым ориентиром для ставки дисконтирования в аренде. Она не учитывает индивидуальный кредитный риск компании, срок заимствования и сумму.',
+                        '❌ В данной ситуации встроенную ставку определить невозможно, так как нет данных о справедливой стоимости предмета аренды. Поэтому у арендатора нет обязанности рассчитывать встроенную ставку — наоборот, при отсутствии данных применяется ставка заимствования.',
+                        '✅ Главная ошибка — использование ключевой ставки ЦБ вместо обоснованной ставки заимствования. У компании есть реальные ориентиры: кредит на 3 года под 24% годовых — это сопоставимый срок. Именно такие данные должны использоваться в качестве ставки заимствования.'
+                    ]
+                },
+                3: {
+                    text: 'ООО «АвтоЛизинг» приобрело у независимого поставщика 10 автомобилей по цене 2 500 000 руб. каждый и передало их в лизинг ООО «Такси-Сервис». Договор на 3 года, ежемесячные платежи фиксированные, выкупная стоимость — 50 000 руб. за автомобиль. У арендатора есть все документы. Бухгалтер рассчитал встроенную ставку через ВСД в Excel (денежный поток: период 0 — минус справедливая стоимость, 1–35 — платежи, 36 — платеж + выкуп), получил 1,8% в месяц. Правильно ли бухгалтер выбрал ставку?',
+                    options: [
+                        'А. Бухгалтер поступил правильно. Поскольку у него были все данные для расчета встроенной ставки, он обязан был применить именно встроенную ставку.',
+                        'Б. Бухгалтер поступил неправильно. Следовало использовать ставку заимствования, так как это более простой и проверяемый способ.',
+                        'В. Бухгалтер поступил неправильно. Он должен был использовать ключевую ставку ЦБ, так как это публичный и надежный ориентир.'
+                    ],
+                    correct: 0,
+                    explanations: [
+                        '✅ ФСБУ 25 (п. 15) устанавливает четкую иерархию: если встроенную ставку можно определить на основе подтверждаемых данных — применяется именно она. Ставка заимствования — это запасной вариант для случаев, когда данных недостаточно. В данной ситуации у арендатора есть все данные: цена приобретения (она же справедливая стоимость), график платежей, выкупная стоимость. Поэтому применение встроенной ставки — это правильное и обоснованное решение.',
+                        '❌ Ставка заимствования — это не «упрощенный вариант на выбор», а вынужденная альтернатива, когда встроенную ставку определить невозможно. В данной ситуации такая возможность есть, поэтому использовать ставку заимствования было бы ошибкой.',
+                        '❌ Ключевая ставка ЦБ не является допустимым ориентиром для ставки дисконтирования в аренде. При наличии данных для расчета встроенной ставки использование ключевой ставки было бы грубой ошибкой.'
+                    ]
+                }
+            };
+
+            let currentTask = 1;
+            let selectedOption = null;
+            let answered = false;
+            let results = {1: null, 2: null, 3: null};
+
+            const container = document.getElementById('questionContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const completionContainer = document.getElementById('completionContainer');
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const step3 = document.getElementById('step3');
+            const steps = [step1, step2, step3];
+            const restartBtn = document.getElementById('restartBtn');
+
+            function updateSteps() {
+                steps.forEach((step, idx) => {
+                    step.classList.remove('active', 'correct', 'incorrect');
+                    const taskNum = idx + 1;
+                    if (taskNum === currentTask && results[taskNum] === null) {
+                        step.classList.add('active');
+                    } else if (results[taskNum] === true) {
+                        step.classList.add('correct');
+                    } else if (results[taskNum] === false) {
+                        step.classList.add('incorrect');
+                    }
+                });
+            }
+
+            function renderTask(taskNum) {
+                const task = tasks[taskNum];
+                selectedOption = null;
+                answered = false;
+
+                let html = `
+                    <div class="question-text">${task.text}</div>
+                    <div class="answers-area" id="answersArea">
+                `;
+
+                task.options.forEach((opt, idx) => {
+                    html += `
+                        <div class="answer-option" data-opt-index="${idx}">
+                            <input type="radio" name="taskOption" value="${idx}" id="opt${idx}">
+                            <label for="opt${idx}">${opt}</label>
+                        </div>
+                    `;
+                });
+
+                html += `
+                    </div>
+                    <div class="button-row">
+                        <button class="btn" id="checkBtn">Проверить</button>
+                    </div>
+                    <div id="feedback" class="feedback hidden"></div>
+                `;
+
+                container.innerHTML = html;
+
+                document.querySelectorAll('.answer-option').forEach(opt => {
+                    opt.addEventListener('click', function() {
+                        if (answered) return;
+                        document.querySelectorAll('.answer-option').forEach(o => o.classList.remove('selected'));
+                        this.classList.add('selected');
+                        const radio = this.querySelector('input[type="radio"]');
+                        radio.checked = true;
+                        selectedOption = parseInt(radio.value);
+                    });
+                });
+
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (answered) return;
+                    checkAnswer(taskNum);
+                });
+
+                updateSteps();
+            }
+
+            function checkAnswer(taskNum) {
+                const task = tasks[taskNum];
+                const feedbackDiv = document.getElementById('feedback');
+                
+                if (selectedOption === null) {
+                    alert('Пожалуйста, выберите вариант ответа');
+                    return;
+                }
+
+                const isCorrect = (selectedOption === task.correct);
+                results[taskNum] = isCorrect;
+
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+                feedbackDiv.innerHTML = task.explanations[selectedOption];
+
+                answered = true;
+                updateSteps();
+
+                if (taskNum < 3) {
+                    nextBtn.disabled = false;
+                } else {
+                    nextBtn.textContent = 'Завершить';
+                    nextBtn.disabled = false;
+                }
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentTask < 3) {
+                    currentTask++;
+                    renderTask(currentTask);
+                    nextBtn.disabled = true;
+                } else {
+                    container.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    completionContainer.classList.remove('hidden');
+                }
+            });
+
+            function restart() {
+                currentTask = 1;
+                selectedOption = null;
+                answered = false;
+                results = {1: null, 2: null, 3: null};
+                
+                container.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+                completionContainer.classList.add('hidden');
+                nextBtn.textContent = 'Далее →';
+                nextBtn.disabled = true;
+                
+                renderTask(1);
+            }
+
+            restartBtn.addEventListener('click', restart);
+
+            renderTask(1);
+        })();
+    </script>
+</body>
+</html>
