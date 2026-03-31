@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Срок аренды · бухгалтерский учёт</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Индикатор прогресса */
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .step-wrapper {
+            text-align: center;
+        }
+        .step {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 1rem;
+            margin: 0 auto 0.2rem;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.correct {
+            background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
+            color: white;
+        }
+        .step-label {
+            font-size: 0.75rem;
+            color: #1e3b5c;
+        }
+
+        /* Контейнер вопроса */
+        .question-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #0a2942;
+            margin-bottom: 1.2rem;
+            font-weight: 500;
+        }
+
+        .answers-area {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border: 2px solid #d8e2f2;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.95rem;
+        }
+        .answer-option:hover {
+            background: #f0f7ff;
+            border-color: #8da9cc;
+        }
+        .answer-option.selected {
+            background: #e1ecfe;
+            border-color: #1e6bb8;
+        }
+        .answer-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: #1e6bb8;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 3px 0 #b0c4dd;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin: 1rem 0 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Таблица самопроверки */
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #1a344c;
+            margin: 1.5rem 0 0.5rem 0;
+            text-align: center;
+        }
+        .summary-table {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #c7daf5;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .summary-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 60px;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #d8e2f2;
+            align-items: center;
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        .summary-row.header {
+            background: #e2ecfe;
+            font-weight: 600;
+            color: #0d2f4e;
+        }
+        .summary-answer {
+            font-weight: 600;
+            color: #1e6bb8;
+        }
+        .summary-key {
+            font-size: 0.9rem;
+            color: #1e3b5c;
+        }
+
+        .congrats {
+            text-align: center;
+            margin: 1.5rem 0 0.5rem;
+            font-size: 1.2rem;
+            color: #1e3b5c;
+        }
+
+        .restart-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .answer-option { font-size: 0.9rem; }
+            .progress { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Индикатор прогресса -->
+        <div class="progress">
+            <div class="step-wrapper">
+                <div class="step active" id="step1">1</div>
+                <div class="step-label">Задача 1</div>
+            </div>
+            <div class="step-wrapper">
+                <div class="step" id="step2">2</div>
+                <div class="step-label">Задача 2</div>
+            </div>
+            <div class="step-wrapper">
+                <div class="step" id="step3">3</div>
+                <div class="step-label">Задача 3</div>
+            </div>
+            <div class="step-wrapper">
+                <div class="step" id="step4">4</div>
+                <div class="step-label">Задача 4</div>
+            </div>
+        </div>
+
+        <!-- Контейнер для текущего вопроса -->
+        <div id="questionContainer" class="question-container">
+            <!-- динамически заполняется -->
+        </div>
+
+        <!-- Кнопка "Далее" -->
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="btn primary" id="nextBtn" disabled>Далее →</button>
+        </div>
+
+        <!-- Итоговая таблица -->
+        <div id="summaryContainer" class="hidden">
+            <div class="congrats">✅ Все задачи решены!</div>
+            <div class="summary-title">Самопроверка</div>
+            <div class="summary-table">
+                <div class="summary-row header">
+                    <div>Задача</div>
+                    <div>Ситуация</div>
+                    <div>Ответ</div>
+                </div>
+                <div class="summary-row">
+                    <div>1</div>
+                    <div class="summary-key">Договор на неопределенный срок, выход за 3 месяца без штрафов, стимулов нет → срок = срок уведомления</div>
+                    <div class="summary-answer">В (3 месяца)</div>
+                </div>
+                <div class="summary-row">
+                    <div>2</div>
+                    <div class="summary-key">11 месяцев с пролонгацией, стимулов нет → пролонгация без стимулов ≠ длительный срок</div>
+                    <div class="summary-answer">А (11 месяцев)</div>
+                </div>
+                <div class="summary-row">
+                    <div>3</div>
+                    <div class="summary-key">11 месяцев с пролонгацией, есть вынуждающие обстоятельства → срок = ограничитель (СПИ улучшений)</div>
+                    <div class="summary-answer">Б (10 лет)</div>
+                </div>
+                <div class="summary-row">
+                    <div>4</div>
+                    <div class="summary-key">49 лет, выход за 3 месяца без штрафов, стимулов нет → длинный срок ≠ защищенность</div>
+                    <div class="summary-answer">Б (3 месяца)</div>
+                </div>
+            </div>
+            <div class="restart-btn">
+                <button class="btn" id="restartBtn">🔄 Пройти заново</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Данные задач
+            const tasks = {
+                1: {
+                    text: 'ООО «СтройИнвест» арендует складское помещение. В договоре аренды указано: «Договор заключен на неопределенный срок. Любая сторона вправе расторгнуть договор в одностороннем порядке, предупредив другую сторону за 3 месяца. Штрафные санкции при расторжении не предусмотрены». Компания пользуется складом 4 года, капитальных вложений не делала, лицензий нет. Арендодатель не заявлял о намерении расторгнуть договор. Какой срок аренды следует принять для целей бухгалтерского учета?',
+                    options: [
+                        'А. 4 года — фактический срок использования.',
+                        'Б. Неопределенный срок, с ежегодным пересмотром.',
+                        'В. 3 месяца — срок уведомления о расторжении.'
+                    ],
+                    correct: 2,
+                    explanations: [
+                        '❌ Неверно. Фактическое время использования не определяет срок аренды в учете. Важно не то, сколько уже сидим, а то, что мешает уйти завтра или что мешает арендодателю попросить уйти. Если ответ — «ничего», то срок тяготеет к сроку уведомления.',
+                        '❌ Неверно. «Неопределенный срок» в договоре — это не срок для бухучета. При отсутствии стимулов и наличии права одностороннего выхода без штрафов, защищенный период равен сроку уведомления.',
+                        '✅ Верно. Это классический случай: договор на неопределенный срок, обе стороны могут выйти без потерь, предупредив за 3 месяца. Никаких удерживающих обстоятельств (улучшений, лицензий, выгодной ставки) нет. Защищенный период — 3 месяца. Именно этот срок и принимается для целей бухучета.'
+                    ]
+                },
+                2: {
+                    text: 'ООО «ТоргСнаб» арендует офисное помещение по договору сроком на 11 месяцев. В договоре предусмотрена автоматическая пролонгация на следующий 11-месячный период, если ни одна из сторон не заявила о прекращении за 30 дней до окончания срока. Арендатор не производил неотделимых улучшений. Ставка аренды соответствует рыночной. Арендодатель — независимая компания. Какой срок аренды следует принять для целей бухгалтерского учета?',
+                    options: [
+                        'А. 11 месяцев — ближайший договорный период.',
+                        'Б. 3 года — типичный срок аренды офисов в этом районе.',
+                        'В. Неопределенный срок с ежегодным пересмотром.'
+                    ],
+                    correct: 0,
+                    explanations: [
+                        '✅ Верно. Сама по себе формулировка «автоматически продлевается» еще не означает длительный срок в учете. Если нет специальных стимулов к продолжению, стороны не связаны обстоятельствами, вынуждающими продлевать аренду, то реальный срок равен ближайшему договорному периоду — 11 месяцам.',
+                        '❌ Неверно. Типичный срок для аналогичных помещений не является основанием для удлинения срока в учете. Нужно исходить из условий конкретного договора и наличия стимулов.',
+                        '❌ Неверно. «Неопределенный срок» в учете не применяется. Если нет стимулов к продлению, срок ограничивается ближайшим периодом, который стороны могут не продлить, уведомив друг друга.'
+                    ]
+                },
+                3: {
+                    text: 'ООО «Городские сети» арендует котельную, обеспечивающую теплом микрорайон. Договор на 11 месяцев с автоматической пролонгацией. Арендодатель (муниципалитет) не имеет специалистов для эксплуатации, других арендаторов нет, арендатор имеет лицензии и произвел неотделимые улучшения на 50 млн руб. (СПИ — 10 лет). Какой срок аренды следует принять?',
+                    options: [
+                        'А. 11 месяцев — как указано в договоре.',
+                        'Б. 10 лет — срок полезного использования улучшений.',
+                        'В. 11 месяцев, но с ежемесячным пересмотром.'
+                    ],
+                    correct: 1,
+                    explanations: [
+                        '❌ Неверно. Формально короткий договорный период не отражает экономическую реальность. Здесь есть сильные стимулы к продолжению аренды у обеих сторон: арендодатель не может эксплуатировать объект самостоятельно, других арендаторов нет, арендатор вложился в неотделимые улучшения.',
+                        '✅ Верно. При наличии вынуждающих обстоятельств срок аренды определяется более длительным периодом, ограниченным экономически обоснованным «потолком». В данном случае таким ограничителем является срок полезного использования неотделимых улучшений — 10 лет.',
+                        '❌ Неверно. Ежемесячный пересмотр не решает проблему. Срок аренды должен быть определен на дату начала аренды исходя из оценки стимулов и ограничителей, а не «плавать» каждый месяц.'
+                    ]
+                },
+                4: {
+                    text: 'ООО «ТехноПарк» арендует производственное оборудование по договору сроком на 49 лет. Однако в договоре предусмотрено, что любая сторона может расторгнуть договор в одностороннем порядке, предупредив за 3 месяца. Существенных штрафов за расторжение нет. Арендатор не производил улучшений, оборудование не уникально, ставки стабильны. Какой срок аренды следует принять?',
+                    options: [
+                        'А. 49 лет — как указано в договоре.',
+                        'Б. 3 месяца — срок уведомления о расторжении.',
+                        'В. 10 лет — средний срок службы такого оборудования.'
+                    ],
+                    correct: 1,
+                    explanations: [
+                        '❌ Неверно. Длинный календарный срок в договоре еще не означает, что он защищен. Если стороны могут выйти без существенных потерь, то реальный срок аренды определяется возможностью одностороннего выхода.',
+                        '✅ Верно. Поскольку любая сторона может расторгнуть договор, предупредив за 3 месяца, и нет ни штрафов, ни стимулов оставаться (улучшений, уникальности оборудования), защищенный период составляет 3 месяца. Именно этот срок принимается для бухучета.',
+                        '❌ Неверно. Средний срок службы оборудования не является определяющим фактором, если стороны могут выйти из договора в любой момент. Без стимулов к продолжению срок определяется защищенным периодом, а не техническими характеристиками актива.'
+                    ]
+                }
+            };
+
+            let currentTask = 1;
+            let selectedOption = null;
+            let answered = false;
+            let results = {1: null, 2: null, 3: null, 4: null};
+
+            const container = document.getElementById('questionContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const summaryContainer = document.getElementById('summaryContainer');
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const step3 = document.getElementById('step3');
+            const step4 = document.getElementById('step4');
+            const steps = [step1, step2, step3, step4];
+            const restartBtn = document.getElementById('restartBtn');
+
+            function updateSteps() {
+                steps.forEach((step, idx) => {
+                    step.classList.remove('active', 'correct', 'incorrect');
+                    const taskNum = idx + 1;
+                    if (taskNum === currentTask && results[taskNum] === null) {
+                        step.classList.add('active');
+                    } else if (results[taskNum] === true) {
+                        step.classList.add('correct');
+                    } else if (results[taskNum] === false) {
+                        step.classList.add('incorrect');
+                    }
+                });
+            }
+
+            function renderTask(taskNum) {
+                const task = tasks[taskNum];
+                selectedOption = null;
+                answered = false;
+
+                let html = `
+                    <div class="question-text">${task.text}</div>
+                    <div class="answers-area" id="answersArea">
+                `;
+
+                task.options.forEach((opt, idx) => {
+                    html += `
+                        <div class="answer-option" data-opt-index="${idx}">
+                            <input type="radio" name="taskOption" value="${idx}" id="opt${idx}">
+                            <label for="opt${idx}">${opt}</label>
+                        </div>
+                    `;
+                });
+
+                html += `
+                    </div>
+                    <div class="button-row">
+                        <button class="btn" id="checkBtn">Проверить</button>
+                    </div>
+                    <div id="feedback" class="feedback hidden"></div>
+                `;
+
+                container.innerHTML = html;
+
+                document.querySelectorAll('.answer-option').forEach(opt => {
+                    opt.addEventListener('click', function() {
+                        if (answered) return;
+                        document.querySelectorAll('.answer-option').forEach(o => o.classList.remove('selected'));
+                        this.classList.add('selected');
+                        const radio = this.querySelector('input[type="radio"]');
+                        radio.checked = true;
+                        selectedOption = parseInt(radio.value);
+                    });
+                });
+
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (answered) return;
+                    checkAnswer(taskNum);
+                });
+
+                updateSteps();
+            }
+
+            function checkAnswer(taskNum) {
+                const task = tasks[taskNum];
+                const feedbackDiv = document.getElementById('feedback');
+                
+                if (selectedOption === null) {
+                    alert('Пожалуйста, выберите вариант ответа');
+                    return;
+                }
+
+                const isCorrect = (selectedOption === task.correct);
+                results[taskNum] = isCorrect;
+
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+                feedbackDiv.innerHTML = task.explanations[selectedOption];
+
+                answered = true;
+                updateSteps();
+
+                if (taskNum < 4) {
+                    nextBtn.disabled = false;
+                } else {
+                    nextBtn.textContent = 'Завершить';
+                    nextBtn.disabled = false;
+                }
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentTask < 4) {
+                    currentTask++;
+                    renderTask(currentTask);
+                    nextBtn.disabled = true;
+                } else {
+                    container.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    summaryContainer.classList.remove('hidden');
+                }
+            });
+
+            function restart() {
+                currentTask = 1;
+                selectedOption = null;
+                answered = false;
+                results = {1: null, 2: null, 3: null, 4: null};
+                
+                container.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+                summaryContainer.classList.add('hidden');
+                nextBtn.textContent = 'Далее →';
+                nextBtn.disabled = true;
+                
+                renderTask(1);
+            }
+
+            restartBtn.addEventListener('click', restart);
+
+            renderTask(1);
+        })();
+    </script>
+</body>
+</html>
