@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>СПИ улучшений · срок аренды</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.8rem 1.5rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .game-board {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            min-height: 320px;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .column-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1a344c;
+            margin-bottom: 0.3rem;
+            text-align: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #d2e0f0;
+        }
+
+        .item-card {
+            background: #f9fcff;
+            border: 2px solid #d2e0f0;
+            border-radius: 20px;
+            padding: 0.9rem 0.5rem;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            transition: 0.1s;
+            min-height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .left-card {
+            background: #ffffff;
+            border: 2px solid #bcc9dc;
+        }
+        .left-card.selected {
+            background: #e1ecfe;
+            border-color: #1e6bb8;
+            box-shadow: 0 0 0 2px rgba(30,107,184,0.2);
+        }
+
+        .right-card {
+            background: #ffffff;
+            border: 2px solid #bcc9dc;
+        }
+        .right-card.selected {
+            background: #e1ecfe;
+            border-color: #1e6bb8;
+            box-shadow: 0 0 0 2px rgba(30,107,184,0.2);
+        }
+
+        /* Стили для подсветки после проверки */
+        .item-card.correct-match {
+            background: #eef6e6;
+            border-color: #2b8c4a;
+        }
+        .item-card.incorrect-match {
+            background: #ffe6e6;
+            border-color: #b13e3e;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+
+        /* Canvas для линий */
+        .lines-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Панель с пояснениями (заменяет игровое поле) */
+        .explanation-panel {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #c7daf5;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        .explanation-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #d8e2f2;
+            align-items: center;
+        }
+        .explanation-row:last-child {
+            border-bottom: none;
+        }
+        .explanation-row.header {
+            background: #e2ecfe;
+            font-weight: 600;
+            color: #0d2f4e;
+        }
+        .explanation-spi, .explanation-term {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+        .explanation-text {
+            font-size: 0.85rem;
+            color: #2c4e6e;
+            line-height: 1.4;
+        }
+        .explanation-text strong {
+            font-weight: 700;
+            color: #0a2942;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .back-button {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .game-board { flex-direction: column; gap: 1.5rem; }
+            .lines-canvas { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Игровое поле -->
+        <div id="gameArea">
+            <div class="game-board" id="gameBoard">
+                <div class="column">
+                    <div class="column-title">📦 СПИ улучшений</div>
+                    <div id="leftItems" class="column">
+                        <div class="item-card left-card" data-spi="2">2 года</div>
+                        <div class="item-card left-card" data-spi="4">4 года</div>
+                        <div class="item-card left-card" data-spi="6">6 лет</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="column-title">📅 Срок аренды</div>
+                    <div id="rightItems" class="column">
+                        <div class="item-card right-card" data-term="3">3 года</div>
+                        <div class="item-card right-card" data-term="4">4 года</div>
+                        <div class="item-card right-card" data-term="5">5 лет</div>
+                    </div>
+                </div>
+                <canvas id="lineCanvas" class="lines-canvas"></canvas>
+            </div>
+
+            <div class="button-row">
+                <button class="btn" id="checkBtn">Проверить</button>
+                <button class="btn" id="resetBtn">Сбросить</button>
+                <button class="btn" id="explainBtn">Смотреть пояснения</button>
+            </div>
+        </div>
+
+        <!-- Панель с пояснениями (изначально скрыта) -->
+        <div id="explanationArea" class="hidden">
+            <div class="explanation-panel">
+                <div class="explanation-row header">
+                    <div>СПИ улучшений</div>
+                    <div>Срок аренды</div>
+                    <div>Пояснение</div>
+                </div>
+                <div id="explanationRows"></div>
+            </div>
+            <div class="back-button">
+                <button class="btn" id="backBtn">← Вернуться к заданию</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Правильные сопоставления
+            const correctMatches = {
+                "2": { term: "3", explanation: "<strong>Защищенный период.</strong> Стимул (улучшения) закончился через 2 года, но юридически выйти нельзя до конца 3-го года." },
+                "4": { term: "4", explanation: "<strong>Срок действия стимула.</strong> Стимул длиннее защищенного периода, но короче срока договора. После 3-х лет юридически выйти можно, но экономически невыгодно из-за неамортизированных улучшений." },
+                "6": { term: "5", explanation: "<strong>Предел договора.</strong> Стимул действует 6 лет, но максимальный срок по договору — только 5 лет. Его и берем." }
+            };
+
+            // Состояние: для каждого SPI храним, с каким term соединён
+            let pairs = { "2": null, "4": null, "6": null };
+            let termToSpi = { "3": null, "4": null, "5": null };
+            let selectedSpi = null;
+            let checked = false; // была ли нажата кнопка Проверить
+
+            const leftItems = document.querySelectorAll('.left-card');
+            const rightItems = document.querySelectorAll('.right-card');
+            const checkBtn = document.getElementById('checkBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const explainBtn = document.getElementById('explainBtn');
+            const backBtn = document.getElementById('backBtn');
+            const gameArea = document.getElementById('gameArea');
+            const explanationArea = document.getElementById('explanationArea');
+            const canvas = document.getElementById('lineCanvas');
+            const gameBoard = document.getElementById('gameBoard');
+
+            function drawLines() {
+                if (!canvas) return;
+                const rect = gameBoard.getBoundingClientRect();
+                if (rect.width === 0) return;
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#9aaebf'; // серый цвет
+                ctx.shadowBlur = 0;
+
+                for (const [spi, term] of Object.entries(pairs)) {
+                    if (term) {
+                        const leftCard = document.querySelector(`.left-card[data-spi="${spi}"]`);
+                        const rightCard = document.querySelector(`.right-card[data-term="${term}"]`);
+                        if (leftCard && rightCard) {
+                            const leftRect = leftCard.getBoundingClientRect();
+                            const rightRect = rightCard.getBoundingClientRect();
+                            const boardRect = gameBoard.getBoundingClientRect();
+                            const startX = leftRect.right - boardRect.left - 5;
+                            const startY = (leftRect.top + leftRect.bottom) / 2 - boardRect.top;
+                            const endX = rightRect.left - boardRect.left + 5;
+                            const endY = (rightRect.top + rightRect.bottom) / 2 - boardRect.top;
+                            ctx.beginPath();
+                            ctx.moveTo(startX, startY);
+                            ctx.lineTo(endX, endY);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function updateHighlight() {
+                // Убираем все классы подсветки
+                leftItems.forEach(item => item.classList.remove('correct-match', 'incorrect-match'));
+                rightItems.forEach(item => item.classList.remove('correct-match', 'incorrect-match'));
+
+                if (checked) {
+                    // Подсвечиваем левые элементы
+                    leftItems.forEach(item => {
+                        const spi = item.getAttribute('data-spi');
+                        const term = pairs[spi];
+                        if (term) {
+                            const isCorrect = (term === correctMatches[spi]?.term);
+                            item.classList.add(isCorrect ? 'correct-match' : 'incorrect-match');
+                        }
+                    });
+                    // Подсвечиваем правые элементы
+                    rightItems.forEach(item => {
+                        const term = item.getAttribute('data-term');
+                        let isCorrect = false;
+                        for (const [spi, t] of Object.entries(pairs)) {
+                            if (t === term && term === correctMatches[spi]?.term) {
+                                isCorrect = true;
+                                break;
+                            }
+                        }
+                        if (Object.values(pairs).includes(term)) {
+                            item.classList.add(isCorrect ? 'correct-match' : 'incorrect-match');
+                        }
+                    });
+                }
+            }
+
+            function updateUI() {
+                drawLines();
+                updateHighlight();
+            }
+
+            function resetGame() {
+                pairs = { "2": null, "4": null, "6": null };
+                termToSpi = { "3": null, "4": null, "5": null };
+                selectedSpi = null;
+                checked = false;
+                leftItems.forEach(item => item.classList.remove('selected', 'correct-match', 'incorrect-match'));
+                rightItems.forEach(item => item.classList.remove('selected', 'correct-match', 'incorrect-match'));
+                updateUI();
+            }
+
+            function handleLeftClick(spi) {
+                if (checked) return; // после проверки нельзя менять соединения
+                if (pairs[spi]) return;
+                leftItems.forEach(item => item.classList.remove('selected'));
+                const clickedItem = document.querySelector(`.left-card[data-spi="${spi}"]`);
+                clickedItem.classList.add('selected');
+                selectedSpi = spi;
+            }
+
+            function handleRightClick(term) {
+                if (checked) return;
+                if (termToSpi[term]) return;
+                if (!selectedSpi) {
+                    alert('Сначала выберите СПИ улучшений слева');
+                    return;
+                }
+                if (pairs[selectedSpi]) {
+                    selectedSpi = null;
+                    leftItems.forEach(item => item.classList.remove('selected'));
+                    alert('Этот элемент уже соединён');
+                    return;
+                }
+                pairs[selectedSpi] = term;
+                termToSpi[term] = selectedSpi;
+                selectedSpi = null;
+                leftItems.forEach(item => item.classList.remove('selected'));
+                updateUI();
+            }
+
+            leftItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const spi = item.getAttribute('data-spi');
+                    handleLeftClick(spi);
+                });
+            });
+
+            rightItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const term = item.getAttribute('data-term');
+                    handleRightClick(term);
+                });
+            });
+
+            function checkAndShowResults() {
+                const allPaired = Object.values(pairs).every(v => v !== null);
+                if (!allPaired) {
+                    alert('Соедините все элементы!');
+                    return;
+                }
+                checked = true;
+                updateUI();
+            }
+
+            function showExplanations() {
+                // Формируем таблицу пояснений
+                let rowsHtml = '';
+                const order = ['2', '4', '6'];
+                for (const spi of order) {
+                    const correct = correctMatches[spi];
+                    const spiText = spi === '2' ? '2 года' : (spi === '4' ? '4 года' : '6 лет');
+                    const termText = correct.term === '5' ? '5 лет' : correct.term + ' года';
+                    rowsHtml += `
+                        <div class="explanation-row">
+                            <div class="explanation-spi">${spiText}</div>
+                            <div class="explanation-term">${termText}</div>
+                            <div class="explanation-text">${correct.explanation}</div>
+                        </div>
+                    `;
+                }
+                document.getElementById('explanationRows').innerHTML = rowsHtml;
+                gameArea.classList.add('hidden');
+                explanationArea.classList.remove('hidden');
+            }
+
+            function backToGame() {
+                explanationArea.classList.add('hidden');
+                gameArea.classList.remove('hidden');
+                // Обновляем линии после возвращения (на случай изменения размера окна)
+                setTimeout(() => updateUI(), 50);
+            }
+
+            checkBtn.addEventListener('click', checkAndShowResults);
+            resetBtn.addEventListener('click', resetGame);
+            explainBtn.addEventListener('click', showExplanations);
+            backBtn.addEventListener('click', backToGame);
+
+            window.addEventListener('resize', () => {
+                if (!gameArea.classList.contains('hidden')) {
+                    updateUI();
+                }
+            });
+
+            resetGame();
+        })();
+    </script>
+</body>
+</html>
