@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Налог на имущество · тренажёр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Индикатор прогресса */
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .step-wrapper {
+            text-align: center;
+        }
+        .step {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 1rem;
+            margin: 0 auto 0.2rem;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.correct {
+            background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
+            color: white;
+        }
+        .step-label {
+            font-size: 0.75rem;
+            color: #1e3b5c;
+            max-width: 80px;
+        }
+
+        /* Контейнер вопроса */
+        .question-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #0a2942;
+            margin-bottom: 1.2rem;
+            font-weight: 500;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            min-width: 150px;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-group span {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 3px 0 #b0c4dd;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin: 1rem 0 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Таблица результатов */
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #1a344c;
+            margin: 1.5rem 0 0.5rem 0;
+            text-align: center;
+        }
+        .summary-table {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #c7daf5;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .summary-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #d8e2f2;
+            align-items: center;
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        .summary-row.header {
+            background: #e2ecfe;
+            font-weight: 600;
+            color: #0d2f4e;
+        }
+        .summary-value {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .congrats {
+            text-align: center;
+            margin: 1.5rem 0 0.5rem;
+            font-size: 1.2rem;
+            color: #1e3b5c;
+        }
+
+        .restart-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .progress { gap: 0.8rem; }
+            .step-label { font-size: 0.65rem; max-width: 60px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Индикатор прогресса -->
+        <div class="progress">
+            <div class="step-wrapper">
+                <div class="step active" id="step1">1</div>
+                <div class="step-label">Средняя стоимость за 9 мес</div>
+            </div>
+            <div class="step-wrapper">
+                <div class="step" id="step2">2</div>
+                <div class="step-label">Аванс за 9 мес</div>
+            </div>
+            <div class="step-wrapper">
+                <div class="step" id="step3">3</div>
+                <div class="step-label">Среднегодовая стоимость</div>
+            </div>
+            <div class="step-wrapper">
+                <div class="step" id="step4">4</div>
+                <div class="step-label">Налог за год</div>
+            </div>
+            <div class="step-wrapper">
+                <div class="step" id="step5">5</div>
+                <div class="step-label">Налог к доплате</div>
+            </div>
+        </div>
+
+        <!-- Контейнер для текущего вопроса -->
+        <div id="questionContainer" class="question-container">
+            <!-- динамически заполняется -->
+        </div>
+
+        <!-- Кнопка "Далее" -->
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="btn primary" id="nextBtn" disabled>Далее →</button>
+        </div>
+
+        <!-- Итоговая таблица -->
+        <div id="summaryContainer" class="hidden">
+            <div class="congrats">✅ Все расчёты выполнены!</div>
+            <div class="summary-title">Итоговая таблица ответов</div>
+            <div class="summary-table">
+                <div class="summary-row header">
+                    <div>Показатель</div>
+                    <div>Значение</div>
+                </div>
+                <div class="summary-row">
+                    <div>Средняя стоимость за 9 месяцев</div>
+                    <div class="summary-value">1 775 000 руб.</div>
+                </div>
+                <div class="summary-row">
+                    <div>Авансовый платеж за 9 месяцев</div>
+                    <div class="summary-value">9 763 руб.</div>
+                </div>
+                <div class="summary-row">
+                    <div>Среднегодовая стоимость</div>
+                    <div class="summary-value">2 680 769,23 руб.</div>
+                </div>
+                <div class="summary-row">
+                    <div>Налог на имущество за год</div>
+                    <div class="summary-value">58 977 руб.</div>
+                </div>
+                <div class="summary-row">
+                    <div>Налог к доплате по итогам года</div>
+                    <div class="summary-value">49 214 руб.</div>
+                </div>
+            </div>
+            <div class="restart-btn">
+                <button class="btn" id="restartBtn">🔄 Пройти заново</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Данные этапов
+            const stages = {
+                1: {
+                    title: 'Средняя стоимость имущества за 9 месяцев',
+                    description: 'Рассчитайте среднюю стоимость имущества за 9 месяцев (январь – сентябрь).',
+                    placeholder: 'Введите сумму в рублях',
+                    correct: 1775000,
+                    explanation: 'Расчёт: (0+0+0+0+0+0+0+6 000 000+5 950 000+5 800 000) / 10 = 17 750 000 / 10 = 1 775 000 руб.'
+                },
+                2: {
+                    title: 'Авансовый платеж за 9 месяцев',
+                    description: 'Рассчитайте сумму авансового платежа за 9 месяцев. Ставка налога — 2,2%.',
+                    placeholder: 'Введите сумму в рублях',
+                    correct: 9763,
+                    explanation: 'Аванс = Средняя стоимость × Ставка × 1/4 = 1 775 000 × 0,022 × 0,25 = 9 763 руб.'
+                },
+                3: {
+                    title: 'Среднегодовая стоимость имущества за год',
+                    description: 'Рассчитайте среднегодовую стоимость имущества за календарный год.',
+                    placeholder: 'Введите сумму в рублях',
+                    correct: 2680769.23,
+                    explanation: 'Расчёт: (0+0+0+0+0+0+0+6 000 000+5 950 000+5 800 000+5 750 000+5 700 000+5 650 000) / 13 = 34 850 000 / 13 = 2 680 769,23 руб.'
+                },
+                4: {
+                    title: 'Налог на имущество за год',
+                    description: 'Рассчитайте сумму налога на имущество за календарный год.',
+                    placeholder: 'Введите сумму в рублях',
+                    correct: 58977,
+                    explanation: 'Налог за год = Среднегодовая стоимость × Ставка = 2 680 769,23 × 0,022 = 58 977 руб.'
+                },
+                5: {
+                    title: 'Налог к доплате по итогам года',
+                    description: 'Рассчитайте сумму налога к доплате по итогам года (с учётом уплаченного аванса).',
+                    placeholder: 'Введите сумму в рублях',
+                    correct: 49214,
+                    explanation: 'Налог к доплате = Налог за год – Аванс за 9 месяцев = 58 977 – 9 763 = 49 214 руб.'
+                }
+            };
+
+            let currentStage = 1;
+            let userValue = '';
+            let answered = false;
+            let results = {1: null, 2: null, 3: null, 4: null, 5: null};
+
+            const container = document.getElementById('questionContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const summaryContainer = document.getElementById('summaryContainer');
+            const steps = [
+                document.getElementById('step1'),
+                document.getElementById('step2'),
+                document.getElementById('step3'),
+                document.getElementById('step4'),
+                document.getElementById('step5')
+            ];
+            const restartBtn = document.getElementById('restartBtn');
+
+            function updateSteps() {
+                steps.forEach((step, idx) => {
+                    const stageNum = idx + 1;
+                    step.classList.remove('active', 'correct', 'incorrect');
+                    if (stageNum === currentStage && results[stageNum] === null) {
+                        step.classList.add('active');
+                    } else if (results[stageNum] === true) {
+                        step.classList.add('correct');
+                    } else if (results[stageNum] === false) {
+                        step.classList.add('incorrect');
+                    }
+                });
+            }
+
+            function renderStage(stageNum) {
+                const stage = stages[stageNum];
+                userValue = '';
+                answered = false;
+
+                let html = `
+                    <div class="question-text">${stage.description}</div>
+                    <div class="input-group">
+                        <input type="number" id="valueInput" step="any" placeholder="${stage.placeholder}">
+                        <span>₽</span>
+                    </div>
+                    <div class="button-row">
+                        <button class="btn" id="checkBtn">Проверить</button>
+                    </div>
+                    <div id="feedback" class="feedback hidden"></div>
+                `;
+
+                container.innerHTML = html;
+
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (answered) return;
+                    checkAnswer(stageNum);
+                });
+
+                updateSteps();
+            }
+
+            function checkAnswer(stageNum) {
+                const stage = stages[stageNum];
+                const input = document.getElementById('valueInput');
+                const rawValue = input.value.trim();
+                
+                if (rawValue === '') {
+                    alert('Введите значение');
+                    return;
+                }
+
+                const numValue = parseFloat(rawValue.replace(/\s/g, '').replace(',', '.'));
+                if (isNaN(numValue)) {
+                    alert('Введите корректное число');
+                    return;
+                }
+
+                const isCorrect = Math.abs(numValue - stage.correct) < 0.01;
+                results[stageNum] = isCorrect;
+
+                const feedbackDiv = document.getElementById('feedback');
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+                
+                if (isCorrect) {
+                    feedbackDiv.innerHTML = `✅ Верно!<br><br>${stage.explanation}`;
+                } else {
+                    feedbackDiv.innerHTML = `❌ Неверно.<br><br>${stage.explanation}<br><br>Ваш ответ: ${numValue.toFixed(2)} руб.`;
+                }
+
+                answered = true;
+                updateSteps();
+
+                if (stageNum < 5) {
+                    nextBtn.disabled = false;
+                } else {
+                    nextBtn.textContent = 'Завершить';
+                    nextBtn.disabled = false;
+                }
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStage < 5) {
+                    currentStage++;
+                    renderStage(currentStage);
+                    nextBtn.disabled = true;
+                } else {
+                    container.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    summaryContainer.classList.remove('hidden');
+                }
+            });
+
+            function restart() {
+                currentStage = 1;
+                userValue = '';
+                answered = false;
+                results = {1: null, 2: null, 3: null, 4: null, 5: null};
+                
+                container.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+                summaryContainer.classList.add('hidden');
+                nextBtn.textContent = 'Далее →';
+                nextBtn.disabled = true;
+                
+                renderStage(1);
+            }
+
+            restartBtn.addEventListener('click', restart);
+
+            renderStage(1);
+        })();
+    </script>
+</body>
+</html>
