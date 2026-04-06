@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Налог на имущество · задачник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Индикатор прогресса */
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .step {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.9rem;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.correct {
+            background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
+            color: white;
+        }
+
+        /* Контейнер задачи */
+        .task-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #0a2942;
+            margin-bottom: 1.2rem;
+            white-space: pre-line;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            min-width: 150px;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-group span {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 3px 0 #b0c4dd;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin: 1rem 0 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Итоговая таблица */
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #1a344c;
+            margin: 1.5rem 0 0.5rem 0;
+            text-align: center;
+        }
+        .summary-table {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #c7daf5;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #d8e2f2;
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        .summary-row.header {
+            background: #e2ecfe;
+            font-weight: 600;
+            color: #0d2f4e;
+        }
+        .summary-value {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .congrats {
+            text-align: center;
+            margin: 1.5rem 0 0.5rem;
+            font-size: 1.2rem;
+            color: #1e3b5c;
+        }
+
+        .restart-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .progress { gap: 0.5rem; }
+            .step { width: 30px; height: 30px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Индикатор прогресса -->
+        <div class="progress" id="progressContainer"></div>
+
+        <!-- Контейнер для текущей задачи -->
+        <div id="taskContainer" class="task-container"></div>
+
+        <!-- Кнопка "Далее" -->
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="btn primary" id="nextBtn" disabled>Далее →</button>
+        </div>
+
+        <!-- Итоговая таблица -->
+        <div id="summaryContainer" class="hidden">
+            <div class="congrats">✅ Все задачи решены!</div>
+            <div class="summary-title">Результаты</div>
+            <div class="summary-table" id="summaryTable"></div>
+            <div class="restart-btn">
+                <button class="btn" id="restartBtn">🔄 Пройти заново</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Данные задач (условие + правильный ответ + пояснение)
+            const tasks = [
+                { text: "Организация имеет на балансе производственное здание. Остаточная стоимость объекта на 1-е число каждого месяца налогового периода составила (руб.):\n1 января — 12 000 000\n1 февраля — 11 900 000\n1 марта — 11 800 000\n1 апреля — 11 700 000\n1 мая — 11 600 000\n1 июня — 11 500 000\n1 июля — 11 400 000\n1 августа — 11 300 000\n1 сентября — 11 200 000\n1 октября — 11 100 000\n1 ноября — 11 000 000\n1 декабря — 10 900 000\n1 января следующего года — 10 800 000\nСтавка налога — 2,2%. Определите налог за год.",
+                  correct: 249108,
+                  explanation: "Среднегодовая стоимость: (12 000 000+11 900 000+11 800 000+11 700 000+11 600 000+11 500 000+11 400 000+11 300 000+11 200 000+11 100 000+11 000 000+10 900 000+10 800 000)/13 = 147 200 000 / 13 = 11 323 076,92 руб.\nНалог: 11 323 076,92 × 2,2% = 249 107,69 ≈ 249 108 руб." },
+                { text: "Остаточная стоимость административного здания:\n1 января — 8 400 000 руб.\n1 февраля — 8 200 000 руб.\n1 марта — 8 000 000 руб.\n1 апреля — 7 800 000 руб.\nСтавка — 2,2%. Определите авансовый платеж за I квартал.",
+                  correct: 44550,
+                  explanation: "Средняя стоимость за I квартал: (8 400 000+8 200 000+8 000 000+7 800 000)/4 = 32 400 000 / 4 = 8 100 000 руб.\nАванс: 8 100 000 × 2,2% × 1/4 = 44 550 руб." },
+                { text: "Остаточная стоимость склада:\n1 января — 6 600 000\n1 февраля — 6 500 000\n1 марта — 6 400 000\n1 апреля — 6 300 000\n1 мая — 6 200 000\n1 июня — 6 100 000\n1 июля — 6 000 000\nСтавка — 2,2%. Найдите авансовый платеж за полугодие.",
+                  correct: 34650,
+                  explanation: "Средняя стоимость за полугодие: (6 600 000+6 500 000+6 400 000+6 300 000+6 200 000+6 100 000+6 000 000)/7 = 44 100 000 / 7 = 6 300 000 руб.\nАванс: 6 300 000 × 2,2% × 1/4 = 34 650 руб." },
+                { text: "Организация владеет помещением в торговом центре. Помещение включено в региональный перечень объектов, по которым база определяется по кадастровой стоимости. Кадастровая стоимость помещения на 1 января года — 25 000 000 руб. Ставка — 1,8%. Определите сумму налога за год.",
+                  correct: 450000,
+                  explanation: "Налог = 25 000 000 × 1,8% = 450 000 руб." },
+                { text: "Организация владеет офисным помещением в административно-деловом центре. Объект включен в перечень кадастровых объектов. Кадастровая стоимость — 18 400 000 руб. Ставка — 2%. Определите авансовый платеж за квартал.",
+                  correct: 92000,
+                  explanation: "Годовой налог: 18 400 000 × 2% = 368 000 руб. Аванс за квартал: 368 000 / 4 = 92 000 руб." },
+                { text: "У организации помещение в торговом комплексе. Среднегодовая стоимость по данным бухучета — 14 000 000 руб. Кадастровая стоимость — 20 000 000 руб. Объект включен в перечень кадастровых объектов. Ставка — 2%. Определите налог за год.",
+                  correct: 400000,
+                  explanation: "Так как объект включен в перечень кадастровых объектов, применяется кадастровая стоимость. Налог = 20 000 000 × 2% = 400 000 руб." },
+                { text: "Организация приобрела 1 апреля помещение в бизнес-центре, включенное в кадастровый перечень. Кадастровая стоимость — 30 000 000 руб. Ставка — 2%. Налог за год исчисляется пропорционально числу полных месяцев владения (с апреля по декабрь — 9 месяцев). Определите налог за год.",
+                  correct: 450000,
+                  explanation: "Годовой налог: 30 000 000 × 2% = 600 000 руб. С учетом 9 месяцев владения: 600 000 × 9/12 = 450 000 руб." },
+                { text: "У организации два объекта:\n• Производственный корпус (среднегодовая стоимость — 16 500 000 руб., ставка — 2,2%)\n• Помещение в торговом центре (кадастровая стоимость — 12 000 000 руб., ставка — 2%)\nОпределите общую сумму налога за год.",
+                  correct: 603000,
+                  explanation: "По производственному корпусу: 16 500 000 × 2,2% = 363 000 руб.\nПо помещению в торговом центре: 12 000 000 × 2% = 240 000 руб.\nИтого: 363 000 + 240 000 = 603 000 руб." },
+                { text: "Организация владеет административным зданием, включенным в перечень объектов, облагаемых по кадастровой стоимости. Кадастровая стоимость — 40 000 000 руб. Ставка — 1,5%. Найдите авансовый платеж за I квартал.",
+                  correct: 150000,
+                  explanation: "Годовой налог: 40 000 000 × 1,5% = 600 000 руб. Аванс за квартал: 600 000 / 4 = 150 000 руб." },
+                { text: "У организации три объекта:\n• Объект А — цех (среднегодовая стоимость 9 800 000 руб., ставка 2,2%)\n• Объект Б — офис (кадастровая стоимость 22 500 000 руб., ставка 2%)\n• Объект В — помещение магазина (кадастровая стоимость 11 600 000 руб., ставка 2%)\nОпределите общую сумму налога за год.",
+                  correct: 897600,
+                  explanation: "Объект А: 9 800 000 × 2,2% = 215 600 руб.\nОбъект Б: 22 500 000 × 2% = 450 000 руб.\nОбъект В: 11 600 000 × 2% = 232 000 руб.\nИтого: 215 600 + 450 000 + 232 000 = 897 600 руб." }
+            ];
+
+            let currentTask = 0;
+            let userValue = '';
+            let answered = false;
+            let results = new Array(10).fill(null);
+
+            const taskContainer = document.getElementById('taskContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const summaryContainer = document.getElementById('summaryContainer');
+            const progressContainer = document.getElementById('progressContainer');
+            const summaryTable = document.getElementById('summaryTable');
+            const restartBtn = document.getElementById('restartBtn');
+
+            function updateProgress() {
+                let html = '';
+                for (let i = 0; i < tasks.length; i++) {
+                    let statusClass = '';
+                    if (i === currentTask && results[i] === null) statusClass = 'active';
+                    else if (results[i] === true) statusClass = 'correct';
+                    else if (results[i] === false) statusClass = 'incorrect';
+                    html += `<div class="step ${statusClass}">${i+1}</div>`;
+                }
+                progressContainer.innerHTML = html;
+            }
+
+            function renderTask() {
+                const task = tasks[currentTask];
+                userValue = '';
+                answered = false;
+
+                let html = `
+                    <div class="task-text">${task.text}</div>
+                    <div class="input-group">
+                        <input type="number" id="valueInput" step="any" placeholder="Введите число">
+                        <span>₽</span>
+                    </div>
+                    <div class="button-row">
+                        <button class="btn" id="checkBtn">Проверить</button>
+                    </div>
+                    <div id="feedback" class="feedback hidden"></div>
+                `;
+
+                taskContainer.innerHTML = html;
+
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (answered) return;
+                    checkAnswer();
+                });
+
+                updateProgress();
+            }
+
+            function checkAnswer() {
+                const task = tasks[currentTask];
+                const input = document.getElementById('valueInput');
+                const rawValue = input.value.trim();
+                
+                if (rawValue === '') {
+                    alert('Введите значение');
+                    return;
+                }
+
+                const numValue = parseFloat(rawValue.replace(/\s/g, '').replace(',', '.'));
+                if (isNaN(numValue)) {
+                    alert('Введите корректное число');
+                    return;
+                }
+
+                const isCorrect = Math.abs(numValue - task.correct) < 0.5; // допуск 0.5 руб.
+                results[currentTask] = isCorrect;
+
+                const feedbackDiv = document.getElementById('feedback');
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+                
+                if (isCorrect) {
+                    feedbackDiv.innerHTML = `✅ Верно!<br><br>${task.explanation}`;
+                } else {
+                    feedbackDiv.innerHTML = `❌ Неверно.<br><br>${task.explanation}<br><br>Ваш ответ: ${numValue.toFixed(0)} руб.`;
+                }
+
+                answered = true;
+                updateProgress();
+
+                if (currentTask < tasks.length - 1) {
+                    nextBtn.disabled = false;
+                } else {
+                    nextBtn.textContent = 'Завершить';
+                    nextBtn.disabled = false;
+                }
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentTask < tasks.length - 1) {
+                    currentTask++;
+                    renderTask();
+                    nextBtn.disabled = true;
+                } else {
+                    // Показать итоговую таблицу
+                    taskContainer.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    
+                    let summaryHtml = '<div class="summary-row header"><span>Задача</span><span>Результат</span></div>';
+                    for (let i = 0; i < tasks.length; i++) {
+                        const status = results[i] === true ? '✅ Верно' : (results[i] === false ? '❌ Неверно' : '⚪ Не решена');
+                        summaryHtml += `<div class="summary-row"><span>Задача ${i+1}</span><span class="summary-value">${status}</span></div>`;
+                    }
+                    summaryTable.innerHTML = summaryHtml;
+                    summaryContainer.classList.remove('hidden');
+                }
+            });
+
+            function restart() {
+                currentTask = 0;
+                results = new Array(10).fill(null);
+                answered = false;
+                
+                taskContainer.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+                summaryContainer.classList.add('hidden');
+                nextBtn.textContent = 'Далее →';
+                nextBtn.disabled = true;
+                
+                renderTask();
+            }
+
+            restartBtn.addEventListener('click', restart);
+
+            renderTask();
+        })();
+    </script>
+</body>
+</html>
