@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Земельный налог · задачник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .step {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.correct {
+            background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
+            color: white;
+        }
+
+        .task-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #0a2942;
+            margin-bottom: 1.2rem;
+            white-space: pre-line;
+        }
+
+        .question-block {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e0eaf5;
+        }
+        .question-title {
+            font-weight: 600;
+            color: #1e3b5c;
+            margin-bottom: 0.6rem;
+            font-size: 0.95rem;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.6rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .input-group input {
+            flex: 1;
+            max-width: 250px;
+            padding: 0.6rem 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-group span {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.8rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+
+        .status-list {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #2c4e6e;
+            border-top: 1px solid #d8e2f2;
+            padding-top: 0.8rem;
+        }
+        .status-item {
+            margin: 0.3rem 0;
+        }
+        .status-correct {
+            color: #2b8c4a;
+            font-weight: 500;
+        }
+        .status-incorrect {
+            color: #b13e3e;
+            font-weight: 500;
+        }
+
+        .explanation-block {
+            margin-top: 0.8rem;
+            background: #eef3fa;
+            border-radius: 18px;
+            padding: 0.8rem;
+            font-size: 0.85rem;
+            border-left: 4px solid #1e6bb8;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .progress { gap: 0.5rem; }
+            .step { width: 32px; height: 32px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="progress" id="progressContainer"></div>
+        <div id="taskContainer" class="task-container"></div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="nextBtn" disabled>Далее →</button>
+        </div>
+        <div id="finalMessage" class="hidden" style="text-align: center; margin-top: 1rem; font-size: 1rem; color: #2b8c4a;"></div>
+    </div>
+
+    <script>
+        (function() {
+            const tasks = [
+                {
+                    text: "ООО «Гамма» владеет земельным участком весь 2026 год.\nКадастровая стоимость участка на 1 января 2026 года — 12 000 000 руб.\nМуниципалитет установил ставку земельного налога 1,5% и предусмотрел отчётные периоды.\nОпределите:",
+                    questions: [
+                        { text: "Сумма авансового платежа за I квартал (руб.)", correct: 45000 },
+                        { text: "Сумма авансового платежа за полугодие (руб.)", correct: 45000 },
+                        { text: "Сумма авансового платежа за 9 месяцев (руб.)", correct: 45000 },
+                        { text: "Общая сумма налога за 2026 год (руб.)", correct: 180000 }
+                    ],
+                    fullExplanation: "Авансовый платеж за I квартал = 180 000 / 4 = 45 000 руб.\nАвансовый платеж за II квартал = 180 000 / 4 = 45 000 руб.\nАвансовый платеж за III квартал = 180 000 / 4 = 45 000 руб.\nНалог за год = 12 000 000 × 1,5% = 180 000 руб."
+                },
+                {
+                    text: "ООО «Колос» владеет земельным участком сельскохозяйственного назначения, используемым для сельхозпроизводства.\nКадастровая стоимость участка на 1 января 2026 года — 20 000 000 руб.\nМуниципалитет установил по таким участкам ставку 0,3%.\nОтчетные периоды установлены.\nОпределите:",
+                    questions: [
+                        { text: "Сумма авансового платежа за I квартал (руб.)", correct: 15000 },
+                        { text: "Сумма авансового платежа за полугодие (руб.)", correct: 15000 },
+                        { text: "Сумма авансового платежа за 9 месяцев (руб.)", correct: 15000 },
+                        { text: "Общая сумма налога за 2026 год (руб.)", correct: 60000 }
+                    ],
+                    fullExplanation: "Авансовый платеж за I квартал = 60 000 / 4 = 15 000 руб.\nАвансовый платеж за II квартал = 60 000 / 4 = 15 000 руб.\nАвансовый платеж за III квартал = 60 000 / 4 = 15 000 руб.\nНалог за год = 20 000 000 × 0,3% = 60 000 руб."
+                },
+                {
+                    text: "ООО «Старт» зарегистрировало право собственности на земельный участок 14 апреля 2026 года.\nКадастровая стоимость участка на 1 января 2026 года — 9 600 000 руб.\nСтавка налога — 1,5%.\nОтчётные периоды установлены.\nОпределите:",
+                    questions: [
+                        { text: "Сумма авансового платежа за I квартал (руб.)", correct: 0 },
+                        { text: "Сумма авансового платежа за полугодие (руб.)", correct: 36000 },
+                        { text: "Сумма авансового платежа за 9 месяцев (руб.)", correct: 36000 },
+                        { text: "Общая сумма налога за 2026 год (руб.)", correct: 108000 }
+                    ],
+                    fullExplanation: "Полный годовой налог без учёта периода = 9 600 000 × 1,5% = 144 000 руб.\nАвансовый платеж за I квартал = 0 руб. (права ещё не было)\nАвансовый платеж за II квартал = 144 000 / 4 = 36 000 руб.\nАвансовый платеж за III квартал = 144 000 / 4 = 36 000 руб.\nНалог за год = 144 000 × 9/12 = 108 000 руб."
+                },
+                {
+                    text: "ООО «Ресурс» владело земельным участком с 1 января 2026 года, а право собственности прекратилось 10 сентября 2026 года.\nКадастровая стоимость участка на 1 января 2026 года — 16 000 000 руб.\nСтавка налога — 1,5%.\nОтчётные периоды установлены.\nОпределите:",
+                    questions: [
+                        { text: "Сумма авансового платежа за I квартал (руб.)", correct: 60000 },
+                        { text: "Сумма авансового платежа за полугодие (руб.)", correct: 60000 },
+                        { text: "Сумма авансового платежа за 9 месяцев (руб.)", correct: 40000 },
+                        { text: "Общая сумма налога за 2026 год (руб.)", correct: 160000 }
+                    ],
+                    fullExplanation: "Полный годовой налог = 16 000 000 × 1,5% = 240 000 руб.\nАвансовый платеж за I квартал = 240 000 / 4 = 60 000 руб.\nАвансовый платеж за II квартал = 240 000 / 4 = 60 000 руб.\nАвансовый платеж за III квартал = 240 000 / 4 × 2/3 = 60 000 × 2/3 = 40 000 руб.\nНалог за год = 240 000 × 8/12 = 160 000 руб."
+                }
+            ];
+
+            let currentTask = 0;
+            let currentQuestion = 0;
+            let results = tasks.map(() => []);
+            let taskCompleted = tasks.map(() => false);
+
+            for (let i = 0; i < tasks.length; i++) {
+                results[i] = new Array(tasks[i].questions.length).fill(null);
+            }
+
+            const taskContainer = document.getElementById('taskContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const finalMessage = document.getElementById('finalMessage');
+
+            function updateProgress() {
+                let html = '';
+                for (let i = 0; i < tasks.length; i++) {
+                    let statusClass = '';
+                    if (i === currentTask && !taskCompleted[currentTask]) statusClass = 'active';
+                    else if (taskCompleted[i]) {
+                        const allCorrect = results[i].every(r => r === true);
+                        statusClass = allCorrect ? 'correct' : 'incorrect';
+                    }
+                    html += `<div class="step ${statusClass}">${i+1}</div>`;
+                }
+                progressContainer.innerHTML = html;
+            }
+
+            function renderCurrentQuestion() {
+                const task = tasks[currentTask];
+                const q = task.questions[currentQuestion];
+                
+                taskContainer.innerHTML = `<div class="task-text">${task.text}</div>`;
+                
+                const questionHtml = `
+                    <div class="question-block">
+                        <div class="question-title">Вопрос ${currentQuestion+1} из ${task.questions.length}: ${q.text}</div>
+                        <div class="input-group">
+                            <input type="number" id="valueInput" step="any" placeholder="Введите число">
+                            <span>₽</span>
+                        </div>
+                        <div class="button-row">
+                            <button class="btn" id="checkBtn">Проверить</button>
+                        </div>
+                    </div>
+                `;
+                taskContainer.insertAdjacentHTML('beforeend', questionHtml);
+                
+                // Добавляем статус вопросов, если уже есть ответы
+                const anyAnswered = results[currentTask].some(r => r !== null);
+                if (anyAnswered) {
+                    let statusHtml = '<div class="status-list"><strong>Статус вопросов:</strong><br>';
+                    for (let i = 0; i < task.questions.length; i++) {
+                        const status = results[currentTask][i];
+                        let statusText = '';
+                        let statusClass = '';
+                        if (status === true) {
+                            statusText = '✅ Верно';
+                            statusClass = 'status-correct';
+                        } else if (status === false) {
+                            statusText = '❌ Неверно';
+                            statusClass = 'status-incorrect';
+                        } else {
+                            statusText = '○ Не отвечен';
+                            statusClass = '';
+                        }
+                        statusHtml += `<div class="status-item"><span class="${statusClass}">${statusText}</span> — ${task.questions[i].text}</div>`;
+                    }
+                    statusHtml += '</div>';
+                    taskContainer.insertAdjacentHTML('beforeend', statusHtml);
+                }
+                
+                // Добавляем пояснение, если задача завершена
+                if (taskCompleted[currentTask]) {
+                    const explanationHtml = `<div class="explanation-block"><strong>Пояснение:</strong><br>${task.fullExplanation.split('\n').join('<br>')}</div>`;
+                    taskContainer.insertAdjacentHTML('beforeend', explanationHtml);
+                }
+                
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (results[currentTask][currentQuestion] !== null) return;
+                    checkAnswer();
+                });
+                
+                updateProgress();
+            }
+            
+            function checkAnswer() {
+                const task = tasks[currentTask];
+                const q = task.questions[currentQuestion];
+                const input = document.getElementById('valueInput');
+                const rawValue = input.value.trim();
+                
+                if (rawValue === '') {
+                    alert('Введите значение');
+                    return;
+                }
+                
+                const numValue = parseFloat(rawValue.replace(/\s/g, '').replace(',', '.'));
+                if (isNaN(numValue)) {
+                    alert('Введите корректное число');
+                    return;
+                }
+                
+                const isCorrect = Math.abs(numValue - q.correct) < 0.5;
+                results[currentTask][currentQuestion] = isCorrect;
+                
+                updateProgress();
+                
+                // Обновляем статус вопросов
+                let statusHtml = '<div class="status-list"><strong>Статус вопросов:</strong><br>';
+                for (let i = 0; i < task.questions.length; i++) {
+                    const status = results[currentTask][i];
+                    let statusText = '';
+                    let statusClass = '';
+                    if (status === true) {
+                        statusText = '✅ Верно';
+                        statusClass = 'status-correct';
+                    } else if (status === false) {
+                        statusText = '❌ Неверно';
+                        statusClass = 'status-incorrect';
+                    } else {
+                        statusText = '○ Не отвечен';
+                        statusClass = '';
+                    }
+                    statusHtml += `<div class="status-item"><span class="${statusClass}">${statusText}</span> — ${task.questions[i].text}</div>`;
+                }
+                statusHtml += '</div>';
+                
+                const existingStatus = taskContainer.querySelector('.status-list');
+                if (existingStatus) {
+                    existingStatus.outerHTML = statusHtml;
+                } else {
+                    taskContainer.insertAdjacentHTML('beforeend', statusHtml);
+                }
+                
+                // Проверяем, завершена ли задача
+                const allAnswered = results[currentTask].every(r => r !== null);
+                if (allAnswered && !taskCompleted[currentTask]) {
+                    taskCompleted[currentTask] = true;
+                    const explanationHtml = `<div class="explanation-block"><strong>Пояснение:</strong><br>${task.fullExplanation.split('\n').join('<br>')}</div>`;
+                    taskContainer.insertAdjacentHTML('beforeend', explanationHtml);
+                }
+                
+                // Переход к следующему вопросу
+                if (currentQuestion + 1 < task.questions.length) {
+                    currentQuestion++;
+                    renderCurrentQuestion();
+                } else {
+                    if (currentTask < tasks.length - 1) {
+                        nextBtn.disabled = false;
+                    } else {
+                        nextBtn.textContent = 'Завершить';
+                        nextBtn.disabled = false;
+                    }
+                }
+            }
+            
+            nextBtn.addEventListener('click', () => {
+                if (currentTask < tasks.length - 1) {
+                    currentTask++;
+                    currentQuestion = 0;
+                    renderCurrentQuestion();
+                    nextBtn.disabled = true;
+                } else {
+                    taskContainer.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    finalMessage.classList.remove('hidden');
+                    finalMessage.innerHTML = '✅ Все задачи решены! Спасибо за работу!';
+                }
+            });
+            
+            renderCurrentQuestion();
+        })();
+    </script>
+</body>
+</html>
