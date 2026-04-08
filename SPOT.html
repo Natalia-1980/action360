@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>СПОТ тренажер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .frame {
+            max-width: 650px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            background: #0b2b3b;
+            color: white;
+            padding: 14px 18px;
+        }
+
+        .quiz-header h1 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .quiz-header p {
+            font-size: 0.7rem;
+            opacity: 0.85;
+            line-height: 1.3;
+        }
+
+        .stats-bar {
+            background: #f8fafc;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .stat {
+            background: white;
+            border-radius: 30px;
+            padding: 3px 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .stat span {
+            font-weight: 700;
+            color: #1e6f5c;
+            margin-right: 3px;
+        }
+
+        .progress-area {
+            padding: 6px 16px 0 16px;
+            background: white;
+        }
+
+        .progress-bar-bg {
+            background: #e2e8f0;
+            border-radius: 20px;
+            height: 4px;
+            width: 100%;
+        }
+
+        .progress-fill {
+            background: #2c7a6e;
+            width: 0%;
+            height: 4px;
+            border-radius: 20px;
+            transition: width 0.2s;
+        }
+
+        .question-area {
+            padding: 16px 16px 12px 16px;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.35;
+            margin-bottom: 14px;
+            color: #0a2c3b;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .option-item {
+            background: #f9fbfd;
+            border: 1px solid #dfe7ef;
+            border-radius: 14px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .option-item:hover {
+            background: #f1f5f9;
+            border-color: #b9cfdf;
+        }
+
+        .option-marker {
+            width: 24px;
+            height: 24px;
+            background: #eef2f5;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 10px;
+            flex-shrink: 0;
+            font-size: 0.75rem;
+        }
+
+        .option-text {
+            font-size: 0.85rem;
+            line-height: 1.35;
+            color: #1f3b4a;
+        }
+
+        .option-item.correct-highlight {
+            background: #e0f2e9;
+            border-color: #2c7a6e;
+        }
+
+        .option-item.wrong-highlight {
+            background: #ffe6e5;
+            border-color: #c73a2b;
+        }
+
+        .feedback-message {
+            background: #f0f4f9;
+            border-radius: 14px;
+            padding: 8px 12px;
+            margin: 8px 0 12px 0;
+            font-size: 0.75rem;
+            border-left: 3px solid #2c7a6e;
+            color: #1e3a4a;
+        }
+
+        .feedback-message strong {
+            color: #1a6e5c;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        button {
+            background: white;
+            border: 1px solid #cbdbe0;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-family: inherit;
+            color: #1f4b5e;
+        }
+
+        button.primary-btn {
+            background: #1f6e5c;
+            border: none;
+            color: white;
+        }
+
+        button.primary-btn:hover {
+            background: #0e5545;
+        }
+
+        button.secondary-btn {
+            background: #eef2f7;
+        }
+
+        button.secondary-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .reset-wrap {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .result-card {
+            background: #fefce8;
+            border-top: 2px solid #e9c46a;
+            margin: 12px 16px 16px 16px;
+            padding: 12px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .result-card h3 {
+            font-size: 1.1rem;
+            color: #b9791a;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.6rem;
+            color: #5c7f8c;
+            margin-top: 12px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+<div class="frame">
+    <div class="quiz-card">
+        <div class="quiz-header">
+            <h1>СПОТ — тренажер</h1>
+            <p>Ввоз из ЕАЭС: сроки, ДОПП, обеспечительный платеж, исключения</p>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">Вопрос <span id="currentQNumber">1</span>/<span id="totalQCount">0</span></div>
+            <div class="stat">Правильно: <span id="correctCount">0</span></div>
+            <div class="stat">Баллы: <span id="scoreSpan">0</span></div>
+        </div>
+        <div class="progress-area">
+            <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="question-area" id="questionArea"></div>
+        <div id="resultBlock" class="result-card hide"></div>
+    </div>
+    <footer>Тренажер по системе СПОТ (автомобильный транспорт, с 2026)</footer>
+</div>
+
+<script>
+    // Вопросы (компактная версия, без лишних иконок, все "е" вместо "ё")
+    const FULL_QUIZ = [
+        {
+            text: "С какого числа вступает в силу новый порядок ввоза товаров из стран ЕАЭС автомобильным транспортом?",
+            options: ["1 января 2026", "1 июля 2026", "1 октября 2026", "6 апреля 2026"],
+            correct: 1,
+            explanation: "С 1 июля 2026 вводится новый порядок, с 1 октября 2026 — полный контроль с обеспечительным платежом."
+        },
+        {
+            text: "Кто является оператором системы СПОТ?",
+            options: ["ФТС", "Минэкономразвития", "ФНС", "Правительство"],
+            correct: 2,
+            explanation: "Оператор СПОТ — ФНС. Она принимает ДОПП, регистрирует платежи и выдает QR-код."
+        },
+        {
+            text: "Что такое ДОПП в системе СПОТ?",
+            options: ["Документ об оплате пошлины", "Договор перевозки", "Документ о предстоящей поставке", "Декларация соответствия"],
+            correct: 2,
+            explanation: "ДОПП — электронный документ о предстоящей поставке, подается за 2 дня до границы."
+        },
+        {
+            text: "За сколько дней до пересечения границы автомобилем нужно подать ДОПП?",
+            options: ["За 1 день", "За 2 дня", "За 5 дней", "В день границы"],
+            correct: 1,
+            explanation: "ДОПП подается за 2 дня до въезда автомобиля."
+        },
+        {
+            text: "Кто из перечисленных освобождается от внесения обеспечительного платежа (ОП)?",
+            options: ["Малый бизнес", "Крупнейший налогоплательщик", "Новый импортер", "Компания с ошибкой в ДОПП"],
+            correct: 1,
+            explanation: "Крупнейшие налогоплательщики, компании на налоговом мониторинге, УЭО, резиденты ОЭЗ освобождены от ОП."
+        },
+        {
+            text: "Какой документ выдает СПОТ после корректного ДОПП и уплаты ОП (с 1 октября 2026)?",
+            options: ["Разрешение на ввоз", "QR-код", "Акцизную марку", "Справку"],
+            correct: 1,
+            explanation: "Выдается QR-код, который подтверждает право ввоза и передается перевозчику."
+        },
+        {
+            text: "На какие виды транспорта СПОТ распространяется с 1 июля 2026?",
+            options: ["На все виды", "Только автомобильный", "Ж/д и морской", "Авиаперевозки"],
+            correct: 1,
+            explanation: "На первом этапе только автомобильный транспорт, остальные — не ранее 2027."
+        },
+        {
+            text: "Какой товар не подпадает под требования СПОТ (исключен)?",
+            options: ["Стройматериалы", "Нефть и нефтепродукты", "Бытовая техника", "Мебель"],
+            correct: 1,
+            explanation: "Нефть, нефтепродукты, электроэнергия, трубопроводный транспорт и личные вещи физлиц исключены."
+        },
+        {
+            text: "Обязан ли импортер подавать ДОПП, если ввозит товары без НДС (для презентации)?",
+            options: ["Да, всегда", "Нет, только при НДС", "Только для акцизов", "По решению таможни"],
+            correct: 0,
+            explanation: "ДОПП подается при любом ввозе из ЕАЭС, независимо от уплаты налогов."
+        },
+        {
+            text: "Кто признается заявителем в системе СПОТ?",
+            options: ["Экспортер", "Импортер или посредник", "Перевозчик", "Таможенный брокер"],
+            correct: 1,
+            explanation: "Заявитель — импортер или посредник, который подает ДОПП и вносит обеспечение."
+        },
+        {
+            text: "Какой из перечисленных субъектов вправе не вносить обеспечительный платеж?",
+            options: ["Компания для перепродажи", "Резидент ОЭЗ на границе ЕАЭС", "Первый импорт", "ИП на УСН"],
+            correct: 1,
+            explanation: "Резиденты свободной/особой экономической зоны на границе ЕАЭС освобождены от ОП."
+        },
+        {
+            text: "Что из перечисленного не является основанием для освобождения от ОП?",
+            options: ["Налоговый мониторинг", "Статус УЭО", "Ввоз для переработки без спецстатуса", "Транзит через РФ"],
+            correct: 2,
+            explanation: "Простой ввоз для переработки без особого статуса не освобождает от ОП."
+        }
+    ];
+
+    let currentIndex = 0;
+    let userAnswers = new Array(FULL_QUIZ.length).fill(null);
+    let answerLocked = false;
+    let quizCompleted = false;
+
+    const questionArea = document.getElementById('questionArea');
+    const currentQNumberSpan = document.getElementById('currentQNumber');
+    const totalQCountSpan = document.getElementById('totalQCount');
+    const correctCountSpan = document.getElementById('correctCount');
+    const scoreSpan = document.getElementById('scoreSpan');
+    const progressFill = document.getElementById('progressFill');
+    const resultBlock = document.getElementById('resultBlock');
+
+    function updateStats() {
+        const correctTotal = userAnswers.filter(a => a !== null && a.isCorrect === true).length;
+        correctCountSpan.innerText = correctTotal;
+        scoreSpan.innerText = correctTotal;
+        totalQCountSpan.innerText = FULL_QUIZ.length;
+        currentQNumberSpan.innerText = currentIndex + 1;
+        const progressPercent = ((currentIndex + 1) / FULL_QUIZ.length) * 100;
+        progressFill.style.width = `${progressPercent}%`;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function renderQuestion() {
+        if (quizCompleted) return;
+        const question = FULL_QUIZ[currentIndex];
+        if (!question) return;
+
+        const answeredData = userAnswers[currentIndex];
+        const isAnswered = answeredData !== null;
+        const selectedIdx = isAnswered ? answeredData.selectedIdx : -1;
+
+        let optionsHtml = '';
+        question.options.forEach((opt, idx) => {
+            let additionalClass = '';
+            if (isAnswered) {
+                if (idx === question.correct) additionalClass = 'correct-highlight';
+                else if (idx === selectedIdx && idx !== question.correct) additionalClass = 'wrong-highlight';
+            }
+            const marker = String.fromCharCode(65 + idx);
+            optionsHtml += `
+                <div class="option-item ${additionalClass}" data-opt-index="${idx}">
+                    <div class="option-marker">${marker}</div>
+                    <div class="option-text">${escapeHtml(opt)}</div>
+                </div>
+            `;
+        });
+
+        let feedbackHtml = '';
+        if (isAnswered) {
+            const isCurCorrect = answeredData.isCorrect;
+            const correctAnswerText = question.options[question.correct];
+            feedbackHtml = `
+                <div class="feedback-message">
+                    <strong>${isCurCorrect ? 'Верно' : 'Ошибка'}</strong><br>
+                    ${isCurCorrect ? '' : 'Правильно: '} ${escapeHtml(correctAnswerText)}<br>
+                    <span>${escapeHtml(question.explanation)}</span>
+                </div>
+            `;
+        }
+
+        const nextDisabled = !isAnswered ? 'disabled' : '';
+        const prevDisabled = currentIndex === 0 ? 'disabled' : '';
+
+        const html = `
+            <div class="question-text">${escapeHtml(question.text)}</div>
+            <div class="options-list" id="optionsContainer">${optionsHtml}</div>
+            ${feedbackHtml}
+            <div class="action-buttons">
+                <button class="secondary-btn" id="prevBtn" ${prevDisabled}>Назад</button>
+                <button class="primary-btn" id="nextBtn" ${nextDisabled}>Вперед</button>
+            </div>
+            <div class="reset-wrap">
+                <button class="secondary-btn" id="resetQuizBtn">Заново</button>
+                ${!quizCompleted && userAnswers.filter(a => a !== null).length === FULL_QUIZ.length ? '<button class="primary-btn" id="finishEarlyBtn" style="margin-left:8px;">Итог</button>' : ''}
+            </div>
+        `;
+
+        questionArea.innerHTML = html;
+        updateStats();
+
+        const optionDivs = document.querySelectorAll('.option-item');
+        if (!isAnswered) {
+            optionDivs.forEach(div => {
+                div.addEventListener('click', () => {
+                    if (answerLocked || quizCompleted) return;
+                    const idx = parseInt(div.dataset.optIndex);
+                    if (!isNaN(idx)) handleAnswer(idx);
+                });
+            });
+        } else {
+            optionDivs.forEach(div => div.style.pointerEvents = 'none');
+        }
+
+        document.getElementById('prevBtn')?.addEventListener('click', () => { if (!quizCompleted) goPrev(); });
+        document.getElementById('nextBtn')?.addEventListener('click', () => { if (!quizCompleted && userAnswers[currentIndex] !== null) goNext(); });
+        document.getElementById('resetQuizBtn')?.addEventListener('click', () => resetQuiz());
+        const finishBtn = document.getElementById('finishEarlyBtn');
+        if (finishBtn) finishBtn.addEventListener('click', () => finishQuiz());
+    }
+
+    function handleAnswer(selectedIdx) {
+        if (answerLocked || quizCompleted) return;
+        const question = FULL_QUIZ[currentIndex];
+        const isCorrect = (selectedIdx === question.correct);
+        userAnswers[currentIndex] = { selectedIdx, isCorrect };
+        answerLocked = true;
+        renderQuestion();
+        answerLocked = false;
+        if (userAnswers.every(a => a !== null) && !quizCompleted) renderQuestion();
+        updateStats();
+    }
+
+    function goNext() {
+        if (currentIndex + 1 < FULL_QUIZ.length) {
+            currentIndex++;
+            answerLocked = false;
+            renderQuestion();
+        } else {
+            if (userAnswers.every(a => a !== null) && !quizCompleted) finishQuiz();
+            else if (!userAnswers.every(a => a !== null)) alert("Ответьте на все вопросы");
+        }
+    }
+
+    function goPrev() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            answerLocked = false;
+            renderQuestion();
+        }
+    }
+
+    function finishQuiz() {
+        if (quizCompleted) return;
+        if (!userAnswers.every(a => a !== null)) {
+            alert("Ответьте на все вопросы");
+            return;
+        }
+        quizCompleted = true;
+        const totalCorrect = userAnswers.filter(a => a.isCorrect).length;
+        const total = FULL_QUIZ.length;
+        const percent = Math.round((totalCorrect / total) * 100);
+        let msg = percent >= 90 ? "Отлично!" : (percent >= 70 ? "Хорошо, но повторите" : "Перечитайте конспект");
+        resultBlock.classList.remove('hide');
+        resultBlock.innerHTML = `
+            <h3>Результат</h3>
+            <p style="margin:6px 0">${totalCorrect} из ${total} (${percent}%)</p>
+            <p>${msg}</p>
+            <button id="restartResult" class="primary-btn" style="margin-top:8px">Заново</button>
+        `;
+        document.getElementById('restartResult')?.addEventListener('click', () => resetQuiz());
+        const qa = document.getElementById('questionArea');
+        qa.style.opacity = '0.5';
+        qa.style.pointerEvents = 'none';
+    }
+
+    function resetQuiz() {
+        userAnswers = new Array(FULL_QUIZ.length).fill(null);
+        currentIndex = 0;
+        quizCompleted = false;
+        answerLocked = false;
+        resultBlock.classList.add('hide');
+        const qa = document.getElementById('questionArea');
+        qa.style.opacity = '1';
+        qa.style.pointerEvents = 'auto';
+        updateStats();
+        renderQuestion();
+    }
+
+    totalQCountSpan.innerText = FULL_QUIZ.length;
+    updateStats();
+    renderQuestion();
+</script>
+</body>
+</html>
