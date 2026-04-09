@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Тест: готовность к СПОТ</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f8 0%, #d9e2ec 100%);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem 1rem;
+        }
+
+        /* главный контейнер — компактнее */
+        .quiz-frame {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(2px);
+            border-radius: 1.8rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.25);
+            padding: 1.2rem 1rem 1.4rem 1rem;
+            transition: all 0.2s;
+        }
+
+        /* заголовок полностью убран */
+
+        /* карусель-листалка */
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            touch-action: pan-y pinch-zoom;
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            will-change: transform;
+        }
+        .quiz-slide {
+            flex: 0 0 100%;
+            padding: 0 0.1rem;
+        }
+
+        /* карточка вопроса — компактная */
+        .question-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.12);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        .card-header {
+            background: linear-gradient(115deg, #2f6b5a, #1f8a72);
+            padding: 0.9rem 1.2rem;
+            color: white;
+        }
+        .q-counter {
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            margin-bottom: 6px;
+        }
+        .q-text {
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .card-body {
+            padding: 1rem 1rem 1.2rem;
+            background: #ffffff;
+            flex: 1;
+        }
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.9rem;
+            padding: 0.6rem 0.9rem;
+            margin-bottom: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1e2f3c;
+            text-align: left;
+            width: 100%;
+        }
+        .option-btn i {
+            font-size: 0.95rem;
+            min-width: 20px;
+            color: #1f7a6b;
+        }
+        .option-btn:hover {
+            background: #eff3f8;
+            border-color: #b9cadb;
+        }
+        .option-btn.selected {
+            background: #e6f4ea;
+            border-color: #1f8a72;
+            color: #0b4f44;
+        }
+        .option-btn.selected i {
+            color: #1f8a72;
+        }
+
+        /* навигация компактнее */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.8rem;
+            gap: 0.5rem;
+        }
+        .nav-arrow {
+            background: rgba(255, 250, 240, 0.95);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: #2b7a6e;
+        }
+        .nav-arrow:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .nav-arrow:not(:disabled):hover {
+            background: white;
+            transform: scale(1.02);
+        }
+        .dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex: 1;
+        }
+        .dot {
+            width: 7px;
+            height: 7px;
+            background: #cbd5e1;
+            border-radius: 50%;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .dot.active {
+            background: #145c4e;
+            width: 20px;
+            border-radius: 20px;
+        }
+
+        /* результат — компактно */
+        .result-block {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            margin-top: 1rem;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 10px 22px -8px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #f4b942;
+            display: none;
+        }
+        .result-score {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 8px;
+        }
+        .result-text {
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: #2c4a5e;
+            margin-bottom: 0.3rem;
+        }
+        .restart-btn {
+            background: #1f8a72;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 2rem;
+            cursor: pointer;
+            margin-top: 12px;
+            width: 100%;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .restart-btn:hover {
+            background: #0f6b58;
+        }
+        .footer-note {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.65rem;
+            color: #5a7d97;
+        }
+        @media (max-width: 600px) {
+            .quiz-frame {
+                padding: 0.9rem 0.8rem;
+            }
+            .q-text {
+                font-size: 0.9rem;
+            }
+            .option-btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            .nav-arrow {
+                width: 34px;
+                height: 34px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-frame">
+    <!-- Заголовок и подзаголовок полностью удалены -->
+
+    <!-- Карусель-листалка -->
+    <div class="carousel" id="quizCarousel">
+        <div class="carousel-track" id="carouselTrack"></div>
+        <div class="nav-buttons">
+            <button class="nav-arrow" id="prevBtn" disabled><i class="fas fa-chevron-left"></i></button>
+            <div class="dots" id="dotsContainer"></div>
+            <button class="nav-arrow" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Блок результата -->
+    <div id="resultBlock" class="result-block"></div>
+    <div class="footer-note">
+        <i class="fas fa-chart-simple"></i> Оцените готовность вашей компании к СПОТ
+    </div>
+</div>
+
+<script>
+    // Данные вопросов (5 вопросов, компактные формулировки)
+    const questions = [
+        {
+            text: "Откуда ввозите товары автотранспортом?",
+            options: [
+                { text: "Регулярно из Беларуси, Казахстана, Армении или Киргизии", score: 3 },
+                { text: "Иногда из ЕАЭС, в основном из третьих стран", score: 2 },
+                { text: "Редко, разовые поставки из ЕАЭС", score: 1 },
+                { text: "Не ввозим из ЕАЭС", score: 0 }
+            ]
+        },
+        {
+            text: "Есть ли действующая КЭП?",
+            options: [
+                { text: "Да, срок действия — после июля 2026", score: 3 },
+                { text: "Есть, но истекает до июля", score: 2 },
+                { text: "Не уверены, нужно проверить", score: 1 },
+                { text: "Нет, не оформлена", score: 0 }
+            ]
+        },
+        {
+            text: "Перевозчики и экспедиторы осведомлены о СПОТ?",
+            options: [
+                { text: "Да, обсуждали, они готовятся", score: 3 },
+                { text: "Знают в общих чертах", score: 2 },
+                { text: "Слышали, но не обсуждали", score: 1 },
+                { text: "Не знают — узнали только сейчас", score: 0 }
+            ]
+        },
+        {
+            text: "Готовы к заморозке средств под обеспечительный платёж?",
+            options: [
+                { text: "Да, просчитали объём и заложили резерв", score: 3 },
+                { text: "Понимаем, но расчёт ещё не делали", score: 2 },
+                { text: "Сложно, нужен анализ ликвидности", score: 1 },
+                { text: "Не задумывались", score: 0 }
+            ]
+        },
+        {
+            text: "Есть ответственный за адаптацию к СПОТ?",
+            options: [
+                { text: "Да, специалист назначен, идёт подготовка", score: 3 },
+                { text: "Есть ВЭД-специалист, но задача не поставлена", score: 2 },
+                { text: "Пока не определились", score: 1 },
+                { text: "Нет — только начинаем разбираться", score: 0 }
+            ]
+        }
+    ];
+
+    let currentIndex = 0;
+    let answers = new Array(questions.length).fill(null);
+    let selectedOptionIndices = new Array(questions.length).fill(null);
+
+    const track = document.getElementById('carouselTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const resultBlock = document.getElementById('resultBlock');
+
+    // Построение всех слайдов
+    function buildCarousel() {
+        track.innerHTML = '';
+        questions.forEach((q, idx) => {
+            const slide = document.createElement('div');
+            slide.className = 'quiz-slide';
+            slide.setAttribute('data-index', idx);
+            
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'card-header';
+            headerDiv.innerHTML = `
+                <div class="q-counter">${idx+1}/${questions.length}</div>
+                <div class="q-text">${escapeHtml(q.text)}</div>
+            `;
+            card.appendChild(headerDiv);
+            
+            const bodyDiv = document.createElement('div');
+            bodyDiv.className = 'card-body';
+            
+            q.options.forEach((opt, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                const icon = document.createElement('i');
+                icon.className = 'far fa-circle';
+                const span = document.createElement('span');
+                span.textContent = opt.text;
+                btn.appendChild(icon);
+                btn.appendChild(span);
+                btn.setAttribute('data-qidx', idx);
+                btn.setAttribute('data-optidx', optIdx);
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectAnswer(idx, optIdx, opt.score);
+                });
+                if (selectedOptionIndices[idx] === optIdx) {
+                    btn.classList.add('selected');
+                    const ic = btn.querySelector('i');
+                    if (ic) ic.className = 'fas fa-check-circle';
+                }
+                bodyDiv.appendChild(btn);
+            });
+            
+            card.appendChild(bodyDiv);
+            slide.appendChild(card);
+            track.appendChild(slide);
+        });
+        updateDots();
+        updateButtonsState();
+        updateCarouselPosition();
+    }
+    
+    function selectAnswer(qIdx, optIdx, score) {
+        answers[qIdx] = score;
+        selectedOptionIndices[qIdx] = optIdx;
+        
+        const slides = document.querySelectorAll('.quiz-slide');
+        if (slides[qIdx]) {
+            const btns = slides[qIdx].querySelectorAll('.option-btn');
+            btns.forEach((btn, idx) => {
+                const icon = btn.querySelector('i');
+                if (idx === optIdx) {
+                    btn.classList.add('selected');
+                    if (icon) icon.className = 'fas fa-check-circle';
+                } else {
+                    btn.classList.remove('selected');
+                    if (icon) icon.className = 'far fa-circle';
+                }
+            });
+        }
+        updateButtonsState();
+    }
+    
+    function updateButtonsState() {
+        prevBtn.disabled = (currentIndex === 0);
+        if (currentIndex === questions.length - 1) {
+            nextBtn.innerHTML = '<i class="fas fa-chart-line"></i>';
+        } else {
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        }
+    }
+    
+    function goToSlide(index) {
+        if (index < 0) index = 0;
+        if (index >= questions.length) index = questions.length - 1;
+        currentIndex = index;
+        updateCarouselPosition();
+        updateDots();
+        updateButtonsState();
+    }
+    
+    function updateCarouselPosition() {
+        const slideWidth = track.parentElement.clientWidth;
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+    
+    function nextSlide() {
+        if (currentIndex === questions.length - 1) {
+            showFinalResult();
+            return;
+        }
+        if (currentIndex < questions.length - 1) {
+            goToSlide(currentIndex + 1);
+        }
+    }
+    
+    function prevSlide() {
+        if (currentIndex > 0) goToSlide(currentIndex - 1);
+    }
+    
+    function updateDots() {
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i < questions.length; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (i === currentIndex) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
+    }
+    
+    function showFinalResult() {
+        const allAnswered = answers.every(val => val !== null);
+        if (!allAnswered) {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.background = '#fef7e0';
+            toast.style.border = '1px solid #f4b942';
+            toast.style.padding = '8px 16px';
+            toast.style.borderRadius = '40px';
+            toast.style.fontSize = '0.75rem';
+            toast.style.fontWeight = '500';
+            toast.style.color = '#7a5b00';
+            toast.style.zIndex = '999';
+            toast.innerHTML = '<i class="fas fa-info-circle"></i> Ответьте на все вопросы';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+            return;
+        }
+        
+        const totalScore = answers.reduce((sum, s) => sum + s, 0);
+        let scoreLabel = '', title = '', description = '';
+        if (totalScore <= 4) {
+            scoreLabel = 'Высокий риск';
+            title = 'Срочно нужна подготовка к СПОТ';
+            description = 'Ваш бизнес пока не готов к запуску СПОТ 1 июля 2026 года. Оформите КЭП, разберитесь с ДОПП, уведомите перевозчиков и просчитайте обеспечительный платёж.';
+        } else if (totalScore <= 9) {
+            scoreLabel = 'Средняя готовность';
+            title = 'Хорошая база — нужны шаги';
+            description = 'Вы понимаете суть СПОТ и частично готовы. Проверьте КЭП, обучите сотрудника работе с ДОПП и рассчитайте нагрузку обеспечительного платежа.';
+        } else {
+            scoreLabel = 'Высокая готовность';
+            title = 'Вы хорошо подготовлены';
+            description = 'Ваша компания в хорошей позиции. Проведите финальный аудит цепочек поставок и убедитесь, что перевозчики готовы к новым требованиям.';
+        }
+        
+        resultBlock.style.display = 'block';
+        resultBlock.innerHTML = `
+            <div class="result-score">${scoreLabel}</div>
+            <div class="result-title">${title}</div>
+            <div class="result-text">${description}</div>
+            <button class="restart-btn" id="restartTestBtn"><i class="fas fa-sync-alt"></i> Пройти заново</button>
+        `;
+        const restartBtn = document.getElementById('restartTestBtn');
+        if (restartBtn) restartBtn.addEventListener('click', () => resetQuiz());
+    }
+    
+    function resetQuiz() {
+        answers.fill(null);
+        selectedOptionIndices.fill(null);
+        for (let i = 0; i < questions.length; i++) {
+            const slides = document.querySelectorAll('.quiz-slide');
+            if (slides[i]) {
+                const btns = slides[i].querySelectorAll('.option-btn');
+                btns.forEach(btn => {
+                    btn.classList.remove('selected');
+                    const icon = btn.querySelector('i');
+                    if (icon) icon.className = 'far fa-circle';
+                });
+            }
+        }
+        resultBlock.style.display = 'none';
+        resultBlock.innerHTML = '';
+        currentIndex = 0;
+        updateCarouselPosition();
+        updateDots();
+        updateButtonsState();
+    }
+    
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function init() {
+        buildCarousel();
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+        window.addEventListener('resize', () => updateCarouselPosition());
+        
+        // Свайп (touch)
+        let startX = 0, isSwiping = false;
+        const carouselContainer = document.querySelector('.carousel');
+        carouselContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isSwiping = true;
+        });
+        carouselContainer.addEventListener('touchend', (e) => {
+            if (!isSwiping) return;
+            const endX = e.changedTouches[0].clientX;
+            const diff = endX - startX;
+            if (Math.abs(diff) > 40) {
+                if (diff > 0 && currentIndex > 0) prevSlide();
+                else if (diff < 0 && currentIndex < questions.length - 1) nextSlide();
+            }
+            isSwiping = false;
+        });
+        carouselContainer.addEventListener('touchcancel', () => { isSwiping = false; });
+        
+        // Клавиатура
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && !prevBtn.disabled) prevSlide();
+            else if (e.key === 'ArrowRight' && !nextBtn.disabled) {
+                if (currentIndex === questions.length - 1) showFinalResult();
+                else nextSlide();
+            }
+        });
+    }
+    
+    init();
+</script>
+</body>
+</html>
