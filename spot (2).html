@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>СПОТ · Этапы внедрения · Карусель</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Swiper JS (карусель) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f8 0%, #d9e2ec 100%);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        /* главный контейнер — максимальная ширина 650px */
+        .carousel-frame {
+            max-width: 650px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 40px -14px rgba(0, 0, 0, 0.3);
+            padding: 1.6rem 1rem 1.8rem 1rem;
+            transition: all 0.2s;
+        }
+
+        /* заголовок */
+        .title-section {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .title-section h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(125deg, #083344, #1b6b5e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .title-section h1 i {
+            background: none;
+            color: #1f7a6b;
+            font-size: 1.7rem;
+        }
+
+        /* Swiper — строго одна карточка на экране */
+        .swiper {
+            width: 100%;
+            padding: 0.5rem 0 2rem 0;
+            overflow: hidden;
+        }
+        .swiper-wrapper {
+            align-items: stretch;
+        }
+        .swiper-slide {
+            height: auto;
+            display: flex;
+            transition: transform 0.2s;
+        }
+
+        /* карточка этапа */
+        .stage-card {
+            background: #ffffff;
+            border-radius: 1.8rem;
+            overflow: hidden;
+            box-shadow: 0 18px 30px -10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease;
+        }
+        .stage-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 22px 35px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* цветные шапки */
+        .card-header {
+            padding: 1.2rem 1.3rem;
+            color: white;
+        }
+        .period {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            letter-spacing: -0.2px;
+        }
+        .period i {
+            font-size: 1.1rem;
+        }
+        .stage-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+        }
+
+        /* тело карточки */
+        .card-body {
+            padding: 1.3rem 1.3rem 1.6rem;
+            background: #ffffff;
+            flex: 1;
+        }
+        .desc-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.45;
+            color: #1e2f3c;
+        }
+        .desc-item i {
+            margin-top: 0.2rem;
+            min-width: 20px;
+            font-size: 0.95rem;
+            color: #1f7a6b;
+        }
+        .desc-item .normal-weight {
+            font-weight: 400;
+        }
+        .divider-light {
+            height: 1px;
+            background: #e9f0f4;
+            margin: 0.6rem 0 0.8rem 0;
+        }
+        /* общий стиль для заметок внизу карточек (единообразное оформление) */
+        .note-box {
+            background: #fef7e0;
+            border-left: 4px solid #f4b942;
+            padding: 0.6rem 0.9rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #7a5b00;
+            margin-top: 0.8rem;
+        }
+        .note-box i {
+            margin-right: 6px;
+        }
+        /* серый стиль для третьей карточки */
+        .note-box-gray {
+            background: #eef2f5;
+            border-left-color: #8a8d8f;
+            color: #4a4e52;
+        }
+        /* голубоватый стиль для второй карточки (для единообразия) */
+        .note-box-info {
+            background: #e8f4f8;
+            border-left-color: #2c8090;
+            color: #145c5f;
+        }
+
+        /* навигация карусели */
+        .swiper-button-next, .swiper-button-prev {
+            color: #2b7a6e;
+            background: rgba(255, 250, 240, 0.95);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .swiper-button-next:after, .swiper-button-prev:after {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .swiper-pagination-bullet {
+            background: #308073;
+            opacity: 0.5;
+        }
+        .swiper-pagination-bullet-active {
+            background: #145c4e;
+            opacity: 1;
+        }
+
+        /* футер */
+        .info-footer {
+            margin-top: 1.2rem;
+            background: #0f2b33;
+            border-radius: 1.6rem;
+            padding: 0.8rem 1rem;
+            text-align: center;
+            color: #eef6fa;
+            font-size: 0.7rem;
+        }
+        .info-footer i {
+            margin-right: 6px;
+        }
+
+        @media (max-width: 680px) {
+            .carousel-frame {
+                padding: 1rem 0.8rem;
+            }
+            .period {
+                font-size: 1rem;
+            }
+            .swiper-button-next, .swiper-button-prev {
+                width: 32px;
+                height: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="carousel-frame">
+    <div class="title-section">
+        <h1>
+            <i class="fas fa-chart-line"></i>
+            Этапы внедрения СПОТ
+            <i class="fas fa-qrcode"></i>
+        </h1>
+    </div>
+
+    <!-- Swiper карусель — строго одна карточка, плавная смена -->
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            <!-- КАРТОЧКА 1: добровольное тестирование -->
+            <div class="swiper-slide">
+                <div class="stage-card">
+                    <div class="card-header" style="background: linear-gradient(115deg, #2f6b5a, #1f8a72);">
+                        <div class="period">
+                            <i class="far fa-calendar-check"></i> 06.04.2026 – 29.06.2026
+                        </div>
+                        <div class="stage-label">Этап добровольного тестирования</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="desc-item">
+                            <i class="fas fa-file-invoice"></i>
+                            <span>Участники подают документ о предстоящей поставке (ДОПП). Налоговая выдает QR–код для таможни.</span>
+                        </div>
+                        <div class="desc-item">
+                            <i class="fas fa-truck-ramp-box"></i>
+                            <span>Товар пропустят без ДОПП и QR-кода.</span>
+                        </div>
+                        <div class="desc-item">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            <span>Обеспечительный платеж не вносится.</span>
+                        </div>
+                        <div class="note-box">
+                            <i class="fas fa-flask"></i> Тестовый режим: отработка взаимодействия, замечания не блокируют ввоз.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- КАРТОЧКА 2: внедрение без уплаты обеспечения (01.07.2026 – 30.09.2026) -->
+            <div class="swiper-slide">
+                <div class="stage-card">
+                    <div class="card-header" style="background: linear-gradient(115deg, #1e5f6b, #2c8090);">
+                        <div class="period">
+                            <i class="fas fa-hourglass-start"></i> 01.07.2026 – 30.09.2026
+                        </div>
+                        <div class="stage-label">Этап внедрения без уплаты обеспечительного платежа</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="desc-item">
+                            <i class="fas fa-upload"></i>
+                            <span>Участники отправляют в налоговую ДОПП. QR-код дадут автоматически после регистрации ДОПП.</span>
+                        </div>
+                        <div class="desc-item">
+                            <i class="fas fa-ban" style="color:#c0392b;"></i>
+                            <span class="normal-weight">Без ДОПП и QR–кода товар не пропустят в Россию.</span>
+                        </div>
+                        <div class="divider-light"></div>
+                        <!-- текст "Обеспечительный платеж по-прежнему не вносится..." оформлен как цветная заметка, единообразно с другими карточками -->
+                        <div class="note-box note-box-info">
+                            <i class="fas fa-info-circle"></i> Обеспечительный платеж по-прежнему не вносится, но въезд без ДОПП и QR уже запрещен.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- КАРТОЧКА 3: полноценная эксплуатация (с 01.10.2026) — цвет средний серый -->
+            <div class="swiper-slide">
+                <div class="stage-card">
+                    <div class="card-header" style="background: linear-gradient(115deg, #6b6e70, #8a8d8f);">
+                        <div class="period">
+                            <i class="fas fa-gavel"></i> С 01.10.2026
+                        </div>
+                        <div class="stage-label">Полноценная эксплуатация системы</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="desc-item">
+                            <i class="fas fa-coins"></i>
+                            <span>Вносится обеспечительный платеж.</span>
+                        </div>
+                        <div class="desc-item">
+                            <i class="fas fa-calendar-week"></i>
+                            <span>Формируется ДОПП, вносится платеж за 2 дня до поставки.</span>
+                        </div>
+                        <div class="desc-item">
+                            <i class="fas fa-qrcode"></i>
+                            <span>Без обеспечения налоговая не выдаст QR–код, таможня не пропустит товар.</span>
+                        </div>
+                        <div class="note-box note-box-gray">
+                            <i class="fas fa-exclamation-circle"></i> Обязательное правило: обеспечительный платеж → QR-код → пропуск через границу.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- стрелки для листалки -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+    </div>
+
+    <!-- футер с основанием (письмо ФНС) -->
+    <div class="info-footer">
+        <i class="fas fa-file-alt"></i> письмо ФНС № EA-36-15/2603@ от 02.04.2026
+    </div>
+</div>
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    // Инициализация карусели: строго одна карточка на экране
+    const swiper = new Swiper('.mySwiper', {
+        slidesPerView: 1,
+        spaceBetween: 0,
+        loop: false,
+        grabCursor: true,
+        speed: 400,
+        effect: 'slide',
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+            dynamicBullets: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        breakpoints: {
+            0: {
+                slidesPerView: 1,
+                spaceBetween: 0,
+            },
+            480: {
+                slidesPerView: 1,
+                spaceBetween: 0,
+            },
+            700: {
+                slidesPerView: 1,
+                spaceBetween: 0,
+            }
+        },
+        centeredSlides: false,
+        watchOverflow: true,
+        keyboard: {
+            enabled: true,
+            onlyInViewport: true,
+        },
+        resistance: true,
+        resistanceRatio: 0.2,
+    });
+
+    // лёгкий фидбек по клику на карточку
+    const cards = document.querySelectorAll('.stage-card');
+    cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('.swiper-button-next') || e.target.closest('.swiper-button-prev')) return;
+            card.style.transition = 'transform 0.1s ease';
+            card.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                card.style.transform = '';
+            }, 130);
+        });
+    });
+</script>
+</body>
+</html>
