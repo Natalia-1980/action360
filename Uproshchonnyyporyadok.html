@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Упрощенный порядок · тренажер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 18px 32px -12px rgba(0, 0, 0, 0.12);
+            padding: 1.2rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .main-title {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #1e3b5c;
+            text-align: center;
+            margin-bottom: 0.7rem;
+            border-bottom: 2px solid #c7daf0;
+            padding-bottom: 0.5rem;
+        }
+
+        .content-panel {
+            background: #f9fcff;
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid #d2e0f0;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #2e7ab3;
+            color: white;
+            border-radius: 40px;
+            padding: 0.2rem 1.2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        .deduction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.6rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .deduction-item {
+            background: #f0f7fe;
+            border-radius: 44px;
+            padding: 0.6rem 0.2rem;
+            border: 2px solid #c7daf5;
+            cursor: pointer;
+            transition: 0.12s linear;
+            text-align: center;
+            font-weight: 600;
+            color: #0d2f4e;
+            font-size: 0.85rem;
+            word-break: break-word;
+            line-height: 1.3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 64px;
+        }
+
+        .deduction-item:hover {
+            background: #e3f0fd;
+            border-color: #8fb7da;
+            transform: scale(0.98);
+        }
+
+        .deduction-item.selected {
+            background: #d4e4fc;
+            border-color: #2e7ab3;
+            box-shadow: 0 2px 6px rgba(46,122,179,0.15);
+        }
+
+        .details-section {
+            background: #e6f0fe;
+            border-radius: 20px;
+            padding: 1rem;
+        }
+
+        .details-title {
+            font-weight: 700;
+            color: #1d4b77;
+            margin-bottom: 0.9rem;
+            font-size: 1rem;
+            border-left: 4px solid #2e7ab3;
+            padding-left: 10px;
+        }
+
+        .details-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            margin-bottom: 0.9rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 18px;
+            border: 1px solid #b6cbe5;
+            flex-wrap: wrap;
+        }
+
+        .details-label {
+            font-weight: 700;
+            color: #1d4b77;
+            min-width: 110px;
+            font-size: 0.9rem;
+            padding: 0.3rem 0 0 0.3rem;
+            line-height: 1.3;
+        }
+
+        .dropzone {
+            flex: 1;
+            min-width: 170px;
+            background: #f9fcff;
+            border: 2px dashed #8fb7da;
+            border-radius: 18px;
+            padding: 0.6rem 0.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .dropzone.filled {
+            background: #eef3fc;
+            border-color: #7e9ec0;
+            border-style: solid;
+        }
+
+        .drop-item {
+            background: white;
+            border: 2px solid #2e7ab3;
+            border-radius: 36px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1d4b77;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: default;
+            line-height: 1.3;
+        }
+
+        .drop-item .remove {
+            color: #b16262;
+            font-weight: 800;
+            cursor: pointer;
+            padding: 0 0.2rem;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .drop-item .remove:hover {
+            color: #a13e3e;
+        }
+
+        .options-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid #c7daf5;
+        }
+
+        .options-title {
+            font-weight: 700;
+            color: #0d2f4e;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .section-header {
+            font-weight: 700;
+            width: 100%;
+            font-size: 0.8rem;
+            color: #2c628b;
+            margin-top: 0.4rem;
+            background: #eef3fa;
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        .option-btn {
+            background: #f0f7fe;
+            border: 2px solid #8fb7da;
+            border-radius: 44px;
+            padding: 0.45rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1d4b77;
+            cursor: grab;
+            transition: 0.08s linear;
+            user-select: none;
+            text-align: center;
+            line-height: 1.25;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 500px) {
+            .option-btn {
+                white-space: normal;
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+        }
+
+        .option-btn:active {
+            cursor: grabbing;
+            opacity: 0.7;
+        }
+
+        .option-btn.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        .check-btn {
+            background: #2e7ab3;
+            border: none;
+            border-radius: 44px;
+            padding: 0.6rem 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            flex: 2;
+        }
+
+        .check-btn:disabled {
+            background: #b4c8dd;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .reset-btn {
+            background: #e0e7f0;
+            border: 2px solid #8f9fb0;
+            border-radius: 44px;
+            padding: 0.6rem 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1d4b77;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .reset-btn:hover, .check-btn:hover:not(:disabled) {
+            filter: brightness(0.96);
+            transform: translateY(-1px);
+        }
+
+        .result-message {
+            margin-top: 0.9rem;
+            padding: 0.7rem;
+            border-radius: 18px;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+
+        .result-message.correct {
+            background: #e2f3de;
+            color: #176b2c;
+            border: 1px solid #5cb377;
+        }
+
+        .result-message.incorrect {
+            background: #ffeae5;
+            color: #b13e3e;
+            border: 1px solid #e09b9b;
+        }
+
+        .error-detail {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            border-top: 1px dashed #e09b9b;
+            padding-top: 0.5rem;
+        }
+
+        .drag-over {
+            background: #e1effb;
+            border-color: #2e7ab3;
+            border-style: solid;
+        }
+
+        @media (max-width: 600px) {
+            .details-row {
+                flex-direction: column;
+            }
+            .dropzone {
+                width: 100%;
+            }
+            .deduction-item {
+                font-size: 0.78rem;
+                min-height: 56px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="app"></div>
+
+<script>
+    (function() {
+        const app = document.getElementById('app');
+        const deductions = [
+            { id: 'property', name: 'Покупка недвижимости' },
+            { id: 'property_percent', name: 'Проценты по ипотеке' },
+            { id: 'education', name: 'Обучение' },
+            { id: 'medical', name: 'Лечение' },
+            { id: 'sport', name: 'Спорт' },
+            { id: 'pension', name: 'Пенсионные взносы' },
+            { id: 'investment', name: 'ИИС' },
+            { id: 'savings', name: 'Долгосрочные сбережения' }
+        ];
+
+        const correctAnswers = {
+            property: {
+                source: ['Росреестр', 'банки'],
+                limit: '2 млн. руб.',
+                features: 'Сведения компания даст, если есть обмен с ФНС'
+            },
+            property_percent: {
+                source: ['банки'],
+                limit: '3 млн. руб.',
+                features: 'Сведения компания даст, если есть обмен с ФНС'
+            },
+            education: {
+                source: ['образовательные организации'],
+                limit: '150 тыс. руб.',
+                features: 'Поставщики услуг дадут справку об оплате по заявлению физлица'
+            },
+            medical: {
+                source: ['медицинские организации'],
+                limit: '150 тыс. руб.',
+                features: 'Поставщики услуг дадут справку об оплате по заявлению физлица'
+            },
+            sport: {
+                source: ['спортивные организации'],
+                limit: '150 тыс. руб.',
+                features: 'Поставщики услуг дадут справку об оплате по заявлению физлица'
+            },
+            pension: {
+                source: ['НПФ', 'страховщики'],
+                limit: '150 тыс. руб.',
+                features: 'Поставщики услуг дадут справку об оплате по заявлению физлица'
+            },
+            investment: {
+                source: ['брокеры'],
+                limit: 'до 400 тыс. руб.',
+                features: 'В сумме внесенных средств по данным брокера'
+            },
+            savings: {
+                source: ['НПФ', 'страховщики'],
+                limit: 'до 400 тыс. руб.',
+                features: 'Вычет дадут по данным НПФ об уплаченных взносах'
+            }
+        };
+
+        const allOptions = ['Росреестр','банки','образовательные организации','медицинские организации','спортивные организации','НПФ','страховщики','брокеры'];
+        const limitOptions = ['2 млн. руб.', '3 млн. руб.', '150 тыс. руб.', 'до 400 тыс. руб.'];
+        const featuresOptions = [
+            'Сведения компания даст, если есть обмен с ФНС',
+            'Поставщики услуг дадут справку об оплате по заявлению физлица',
+            'В сумме внесенных средств по данным брокера',
+            'Вычет дадут по данным НПФ об уплаченных взносах'
+        ];
+
+        let selectedDeduction = deductions[0];
+        let currentState = { source: [], limit: '', features: '' };
+        let showResult = false;
+
+        function resetState() {
+            currentState = { source: [], limit: '', features: '' };
+            showResult = false;
+        }
+
+        function isOptionUsed(opt) { return currentState.source.includes(opt); }
+        function arraysEqual(a,b) {
+            if(a.length !== b.length) return false;
+            const sortedA = [...a].sort();
+            const sortedB = [...b].sort();
+            for(let i=0;i<sortedA.length;i++) if(sortedA[i]!==sortedB[i]) return false;
+            return true;
+        }
+
+        function getErrors(correct) {
+            const errors = [];
+            if(!arraysEqual(currentState.source, correct.source)) {
+                errors.push(`Кто передает: должно "${correct.source.join(', ')}", у вас "${currentState.source.join(', ') || 'не выбрано'}"`);
+            }
+            if(currentState.limit !== correct.limit) {
+                errors.push(`Лимит: должно "${correct.limit}", у вас "${currentState.limit || 'не выбрано'}"`);
+            }
+            if(currentState.features !== correct.features) {
+                errors.push(`Особенности: должно "${correct.features}", у вас "${currentState.features || 'не выбрано'}"`);
+            }
+            return errors;
+        }
+
+        function render() {
+            const correct = correctAnswers[selectedDeduction.id];
+            const isComplete = currentState.source.length > 0 && currentState.limit && currentState.features;
+            let isCorrect = false, errors = [];
+            if(showResult && isComplete) {
+                const srcMatch = arraysEqual(currentState.source, correct.source);
+                isCorrect = srcMatch && currentState.limit === correct.limit && currentState.features === correct.features;
+                if(!isCorrect) errors = getErrors(correct);
+            }
+
+            app.innerHTML = `
+                <div class="main-title">Упрощенный порядок вычетов по НДФЛ</div>
+                <div class="content-panel">
+                    <div class="badge">выберите вычет</div>
+                    <div class="deduction-grid">
+                        ${deductions.map(d => `
+                            <div class="deduction-item ${selectedDeduction.id === d.id ? 'selected' : ''}" data-id="${d.id}">${d.name}</div>
+                        `).join('')}
+                    </div>
+                    <div class="details-section">
+                        <div class="details-title">${selectedDeduction.name}</div>
+                        
+                        <div class="details-row">
+                            <span class="details-label">Кто передает данные:</span>
+                            <div class="dropzone ${currentState.source.length ? 'filled' : ''}" id="dropzone-source">
+                                ${currentState.source.map(s => `<span class="drop-item">${s}<span class="remove" data-remove="${s}">✕</span></span>`).join('')}
+                                ${currentState.source.length === 0 ? '<span style="color:#7f8c8d; font-size:0.75rem;">перетащите сюда</span>' : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="details-row">
+                            <span class="details-label">Лимит:</span>
+                            <div class="dropzone ${currentState.limit ? 'filled' : ''}" id="dropzone-limit">
+                                ${currentState.limit ? `<span class="drop-item">${currentState.limit}<span class="remove" data-remove="limit">✕</span></span>` : '<span style="color:#7f8c8d; font-size:0.75rem;">выберите лимит</span>'}
+                            </div>
+                        </div>
+                        
+                        <div class="options-panel" style="margin-top:0.5rem;">
+                            <div class="options-title">Источники и лимиты (перетащите)</div>
+                            <div class="options-container">
+                                <div class="section-header">Кто передает данные</div>
+                                ${allOptions.map(o => `<div class="option-btn ${isOptionUsed(o) ? 'disabled' : ''}" draggable="${!isOptionUsed(o)}" data-option="${o}">${o}</div>`).join('')}
+                                
+                                <div class="section-header">Лимиты</div>
+                                ${limitOptions.map(o => `<div class="option-btn ${currentState.limit ? 'disabled' : ''}" draggable="${!currentState.limit}" data-option="limit:${o}">${o}</div>`).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="options-panel" style="margin-top:1rem;">
+                            <div class="options-title">Особенности (перетащите)</div>
+                            <div class="options-container">
+                                <div class="section-header">Особенности предоставления</div>
+                                ${featuresOptions.map(o => `<div class="option-btn ${currentState.features ? 'disabled' : ''}" draggable="${!currentState.features}" data-option="features:${o}">${o}</div>`).join('')}
+                            </div>
+                            <div class="dropzone ${currentState.features ? 'filled' : ''}" id="dropzone-features" style="margin-top:0.8rem;">
+                                ${currentState.features ? `<span class="drop-item">${currentState.features}<span class="remove" data-remove="features">✕</span></span>` : '<span style="color:#7f8c8d; font-size:0.75rem;">перетащите сюда особенность</span>'}
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="check-btn" id="checkBtn" ${!isComplete ? 'disabled' : ''}>Проверить</button>
+                            <button class="reset-btn" id="resetBtn">Сбросить все</button>
+                        </div>
+                        
+                        ${showResult ? `
+                            <div class="result-message ${isCorrect ? 'correct' : 'incorrect'}">
+                                ${isCorrect ? 'Все верно!' : 'Есть ошибки:'}
+                                ${!isCorrect && errors.length ? errors.map(e => `<div class="error-detail">❌ ${e}</div>`).join('') : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            document.querySelectorAll('.deduction-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const found = deductions.find(d => d.id === item.dataset.id);
+                    if (found) {
+                        selectedDeduction = found;
+                        resetState();
+                        render();
+                    }
+                });
+            });
+
+            const draggableOptions = document.querySelectorAll('.option-btn[draggable="true"]');
+            const dropSource = document.getElementById('dropzone-source');
+            const dropLimit = document.getElementById('dropzone-limit');
+            const dropFeatures = document.getElementById('dropzone-features');
+
+            draggableOptions.forEach(opt => {
+                opt.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/plain', opt.dataset.option);
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
+            });
+
+            function setupDropZone(zone, type) {
+                if (!zone) return;
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const rawData = e.dataTransfer.getData('text/plain');
+                    if (!rawData) return;
+
+                    if (type === 'source') {
+                        if (allOptions.includes(rawData) && !currentState.source.includes(rawData)) {
+                            currentState.source.push(rawData);
+                            showResult = false;
+                            render();
+                        }
+                    } 
+                    else if (type === 'limit') {
+                        if (rawData.startsWith('limit:')) {
+                            const limitVal = rawData.replace('limit:', '');
+                            if (limitOptions.includes(limitVal)) {
+                                currentState.limit = limitVal;
+                                showResult = false;
+                                render();
+                            }
+                        }
+                    } 
+                    else if (type === 'features') {
+                        if (rawData.startsWith('features:')) {
+                            const featureVal = rawData.replace('features:', '');
+                            if (featuresOptions.includes(featureVal)) {
+                                currentState.features = featureVal;
+                                showResult = false;
+                                render();
+                            }
+                        }
+                    }
+                });
+            }
+
+            setupDropZone(dropSource, 'source');
+            setupDropZone(dropLimit, 'limit');
+            setupDropZone(dropFeatures, 'features');
+
+            document.querySelectorAll('.remove').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const val = btn.dataset.remove;
+                    if (val === 'limit') {
+                        currentState.limit = '';
+                    } else if (val === 'features') {
+                        currentState.features = '';
+                    } else {
+                        currentState.source = currentState.source.filter(s => s !== val);
+                    }
+                    showResult = false;
+                    render();
+                });
+            });
+
+            const checkBtn = document.getElementById('checkBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            if (checkBtn) {
+                checkBtn.addEventListener('click', () => {
+                    if (currentState.source.length && currentState.limit && currentState.features) {
+                        showResult = true;
+                        render();
+                    }
+                });
+            }
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    resetState();
+                    render();
+                });
+            }
+        }
+
+        render();
+    })();
+</script>
+</body>
+</html>
