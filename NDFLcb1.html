@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>НДФЛ с ценных бумаг · карточки-перевёртыши</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 620px;
+            width: 100%;
+            background: transparent;
+            border-radius: 32px;
+            padding: 0.2rem 0.2rem 0.6rem;
+        }
+
+        .main-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a4b6e;
+            text-align: center;
+            letter-spacing: -0.2px;
+            margin-bottom: 0.2rem;
+        }
+
+        .sub {
+            color: #2c5a7a;
+            font-size: 0.75rem;
+            text-align: center;
+            background: #eef3fc;
+            border-radius: 40px;
+            padding: 0.25rem 0.8rem;
+            margin: 0.2rem auto 0.8rem;
+            display: inline-block;
+            width: auto;
+            border: 1px solid #c7ddf5;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            background: #e3edf7;
+            border-radius: 40px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            color: #1a4b6e;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        /* 3D flip контейнер */
+        .flip-container {
+            background: transparent;
+            perspective: 1500px;
+            margin-bottom: 1.2rem;
+        }
+
+        .flipper {
+            position: relative;
+            width: 100%;
+            height: auto;
+            min-height: 280px;
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+            border-radius: 28px;
+        }
+
+        .flipper.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .front, .back {
+            position: relative;
+            width: 100%;
+            backface-visibility: hidden;
+            border-radius: 28px;
+            background: #ffffff;
+            box-shadow: 0 12px 22px -10px rgba(0,0,0,0.12);
+            border: 1px solid #dce5ef;
+            padding: 1.3rem 1rem;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .front {
+            transform: rotateY(0deg);
+            z-index: 2;
+        }
+
+        .back {
+            transform: rotateY(180deg);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #fefaf5;
+            border-left: 5px solid #2c6a91;
+        }
+
+        .statement-text {
+            font-size: 1rem;
+            line-height: 1.45;
+            color: #0b2a3b;
+            font-weight: 500;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .back .explanation-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #1e4a6e;
+        }
+
+        .back .explanation-text {
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #1f3c4d;
+        }
+
+        .back .verdict-badge {
+            margin-top: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: right;
+            border-top: 1px dashed #cfdfef;
+            padding-top: 0.6rem;
+        }
+
+        /* Кнопки ответа */
+        .buttons-row {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .answer-btn {
+            flex: 1;
+            background: #f0f2f5;
+            border: 2px solid #8f9eae;
+            border-radius: 60px;
+            padding: 0.6rem 0.2rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #2c3e4e;
+            cursor: pointer;
+            transition: 0.08s linear;
+            box-shadow: 0 2px 0 #b7c2ce;
+            font-family: inherit;
+        }
+
+        .answer-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 0px 0 #b7c2ce;
+        }
+
+        .answer-btn:disabled {
+            opacity: 0.7;
+            cursor: default;
+            transform: none;
+        }
+
+        /* Цветовые схемы для выбранных кнопок (после ответа они подсвечиваются) */
+        .answer-btn.selected-true-green {
+            background: #2b7a3e !important;
+            border: 2px solid #1a5a2c !important;
+            color: white !important;
+            box-shadow: none;
+        }
+
+        .answer-btn.selected-false-red {
+            background: #b13e3e !important;
+            border: 2px solid #8b2c2c !important;
+            color: white !important;
+        }
+
+        .answer-btn.selected-true-red {
+            background: #c14242 !important;
+            border: 2px solid #9a2e2e !important;
+            color: white !important;
+        }
+
+        .answer-btn.selected-false-green {
+            background: #2e7d5e !important;
+            border: 2px solid #1f5a44 !important;
+            color: white !important;
+        }
+
+        /* Навигация */
+        .nav-buttons {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin: 0.2rem 0 0.6rem;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 2px solid #2c6a91;
+            border-radius: 60px;
+            padding: 0.4rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #2c6a91;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #cbdbe0;
+            transition: 0.05s linear;
+            flex: 1;
+            max-width: 110px;
+        }
+
+        .nav-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #cbdbe0;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: none;
+            color: #3f729b;
+            font-size: 0.7rem;
+            text-decoration: underline dotted;
+            cursor: pointer;
+            padding: 0.3rem 0.6rem;
+            margin-top: 0.2rem;
+            font-weight: 500;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #d4e2f5;
+            margin: 0.6rem 0 0.3rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: #587b9c;
+            font-size: 0.6rem;
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="trainerContainer"></div>
+
+<script>
+    (function() {
+        // 4 карточки
+        const statements = [
+            {
+                text: 'Петров И.К. купил 100 акций Газпрома на 138 000 руб., продал за 156 000 руб. Налоговая база для расчета НДФЛ равна 156 000 руб.',
+                correct: false,
+                explanation: 'НДФЛ уплачивается только с финансового результата = доходы – расходы. Налоговая база: 156 000 руб. – 138 000 руб. = 18 000 руб.',
+                colorMap: { true: 'red', false: 'green' }
+            },
+            {
+                text: 'Иванов купил 20 акций по 150 руб. за штуку, затем еще 10 акций по 200 руб. Продал 10 акций по 140 руб. Брокер спишет акции, которые были приобретены первыми по 150 руб. на сумму 1500 руб.',
+                correct: true,
+                explanation: 'При реализации ценных бумаг расходы списывают по методу ФИФО — первые по времени приобретения продаются первыми. В данном случае стоимость проданных акций брокер считает так: 10 × 150 руб. = 1 500 руб.',
+                colorMap: { true: 'green', false: 'red' }
+            },
+            {
+                text: 'Иванов купил бумаги 1 февраля 2026 года за 10 000 долл. США. Курс — 80 руб./USD. Продал бумаги 1 сентября 2026 года за 10 000 долл. по курсу 85 руб./USD. Налоговой базы не будет, так как курсовая разница не учитывается для НДФЛ.',
+                correct: false,
+                explanation: 'Из-за курсовых колебаний может возникнуть налогооблагаемая прибыль даже при нулевом результате в валюте. В данном случае налоговая база для НДФЛ = (10 000 USD × 85 руб.) – (10 000 USD × 80 руб) = 50 000 руб.',
+                colorMap: { true: 'red', false: 'green' }
+            },
+            {
+                text: 'Петров В.Т. в январе приобрел обращающиеся ценные бумаги на сумму 300 000 руб. и необращающиеся ценные бумаги на сумму 100 000 руб. Вознаграждение брокера 10 000 руб. В марте Петров продал обращающиеся ценные бумаги за 450 000 руб., необращающиеся — за 150 000 руб. Налоговую базу по обращающимся ценным бумагам уменьшает вознаграждение брокера 10 000 руб.',
+                correct: false,
+                explanation: 'Расходы на вознаграждение брокера, приобретавшего ценные бумаги, распределяются пропорционально доле дохода, относящегося к каждому виду ценных бумаг. В данном случае на расходы по обращающимся можно отнести: 10 000 руб. × 450 000 руб. : 600 000 руб. = 7 500 руб. (а не полные 10 000 руб.).',
+                colorMap: { true: 'red', false: 'green' }
+            }
+        ];
+
+        let currentIndex = 0;
+        let userAnswers = new Array(statements.length).fill(null);
+        let answeredStatus = new Array(statements.length).fill(false);
+        let flipStates = new Array(statements.length).fill(false);
+
+        const container = document.getElementById('trainerContainer');
+
+        function getButtonClass(cardIdx, buttonType) {
+            if (!answeredStatus[cardIdx]) return '';
+            const userChoice = userAnswers[cardIdx];
+            if (userChoice === null) return '';
+
+            const colorScheme = statements[cardIdx].colorMap;
+            const isSelected = (buttonType === 'true' && userChoice === true) || (buttonType === 'false' && userChoice === false);
+            if (!isSelected) return '';
+
+            let targetColor = (userChoice === true) ? colorScheme.true : colorScheme.false;
+            if (targetColor === 'green') {
+                if (buttonType === 'true' && targetColor === 'green') return 'selected-true-green';
+                if (buttonType === 'false' && targetColor === 'green') return 'selected-false-green';
+            } else if (targetColor === 'red') {
+                if (buttonType === 'true' && targetColor === 'red') return 'selected-true-red';
+                if (buttonType === 'false' && targetColor === 'red') return 'selected-false-red';
+            }
+            return '';
+        }
+
+        function render() {
+            const total = statements.length;
+            const answeredCount = userAnswers.filter(a => a !== null).length;
+            const current = statements[currentIndex];
+            const hasAnswered = answeredStatus[currentIndex];
+            const isFlipped = flipStates[currentIndex];
+
+            let verdictText = '';
+            let verdictColor = '';
+            let isAnswerCorrect = false;
+            if (hasAnswered) {
+                isAnswerCorrect = (userAnswers[currentIndex] === current.correct);
+                verdictText = isAnswerCorrect ? 'Правильно' : 'Ошибка';
+                verdictColor = isAnswerCorrect ? '#2e7d5e' : '#b13e3e';
+            }
+
+            const html = `
+                <div class="main-title">НДФЛ с ценных бумаг</div>
+                <div style="text-align: center;">
+                    <span class="sub">Верно / Неверно</span>
+                </div>
+                <div class="progress-bar">отвечено ${answeredCount} из ${total}</div>
+
+                <div class="flip-container">
+                    <div class="flipper ${isFlipped ? 'flipped' : ''}" id="flipperEl">
+                        <!-- лицевая сторона (вопрос) -->
+                        <div class="front">
+                            <div class="statement-text">${current.text}</div>
+                        </div>
+                        <!-- оборотная сторона (пояснение + вердикт) -->
+                        <div class="back">
+                            <div class="explanation-title">Пояснение</div>
+                            <div class="explanation-text">${current.explanation}</div>
+                            <div class="verdict-badge" style="color: ${verdictColor}">${verdictText}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="buttons-row">
+                    <button class="answer-btn" id="trueBtn" ${hasAnswered ? 'disabled' : ''}>ВЕРНО</button>
+                    <button class="answer-btn" id="falseBtn" ${hasAnswered ? 'disabled' : ''}>НЕВЕРНО</button>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn" id="prevBtn" ${currentIndex === 0 ? 'disabled' : ''}>← Назад</button>
+                    <button class="nav-btn" id="nextBtn" ${currentIndex === total - 1 ? 'disabled' : ''}>Вперед →</button>
+                </div>
+                <div style="text-align: center;">
+                    <button class="reset-btn" id="resetBtn">начать заново</button>
+                </div>
+                <hr>
+                <div class="footer">ст. 214.1 НК РФ · операции с ценными бумагами</div>
+            `;
+
+            container.innerHTML = html;
+
+            // Подсветка кнопок после ответа
+            if (hasAnswered) {
+                const trueBtn = document.getElementById('trueBtn');
+                const falseBtn = document.getElementById('falseBtn');
+                const trueClass = getButtonClass(currentIndex, 'true');
+                const falseClass = getButtonClass(currentIndex, 'false');
+                if (trueClass) trueBtn.classList.add(trueClass);
+                if (falseClass) falseBtn.classList.add(falseClass);
+            }
+
+            // Обработчики ответов
+            document.getElementById('trueBtn').addEventListener('click', () => handleAnswer(true));
+            document.getElementById('falseBtn').addEventListener('click', () => handleAnswer(false));
+
+            // Навигация
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    render();
+                }
+            });
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                if (currentIndex < total - 1) {
+                    currentIndex++;
+                    render();
+                }
+            });
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                userAnswers = new Array(statements.length).fill(null);
+                answeredStatus = new Array(statements.length).fill(false);
+                flipStates = new Array(statements.length).fill(false);
+                currentIndex = 0;
+                render();
+            });
+        }
+
+        function handleAnswer(answer) {
+            if (answeredStatus[currentIndex]) return;
+
+            // Сохраняем ответ
+            userAnswers[currentIndex] = answer;
+            answeredStatus[currentIndex] = true;
+            
+            // ПЕРЕВОРАЧИВАЕМ карточку, чтобы показать пояснение на обороте
+            flipStates[currentIndex] = true;
+            
+            render();
+        }
+
+        render();
+    })();
+</script>
+</body>
+</html>
