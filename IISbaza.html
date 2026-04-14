@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ИИС: расчет налоговой базы · карточки</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #d9dfe5;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .trainer {
+            max-width: 680px;
+            width: 100%;
+            background: transparent;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e4e;
+            letter-spacing: -0.2px;
+        }
+
+        .header p {
+            font-size: 0.7rem;
+            color: #4a5e72;
+            background: #e2e8ef;
+            display: inline-block;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            margin-top: 0.3rem;
+        }
+
+        .card {
+            background: #f2f4f7;
+            border-radius: 28px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+            border: 1px solid #cbd2d9;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .rule {
+            background: #e8ecf0;
+            border-left: 4px solid #6c7e8f;
+            padding: 0.7rem 1rem;
+            border-radius: 16px;
+            margin-bottom: 1.2rem;
+            font-size: 0.75rem;
+            color: #2c3e4e;
+            line-height: 1.4;
+        }
+
+        .task-title {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #2c3e4e;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #cbd2d9;
+            padding-bottom: 0.3rem;
+        }
+
+        .condition {
+            background: #eef0f3;
+            border: 1px solid #d0d6dd;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #2c3e4e;
+        }
+
+        .highlight-number {
+            display: inline-block;
+            background: #dee2e8;
+            padding: 0.1rem 0.4rem;
+            border-radius: 12px;
+            font-weight: 500;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin: 0 2px;
+        }
+
+        .answer-area {
+            margin: 1rem 0 0.5rem;
+        }
+
+        .answer-label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #3a4e64;
+            margin-right: 0.8rem;
+        }
+
+        .answer-input {
+            width: 160px;
+            padding: 0.5rem 0.7rem;
+            border-radius: 20px;
+            border: 1.5px solid #b9c2cc;
+            background: white;
+            font-size: 0.9rem;
+            text-align: center;
+            font-weight: 400;
+            font-family: monospace;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #6c7e8f;
+        }
+
+        .check-btn {
+            background: #6c7e8f;
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-left: 0.8rem;
+            transition: 0.1s;
+        }
+
+        .check-btn:active {
+            transform: translateY(1px);
+            background: #5a6c7d;
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background: #e8ecf0;
+            border-left: 4px solid #8f9eae;
+        }
+
+        .feedback.correct {
+            background: #dfe6e3;
+            border-left-color: #5a7c6b;
+        }
+
+        .feedback.incorrect {
+            background: #e8dfdd;
+            border-left-color: #9e6b6b;
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 0.5rem 0 0.8rem;
+        }
+
+        .nav-btn {
+            background: #e2e8ef;
+            border: 1px solid #b0bbc6;
+            border-radius: 60px;
+            padding: 0.4rem 1.2rem;
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: #3a4e64;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .nav-btn:active {
+            transform: translateY(1px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+            transform: none;
+        }
+
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.2rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #b9c2cc;
+            border-radius: 10px;
+            transition: 0.1s;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: #6c7e8f;
+            width: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 0.6rem;
+            color: #5a6c7d;
+            margin-top: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+<div class="trainer">
+    <div class="header">
+        <h1>ИИС: налоговая база</h1>
+        <p>расчет финансового результата</p>
+    </div>
+
+    <div id="cardsContainer"></div>
+
+    <div class="carousel-nav">
+        <button class="nav-btn" id="prevBtn" disabled>← Назад</button>
+        <button class="nav-btn" id="nextBtn">Вперед →</button>
+    </div>
+    <div class="dots" id="dotsContainer"></div>
+    <div class="footer">
+        Правило: налоговая база по ИИС = положительный финансовый результат по всем операциям на ИИС (сумма прибылей и убытков за все годы).<br>
+        Убытки внутри ИИС уменьшают прибыль. Убытки с других счетов не уменьшают базу ИИС, и наоборот.
+    </div>
+</div>
+
+<script>
+    // Карточки с фиксированными условиями (исправленные)
+    const cardsData = [
+        {
+            title: "Задача 1. Расчет базы по ИИС за несколько лет",
+            condition: `Иванов открыл ИИС. 
+                В первый год он получил убыток 10 000 руб.
+                Во второй год получил прибыль 60 000 руб.
+                В третий год получил прибыль 40 000 руб.
+                В четвертый год получил убыток 12 000 руб. и закрыл ИИС.
+                Чему равна налоговая база?`,
+            correctAnswer: 78000,
+            explanation: `Расчет: –10 000 руб. + 60 000 руб. + 40 000 руб. + (–12 000 руб.) = 78 000 руб. (положительный результат). Налоговая база = 78 000 руб.`
+        },
+        {
+            title: "Задача 2. Убыток на ИИС и убыток на обычном счете",
+            condition: `Петров получил убыток на ИИС 15 000 руб. 
+                На обычном брокерском счете получил убыток 25 000 руб.
+                Чему равен убыток на ИИС?`,
+            correctAnswer: -15000,
+            explanation: `Убыток на ИИС составляет 15 000 руб. Убыток с брокерского счета (25 000 руб.) не суммируется с ИИС, поэтому убыток на ИИС остается 15 000 руб. Налоговая база по ИИС = 0 руб.`
+        },
+        {
+            title: "Задача 3. Убыток на обоих счетах",
+            condition: `У Сидорова на ИИС убыток 8 000 руб., на обычном брокерском счете убыток 12 000 руб. Определите общую сумму налоговой базы.`,
+            correctAnswer: 0,
+            explanation: `ИИС: –8 000 руб. → налоговая база = 0 руб. Обычный счет: –12 000 руб. → налоговая база = 0 руб. Общая налоговая база = 0 руб. НДФЛ не платится.`
+        },
+        {
+            title: "Задача 4. Перенос убытков внутри ИИС",
+            condition: `На ИИС за 1-й год прибыль 100 000 руб., 
+                за 2-й год убыток 70 000 руб., 
+                за 3-й год прибыль 30 000 руб., 
+                за 4-й год убыток 20 000 руб. 
+                ИИС закрыт. Найдите налоговую базу по ИИС.`,
+            correctAnswer: 40000,
+            explanation: `Расчет: 100 000 + (–70 000) + 30 000 + (–20 000) = 40 000 руб. Положительный результат → налоговая база = 40 000 руб.`
+        }
+    ];
+
+    let currentIndex = 0;
+    let feedbackStates = cardsData.map(() => null);
+    let userInputValues = cardsData.map(() => '');
+
+    const container = document.getElementById('cardsContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsContainer = document.getElementById('dotsContainer');
+
+    function renderCard() {
+        const card = cardsData[currentIndex];
+        const savedAnswer = userInputValues[currentIndex];
+        const fb = feedbackStates[currentIndex];
+
+        const html = `
+            <div class="card">
+                <div class="task-title">${card.title}</div>
+                <div class="condition">${card.condition}</div>
+                
+                <div class="answer-area">
+                    <span class="answer-label">Налоговая база (руб):</span>
+                    <input type="number" id="answerInput" class="answer-input" placeholder="введите число" value="${savedAnswer !== '' ? savedAnswer : ''}">
+                    <button class="check-btn" id="checkBtn">Проверить</button>
+                </div>
+                
+                <div id="feedbackBlock" class="feedback" style="${fb ? '' : 'display:none;'}">
+                    ${fb ? `<strong>${fb.isCorrect ? 'Верно' : 'Ошибка'}</strong><br>${fb.message}` : ''}
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        const answerInput = document.getElementById('answerInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const feedbackDiv = document.getElementById('feedbackBlock');
+
+        checkBtn.addEventListener('click', () => {
+            const userValue = parseFloat(answerInput.value);
+            const correct = card.correctAnswer;
+            
+            if (isNaN(userValue)) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.className = 'feedback incorrect';
+                feedbackDiv.innerHTML = `<strong>Ошибка</strong><br>Введите число в поле "Налоговая база".`;
+                feedbackStates[currentIndex] = { isCorrect: false, message: `Введите число.` };
+                userInputValues[currentIndex] = answerInput.value;
+                return;
+            }
+            
+            userInputValues[currentIndex] = answerInput.value;
+            
+            if (Math.abs(userValue - correct) < 0.01) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.className = 'feedback correct';
+                feedbackDiv.innerHTML = `<strong>Верно</strong><br>${card.explanation}`;
+                feedbackStates[currentIndex] = { isCorrect: true, message: card.explanation };
+            } else {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.className = 'feedback incorrect';
+                let correctText = correct.toLocaleString();
+                if (card.title === "Задача 2. Убыток на ИИС и убыток на обычном счете") {
+                    correctText = "-15 000";
+                }
+                feedbackDiv.innerHTML = `<strong>Ошибка</strong><br>Правильный ответ: ${correctText} руб.<br><span style="font-size:0.75rem;">${card.explanation}</span>`;
+                feedbackStates[currentIndex] = { isCorrect: false, message: `Правильный ответ: ${correctText} руб. ${card.explanation}` };
+            }
+        });
+        
+        if (fb) {
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.className = fb.isCorrect ? 'feedback correct' : 'feedback incorrect';
+            feedbackDiv.innerHTML = `<strong>${fb.isCorrect ? 'Верно' : 'Ошибка'}</strong><br>${fb.message}`;
+        }
+    }
+
+    function updateDots() {
+        dotsContainer.innerHTML = '';
+        cardsData.forEach((_, idx) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (idx === currentIndex) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                currentIndex = idx;
+                renderCard();
+                updateNavButtons();
+                updateDots();
+            });
+            dotsContainer.appendChild(dot);
+        });
+    }
+
+    function updateNavButtons() {
+        prevBtn.disabled = (currentIndex === 0);
+        nextBtn.disabled = (currentIndex === cardsData.length - 1);
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderCard();
+            updateNavButtons();
+            updateDots();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentIndex < cardsData.length - 1) {
+            currentIndex++;
+            renderCard();
+            updateNavButtons();
+            updateDots();
+        }
+    });
+
+    renderCard();
+    updateNavButtons();
+    updateDots();
+</script>
+</body>
+</html>
