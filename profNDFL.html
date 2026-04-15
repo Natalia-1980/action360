@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Профессиональный вычет · тренажер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #d9dfe6;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .trainer {
+            max-width: 650px;
+            width: 100%;
+            background: #f0f3f7;
+            border-radius: 28px;
+            padding: 1rem;
+            border: 1px solid #cbd5e1;
+        }
+
+        .title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 0.2rem;
+        }
+
+        .carousel-container {
+            background: white;
+            border-radius: 24px;
+            padding: 0.8rem;
+        }
+
+        .carousel {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cards-wrapper {
+            flex: 1;
+            overflow: hidden;
+            border-radius: 18px;
+        }
+
+        .cards-track {
+            display: flex;
+            transition: transform 0.25s ease;
+        }
+
+        .scenario-card {
+            flex: 0 0 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 0.9rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .task-text {
+            background: #f5f7fa;
+            border-radius: 16px;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            line-height: 1.45;
+            color: #000000;
+        }
+
+        .calc-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 6px 0;
+            font-size: 0.8rem;
+            color: #000000;
+        }
+
+        .calc-label {
+            font-weight: 500;
+            color: #000000;
+            min-width: 240px;
+        }
+
+        .answer-area {
+            margin: 12px 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .answer-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #000000;
+        }
+
+        .answer-input {
+            width: 140px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            border: 1.5px solid #cdd9ed;
+            font-size: 0.8rem;
+            text-align: center;
+            font-weight: 500;
+            color: #000000;
+        }
+
+        .btn {
+            background: #2c577a;
+            border: none;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #bdcad9;
+            color: #2c577a;
+        }
+
+        .explain-card {
+            background: #eef2f8;
+            border-radius: 14px;
+            padding: 8px 10px;
+            margin-top: 10px;
+            border-left: 4px solid #5b6e82;
+            font-size: 0.75rem;
+            color: #000000;
+            line-height: 1.35;
+        }
+
+        .explain-card.correct {
+            border-left-color: #2f7355;
+            background: #e0f0e8;
+        }
+
+        .explain-card.incorrect {
+            border-left-color: #b3432e;
+            background: #f7e6e2;
+        }
+
+        .arrow-btn {
+            background: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            border: 1px solid #cbdae9;
+            cursor: pointer;
+            color: #2c577a;
+            flex-shrink: 0;
+        }
+
+        .counter {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: #4a627a;
+            font-weight: 500;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .extra-block {
+            margin-top: 8px;
+            padding: 6px;
+            background: #eef2f8;
+            border-radius: 12px;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+<div class="trainer">
+    <div class="title">Профессиональный вычет</div>
+
+    <div class="carousel-container">
+        <div class="carousel">
+            <button class="arrow-btn" id="prevBtn">←</button>
+            <div class="cards-wrapper" id="cardsWrapper">
+                <div class="cards-track" id="cardsTrack"></div>
+            </div>
+            <button class="arrow-btn" id="nextBtn">→</button>
+        </div>
+        <div class="counter" id="counter">1 / 3</div>
+        <div class="explain-card" id="explanationBox" style="display: none;"></div>
+        <div class="btn-row">
+            <button class="btn" id="submitBtn">Проверить</button>
+            <button class="btn btn-outline" id="resetBtn">Сбросить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const scenarios = [
+        {
+            title: "Задача 1. ИП оптовая торговля",
+            description: "ИП Катаев П.Н. занимается оптовой торговлей. Показатели за год:",
+            items: [
+                { label: "Закупочная стоимость товаров", value: 3800000 },
+                { label: "Аренда", value: 300000 },
+                { label: "Зарплата рабочих с НДФЛ и страховыми взносами", value: 900000 },
+                { label: "Расходы на топливо", value: 75000 },
+                { label: "Страховые взносы за себя", value: 149390 },
+                { label: "Канцтовары (подтверждающих документов нет)", value: 25000 }
+            ],
+            extraInfo: "В этом же году ИП продал за 2 млн руб. квартиру, которая находилась в его собственности менее 5 лет. При декларировании дохода он заявляет вычет в размере 1 млн руб.",
+            question: "Рассчитайте размер профессионального вычета:",
+            correctAnswer: 5224390,
+            explanation: "Профессиональный вычет = 3 800 000 + 300 000 + 900 000 + 75 000 + 149 390 = 5 224 390 руб. Расходы на канцтовары не надо считать, так как нет подтверждающих документов. Имущественный вычет за квартиру 1 млн руб. предоставляется отдельно, в состав профессионального вычета не входит."
+        },
+        {
+            title: "Задача 2. Авторское вознаграждение",
+            description: "По договору с организацией ИП Сергеев А.А. получает авторское вознаграждение за публикацию своих статей.",
+            items: [
+                { label: "Сумма вознаграждения", value: 20000 },
+                { label: "Документально подтвержденные расходы", value: 0, note: "(нет документов)" }
+            ],
+            extraInfo: "",
+            question: "Рассчитайте налоговую базу (доход минус профессиональный вычет):",
+            correctAnswer: 16000,
+            explanation: "Так как нет документов, используется профессиональный вычет в размере норматива 20%. Налоговая база = 20 000 - (20 000 × 20%) = 20 000 - 4 000 = 16 000 руб."
+        },
+        {
+            title: "Задача 3. Договор подряда",
+            description: "По договору подряда, заключенному с организацией, ИП Федоров В.В. обязан осуществить работы по ремонту производственного оборудования.",
+            items: [
+                { label: "Сумма вознаграждения по договору", value: 150000 },
+                { label: "Затраты на запасные части и материалы", value: 88000 },
+                { label: "Транспортные расходы на доставку", value: 7000 }
+            ],
+            extraInfo: "На фактические расходы есть первичные документы.",
+            question: "Рассчитайте налоговую базу (доход минус профессиональный вычет):",
+            correctAnswer: 55000,
+            explanation: "Налоговая база = 150 000 - (88 000 + 7 000) = 150 000 - 95 000 = 55 000 руб."
+        }
+    ];
+
+    let currentIndex = 0;
+    let userAnswers = ['', '', ''];
+    let submittedStates = [false, false, false];
+
+    const track = document.getElementById('cardsTrack');
+    const counterEl = document.getElementById('counter');
+    const explanationBox = document.getElementById('explanationBox');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function formatNumber(num) {
+        return num.toLocaleString('ru-RU');
+    }
+
+    function renderAllCards() {
+        let htmlStr = '';
+        scenarios.forEach((s, idx) => {
+            let itemsHtml = '';
+            s.items.forEach(item => {
+                let valueStr = formatNumber(item.value);
+                if (item.note) valueStr += ' ' + item.note;
+                itemsHtml += `
+                    <div class="calc-row">
+                        <span class="calc-label">${item.label}:</span>
+                        <span style="font-weight:600;">${valueStr} руб.</span>
+                    </div>
+                `;
+            });
+
+            const isActive = (idx === currentIndex);
+            const displayStyle = isActive ? 'block' : 'none';
+            
+            htmlStr += `
+                <div class="scenario-card" data-card-index="${idx}" style="display: ${displayStyle}">
+                    <div class="task-text">
+                        <strong>${s.title}</strong><br><br>
+                        ${s.description}<br><br>
+                        ${itemsHtml}
+                        ${s.extraInfo ? `<div class="extra-block">${s.extraInfo}</div>` : ''}
+                    </div>
+                    
+                    <div class="answer-area">
+                        <span class="answer-label">${s.question}</span>
+                        <input type="number" id="answerInput_${idx}" class="answer-input" placeholder="введите число" value="${userAnswers[idx]}">
+                    </div>
+                </div>
+            `;
+        });
+        
+        track.innerHTML = htmlStr;
+        
+        if (submittedStates[currentIndex]) {
+            const s = scenarios[currentIndex];
+            const userVal = parseFloat(userAnswers[currentIndex]);
+            const isCorrect = !isNaN(userVal) && Math.abs(userVal - s.correctAnswer) < 0.5;
+            explanationBox.style.display = 'block';
+            explanationBox.className = isCorrect ? 'explain-card correct' : 'explain-card incorrect';
+            explanationBox.innerHTML = `<strong>${isCorrect ? 'Верно' : 'Ошибка'}</strong><br>${s.explanation}`;
+        } else {
+            explanationBox.style.display = 'none';
+        }
+        
+        updateCounter();
+    }
+
+    function updateCounter() {
+        counterEl.innerText = `${currentIndex+1} / ${scenarios.length}`;
+    }
+
+    function handleSubmit() {
+        const answerInput = document.getElementById(`answerInput_${currentIndex}`);
+        if (!answerInput) return;
+        
+        const rawValue = answerInput.value.trim();
+        if (rawValue === '') {
+            alert('Введите число в поле ответа');
+            return;
+        }
+        
+        const numValue = parseFloat(rawValue.replace(/\s/g, ''));
+        if (isNaN(numValue)) {
+            alert('Введите корректное число');
+            return;
+        }
+        
+        userAnswers[currentIndex] = rawValue;
+        submittedStates[currentIndex] = true;
+        
+        const s = scenarios[currentIndex];
+        const isCorrect = (Math.abs(numValue - s.correctAnswer) < 0.5);
+        
+        explanationBox.style.display = 'block';
+        explanationBox.className = isCorrect ? 'explain-card correct' : 'explain-card incorrect';
+        explanationBox.innerHTML = `<strong>${isCorrect ? 'Верно' : 'Ошибка'}</strong><br>${s.explanation}`;
+        
+        const inputField = document.getElementById(`answerInput_${currentIndex}`);
+        if (inputField) inputField.value = rawValue;
+    }
+
+    function resetCurrentCard() {
+        userAnswers[currentIndex] = '';
+        submittedStates[currentIndex] = false;
+        explanationBox.style.display = 'none';
+        
+        const inputField = document.getElementById(`answerInput_${currentIndex}`);
+        if (inputField) inputField.value = '';
+    }
+
+    function goToIndex(newIndex) {
+        if (newIndex < 0) newIndex = scenarios.length - 1;
+        if (newIndex >= scenarios.length) newIndex = 0;
+        currentIndex = newIndex;
+        
+        const cards = document.querySelectorAll('.scenario-card');
+        cards.forEach((card, idx) => {
+            card.style.display = idx === currentIndex ? 'block' : 'none';
+        });
+        
+        if (submittedStates[currentIndex]) {
+            const s = scenarios[currentIndex];
+            const userVal = parseFloat(userAnswers[currentIndex]);
+            const isCorrect = !isNaN(userVal) && Math.abs(userVal - s.correctAnswer) < 0.5;
+            explanationBox.style.display = 'block';
+            explanationBox.className = isCorrect ? 'explain-card correct' : 'explain-card incorrect';
+            explanationBox.innerHTML = `<strong>${isCorrect ? 'Верно' : 'Ошибка'}</strong><br>${s.explanation}`;
+        } else {
+            explanationBox.style.display = 'none';
+        }
+        
+        updateCounter();
+    }
+
+    submitBtn.addEventListener('click', handleSubmit);
+    resetBtn.addEventListener('click', resetCurrentCard);
+    prevBtn.addEventListener('click', () => goToIndex(currentIndex - 1));
+    nextBtn.addEventListener('click', () => goToIndex(currentIndex + 1));
+    
+    renderAllCards();
+    updateCounter();
+</script>
+</body>
+</html>
