@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>НДПИ · налоговый практикум</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .step {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.correct {
+            background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
+            color: white;
+        }
+
+        .task-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #0a2942;
+            margin-bottom: 1.2rem;
+            white-space: pre-line;
+        }
+
+        .question-block {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e0eaf5;
+        }
+        .question-title {
+            font-weight: 600;
+            color: #1e3b5c;
+            margin-bottom: 0.6rem;
+            font-size: 0.95rem;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.6rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .input-group input {
+            flex: 1;
+            max-width: 250px;
+            padding: 0.6rem 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-group span {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.8rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+
+        .status-list {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #2c4e6e;
+            border-top: 1px solid #d8e2f2;
+            padding-top: 0.8rem;
+        }
+        .status-item {
+            margin: 0.3rem 0;
+        }
+        .status-correct {
+            color: #2b8c4a;
+            font-weight: 500;
+        }
+        .status-incorrect {
+            color: #b13e3e;
+            font-weight: 500;
+        }
+
+        .explanation-block {
+            margin-top: 0.8rem;
+            background: #eef3fa;
+            border-radius: 18px;
+            padding: 0.8rem;
+            font-size: 0.85rem;
+            border-left: 4px solid #1e6bb8;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .progress { gap: 0.5rem; }
+            .step { width: 32px; height: 32px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="progress" id="progressContainer"></div>
+        <div id="taskContainer" class="task-container"></div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="nextBtn" disabled>Далее →</button>
+        </div>
+        <div id="finalMessage" class="hidden" style="text-align: center; margin-top: 1rem; font-size: 1rem; color: #2b8c4a;"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Данные задач
+            const tasks = [
+                {
+                    text: "Задача 1. Налоговая база - цена реализации\n\nООО «Альфа» занимается добычей и продажей природного строительного песка на основании лицензии. В январе организация добыла 28 940 тонн песка и реализовала:\n• 12 000 т – по цене 244 руб./т (в том числе НДС – 44 руб.);\n• 14 500 т – по цене 366 руб./т (в том числе НДС – 66 руб.).\nРасходы на доставку песка до покупателей в январе составили 634 100 руб., без НДС.\nРассчитайте налоговую базу НДПИ за январь.",
+                    questions: [
+                        { text: "Стоимость реализации без НДС и расходов на доставку (руб.)", correct: 6679063 },
+                        { text: "Налоговая база НДПИ (руб.)", correct: 6679063 }
+                    ],
+                    fullExplanation: "Стоимость 1 тонны добытого песка для расчета НДПИ = ((12 000 × (244 − 44)) + (14 500 × (366 − 66)) − 634 100) / (12 000 + 14 500) = (12 000×200 + 14 500×300 − 634 100) / 26 500 = (2 400 000 + 4 350 000 − 634 100) / 26 500 = 6 115 900 / 26 500 = 230,79 руб./т.\nНалоговая база = 230,79 × 28 940 = 6 679 063 руб.\nОбратите внимание: оба вопроса требуют одинакового числового ответа."
+                },
+                {
+                    text: "Задача 2. Налоговая база - расчетная стоимость\n\nООО «Альфа» добывает щебень, из которого производит бетон. Затраты на добычу отражаются на субсчете \"20-добыча\" и списываются по мере передачи щебня в производство. В январе добыто 75 000 т щебня.\nОстаток по субсчету \"20-добыча\" на 1 января — 5 300 000 руб., остаток НЗП на 31 января — 7 800 000 руб., дебетовый оборот по счету \"20-добыча\" за январь — 22 800 000 руб.\nОбщие прямые расходы за январь — 40 000 000 руб., включая расходы на добычу.\nКосвенные расходы за январь — 15 000 000 руб. Расходов, непосредственно связанных только с добычей ПИ, среди них нет.\nРассчитайте налоговую базу НДПИ за январь.",
+                    questions: [
+                        { text: "Прямые расходы на добычу (руб.)", correct: 20300000 },
+                        { text: "Косвенные расходы, относящиеся к добыче (руб.)", correct: 8550000 },
+                        { text: "Налоговая база НДПИ (стоимость добытого ПИ) (руб.)", correct: 28850000 }
+                    ],
+                    fullExplanation: "Прямые расходы на добычу = Остаток НЗП на начало + Оборот по добыче − Остаток НЗП на конец = 5 300 000 + 22 800 000 − 7 800 000 = 20 300 000 руб.\nКосвенные расходы, относящиеся к добыче = Общие косвенные расходы × (Расходы на добычу / Общие прямые расходы) = 15 000 000 × (22 800 000 / 40 000 000) = 15 000 000 × 0,57 = 8 550 000 руб.\nНалоговая база = Прямые расходы на добычу + Косвенные расходы на добычу = 20 300 000 + 8 550 000 = 28 850 000 руб."
+                }
+            ];
+
+            let currentTask = 0;
+            let currentQuestion = 0;
+            let results = tasks.map(() => []);
+            let taskCompleted = tasks.map(() => false);
+
+            for (let i = 0; i < tasks.length; i++) {
+                results[i] = new Array(tasks[i].questions.length).fill(null);
+            }
+
+            const taskContainer = document.getElementById('taskContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const finalMessage = document.getElementById('finalMessage');
+
+            function updateProgress() {
+                let html = '';
+                for (let i = 0; i < tasks.length; i++) {
+                    let statusClass = '';
+                    if (i === currentTask && !taskCompleted[currentTask]) statusClass = 'active';
+                    else if (taskCompleted[i]) {
+                        const allCorrect = results[i].every(r => r === true);
+                        statusClass = allCorrect ? 'correct' : 'incorrect';
+                    }
+                    html += `<div class="step ${statusClass}">${i+1}</div>`;
+                }
+                progressContainer.innerHTML = html;
+            }
+
+            function renderCurrentQuestion() {
+                const task = tasks[currentTask];
+                const q = task.questions[currentQuestion];
+                
+                taskContainer.innerHTML = `<div class="task-text">${task.text}</div>`;
+                
+                const questionHtml = `
+                    <div class="question-block">
+                        <div class="question-title">Вопрос ${currentQuestion+1} из ${task.questions.length}: ${q.text}</div>
+                        <div class="input-group">
+                            <input type="number" id="valueInput" step="any" placeholder="Введите число">
+                            <span>₽</span>
+                        </div>
+                        <div class="button-row">
+                            <button class="btn" id="checkBtn">Проверить</button>
+                        </div>
+                    </div>
+                `;
+                taskContainer.insertAdjacentHTML('beforeend', questionHtml);
+                
+                // Добавляем статус вопросов, если уже есть ответы
+                const anyAnswered = results[currentTask].some(r => r !== null);
+                if (anyAnswered) {
+                    let statusHtml = '<div class="status-list"><strong>Статус вопросов:</strong><br>';
+                    for (let i = 0; i < task.questions.length; i++) {
+                        const status = results[currentTask][i];
+                        let statusText = '';
+                        let statusClass = '';
+                        if (status === true) {
+                            statusText = '✅ Верно';
+                            statusClass = 'status-correct';
+                        } else if (status === false) {
+                            statusText = '❌ Неверно';
+                            statusClass = 'status-incorrect';
+                        } else {
+                            statusText = '○ Не отвечен';
+                            statusClass = '';
+                        }
+                        statusHtml += `<div class="status-item"><span class="${statusClass}">${statusText}</span> — ${task.questions[i].text}</div>`;
+                    }
+                    statusHtml += '</div>';
+                    taskContainer.insertAdjacentHTML('beforeend', statusHtml);
+                }
+                
+                // Добавляем пояснение, если задача завершена
+                if (taskCompleted[currentTask]) {
+                    const explanationHtml = `<div class="explanation-block"><strong>Пояснение:</strong><br>${task.fullExplanation.split('\n').join('<br>')}</div>`;
+                    taskContainer.insertAdjacentHTML('beforeend', explanationHtml);
+                }
+                
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (results[currentTask][currentQuestion] !== null) return;
+                    checkAnswer();
+                });
+                
+                updateProgress();
+            }
+            
+            function checkAnswer() {
+                const task = tasks[currentTask];
+                const q = task.questions[currentQuestion];
+                const input = document.getElementById('valueInput');
+                const rawValue = input.value.trim();
+                
+                if (rawValue === '') {
+                    alert('Введите значение');
+                    return;
+                }
+                
+                const numValue = parseFloat(rawValue.replace(/\s/g, '').replace(',', '.'));
+                if (isNaN(numValue)) {
+                    alert('Введите корректное число');
+                    return;
+                }
+                
+                const isCorrect = Math.abs(numValue - q.correct) < 0.5;
+                results[currentTask][currentQuestion] = isCorrect;
+                
+                updateProgress();
+                
+                // Обновляем статус вопросов
+                let statusHtml = '<div class="status-list"><strong>Статус вопросов:</strong><br>';
+                for (let i = 0; i < task.questions.length; i++) {
+                    const status = results[currentTask][i];
+                    let statusText = '';
+                    let statusClass = '';
+                    if (status === true) {
+                        statusText = '✅ Верно';
+                        statusClass = 'status-correct';
+                    } else if (status === false) {
+                        statusText = '❌ Неверно';
+                        statusClass = 'status-incorrect';
+                    } else {
+                        statusText = '○ Не отвечен';
+                        statusClass = '';
+                    }
+                    statusHtml += `<div class="status-item"><span class="${statusClass}">${statusText}</span> — ${task.questions[i].text}</div>`;
+                }
+                statusHtml += '</div>';
+                
+                const existingStatus = taskContainer.querySelector('.status-list');
+                if (existingStatus) {
+                    existingStatus.outerHTML = statusHtml;
+                } else {
+                    taskContainer.insertAdjacentHTML('beforeend', statusHtml);
+                }
+                
+                // Проверяем, завершена ли задача
+                const allAnswered = results[currentTask].every(r => r !== null);
+                if (allAnswered && !taskCompleted[currentTask]) {
+                    taskCompleted[currentTask] = true;
+                    const explanationHtml = `<div class="explanation-block"><strong>Пояснение:</strong><br>${task.fullExplanation.split('\n').join('<br>')}</div>`;
+                    taskContainer.insertAdjacentHTML('beforeend', explanationHtml);
+                }
+                
+                // Переход к следующему вопросу
+                if (currentQuestion + 1 < task.questions.length) {
+                    currentQuestion++;
+                    renderCurrentQuestion();
+                } else {
+                    if (currentTask < tasks.length - 1) {
+                        nextBtn.disabled = false;
+                    } else {
+                        nextBtn.textContent = 'Завершить';
+                        nextBtn.disabled = false;
+                    }
+                }
+            }
+            
+            nextBtn.addEventListener('click', () => {
+                if (currentTask < tasks.length - 1) {
+                    currentTask++;
+                    currentQuestion = 0;
+                    renderCurrentQuestion();
+                    nextBtn.disabled = true;
+                } else {
+                    taskContainer.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    finalMessage.classList.remove('hidden');
+                    finalMessage.innerHTML = '✅ Все задачи решены! Спасибо за работу!';
+                }
+            });
+            
+            renderCurrentQuestion();
+        })();
+    </script>
+</body>
+</html>
