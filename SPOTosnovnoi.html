@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>СПОТ — ввоз из ЕАЭС</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .frame {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            background: #0b2b3b;
+            color: white;
+            padding: 14px 16px;
+        }
+
+        .quiz-header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .stats-bar {
+            background: #f8fafc;
+            padding: 8px 14px;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+            font-weight: 500;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: white;
+            border-radius: 30px;
+            padding: 4px 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .stat span {
+            font-weight: 700;
+            color: #1e6f5c;
+            margin-right: 3px;
+        }
+
+        .progress-area {
+            padding: 8px 14px 0 14px;
+            background: white;
+        }
+
+        .progress-bar-bg {
+            background: #e2e8f0;
+            border-radius: 20px;
+            height: 5px;
+            width: 100%;
+        }
+
+        .progress-fill {
+            background: #2c7a6e;
+            width: 0%;
+            height: 5px;
+            border-radius: 20px;
+            transition: width 0.2s;
+        }
+
+        .question-area {
+            padding: 16px 14px 14px 14px;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 16px;
+            color: #0a2c3b;
+            background: #f6fafe;
+            padding: 12px 14px;
+            border-radius: 16px;
+            border-left: 4px solid #2c7a6e;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .option-item {
+            background: #f9fbfd;
+            border: 1px solid #dfe7ef;
+            border-radius: 16px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .option-item:hover {
+            background: #f1f5f9;
+            border-color: #b9cfdf;
+        }
+
+        .option-marker {
+            width: 26px;
+            height: 26px;
+            background: #eef2f5;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+
+        .option-text {
+            font-size: 0.9rem;
+            line-height: 1.35;
+            color: #1f3b4a;
+        }
+
+        .option-item.correct-highlight {
+            background: #e0f2e9;
+            border-color: #2c7a6e;
+        }
+
+        .option-item.wrong-highlight {
+            background: #ffe6e5;
+            border-color: #c73a2b;
+        }
+
+        .feedback-message {
+            background: #f0f4f9;
+            border-radius: 16px;
+            padding: 10px 14px;
+            margin: 8px 0 12px 0;
+            font-size: 0.85rem;
+            border-left: 4px solid #2c7a6e;
+            color: #1e3a4a;
+            line-height: 1.45;
+        }
+
+        .feedback-message strong {
+            color: #1a6e5c;
+        }
+        .wrong-strong {
+            color: #c73a2b !important;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        button {
+            background: white;
+            border: 1px solid #cbdbe0;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: inherit;
+            color: #1f4b5e;
+            transition: 0.1s;
+        }
+
+        button.primary-btn {
+            background: #1f6e5c;
+            border: none;
+            color: white;
+        }
+
+        button.primary-btn:hover {
+            background: #0e5545;
+        }
+
+        button.secondary-btn {
+            background: #eef2f7;
+        }
+
+        button.secondary-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .reset-wrap {
+            margin-top: 14px;
+            text-align: center;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .result-card {
+            background: #fefce8;
+            border-top: 2px solid #e9c46a;
+            margin: 10px 14px 16px 14px;
+            padding: 12px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .result-card h3 {
+            font-size: 1.1rem;
+            color: #b9791a;
+            margin-bottom: 6px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #5c7f8c;
+            margin-top: 12px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+<div class="frame">
+    <div class="quiz-card">
+        <div class="quiz-header">
+            <h1>Ввоз товара из ЕАЭС по новым правилам</h1>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">Ситуация <span id="currentQNumber">1</span>/<span id="totalQCount">0</span></div>
+            <div class="stat">Верно: <span id="correctCount">0</span></div>
+            <div class="stat">Баллы: <span id="scoreSpan">0</span></div>
+        </div>
+        <div class="progress-area">
+            <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="question-area" id="questionArea"></div>
+        <div id="resultBlock" class="result-card hide"></div>
+    </div>
+    <footer>СПОТ — автомобильный транспорт, правила с 1 июня 2026</footer>
+</div>
+
+<script>
+    // 7 жизненных ситуаций (без иконок, буква "ё" заменена на "е", читабельные тексты)
+    const SITUATIONS = [
+        {
+            text: "ООО \"Лютик\" 3 июня 2026 года подало ДОПП и отправило водителю сообщение: \"Товар можно везти, мы все оформили\". На границе инспектор запросил QR-код со статусом \"Обеспечен\". У перевозчика QR-кода нет. Пропустят ли машину в Россию?",
+            options: [
+                "Да, ДОПП уже подан, значит товар пропустят",
+                "Нет, так как не уплачен обеспечительный платеж и нет QR-кода, машину развернут",
+                "Пропустят, если перевозчик заплатит штраф на месте",
+                "Пропустят, если товар – продукты питания"
+            ],
+            correct: 1,
+            explanation: "Ошибка! Для ввоза требуется QR-код со статусом \"Обеспечен\", который выдается после уплаты обеспечительного платежа. Без него таможня не пропустит грузовик, даже если ДОПП подан. Реальный риск разворота на границе."
+        },
+        {
+            text: "ООО \"Сладкий мир\" ввозит кондитерские изделия из Казахстана. Компания подала ДОПП за 2 дня, перечислила обеспечительный платеж и получила QR-код. На таможне выяснилось: в ДОПП ошиблись в весе брутто (указали 2 тонны вместо 5 тонн). Будет ли QR-код действителен?",
+            options: [
+                "Да, ошибка в весе не важна, главное сам QR-код",
+                "Нет, любые расхождения в ДОПП аннулируют QR-код, потребуется корректировка",
+                "Пропустят, если заплатить разницу пошлины на месте",
+                "QR-код останется активным, но таможня выпишет предупреждение"
+            ],
+            correct: 1,
+            explanation: "Неверные данные в ДОПП делают QR-код недействительным. Таможня сверит фактические параметры. Нужно аннулировать ДОПП и подать новый за 2 дня, иначе отказ во ввозе."
+        },
+        {
+            text: "Завод \"МеталлПро\" ввозит оборудование для собственного производства. Компания имеет статус крупнейшего налогоплательщика. Перед ввозом партии оборудования подала ДОПП, платеж не вносила. ФНС отказала в выдаче QR-кода. Верны ли действия инспекции?",
+            options: [
+                "Да, без платежа QR-код не выдается ни при каких условиях",
+                "Нет, крупнейшие налогоплательщики освобождены от уплаты обеспечительного платежа, поэтому отказ неправомерен",
+                "Верны, потому что оборудование относится к высокорисковым товарам",
+                "Отказ правомерен, если сумма налогов превышает 500 тысяч рублей"
+            ],
+            correct: 1,
+            explanation: "Нет, действия инспекции неверны. Крупнейшие налогоплательщики освобождены от внесения обеспечительного платежа (ОП) по правилам СПОТ, поэтому отказ в выдаче QR-кода неправомерен."
+        },
+        {
+            text: "ООО \"Вектор\" 30 июня 2026 года подало ДОПП на товары, которые будут пересекать границу 1 июля в 9:00 утра. Соблюден ли срок подачи и выдаст ли ФНС QR-код?",
+            options: [
+                "Да, срок соблюден, QR-код будет выдан (ДОПП за 1 день до въезда допустим)",
+                "Нет, срок не соблюден: ДОПП нужно подавать минимум за 2 полных дня до въезда. 30 июня -> 1 июля – это менее 2 дней, QR-код не выдадут",
+                "Срок соблюден, так как 30 июня и 1 июля считаются разными днями",
+                "Все равно выдадут, если заплатить ускоренный сбор"
+            ],
+            correct: 1,
+            explanation: "Срок не соблюден. Правило: ДОПП подается не позднее чем за 2 дня до дня пересечения границы (день въезда не учитывается). 30 июня подача, 1 июля въезд – между ними только 30 июня (один полный день), поэтому QR-код не будет выдан."
+        },
+        {
+            text: "Транспортная компания перевозит нефтепродукты из Казахстана в Россию автомобильным транспортом. Обязаны ли они оформлять ДОПП и вносить обеспечительный платеж?",
+            options: [
+                "Да, нефтепродукты под полным контролем СПОТ",
+                "Нет, нефть и нефтепродукты исключены из требований СПОТ (как и электроэнергия, трубопроводный транспорт)",
+                "Требуется только ДОПП без обеспечительного платежа",
+                "Только если объем более 20 тонн"
+            ],
+            correct: 1,
+            explanation: "Исключение! Нефть, нефтепродукты, газ, электроэнергия, трубопроводный транспорт, а также личные вещи физических лиц – не подпадают под СПОТ. ДОПП и обеспечительный платеж не нужны."
+        },
+        {
+            text: "ООО \"ТехноГрад\" ввозит партию смартфонов из Армении. Они уплатили обеспечительный платеж, получили QR-код, но на границе водитель предъявил распечатанный QR-код на бумаге, а не в телефоне. Таможня не может его отсканировать из-за плохого качества печати. Что будет?",
+            options: [
+                "Пропустят по номеру QR в ручном режиме",
+                "Машину не пропустят, пока перевозчик не предъявит читаемый код (электронно или четкая распечатка)",
+                "Таможня свяжется с импортером и подтвердит ввоз по телефону",
+                "Штраф 50 тысяч рублей, но товар впустят"
+            ],
+            correct: 1,
+            explanation: "QR-код должен быть читаемым. Если инспектор не может его отсканировать, это приравнивается к отсутствию подтверждения. Перевозчику потребуется получить новый читаемый QR от импортера или предъявить на экране устройства. До этого – задержка."
+        },
+        {
+            text: "Импортер ввозит образцы товаров для выставки стоимостью 300 долларов США. По закону НДС и пошлины не уплачиваются. Обязан ли он подавать ДОПП и вносить обеспечение?",
+            options: [
+                "Нет, если налоги нулевые, СПОТ не нужен",
+                "Да, ДОПП подается при любом ввозе из ЕАЭС, независимо от уплаты налогов. Обеспечение может потребоваться, но при нулевых налогах сумма 0, но ДОПП все равно оформляют",
+                "Только если товар попадает в перечень подакцизных",
+                "Достаточно устного уведомления таможни"
+            ],
+            correct: 1,
+            explanation: "ДОПП обязателен при любом ввозе из стран ЕАЭС, даже если налоги равны нулю. Обеспечительный платеж в таком случае равен нулю, но сам электронный документ о предстоящей поставке подается за 2 дня. Иначе QR-код не получить, а значит, ввоз невозможен."
+        }
+    ];
+
+    let currentIndex = 0;
+    let userAnswers = new Array(SITUATIONS.length).fill(null);
+    let answerLocked = false;
+    let quizCompleted = false;
+
+    const questionArea = document.getElementById('questionArea');
+    const currentQNumberSpan = document.getElementById('currentQNumber');
+    const totalQCountSpan = document.getElementById('totalQCount');
+    const correctCountSpan = document.getElementById('correctCount');
+    const scoreSpan = document.getElementById('scoreSpan');
+    const progressFill = document.getElementById('progressFill');
+    const resultBlock = document.getElementById('resultBlock');
+
+    function updateStats() {
+        const correctTotal = userAnswers.filter(a => a !== null && a.isCorrect === true).length;
+        correctCountSpan.innerText = correctTotal;
+        scoreSpan.innerText = correctTotal;
+        totalQCountSpan.innerText = SITUATIONS.length;
+        currentQNumberSpan.innerText = currentIndex + 1;
+        const progressPercent = ((currentIndex + 1) / SITUATIONS.length) * 100;
+        progressFill.style.width = `${progressPercent}%`;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function renderQuestion() {
+        if (quizCompleted) return;
+        const situation = SITUATIONS[currentIndex];
+        if (!situation) return;
+
+        const answeredData = userAnswers[currentIndex];
+        const isAnswered = answeredData !== null;
+        const selectedIdx = isAnswered ? answeredData.selectedIdx : -1;
+
+        let optionsHtml = '';
+        situation.options.forEach((opt, idx) => {
+            let additionalClass = '';
+            if (isAnswered) {
+                if (idx === situation.correct) additionalClass = 'correct-highlight';
+                else if (idx === selectedIdx && idx !== situation.correct) additionalClass = 'wrong-highlight';
+            }
+            const marker = String.fromCharCode(65 + idx);
+            optionsHtml += `
+                <div class="option-item ${additionalClass}" data-opt-index="${idx}">
+                    <div class="option-marker">${marker}</div>
+                    <div class="option-text">${escapeHtml(opt)}</div>
+                </div>
+            `;
+        });
+
+        let feedbackHtml = '';
+        if (isAnswered) {
+            const isCurCorrect = answeredData.isCorrect;
+            const correctAnswerText = situation.options[situation.correct];
+            const correctLabel = isCurCorrect ? 'Верно' : 'Неправильно';
+            const strongClass = isCurCorrect ? '' : 'wrong-strong';
+            feedbackHtml = `
+                <div class="feedback-message">
+                    <strong class="${strongClass}">${correctLabel}</strong><br>
+                    <span style="display:inline-block; margin-top: 5px;">Правильный ответ: ${escapeHtml(correctAnswerText)}</span><br>
+                    <span style="display:inline-block; margin-top: 6px;">${escapeHtml(situation.explanation)}</span>
+                </div>
+            `;
+        }
+
+        const nextDisabled = (!isAnswered) ? 'disabled' : '';
+        const prevDisabled = (currentIndex === 0) ? 'disabled' : '';
+        const allAnswered = userAnswers.every(a => a !== null);
+        const showFinishButton = (!quizCompleted && allAnswered) ? true : false;
+
+        const html = `
+            <div class="question-text">${escapeHtml(situation.text)}</div>
+            <div class="options-list" id="optionsContainer">${optionsHtml}</div>
+            ${feedbackHtml}
+            <div class="action-buttons">
+                <button class="secondary-btn" id="prevBtn" ${prevDisabled}>Назад</button>
+                <button class="primary-btn" id="nextBtn" ${nextDisabled}>Вперед</button>
+            </div>
+            <div class="reset-wrap">
+                <button class="secondary-btn" id="resetQuizBtn">Заново</button>
+                ${showFinishButton ? '<button class="primary-btn" id="finishEarlyBtn">Итог</button>' : ''}
+            </div>
+        `;
+
+        questionArea.innerHTML = html;
+        updateStats();
+
+        const optionDivs = document.querySelectorAll('.option-item');
+        if (!isAnswered) {
+            optionDivs.forEach(div => {
+                div.addEventListener('click', () => {
+                    if (answerLocked || quizCompleted) return;
+                    const idx = parseInt(div.dataset.optIndex);
+                    if (!isNaN(idx)) handleAnswer(idx);
+                });
+            });
+        } else {
+            optionDivs.forEach(div => div.style.pointerEvents = 'none');
+        }
+
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const resetBtn = document.getElementById('resetQuizBtn');
+        const finishBtn = document.getElementById('finishEarlyBtn');
+
+        if (prevBtn) prevBtn.addEventListener('click', () => { if (!quizCompleted) goPrev(); });
+        if (nextBtn) nextBtn.addEventListener('click', () => { if (!quizCompleted && userAnswers[currentIndex] !== null) goNext(); });
+        if (resetBtn) resetBtn.addEventListener('click', () => resetQuiz());
+        if (finishBtn) finishBtn.addEventListener('click', () => finishQuiz());
+    }
+
+    function handleAnswer(selectedIdx) {
+        if (answerLocked || quizCompleted) return;
+        const situation = SITUATIONS[currentIndex];
+        const isCorrect = (selectedIdx === situation.correct);
+        userAnswers[currentIndex] = { selectedIdx, isCorrect };
+        answerLocked = true;
+        renderQuestion();
+        answerLocked = false;
+        if (userAnswers.every(a => a !== null) && !quizCompleted) {
+            renderQuestion();
+        }
+        updateStats();
+    }
+
+    function goNext() {
+        if (currentIndex + 1 < SITUATIONS.length) {
+            currentIndex++;
+            answerLocked = false;
+            renderQuestion();
+        } else {
+            if (userAnswers.every(a => a !== null) && !quizCompleted) {
+                finishQuiz();
+            } else if (!userAnswers.every(a => a !== null)) {
+                alert("Ответьте на все ситуации, прежде чем завершить.");
+            }
+        }
+    }
+
+    function goPrev() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            answerLocked = false;
+            renderQuestion();
+        }
+    }
+
+    function finishQuiz() {
+        if (quizCompleted) return;
+        if (!userAnswers.every(a => a !== null)) {
+            alert("Пожалуйста, ответьте на все 7 ситуаций, чтобы увидеть результат.");
+            return;
+        }
+        quizCompleted = true;
+        const totalCorrect = userAnswers.filter(a => a.isCorrect).length;
+        const total = SITUATIONS.length;
+        const percent = Math.round((totalCorrect / total) * 100);
+        let msg = "";
+        if (percent >= 90) msg = "Отлично! Вы хорошо понимаете реальные риски СПОТ.";
+        else if (percent >= 70) msg = "Хороший результат, но стоит повторить исключения и нюансы QR-кода.";
+        else msg = "Пересмотрите правила: ДОПП, обеспечительный платеж, статус QR и исключения.";
+        
+        resultBlock.classList.remove('hide');
+        resultBlock.innerHTML = `
+            <h3>Итог</h3>
+            <p style="margin:8px 0; font-size:0.95rem;"><strong>${totalCorrect}</strong> из <strong>${total}</strong> верных (${percent}%)</p>
+            <p style="margin-bottom: 10px;">${msg}</p>
+            <button id="restartResult" class="primary-btn" style="margin-top:2px">Пройти заново</button>
+        `;
+        document.getElementById('restartResult')?.addEventListener('click', () => resetQuiz());
+        const qa = document.getElementById('questionArea');
+        qa.style.opacity = '0.45';
+        qa.style.pointerEvents = 'none';
+    }
+
+    function resetQuiz() {
+        userAnswers = new Array(SITUATIONS.length).fill(null);
+        currentIndex = 0;
+        quizCompleted = false;
+        answerLocked = false;
+        resultBlock.classList.add('hide');
+        const qa = document.getElementById('questionArea');
+        qa.style.opacity = '1';
+        qa.style.pointerEvents = 'auto';
+        updateStats();
+        renderQuestion();
+    }
+
+    totalQCountSpan.innerText = SITUATIONS.length;
+    updateStats();
+    renderQuestion();
+</script>
+</body>
+</html>
