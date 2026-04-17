@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>СПОТ | До и после</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #e2e8f0;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 1300px;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header p {
+            background: white;
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            color: #2d4a6e;
+        }
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+        }
+        .card {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.2);
+        }
+        /* Цвета карточек */
+        .card-before {
+            background: linear-gradient(145deg, #eef3fc, #e0eaf3);
+        }
+        .card-after {
+            background: linear-gradient(145deg, #eef7f2, #e2f0e8);
+        }
+        .card-inner {
+            padding: 20px;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.2s ease;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid;
+            display: inline-block;
+        }
+        .card-before .title {
+            color: #1e3a5f;
+            border-color: #2c6285;
+        }
+        .card-after .title {
+            color: #1e6b5c;
+            border-color: #1a836f;
+        }
+        .items {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
+        }
+        .item {
+            background: rgba(255,255,255,0.7);
+            border-radius: 16px;
+            padding: 12px 14px;
+            border-left: 4px solid;
+        }
+        .card-before .item {
+            border-left-color: #2c6285;
+        }
+        .card-after .item {
+            border-left-color: #1a836f;
+        }
+        .item-title {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2c5a7a;
+            margin-bottom: 6px;
+        }
+        .card-after .item-title {
+            color: #1a6b5c;
+        }
+        .item-desc {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e2f3c;
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+        .item-note {
+            font-size: 11px;
+            color: #6c7e8c;
+        }
+        .hint {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #7a8e9c;
+            background: rgba(0,0,0,0.05);
+            padding: 8px;
+            border-radius: 30px;
+        }
+        .footer {
+            margin-top: 30px;
+            background: #eef2f6;
+            border-radius: 50px;
+            padding: 12px 20px;
+            text-align: center;
+            color: #4a5e6e;
+            font-size: 13px;
+        }
+        @media (max-width: 700px) {
+            .card-inner {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <p>Сравнение процессов импорта: контроль, платежи, документация</p>
+        <div style="font-size: 12px; margin-top: 8px; color: #5e7687;">▼ Нажмите на карточку, чтобы переключить вид ▼</div>
+    </div>
+
+    <div class="cards">
+        <!-- КАРТОЧКА 1: ДО СПОТ -->
+        <div class="card card-before" id="card1">
+            <div class="card-inner" id="card1Inner">
+                <!-- Содержимое будет меняться через JS -->
+            </div>
+        </div>
+
+        <!-- КАРТОЧКА 2: ПОСЛЕ СПОТ -->
+        <div class="card card-after" id="card2">
+            <div class="card-inner" id="card2Inner">
+                <!-- Содержимое будет меняться через JS -->
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        • Неуплата обеспечительного платежа → отказ в выдаче QR-кода → недопуск товара в Россию
+    </div>
+</div>
+
+<script>
+    // Данные для карточки 1 (ДО СПОТ)
+    const beforeFront = {
+        title: 'До внедрения СПОТ',
+        items: [
+            { title: 'Документы на ввоз', desc: 'Декларация по косвенным налогам после ввоза', note: 'Пост-таможенное оформление' },
+            { title: 'Обеспечительный платеж', desc: 'Отсутствовал. НДС импортер уплачивал после ввоза', note: 'Отсрочка уплаты до подачи декларации' },
+            { title: 'Сроки уплаты налогов', desc: 'После ввоза, на основании декларации по косвенным налогам', note: 'Уплата в стандартные сроки' }
+        ],
+        hint: '→ нажмите, чтобы увидеть контроль, таможню и риски'
+    };
+    
+    const beforeBack = {
+        title: 'До внедрения СПОТ',
+        items: [
+            { title: 'Контроль ФНС', desc: 'Камеральная проверка декларации после ввоза', note: 'Реактивный контроль' },
+            { title: 'Таможенный контроль', desc: 'Стандартная проверка документов — контракты, CMR, ТН', note: 'Ручная сверка' },
+            { title: 'Риски для импортера', desc: 'Штрафы за неправильное заполнение декларации по косвенным налогам', note: 'Административные и налоговые риски' }
+        ],
+        hint: '← нажмите, чтобы вернуться'
+    };
+    
+    // Данные для карточки 2 (ПОСЛЕ СПОТ)
+    const afterFront = {
+        title: 'После внедрения СПОТ',
+        items: [
+            { title: 'Документы на ввоз', desc: 'ДОПП до ввоза + Декларация по косвенным налогам после', note: 'Предварительное уведомление' },
+            { title: 'Обеспечительный платеж', desc: 'Обеспечительный платеж уплачивается до ввоза', note: 'Обеспечение уплаты налогов' },
+            { title: 'Сроки уплаты налогов', desc: 'Частично до ввоза + корректировка после', note: 'Сокращение сроков администрирования' }
+        ],
+        hint: '→ нажмите, чтобы увидеть контроль, таможню и риски'
+    };
+    
+    const afterBack = {
+        title: 'После внедрения СПОТ',
+        items: [
+            { title: 'Контроль ФНС', desc: 'ДОПП до ввоза → выдача QR-кода → декларация после ввоза', note: 'QR-код обязателен для таможни' },
+            { title: 'Таможенный контроль', desc: 'Сканирование QR-кода – мгновенное подтверждение легальности ввоза', note: 'Автоматизация проверки' },
+            { title: 'Риски для импортера', desc: 'Штрафы за неверные ДОПП + декларацию', note: 'Двойной контроль и новые санкции' }
+        ],
+        hint: '← нажмите, чтобы вернуться'
+    };
+    
+    // Функция отрисовки карточки
+    function renderCard(container, data) {
+        let html = `
+            <div class="title">${data.title}</div>
+            <div class="items">
+        `;
+        for (let item of data.items) {
+            html += `
+                <div class="item">
+                    <div class="item-title">${item.title}</div>
+                    <div class="item-desc">${item.desc}</div>
+                    <div class="item-note">${item.note}</div>
+                </div>
+            `;
+        }
+        html += `
+            </div>
+            <div class="hint">${data.hint}</div>
+        `;
+        container.innerHTML = html;
+    }
+    
+    // Состояния карточек (true = лицевая сторона, false = обратная)
+    let card1State = true;  // true = front (Документы...), false = back (Контроль...)
+    let card2State = true;
+    
+    // Получаем контейнеры
+    const card1Inner = document.getElementById('card1Inner');
+    const card2Inner = document.getElementById('card2Inner');
+    const card1 = document.getElementById('card1');
+    const card2 = document.getElementById('card2');
+    
+    // Начальная отрисовка
+    renderCard(card1Inner, beforeFront);
+    renderCard(card2Inner, afterFront);
+    
+    // Обработчик клика для карточки 1
+    card1.addEventListener('click', () => {
+        if (card1State) {
+            renderCard(card1Inner, beforeBack);
+        } else {
+            renderCard(card1Inner, beforeFront);
+        }
+        card1State = !card1State;
+    });
+    
+    // Обработчик клика для карточки 2
+    card2.addEventListener('click', () => {
+        if (card2State) {
+            renderCard(card2Inner, afterBack);
+        } else {
+            renderCard(card2Inner, afterFront);
+        }
+        card2State = !card2State;
+    });
+</script>
+</body>
+</html>
