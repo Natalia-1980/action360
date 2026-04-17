@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Хронология | Импорт ЕАЭС</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #cbd5e1;
+            font-family: -apple-system, 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            padding: 12px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* главный контейнер — компактный */
+        .trainer {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            background: transparent;
+            border-radius: 32px;
+        }
+
+        /* поля — мягкие, пастельные, не яркие */
+        .timeline-area {
+            background: #dce5ef;
+            border-radius: 28px;
+            padding: 14px 12px;
+            margin-bottom: 18px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.03), 0 3px 8px rgba(0,0,0,0.08);
+        }
+
+        .mixzone {
+            background: #d4dfea;
+            border-radius: 28px;
+            padding: 14px 12px;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), 0 3px 8px rgba(0,0,0,0.08);
+        }
+
+        /* сетка — 2 колонки при возможности */
+        .timeline-steps, .cards-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        @media (min-width: 480px) {
+            .timeline-steps, .cards-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+
+        /* КАРТОЧКИ: светло-серый фон + тёмно-синий текст */
+        .step-card, .drag-card {
+            background: #eef2f7;   /* светло-серый с голубоватым оттенком */
+            border-radius: 18px;
+            padding: 12px 10px;
+            color: #0a2f4d;        /* тёмно-синий, приятный для чтения */
+            font-weight: 700;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            text-align: center;
+            transition: 0.08s linear;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            border: 1px solid #cbd8e6;
+        }
+
+        .drag-card {
+            cursor: pointer;
+            background: #e8edf4;
+        }
+        .drag-card:active {
+            transform: scale(0.97);
+            background: #d9e2ec;
+        }
+
+        .step-card {
+            background: #e8edf4;
+        }
+
+        .card-text {
+            font-weight: 700;
+            font-size: 0.8rem;
+            word-break: break-word;
+            color: #0a2f4d;
+        }
+
+        /* кнопки управления внутри карточек линейки — нейтральные */
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #cbdae9;
+        }
+        .card-controls button {
+            background: #cbdae9;
+            border: none;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.05s linear;
+            color: #0a2f4d;
+            font-family: inherit;
+        }
+        .card-controls button:active {
+            transform: scale(0.94);
+            background: #b7c8db;
+        }
+        .remove-btn {
+            background: #e0cdcd;
+            color: #7a3e3e;
+        }
+        .remove-btn:active {
+            background: #d4baba;
+        }
+
+        /* пустые состояния */
+        .empty-placeholder {
+            grid-column: span 2;
+            text-align: center;
+            color: #3a5c7c;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 28px 12px;
+            background: #e2eaf3;
+            border-radius: 28px;
+        }
+        @media (max-width: 479px) {
+            .empty-placeholder {
+                grid-column: span 1;
+            }
+        }
+
+        /* компактное сообщение "Все карточки в линейке..." */
+        .compact-message {
+            grid-column: span 2;
+            background: #d2dfea;
+            border-radius: 24px;
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #2b4f6e;
+            margin: 0;
+            line-height: 1.3;
+        }
+        @media (max-width: 479px) {
+            .compact-message {
+                grid-column: span 1;
+            }
+        }
+
+        /* кнопки внизу */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 18px;
+        }
+        button {
+            background: #5b6e7e;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.05s linear;
+            font-family: inherit;
+            flex: 0 1 auto;
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        .check-btn {
+            background: #4b6e55;
+        }
+
+        .message-area {
+            background: #e0e9f2;
+            border-radius: 28px;
+            padding: 10px 14px;
+            margin-top: 16px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #2c4e6e;
+            border-left: 4px solid #7f9bb5;
+        }
+        .message-area.success {
+            background: #deede5;
+            border-left-color: #5b8c6f;
+            color: #2a5a41;
+        }
+        .message-area.error {
+            background: #f2e2e2;
+            border-left-color: #b36b6b;
+            color: #8b4242;
+        }
+    </style>
+</head>
+<body>
+<div class="trainer">
+    <!-- Хронологическая линейка -->
+    <div class="timeline-area">
+        <div id="timelineContainer" class="timeline-steps">
+            <div class="empty-placeholder">⬅️ Нажмите на карточку внизу, чтобы добавить</div>
+        </div>
+    </div>
+
+    <!-- Зона с доступными карточками -->
+    <div class="mixzone">
+        <div id="dragContainer" class="cards-container"></div>
+    </div>
+
+    <div class="action-bar">
+        <button id="resetBtn">⟳ Сброс</button>
+        <button id="checkBtn" class="check-btn">✅ Проверить</button>
+    </div>
+    <div id="messageBox" class="message-area">
+        💡 Нажмите на карточку → она попадёт в линейку. Кнопками ▲▼ меняйте порядок, ✖ — вернёте обратно.
+    </div>
+</div>
+
+<script>
+    // ========= ЭТАЛОННЫЙ ПОРЯДОК (9 шагов) =========
+    const MASTER_STEPS = [
+        "Импортер подает ДОПП в ФНС",
+        "Импортер уплачивает ОП в счет будущей уплаты НДС",
+        "ФНС проверяет данные и присваивает QR-код",
+        "Импортер передает QR-код перевозчику вместе с ДОПП",
+        "Перевозчик проверяет QR-код и везет товар в Россию",
+        "Таможня на границе сканирует QR-код, сверяет данные и подтверждает поставку",
+        "Импортер подает декларацию после ввоза",
+        "ФНС засчитывает соответствующие суммы ОП в счет уплаты косвенных налогов",
+        "Излишние суммы ОП импортер вправе вернуть"
+    ];
+
+    let timelineItems = [];
+    let availableItems = [];
+
+    const timelineContainer = document.getElementById("timelineContainer");
+    const dragContainer = document.getElementById("dragContainer");
+    const messageBox = document.getElementById("messageBox");
+    const resetBtn = document.getElementById("resetBtn");
+    const checkBtn = document.getElementById("checkBtn");
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function getShuffledAvailable() {
+        return shuffleArray([...MASTER_STEPS]);
+    }
+
+    function showMessage(msg, type = "info") {
+        messageBox.innerHTML = msg;
+        messageBox.classList.remove("success", "error");
+        if (type === "success") messageBox.classList.add("success");
+        if (type === "error") messageBox.classList.add("error");
+        setTimeout(() => {
+            if (messageBox.innerHTML === msg) messageBox.classList.remove("success", "error");
+        }, 2500);
+    }
+
+    function isOrderCorrect() {
+        if (timelineItems.length !== MASTER_STEPS.length) return false;
+        for (let i = 0; i < timelineItems.length; i++) {
+            if (timelineItems[i] !== MASTER_STEPS[i]) return false;
+        }
+        return true;
+    }
+
+    function moveCardInTimeline(index, direction) {
+        if (direction === 'up' && index > 0) {
+            [timelineItems[index - 1], timelineItems[index]] = [timelineItems[index], timelineItems[index - 1]];
+        } else if (direction === 'down' && index < timelineItems.length - 1) {
+            [timelineItems[index + 1], timelineItems[index]] = [timelineItems[index], timelineItems[index + 1]];
+        }
+        renderAll();
+    }
+
+    function removeFromTimeline(index) {
+        const removed = timelineItems.splice(index, 1)[0];
+        availableItems.push(removed);
+        renderAll();
+        showMessage(`↩️ "${removed.substring(0, 35)}..." возвращена`, "info");
+    }
+
+    function addToTimeline(indexInAvailable) {
+        const added = availableItems.splice(indexInAvailable, 1)[0];
+        timelineItems.push(added);
+        renderAll();
+        showMessage(`➕ Добавлено: "${added.substring(0, 38)}..."`, "success");
+    }
+
+    function renderTimeline() {
+        timelineContainer.innerHTML = "";
+        if (timelineItems.length === 0) {
+            const emptyDiv = document.createElement("div");
+            emptyDiv.className = "empty-placeholder";
+            emptyDiv.innerText = "⬅️ Нажмите на карточку внизу, чтобы добавить";
+            timelineContainer.appendChild(emptyDiv);
+            return;
+        }
+        timelineItems.forEach((item, idx) => {
+            const card = document.createElement("div");
+            card.className = "step-card";
+            card.innerHTML = `
+                <div class="card-text">${escapeHtml(item)}</div>
+                <div class="card-controls">
+                    <button class="move-up" data-index="${idx}" ${idx === 0 ? 'disabled style="opacity:0.5;"' : ''}>▲ Вверх</button>
+                    <button class="move-down" data-index="${idx}" ${idx === timelineItems.length-1 ? 'disabled style="opacity:0.5;"' : ''}>▼ Вниз</button>
+                    <button class="remove-btn" data-index="${idx}">✖ Вернуть</button>
+                </div>
+            `;
+            timelineContainer.appendChild(card);
+        });
+        document.querySelectorAll('.move-up').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                moveCardInTimeline(idx, 'up');
+            });
+        });
+        document.querySelectorAll('.move-down').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                moveCardInTimeline(idx, 'down');
+            });
+        });
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                removeFromTimeline(idx);
+            });
+        });
+    }
+
+    function renderDragZone() {
+        dragContainer.innerHTML = "";
+        if (availableItems.length === 0) {
+            const emptyMsg = document.createElement("div");
+            emptyMsg.className = "compact-message";
+            emptyMsg.innerText = "✓ Все карточки в линейке! Теперь расставьте порядок ▲▼";
+            dragContainer.appendChild(emptyMsg);
+            return;
+        }
+        availableItems.forEach((item, idx) => {
+            const card = document.createElement("div");
+            card.className = "drag-card";
+            card.setAttribute("data-avail-idx", idx);
+            card.innerHTML = `<div class="card-text">${escapeHtml(item)}</div>`;
+            card.addEventListener('click', () => {
+                addToTimeline(idx);
+            });
+            dragContainer.appendChild(card);
+        });
+    }
+
+    function renderAll() {
+        renderTimeline();
+        renderDragZone();
+    }
+
+    function resetGame() {
+        timelineItems = [];
+        availableItems = getShuffledAvailable();
+        renderAll();
+        showMessage("🌀 Сброс. Нажимайте на карточки внизу → они появятся в линейке. Используйте ▲▼ для сортировки.", "info");
+    }
+
+    function checkOrder() {
+        if (timelineItems.length !== MASTER_STEPS.length) {
+            showMessage(`❌ В линейке ${timelineItems.length} из ${MASTER_STEPS.length} шагов. Добавьте все карточки.`, "error");
+            return;
+        }
+        if (isOrderCorrect()) {
+            showMessage("✅ Идеально! Хронология построена верно (от ДОПП до возврата ОП).", "success");
+        } else {
+            showMessage("❌ Неправильный порядок. Меняйте расположение кнопками ▲▼ внутри карточек.", "error");
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    resetBtn.addEventListener("click", resetGame);
+    checkBtn.addEventListener("click", checkOrder);
+
+    resetGame();
+</script>
+</body>
+</html>
