@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Резерв по сомнительным долгам · задачник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .step {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.correct {
+            background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
+            color: white;
+        }
+
+        .task-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #0a2942;
+            margin-bottom: 1.2rem;
+            white-space: pre-line;
+        }
+
+        .answers-area {
+            margin: 1rem 0;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border: 2px solid #d8e2f2;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.95rem;
+            margin-bottom: 0.6rem;
+        }
+        .answer-option:hover {
+            background: #f0f7ff;
+            border-color: #8da9cc;
+        }
+        .answer-option.selected {
+            background: #e1ecfe;
+            border-color: #1e6bb8;
+        }
+        .answer-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: #1e6bb8;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.8rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin: 1rem 0 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .final-message {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #2b8c4a;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .progress { gap: 0.5rem; }
+            .step { width: 32px; height: 32px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="progress" id="progressContainer"></div>
+        <div id="taskContainer" class="task-container"></div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="nextBtn" disabled>Далее →</button>
+        </div>
+        <div id="finalMessage" class="hidden final-message"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Данные задач
+            const tasks = [
+                {
+                    text: "Задача 1\n\nНа 31.12.2025 у ООО «ВГ» есть три сомнительных долга:\n• Контрагент А — 6 200 000 руб., просрочка 110 дней\n• Контрагент Б — 2 500 000 руб., просрочка 35 дней\n• Контрагент В — 1 800 000 руб., просрочка 70 дней\n\nКомпания создала резерв по сомнительным долгам на 31.12.2025. В 1 квартале 2026 года:\n- Контрагент А обанкротился и ликвидирован — долг безнадежный.\n- Контрагенты Б и В так и не заплатили.\nВыручка за квартал за 1 квартал 2026 года — 5 млрд руб. (лимит резерва — 10%, 500 млн руб.).\n\nКакие суммы надо включить в доходы и расходы за 1 квартал 2026 года?",
+                    options: [
+                        "А) доходы - 7 100 000 руб., расходы - 4 300 000 руб.",
+                        "Б) расходы 6 200 000 руб.",
+                        "В) расходы 10 500 000 руб.",
+                        "Г) расходы 3 400 000 руб."
+                    ],
+                    correct: 3,
+                    correctAnswerLetter: "Г",
+                    correctAnswerText: "расходы 3 400 000 руб.",
+                    explanation: "<strong>Правильный ответ: Г) расходы 3 400 000 руб.</strong><br><br><strong>Шаг 1.</strong> Резерв на 31.12.2025: 6 200 000 (А, 100%) + 1 800 000 × 50% = 6 200 000 + 900 000 = 7 100 000 руб. Долг Б (35 дней) не включается (менее 45 дней).<br><br><strong>Шаг 2.</strong> Долг ликвидированного контрагента А списываем за счет резерва. Остаток резерва после списания: 7 100 000 − 6 200 000 = 900 000 руб.<br><br><strong>Шаг 3.</strong> Увеличиваем резерв на 31.03.2026, так как просрочка контрагентов Б и В увеличилась на 90 дней. Резерв на 31.03.2026: 2 500 000 (Б, 100%, просрочка 125 дней) + 1 800 000 (В, 100%, просрочка 160 дней) = 4 300 000 руб.<br><br><strong>Шаг 4.</strong> Определяем, сколько включить в расходы. Остаток резерва после списания — 900 000 руб. Резерв на 31.03.2026 — 4 300 000 руб. Надо доначислить 3 400 000 руб. (4 300 000 − 900 000)."
+                },
+                {
+                    text: "Задача 2\n\nНа начало 2026 года у ООО «Громоотвод» уже есть резерв — 2 500 000 руб.\nВ 2026 году:\n- контрагент А признан банкротом, сумма долга 1 200 000 руб.\n- контрагент Б исчез, возбуждено уголовное дело, сумма долга 300 000 руб.\nОба долга возникли в начале 2025 года и уже были включены в резерв.\nНа конец 2026 года добавились новые долги:\n- контрагент В: сумма долга 1 000 000 руб., просрочка - 60 дней\n- контрагент Г: сумма долга 500 000 руб., просрочка - 25 дней\nВыручка за 2026 год — 300 млн руб. (лимит резерва — 10%, 30 млн руб.).\n\nКакие доходы или расходы по резерву нужно учесть для налога на прибыль за 2026 год?",
+                    options: [
+                        "А) доходы 1 700 000 руб.",
+                        "Б) расходы 800 000 руб.",
+                        "В) доходы 2 000 000 руб.",
+                        "Г) расходы 1 200 000 руб."
+                    ],
+                    correct: 0,
+                    correctAnswerLetter: "А",
+                    correctAnswerText: "доходы 1 700 000 руб.",
+                    explanation: "<strong>Правильный ответ: А) доходы 1 700 000 руб.</strong><br><br><strong>Шаг 1.</strong> Резерв на начало года — 2 500 000 руб.<br><br><strong>Шаг 2.</strong> Списываем безнадежный долг А (1 200 000 руб.) за счет резерва. Остаток резерва после списания: 2 500 000 − 1 200 000 = 1 300 000 руб.<br><br><strong>Шаг 3.</strong> Рассчитываем резерв по долгам на конец года:<br>— Контрагент Б (исчез, уголовное дело) — долг не безнадежный, остается в резерве: 300 000 руб.<br>— Контрагент В: просрочка 60 дней → включаем 50%: 1 000 000 × 50% = 500 000 руб.<br>— Контрагент Г: просрочка 25 дней (< 45) — не включается: 0 руб.<br>Итого резерв на конец года: 300 000 + 500 000 = 800 000 руб.<br><br><strong>Шаг 4.</strong> Сравниваем резервы: на начало года — 2 500 000 руб., на конец года — 800 000 руб. Резерв уменьшился → разницу восстанавливаем. Это внереализационный доход: 2 500 000 − 800 000 = 1 700 000 руб. Расходов нет."
+                }
+            ];
+
+            let currentTask = 0;
+            let results = tasks.map(() => null);
+            let taskCompleted = tasks.map(() => false);
+
+            const taskContainer = document.getElementById('taskContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const finalMessage = document.getElementById('finalMessage');
+
+            function updateProgress() {
+                let html = '';
+                for (let i = 0; i < tasks.length; i++) {
+                    let statusClass = '';
+                    if (i === currentTask && !taskCompleted[currentTask]) statusClass = 'active';
+                    else if (taskCompleted[i]) {
+                        statusClass = results[i] === true ? 'correct' : 'incorrect';
+                    }
+                    html += `<div class="step ${statusClass}">${i+1}</div>`;
+                }
+                progressContainer.innerHTML = html;
+            }
+
+            function renderCurrentTask() {
+                const task = tasks[currentTask];
+                
+                let optionsHtml = '';
+                task.options.forEach((opt, idx) => {
+                    optionsHtml += `
+                        <div class="answer-option" data-opt-index="${idx}">
+                            <input type="radio" name="taskOption" value="${idx}" id="opt${idx}">
+                            <label for="opt${idx}">${opt}</label>
+                        </div>
+                    `;
+                });
+
+                const html = `
+                    <div class="task-text">${task.text}</div>
+                    <div class="answers-area" id="answersArea">
+                        ${optionsHtml}
+                    </div>
+                    <div class="button-row">
+                        <button class="btn" id="checkBtn">Проверить</button>
+                    </div>
+                    <div id="feedback" class="feedback hidden"></div>
+                `;
+
+                taskContainer.innerHTML = html;
+
+                document.querySelectorAll('.answer-option').forEach(opt => {
+                    opt.addEventListener('click', function() {
+                        document.querySelectorAll('.answer-option').forEach(o => o.classList.remove('selected'));
+                        this.classList.add('selected');
+                        const radio = this.querySelector('input[type="radio"]');
+                        radio.checked = true;
+                    });
+                });
+
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (taskCompleted[currentTask]) return;
+                    checkAnswer();
+                });
+
+                updateProgress();
+            }
+            
+            function checkAnswer() {
+                const task = tasks[currentTask];
+                const selectedRadio = document.querySelector('input[name="taskOption"]:checked');
+                
+                if (!selectedRadio) {
+                    alert('Выберите вариант ответа');
+                    return;
+                }
+                
+                const selectedValue = parseInt(selectedRadio.value);
+                const isCorrect = (selectedValue === task.correct);
+                results[currentTask] = isCorrect;
+                taskCompleted[currentTask] = true;
+                
+                const feedbackDiv = document.getElementById('feedback');
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+                feedbackDiv.innerHTML = task.explanation;
+                
+                updateProgress();
+                
+                if (currentTask < tasks.length - 1) {
+                    nextBtn.disabled = false;
+                } else {
+                    nextBtn.textContent = 'Завершить';
+                    nextBtn.disabled = false;
+                }
+            }
+            
+            nextBtn.addEventListener('click', () => {
+                if (currentTask < tasks.length - 1) {
+                    currentTask++;
+                    renderCurrentTask();
+                    nextBtn.disabled = true;
+                } else {
+                    taskContainer.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    finalMessage.classList.remove('hidden');
+                    finalMessage.innerHTML = '✅ Все задачи решены! Спасибо за работу!';
+                }
+            });
+            
+            renderCurrentTask();
+        })();
+    </script>
+</body>
+</html>
