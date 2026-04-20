@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Материальные расходы · тренажёр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.5rem;
+            border: 1px solid #dee6f0;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: #0a2942;
+            margin-bottom: 1rem;
+        }
+
+        .expenses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin: 1rem 0;
+        }
+
+        .expense-item {
+            background: #f9fcff;
+            border: 2px solid #d2e0f0;
+            border-radius: 18px;
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            transition: 0.1s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .expense-item:hover {
+            background: #f0f7ff;
+            border-color: #8da9cc;
+        }
+        .expense-item.selected {
+            background: #e1ecfe;
+            border-color: #1e6bb8;
+            position: relative;
+        }
+        .expense-item.selected::after {
+            content: "✓";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1e6bb8;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .expense-name {
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.9rem;
+        }
+        .expense-amount {
+            font-weight: 600;
+            color: #1a344c;
+            background: #eef3fa;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0 0.5rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+
+        .feedback-overlay {
+            background: white;
+            border-radius: 24px;
+            border: 2px solid #c7daf5;
+            padding: 1rem;
+            margin-top: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .feedback-overlay.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback-overlay.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .result-table {
+            margin-top: 0.5rem;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            font-size: 0.8rem;
+            border-bottom: 1px dashed #e0eaf5;
+        }
+        .result-row.total {
+            font-weight: 600;
+            color: #1a344c;
+            border-bottom: none;
+            margin-top: 0.3rem;
+            padding-top: 0.3rem;
+            border-top: 2px solid #d2e0f0;
+        }
+        .result-correct {
+            color: #2b8c4a;
+        }
+        .result-incorrect {
+            color: #b13e3e;
+            text-decoration: line-through;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1rem; }
+            .expense-item { flex-direction: column; align-items: flex-start; }
+            .expense-item.selected::after { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="task-text">
+            ООО «Стройка» закупило партию пиломатериалов. Отметьте расходы, которые нужно включить в фактическую стоимость материалов для налогового учёта.
+        </div>
+
+        <div id="expensesList" class="expenses-list"></div>
+
+        <div class="button-row">
+            <button class="btn" id="checkBtn">Проверить</button>
+            <button class="btn" id="resetBtn">Сбросить</button>
+        </div>
+
+        <div id="feedback" class="feedback-overlay hidden"></div>
+    </div>
+
+    <script>
+        (function() {
+            const expenses = [
+                { name: "Стоимость материалов по договору", amount: 500000, correct: true, key: "price" },
+                { name: "НДС", amount: 90000, correct: false, key: "nds" },
+                { name: "Доставка от поставщика до склада компании", amount: 30000, correct: true, key: "delivery" },
+                { name: "Услуги брокера на таможне", amount: 0, correct: false, key: "broker" },
+                { name: "Погрузочно-разгрузочные работы на складе покупателя", amount: 15000, correct: true, key: "loading" },
+                { name: "Оплата услуг посредника, который нашёл поставщика", amount: 10000, correct: true, key: "mediator" },
+                { name: "Страховка груза в пути", amount: 8000, correct: false, key: "insurance" },
+                { name: "Проценты по кредиту, взятому на покупку материалов", amount: 12000, correct: false, key: "interest" },
+                { name: "Оплата экспертизы качества материалов перед отгрузкой", amount: 5000, correct: false, key: "expertise" }
+            ];
+
+            let selected = new Array(expenses.length).fill(false);
+
+            const expensesList = document.getElementById('expensesList');
+            const checkBtn = document.getElementById('checkBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const feedbackDiv = document.getElementById('feedback');
+
+            function formatAmount(amount) {
+                return amount.toLocaleString('ru') + ' ₽';
+            }
+
+            function renderList() {
+                let html = '';
+                expenses.forEach((exp, idx) => {
+                    const selectedClass = selected[idx] ? 'selected' : '';
+                    html += `
+                        <div class="expense-item ${selectedClass}" data-idx="${idx}">
+                            <span class="expense-name">${exp.name}</span>
+                            <span class="expense-amount">${formatAmount(exp.amount)}</span>
+                        </div>
+                    `;
+                });
+                expensesList.innerHTML = html;
+
+                document.querySelectorAll('.expense-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const idx = parseInt(item.dataset.idx);
+                        selected[idx] = !selected[idx];
+                        renderList();
+                    });
+                });
+            }
+
+            function checkResult() {
+                let totalCorrect = expenses.filter(e => e.correct).length;
+                let correctSelected = 0;
+                let incorrectSelected = 0;
+
+                for (let i = 0; i < expenses.length; i++) {
+                    if (selected[i] && expenses[i].correct) correctSelected++;
+                    if (selected[i] && !expenses[i].correct) incorrectSelected++;
+                }
+
+                const isAllCorrect = (correctSelected === totalCorrect && incorrectSelected === 0);
+                
+                let resultHtml = '<div class="result-table"><strong>Результат проверки:</strong><br>';
+                for (let i = 0; i < expenses.length; i++) {
+                    const isSelected = selected[i];
+                    const shouldBeSelected = expenses[i].correct;
+                    let statusClass = '';
+                    let statusText = '';
+                    
+                    if (shouldBeSelected && isSelected) {
+                        statusClass = 'result-correct';
+                        statusText = '✅ Верно';
+                    } else if (shouldBeSelected && !isSelected) {
+                        statusClass = 'result-incorrect';
+                        statusText = '❌ Должно быть включено';
+                    } else if (!shouldBeSelected && isSelected) {
+                        statusClass = 'result-incorrect';
+                        statusText = '❌ Не должно быть включено';
+                    } else {
+                        statusClass = '';
+                        statusText = '—';
+                    }
+                    
+                    resultHtml += `
+                        <div class="result-row">
+                            <span>${expenses[i].name}</span>
+                            <span class="${statusClass}">${statusText}</span>
+                            <span style="font-size:0.75rem; color:#5e7290;">${formatAmount(expenses[i].amount)}</span>
+                        </div>
+                    `;
+                }
+                
+                let totalCost = 0;
+                for (let i = 0; i < expenses.length; i++) {
+                    if (selected[i] && expenses[i].correct) {
+                        totalCost += expenses[i].amount;
+                    }
+                }
+                
+                resultHtml += `<div class="result-row total">
+                    <span><strong>Итого стоимость материалов</strong></span>
+                    <span><strong>${formatAmount(totalCost)}</strong></span>
+                </div>`;
+                resultHtml += '</div>';
+                
+                let explanationText = '';
+                if (isAllCorrect) {
+                    explanationText = '✅ Отлично! Все расходы отмечены верно. ';
+                } else {
+                    explanationText = '❌ Есть ошибки. ';
+                }
+                explanationText += 'По правилам ст. 254 НК РФ в фактическую стоимость материалов включаются: цена по договору, доставка до склада, погрузочно-разгрузочные работы, услуги посредника. НДС, страховка, проценты по кредиту и экспертиза не включаются.';
+                
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.className = 'feedback-overlay ' + (isAllCorrect ? 'correct' : 'incorrect');
+                feedbackDiv.innerHTML = `<div style="margin-bottom:0.5rem;"><strong>${explanationText}</strong></div>${resultHtml}`;
+            }
+
+            function resetSelection() {
+                selected = new Array(expenses.length).fill(false);
+                renderList();
+                feedbackDiv.classList.add('hidden');
+            }
+
+            renderList();
+            checkBtn.addEventListener('click', checkResult);
+            resetBtn.addEventListener('click', resetSelection);
+        })();
+    </script>
+</body>
+</html>
