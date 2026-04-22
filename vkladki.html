@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Налоговые базы РФ — тренажер карточек</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f7;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 1rem;
+            color: #0a1c2f;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-container {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .card-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .side-arrow {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1e3c72;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: 0.2s;
+            user-select: none;
+        }
+
+        .side-arrow:active {
+            background: #eef2ff;
+            transform: scale(0.94);
+        }
+
+        .flashcard {
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .card-inner {
+            padding: 1.2rem 1rem;
+        }
+
+        .badge-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .tax-type {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1e3c72;
+            line-height: 1.3;
+        }
+
+        .code-badge {
+            background: #eef2ff;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #1e3c72;
+            font-family: monospace;
+        }
+
+        .subheader {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #5b6e8c;
+            cursor: pointer;
+            border-radius: 2rem 2rem 0 0;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #1e3c72;
+            background: #eef2ff;
+            border-bottom: 2px solid #1e3c72;
+        }
+
+        .tabs-content-wrapper {
+            position: relative;
+        }
+
+        .tab-content {
+            display: none;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .rate-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.7rem 0;
+        }
+
+        .rate-pill {
+            background: #f1f5f9;
+            border-radius: 40px;
+            padding: 0.25rem 0.85rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid #cbd5e1;
+            font-family: monospace;
+        }
+
+        .income-desc {
+            font-size: 0.75rem;
+            color: #2c3e50;
+            margin-bottom: 0.3rem;
+            line-height: 1.4;
+        }
+
+        .deduct-block {
+            margin-top: 0.6rem;
+            padding-top: 0.4rem;
+            border-top: 1px solid #edf2f7;
+        }
+
+        .deduct-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            background: #e6f7ec;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            color: #2c6e2f;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+
+        .no-deduct {
+            background: #ffe8e6;
+            color: #b91c1c;
+        }
+
+        .deduct-text {
+            font-size: 0.75rem;
+            color: #2c3e50;
+        }
+
+        .counter {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #4b5565;
+            background: rgba(255,255,240,0.8);
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin: 0 auto 0.8rem;
+            width: fit-content;
+        }
+
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.45rem;
+            margin: 0.5rem 0 0.2rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #cbd5e1;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .dot.active {
+            background: #2a5298;
+            width: 18px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #7e8b9f;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 550px) {
+            body {
+                padding: 0.75rem;
+            }
+            .card-inner {
+                padding: 1rem 0.9rem;
+            }
+            .tax-type {
+                font-size: 0.9rem;
+            }
+            .side-arrow {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+            .card-row {
+                gap: 0.3rem;
+            }
+            .tab-btn {
+                padding: 0.4rem 0.7rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="card-container">
+    <div style="display: flex; justify-content: center; margin-bottom: 0.5rem;">
+        <div class="counter" id="cardCounter">1 / 3</div>
+    </div>
+
+    <div class="card-row">
+        <div class="side-arrow" id="prevArrow">←</div>
+        <div class="flashcard" id="flashcard">
+            <div class="card-inner" id="cardInner"></div>
+        </div>
+        <div class="side-arrow" id="nextArrow">→</div>
+    </div>
+    
+    <div class="progress-dots" id="progressDots"></div>
+    <footer>Тренажер: виды налоговых баз, ставки и вычеты по НК РФ</footer>
+</div>
+
+<script>
+    // Данные для карточек с вкладками
+    const cardsData = [
+        {   // карточка 1: Первая и вторая шкала
+            title: "Первая и вторая шкала, частично прогрессивные",
+            code: "доходы из п.6, 6.1, 6.2 ст.210 НК",
+            sub: "",
+            tabs: [
+                {
+                    name: "Инвестиционные доходы",
+                    desc: "Дивиденды, продажа имущества, страхование",
+                    rates: [
+                        { limit: "до 2,4 млн руб.", rate: "13%" },
+                        { limit: "свыше 2,4 млн руб.", rate: "15%" }
+                    ],
+                    deductStatus: "Вычеты",
+                    deductText: "Некоторые виды вычетов, например имущественные вычеты по ст.220 НК при продаже имущества.",
+                    deductClass: ""
+                },
+                {
+                    name: "СВО, надбавки",
+                    desc: "Выплаты участникам СВО, северные надбавки, районные коэффициенты",
+                    rates: [
+                        { limit: "до 5 млн руб.", rate: "13%" },
+                        { limit: "свыше 5 млн руб.", rate: "15%" }
+                    ],
+                    deductStatus: "Вычеты",
+                    deductText: "Вычетов нет, но остаток вычета с основной базы можно перенести на районные коэффициенты и северные надбавки.",
+                    deductClass: "no-deduct"
+                }
+            ]
+        },
+        {   // карточка 2: Третья шкала
+            title: "Третья шкала, 5-уровневая прогрессивная",
+            code: "",
+            sub: "сумма баз из п.2.1 ст.210 НК",
+            tabs: [
+                {
+                    name: "Основная база",
+                    desc: "Зарплата, отпускные, больничные, выплаты по ГПД и другие доходы",
+                    rates: [
+                        { limit: "до 2,4 млн руб.", rate: "13%" },
+                        { limit: "2,4–5 млн руб.", rate: "15%" },
+                        { limit: "5–20 млн руб.", rate: "18%" },
+                        { limit: "20–50 млн руб.", rate: "20%" },
+                        { limit: "свыше 50 млн руб.", rate: "22%" }
+                    ],
+                    deductStatus: "Вычеты",
+                    deductText: "Стандартные, социальные, имущественные вычеты по ст.218-220 НК.",
+                    deductClass: ""
+                },
+                {
+                    name: "Другие доходы",
+                    desc: "Выигрыши в азартных играх и лотереях, доходы участников инвестиционного товарищества, прибыль КИК, доходы в виде цифровой валюты",
+                    rates: [
+                        { limit: "до 2,4 млн руб.", rate: "13%" },
+                        { limit: "2,4–5 млн руб.", rate: "15%" },
+                        { limit: "5–20 млн руб.", rate: "18%" },
+                        { limit: "20–50 млн руб.", rate: "20%" },
+                        { limit: "свыше 50 млн руб.", rate: "22%" }
+                    ],
+                    deductStatus: "Вычеты",
+                    deductText: "Вычеты по ст.218-220 НК не предоставляются.",
+                    deductClass: "no-deduct"
+                }
+            ]
+        },
+        {   // карточка 3: Плоские ставки
+            title: "Базы с плоскими ставками",
+            code: "",
+            sub: "доходы по ставкам из п.2, 5, 6 ст.224 НК",
+            tabs: [
+                {
+                    name: "Ставка 35%",
+                    desc: "35% с суммы свыше 4 тыс. руб.",
+                    rates: [],
+                    deductStatus: "Вычеты",
+                    deductText: "Вычеты по ст.218-220 НК не применяются.",
+                    deductClass: "no-deduct",
+                    customIncome: "Выигрыши и призы в конкурсах, играх и других мероприятиях в целях рекламы (сверх лимита), материальная выгода от экономии на процентах по займам, плата за использование средств пайщиков."
+                },
+                {
+                    name: "Ставка 9%",
+                    desc: "9%",
+                    rates: [],
+                    deductStatus: "Вычеты",
+                    deductText: "Вычеты по ст.218-220 НК не применяются.",
+                    deductClass: "no-deduct",
+                    customIncome: "Проценты по облигациям с ипотечным покрытием."
+                },
+                {
+                    name: "Ставка 30%",
+                    desc: "30%",
+                    rates: [],
+                    deductStatus: "Вычеты",
+                    deductText: "Вычеты по ст.218-220 НК не применяются.",
+                    deductClass: "no-deduct",
+                    customIncome: "Доходы по ценным бумагам на счетах депо."
+                }
+            ]
+        }
+    ];
+
+    let currentCard = 0;
+    const totalCards = cardsData.length;
+    let activeTabIndex = 0;
+
+    const cardInner = document.getElementById('cardInner');
+    const counterSpan = document.getElementById('cardCounter');
+    const dotsContainer = document.getElementById('progressDots');
+    const prevArrow = document.getElementById('prevArrow');
+    const nextArrow = document.getElementById('nextArrow');
+
+    // Генерация HTML содержимого вкладки
+    function generateTabContentHtml(tab) {
+        let ratesHtml = '';
+        if (tab.rates && tab.rates.length > 0) {
+            tab.rates.forEach(r => {
+                ratesHtml += `<span class="rate-pill">${r.limit} → ${r.rate}</span>`;
+            });
+        }
+        
+        let descHtml = '';
+        if (tab.desc) {
+            descHtml = `<div class="income-desc">${tab.desc}</div>`;
+        }
+        
+        let customIncomeHtml = '';
+        if (tab.customIncome) {
+            customIncomeHtml = `<div class="income-desc" style="margin-top: 0.5rem;">${tab.customIncome}</div>`;
+        }
+        
+        let deductClass = tab.deductClass || '';
+        
+        return `
+            ${descHtml}
+            ${customIncomeHtml}
+            ${ratesHtml ? `<div class="rate-pills">${ratesHtml}</div>` : ''}
+            <div class="deduct-block">
+                <span class="deduct-badge ${deductClass}">${tab.deductStatus}</span>
+                <span class="deduct-text">${tab.deductText}</span>
+            </div>
+        `;
+    }
+
+    // Функция выравнивания высоты всех вкладок внутри текущей карточки
+    function equalizeTabHeights() {
+        const wrapper = document.getElementById('tabsContentWrapper');
+        if (!wrapper) return;
+        
+        const tabContents = wrapper.querySelectorAll('.tab-content');
+        if (tabContents.length === 0) return;
+        
+        // Сначала сбрасываем minHeight, чтобы получить реальные высоты
+        tabContents.forEach(content => {
+            content.style.minHeight = '';
+        });
+        
+        // Временно делаем все вкладки видимыми для измерения (но не активными)
+        const originalDisplay = [];
+        const originalVisibility = [];
+        const originalOpacity = [];
+        
+        tabContents.forEach((content, idx) => {
+            originalDisplay[idx] = content.style.display;
+            originalVisibility[idx] = content.style.visibility;
+            originalOpacity[idx] = content.style.opacity;
+            content.style.display = 'block';
+            content.style.visibility = 'hidden';
+            content.style.opacity = '0';
+            content.style.position = 'absolute';
+            content.style.top = '-9999px';
+        });
+        
+        // Измеряем высоты
+        let maxHeight = 0;
+        tabContents.forEach(content => {
+            const height = content.offsetHeight;
+            if (height > maxHeight) maxHeight = height;
+        });
+        
+        // Восстанавливаем исходное состояние
+        tabContents.forEach((content, idx) => {
+            content.style.display = originalDisplay[idx];
+            content.style.visibility = originalVisibility[idx];
+            content.style.opacity = originalOpacity[idx];
+            content.style.position = '';
+            content.style.top = '';
+        });
+        
+        // Устанавливаем одинаковую высоту
+        if (maxHeight > 0) {
+            tabContents.forEach(content => {
+                content.style.minHeight = maxHeight + 'px';
+            });
+        }
+    }
+
+    function renderCard(cardIdx, tabIdx = 0) {
+        const card = cardsData[cardIdx];
+        if (!card) return;
+        activeTabIndex = tabIdx;
+
+        let headerHtml = `
+            <div class="badge-row">
+                <span class="tax-type">${card.title}</span>
+                ${card.code ? `<span class="code-badge">${card.code}</span>` : ''}
+            </div>
+        `;
+        if (card.sub) {
+            headerHtml += `<div class="subheader">${card.sub}</div>`;
+        }
+
+        let tabsHtml = `<div class="tabs">`;
+        card.tabs.forEach((tab, idx) => {
+            tabsHtml += `<button class="tab-btn ${idx === activeTabIndex ? 'active' : ''}" data-tab-index="${idx}">${tab.name}</button>`;
+        });
+        tabsHtml += `</div>`;
+
+        // Контейнер для содержимого вкладок
+        let contentsHtml = `<div class="tabs-content-wrapper" id="tabsContentWrapper">`;
+        card.tabs.forEach((tab, idx) => {
+            const contentHtml = generateTabContentHtml(tab);
+            contentsHtml += `
+                <div class="tab-content ${idx === activeTabIndex ? 'active' : ''}" data-tab="${idx}" id="tabContent_${idx}">
+                    ${contentHtml}
+                </div>
+            `;
+        });
+        contentsHtml += `</div>`;
+
+        const fullHtml = headerHtml + tabsHtml + contentsHtml;
+        cardInner.innerHTML = fullHtml;
+
+        // Применяем выравнивание высоты после рендера
+        setTimeout(() => {
+            equalizeTabHeights();
+        }, 10);
+
+        const tabButtons = cardInner.querySelectorAll('.tab-btn');
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabIndex = parseInt(btn.dataset.tabIndex);
+                if (!isNaN(tabIndex)) {
+                    setActiveTab(cardIdx, tabIndex);
+                }
+            });
+        });
+
+        counterSpan.innerText = `${cardIdx+1} / ${totalCards}`;
+        updateDots(cardIdx);
+    }
+
+    function setActiveTab(cardIdx, tabIdx) {
+        const tabs = cardInner.querySelectorAll('.tab-btn');
+        const contents = cardInner.querySelectorAll('.tab-content');
+        
+        tabs.forEach((btn, idx) => {
+            if (idx === tabIdx) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        contents.forEach((content, idx) => {
+            if (idx === tabIdx) {
+                content.classList.add('active');
+            } else {
+                content.classList.remove('active');
+            }
+        });
+        
+        activeTabIndex = tabIdx;
+        
+        // После переключения вкладки пересчитываем высоту
+        setTimeout(() => {
+            equalizeTabHeights();
+        }, 10);
+    }
+
+    function updateDots(activeIdx) {
+        if (!dotsContainer) return;
+        let dotsHtml = '';
+        for (let i = 0; i < totalCards; i++) {
+            dotsHtml += `<div class="dot ${i === activeIdx ? 'active' : ''}"></div>`;
+        }
+        dotsContainer.innerHTML = dotsHtml;
+    }
+
+    function nextCard() {
+        if (currentCard < totalCards - 1) {
+            currentCard++;
+            renderCard(currentCard, 0);
+        }
+    }
+
+    function prevCard() {
+        if (currentCard > 0) {
+            currentCard--;
+            renderCard(currentCard, 0);
+        }
+    }
+
+    prevArrow.addEventListener('click', prevCard);
+    nextArrow.addEventListener('click', nextCard);
+
+    // Свайп для мобильных
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const flashcard = document.getElementById('flashcard');
+    
+    flashcard.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+    
+    flashcard.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const deltaX = touchEndX - touchStartX;
+        if (deltaX < -40) {
+            nextCard();
+        } else if (deltaX > 40) {
+            prevCard();
+        }
+    }, {passive: true});
+
+    renderCard(0, 0);
+</script>
+</body>
+</html>
