@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>НДФЛ: нерезиденты — тренажер</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #eef2f5;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .trainer-card {
+      max-width: 550px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 0.9rem 0.9rem 0.6rem;
+      border: 1px solid #dce5f0;
+    }
+
+    .main-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a4972;
+      text-align: center;
+      margin-bottom: 0.2rem;
+    }
+
+    .sub {
+      color: #2b4b6e;
+      font-size: 0.75rem;
+      background: #e9f1fa;
+      border-radius: 30px;
+      padding: 0.2rem 0.7rem;
+      margin-bottom: 0.6rem;
+      line-height: 1.3;
+      border: 1px solid #cde0f0;
+      text-align: center;
+    }
+
+    .carousel-container {
+      margin: 0.1rem 0 0.4rem;
+    }
+
+    .card-wrapper {
+      overflow: hidden;
+    }
+
+    .card-slide {
+      display: flex;
+      transition: transform 0.2s ease;
+    }
+
+    .card-item {
+      flex: 0 0 100%;
+    }
+
+    .task-card {
+      background: #f8fbfe;
+      border-radius: 20px;
+      padding: 0.7rem 0.8rem 0.6rem;
+      border: 1px solid #dce5f0;
+    }
+
+    .card-header {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #04335b;
+      background: #e4edfa;
+      display: inline-block;
+      padding: 0.2rem 0.9rem;
+      border-radius: 30px;
+      margin-bottom: 0.6rem;
+    }
+
+    .scenario {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 0.5rem 0.7rem;
+      border: 1px dashed #9bb1c7;
+      margin-bottom: 0.6rem;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      color: #1f2c38;
+    }
+
+    .question-text {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      color: #021c30;
+    }
+
+    .criteria-block {
+      background: #f0f7ff;
+      border-radius: 14px;
+      padding: 0.6rem 0.6rem;
+      border: 1px solid #cbdbe3;
+      margin-bottom: 0.7rem;
+    }
+
+    .criteria-title {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #1e3b5c;
+      margin-bottom: 0.4rem;
+      padding-bottom: 0.2rem;
+      border-bottom: 1px dashed #9aa9b7;
+    }
+
+    .criteria-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .criteria-row {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+
+    .criteria-label {
+      font-weight: 600;
+      color: #1f2c38;
+      font-size: 0.75rem;
+      min-width: 115px;
+    }
+
+    .dropzone {
+      background: #ffffff;
+      border: 1.5px dashed #9aa9b7;
+      border-radius: 30px;
+      padding: 0.3rem 0.6rem;
+      min-width: 100px;
+      text-align: center;
+      font-weight: 500;
+      color: #5f7485;
+      transition: 0.1s;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .dropzone.filled {
+      border: 1.5px solid #6b7b8c;
+      background: #d1dbe5;
+      color: #1f2c38;
+      font-weight: 600;
+    }
+
+    .dropzone.correct-check {
+      border: 2px solid #2e7d5e;
+      background: #d0ecdf;
+      font-weight: 700;
+    }
+
+    .dropzone.incorrect-check {
+      border: 2px solid #b13e3e;
+      background: #ffeae5;
+      font-weight: 700;
+    }
+
+    .unit {
+      font-size: 0.6rem;
+      color: #5f7485;
+    }
+
+    .options-panel {
+      background: #edf2f7;
+      border-radius: 14px;
+      padding: 0.6rem 0.6rem;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 0.6rem;
+    }
+
+    .options-panel h3 {
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #2b4050;
+      border-bottom: 1px dashed #9aa9b7;
+      padding-bottom: 0.2rem;
+      margin-bottom: 0.4rem;
+      text-align: center;
+    }
+
+    .draggable-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .drag-item {
+      background: #ffffff;
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      border: 1.5px solid #1a5d8f;
+      color: #1a5d8f;
+      font-weight: 600;
+      font-size: 0.7rem;
+      cursor: grab;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      transition: 0.1s;
+      user-select: none;
+    }
+
+    .drag-item:active {
+      cursor: grabbing;
+      opacity: 0.7;
+    }
+
+    .drag-item.placed {
+      background: #d1dbe5;
+      border: 1.5px solid #6b7b8c;
+      color: #4a5f73;
+      cursor: default;
+      opacity: 0.5;
+      pointer-events: none;
+      text-decoration: line-through;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 0.3rem 0 0.4rem;
+    }
+
+    .btn {
+      background: white;
+      border: 1.5px solid #1a5d8f;
+      border-radius: 60px;
+      padding: 0.2rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.7rem;
+      color: #1a5d8f;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .btn-primary {
+      background: #1a5d8f;
+      color: white;
+      border: 1.5px solid #0e3b5c;
+    }
+
+    .btn-primary:hover { background: #0e4a77; }
+    .btn:hover { background: #e1ecfe; }
+    .btn:active, .btn-primary:active {
+      transform: translateY(1px);
+    }
+
+    .carousel-arrows {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0.2rem 0 0.3rem;
+    }
+
+    .arrow-btn {
+      background: white;
+      border: 1.5px solid #2a5f8a;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2a5f8a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .arrow-btn:active {
+      transform: translateY(1px);
+    }
+
+    .arrow-btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .counter {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #1e3b5c;
+      background: #e6f0fa;
+      padding: 0.2rem 0.8rem;
+      border-radius: 60px;
+    }
+
+    .feedback {
+      background: #f2f8fd;
+      border-radius: 14px;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.7rem;
+      color: #1e3b5c;
+      border: 1px solid #cde0f0;
+      margin: 0.2rem 0 0.2rem;
+      min-height: 2rem;
+    }
+
+    .reset-area {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.1rem;
+    }
+
+    .reset-link {
+      background: transparent;
+      border: none;
+      color: #2a5f8a;
+      font-size: 0.65rem;
+      text-decoration: underline dotted;
+      cursor: pointer;
+      padding: 0.1rem 0.4rem;
+    }
+  </style>
+</head>
+<body>
+<div class="trainer-card" id="trainerContainer"></div>
+
+<script>
+  (function() {
+    const cardsData = [
+      {
+        title: 'Задание 1',
+        scenario: 'Иностранец Джон работает в России, получает зарплату 90 000 руб. в месяц. Также получает доход от аренды квартиры в Лондоне — 600 000 руб. в год. Джон — нерезидент.',
+        question: 'Какая налоговая база для НДФЛ в России?',
+        dropZones: [
+          { label: 'Налоговая база', expected: '1 080 000 руб.', unit: 'руб.' }
+        ],
+        draggableValues: ['1 080 000 руб.', '600 000 руб.', '1 680 000 руб.', '90 000 руб.'],
+        explanation: 'Нерезидент: только доходы от источников в РФ = 90 000 × 12 = 1 080 000 руб.'
+      },
+      {
+        title: 'Задание 2',
+        scenario: 'Мария — нерезидент. Работает в России, зарплата 700 000 руб. в год и получает алименты от бывшего мужа из Германии — 240 000 руб. в год.',
+        question: 'Налоговая база в РФ?',
+        dropZones: [
+          { label: 'База для НДФЛ', expected: '700 000 руб.', unit: 'руб.' }
+        ],
+        draggableValues: ['700 000 руб.', '940 000 руб.', '240 000 руб.', '460 000 руб.'],
+        explanation: 'Нерезидент: облагаются только доходы от источников в РФ (зарплата 700 000 руб.). Алименты не облагаются.'
+      },
+      {
+        title: 'Задание 3',
+        scenario: 'Российская организация выплачивает участникам дивиденды в общей сумме 266 000 руб. Смит — нерезидент, гражданин Австрии, ему принадлежит из 100 акций 40 акций. Кроме того, Смит получает от издательства в Швейцарии вознаграждение за книги 40 000 евро.',
+        question: 'Налоговая база Смита для НДФЛ?',
+        dropZones: [
+          { label: 'Налоговая база', expected: '106 400 руб.', unit: 'руб.' }
+        ],
+        draggableValues: ['106 400 руб.', '266 000 руб.', '40 000 евро', '0 руб.'],
+        explanation: 'Нерезидент: облагаются только дивиденды от источников в РФ: 266 000 руб. ÷ 100 акций × 40 акций = 106 400 руб. Доход из Швейцарии не облагается.'
+      },
+      {
+        title: 'Задание 4',
+        scenario: 'Иван — нерезидент. Продал в г. Суздаль квартиру за 2 500 000 руб. Срок владения — 2 года. Приобретал за 1 500 000 руб. Документы на покупку не сохранились.',
+        question: 'Налоговая база для Ивана?',
+        dropZones: [
+          { label: 'Налоговая база', expected: '2 500 000 руб.', unit: 'руб.' }
+        ],
+        draggableValues: ['2 500 000 руб.', '1 500 000 руб.', '1 000 000 руб.', '0 руб.'],
+        explanation: 'Нерезидент не может уменьшить доходы от продажи имущества на вычет или расходы. Облагается полная сумма продажи 2 500 000 руб.'
+      }
+    ];
+
+    let cardState = cardsData.map(() => ({
+      dropValues: [],
+      usedValues: [],
+      disabled: false,
+      feedbackText: '',
+      feedbackClass: ''
+    }));
+
+    let currentIndex = 0;
+    const container = document.getElementById('trainerContainer');
+
+    function render() {
+      const total = cardsData.length;
+      if (currentIndex >= total) currentIndex = total - 1;
+      if (currentIndex < 0) currentIndex = 0;
+
+      container.innerHTML = `
+        <div class="main-title">НДФЛ: нерезиденты</div>
+        <div class="sub">Заполните пропуски — перетащите нужную сумму</div>
+
+        <div class="carousel-container">
+          <div class="card-wrapper">
+            <div class="card-slide" style="transform: translateX(0%);">
+              <div class="card-item" id="carouselCard"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-arrows">
+          <button class="arrow-btn" id="prevCard" ${total <= 1 || currentIndex === 0 ? 'disabled' : ''}>←</button>
+          <span class="counter">${currentIndex+1} / ${total}</span>
+          <button class="arrow-btn" id="nextCard" ${total <= 1 || currentIndex === total-1 ? 'disabled' : ''}>→</button>
+        </div>
+
+        <div class="reset-area">
+          <button class="reset-link" id="resetCardBtn">сбросить эту карточку</button>
+          <span>|</span>
+          <button class="reset-link" id="resetAllBtn">сбросить всё</button>
+        </div>
+
+        <div class="feedback" id="cardFeedback"></div>
+      `;
+
+      renderCurrentCard();
+
+      document.getElementById('prevCard').addEventListener('click', () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          render();
+        }
+      });
+
+      document.getElementById('nextCard').addEventListener('click', () => {
+        if (currentIndex < total - 1) {
+          currentIndex++;
+          render();
+        }
+      });
+
+      document.getElementById('resetCardBtn').addEventListener('click', () => {
+        resetSingleCard(currentIndex);
+        render();
+      });
+
+      document.getElementById('resetAllBtn').addEventListener('click', () => {
+        cardState = cardsData.map(() => ({
+          dropValues: [],
+          usedValues: [],
+          disabled: false,
+          feedbackText: '',
+          feedbackClass: ''
+        }));
+        render();
+      });
+    }
+
+    function resetSingleCard(idx) {
+      cardState[idx] = {
+        dropValues: [],
+        usedValues: [],
+        disabled: false,
+        feedbackText: '',
+        feedbackClass: ''
+      };
+    }
+
+    function renderCurrentCard() {
+      const card = cardsData[currentIndex];
+      const state = cardState[currentIndex];
+      const containerDiv = document.getElementById('carouselCard');
+      if (!containerDiv) return;
+
+      if (state.dropValues.length === 0) {
+        state.dropValues = card.dropZones.map(() => '');
+      }
+
+      let html = `
+        <div class="task-card">
+          <div class="card-header">${card.title}</div>
+          <div class="scenario">${card.scenario}</div>
+          <div class="question-text">${card.question}</div>
+          
+          <div class="criteria-block" id="dropzones-${currentIndex}">
+            <div class="criteria-title">Перетащите значение</div>
+            <div class="criteria-grid">
+      `;
+
+      card.dropZones.forEach((zone, zIdx) => {
+        const currentVal = state.dropValues[zIdx] || '';
+        const filledClass = currentVal ? 'filled' : '';
+        const correctClass = (state.disabled && currentVal === zone.expected) ? 'correct-check' : '';
+        const incorrectClass = (state.disabled && currentVal && currentVal !== zone.expected) ? 'incorrect-check' : '';
+        html += `
+          <div class="criteria-row">
+            <span class="criteria-label">${zone.label}</span>
+            <div class="dropzone ${filledClass} ${correctClass} ${incorrectClass}" 
+                 id="drop-${currentIndex}-${zIdx}" 
+                 data-expected="${zone.expected}"
+                 data-zone-index="${zIdx}">${currentVal}</div>
+            <span class="unit">${zone.unit}</span>
+          </div>
+        `;
+      });
+
+      html += `</div></div>`;
+
+      html += `
+        <div class="options-panel">
+          <h3>Доступные суммы</h3>
+          <div class="draggable-items" id="draggable-${currentIndex}">
+      `;
+
+      card.draggableValues.forEach(val => {
+        const isUsed = state.usedValues.includes(val);
+        html += `<div class="drag-item ${isUsed ? 'placed' : ''}" draggable="${!isUsed && !state.disabled}" data-value="${val}">${val}</div>`;
+      });
+
+      html += `</div></div>`;
+
+      html += `
+        <div class="actions">
+          <button class="btn" id="clearCardBtn">Очистить поля</button>
+          <button class="btn btn-primary" id="checkCardBtn" ${state.disabled ? 'disabled' : ''}>Проверить</button>
+        </div>
+      `;
+
+      if (state.feedbackText) {
+        html += `<div class="feedback ${state.feedbackClass}">${state.feedbackText}</div>`;
+      }
+
+      html += `</div>`;
+      containerDiv.innerHTML = html;
+
+      setupDragAndDrop(currentIndex);
+
+      document.getElementById('clearCardBtn').addEventListener('click', () => {
+        if (state.disabled) return;
+        state.dropValues = card.dropZones.map(() => '');
+        state.usedValues = [];
+        state.feedbackText = '';
+        state.feedbackClass = '';
+        renderCurrentCard();
+      });
+
+      document.getElementById('checkCardBtn').addEventListener('click', () => {
+        checkCard(currentIndex);
+      });
+    }
+
+    function setupDragAndDrop(cardIdx) {
+      const card = cardsData[cardIdx];
+      const state = cardState[cardIdx];
+
+      const draggables = document.querySelectorAll(`#draggable-${cardIdx} .drag-item`);
+      const dropZones = document.querySelectorAll(`[id^="drop-${cardIdx}-"]`);
+
+      draggables.forEach(item => {
+        if (item.getAttribute('draggable') !== 'true') return;
+        item.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', item.getAttribute('data-value') || item.innerText);
+          item.classList.add('dragging');
+        });
+        item.addEventListener('dragend', (e) => {
+          item.classList.remove('dragging');
+        });
+      });
+
+      dropZones.forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragenter', (e) => {
+          e.preventDefault();
+          zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragleave', () => {
+          zone.classList.remove('drag-over');
+        });
+        zone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          zone.classList.remove('drag-over');
+          if (state.disabled) {
+            document.getElementById('cardFeedback').innerText = 'Карточка уже проверена, сбросьте её.';
+            return;
+          }
+          const data = e.dataTransfer.getData('text/plain');
+          if (!data) return;
+          const zoneIndex = zone.dataset.zoneIndex;
+          if (zoneIndex === undefined) return;
+          if (state.dropValues[zoneIndex]) {
+            document.getElementById('cardFeedback').innerText = '⚠️ Эта ячейка уже заполнена. Очистите двойным кликом.';
+            return;
+          }
+          if (state.usedValues.includes(data)) {
+            document.getElementById('cardFeedback').innerText = '⚠️ Эта сумма уже использована. Выберите другую.';
+            return;
+          }
+          state.dropValues[zoneIndex] = data;
+          state.usedValues.push(data);
+          renderCurrentCard();
+        });
+        zone.addEventListener('dblclick', () => {
+          if (state.disabled) return;
+          const zoneIndex = zone.dataset.zoneIndex;
+          const currentVal = state.dropValues[zoneIndex];
+          if (currentVal) {
+            state.usedValues = state.usedValues.filter(v => v !== currentVal);
+            state.dropValues[zoneIndex] = '';
+            renderCurrentCard();
+          }
+        });
+      });
+    }
+
+    function checkCard(cardIdx) {
+      const card = cardsData[cardIdx];
+      const state = cardState[cardIdx];
+      if (state.dropValues.some(v => !v)) {
+        document.getElementById('cardFeedback').innerText = '❌ Заполните все поля перед проверкой.';
+        return;
+      }
+      let allCorrect = true;
+      card.dropZones.forEach((zone, idx) => {
+        if (state.dropValues[idx] !== zone.expected) allCorrect = false;
+      });
+      state.disabled = true;
+      if (allCorrect) {
+        state.feedbackText = '✅ Верно! ' + card.explanation;
+        state.feedbackClass = 'correct';
+      } else {
+        state.feedbackText = '❌ Ошибка. ' + card.explanation;
+        state.feedbackClass = 'incorrect';
+      }
+      renderCurrentCard();
+    }
+
+    render();
+  })();
+</script>
+</body>
+</html>
