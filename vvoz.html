@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Хронология | Импорт ЕАЭС</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #cbd5e1;
+            font-family: -apple-system, 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            padding: 10px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trainer {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            background: transparent;
+            border-radius: 28px;
+        }
+
+        /* два столбца — всегда вертикально на всех экранах */
+        .two-columns {
+            display: flex;
+            flex-direction: row;
+            gap: 14px;
+            flex-wrap: nowrap;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 0;
+            background: #dce5ef;
+            border-radius: 24px;
+            padding: 12px 10px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.03), 0 3px 8px rgba(0,0,0,0.08);
+        }
+
+        .column-title {
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #0a2f4d;
+            background: #cbdae9;
+            display: inline-block;
+            width: 100%;
+            padding: 5px 0;
+            border-radius: 40px;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* левая колонка — доступные карточки */
+        .drag-card {
+            background: #eef2f7;
+            border-radius: 16px;
+            padding: 10px 8px;
+            color: #0a2f4d;
+            font-weight: 700;
+            font-size: 0.75rem;
+            line-height: 1.3;
+            text-align: center;
+            transition: 0.08s linear;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #cbd8e6;
+            cursor: pointer;
+            user-select: none;
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-word;
+        }
+        .drag-card:active {
+            transform: scale(0.97);
+            background: #d9e2ec;
+        }
+
+        /* правая колонка — шаги с номером */
+        .step-slot {
+            background: #eef2f7;
+            border-radius: 16px;
+            padding: 6px 8px;
+            border: 2px solid #cbd8e6;
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.1s;
+        }
+        .step-slot.empty {
+            background: #e8edf4;
+            border: 2px dashed #9aa9b7;
+        }
+        .step-slot.filled {
+            border: 2px solid #6b7b8c;
+            background: #eef2f7;
+        }
+
+        .step-number {
+            background: #5b6e7e;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #0a2f4d;
+            text-align: left;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+
+        .step-controls {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .step-controls button {
+            background: #cbdae9;
+            border: none;
+            border-radius: 30px;
+            padding: 3px 8px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.05s linear;
+            color: #0a2f4d;
+            font-family: inherit;
+        }
+        .step-controls button:active {
+            transform: scale(0.94);
+            background: #b7c8db;
+        }
+        .remove-btn {
+            background: #e0cdcd;
+            color: #7a3e3e;
+        }
+        .remove-btn:active {
+            background: #d4baba;
+        }
+
+        .empty-placeholder {
+            text-align: center;
+            color: #3a5c7c;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 16px 10px;
+            background: #e2eaf3;
+            border-radius: 24px;
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 14px;
+        }
+        button {
+            background: #5b6e7e;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.05s linear;
+            font-family: inherit;
+            flex: 0 1 auto;
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        .check-btn {
+            background: #4b6e55;
+        }
+
+        .message-area {
+            background: #e0e9f2;
+            border-radius: 24px;
+            padding: 8px 12px;
+            margin-top: 14px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.65rem;
+            color: #2c4e6e;
+            border-left: 4px solid #7f9bb5;
+        }
+        .message-area.success {
+            background: #deede5;
+            border-left-color: #5b8c6f;
+            color: #2a5a41;
+        }
+        .message-area.error {
+            background: #f2e2e2;
+            border-left-color: #b36b6b;
+            color: #8b4242;
+        }
+
+        /* на очень маленьких экранах — всё равно столбцы остаются вертикальными, просто чуть уже */
+        @media (max-width: 600px) {
+            .two-columns {
+                gap: 10px;
+            }
+            .column {
+                padding: 10px 8px;
+            }
+            .drag-card, .step-slot {
+                min-height: 52px;
+            }
+            .step-number {
+                width: 24px;
+                height: 24px;
+                font-size: 0.65rem;
+            }
+            .step-content {
+                font-size: 0.65rem;
+            }
+            .step-controls button {
+                padding: 2px 6px;
+                font-size: 0.55rem;
+            }
+            .column-title {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 6px;
+            }
+            .drag-card {
+                font-size: 0.7rem;
+                padding: 8px 6px;
+            }
+            .step-content {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="trainer">
+    <div class="two-columns">
+        <!-- Левая колонка: доступные карточки -->
+        <div class="column">
+            <div class="column-title">📋 Доступные шаги</div>
+            <div id="dragContainer" class="cards-container"></div>
+        </div>
+
+        <!-- Правая колонка: пронумерованные поля для шагов -->
+        <div class="column">
+            <div class="column-title">📅 Хронология</div>
+            <div id="timelineContainer" class="cards-container"></div>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <button id="resetBtn">⟳ Сброс</button>
+        <button id="checkBtn" class="check-btn">✅ Проверить</button>
+    </div>
+    <div id="messageBox" class="message-area">
+        💡 Нажмите на карточку слева → она попадёт в ближайший свободный шаг справа. Кнопками ▲▼ меняйте порядок, ✖ — вернёте обратно.
+    </div>
+</div>
+
+<script>
+    // ЭТАЛОННЫЙ ПОРЯДОК (9 шагов)
+    const MASTER_STEPS = [
+        "Импортер подает ДОПП в ФНС",
+        "Импортер уплачивает ОП в счет будущей уплаты НДС",
+        "ФНС проверяет данные и присваивает QR-код",
+        "Импортер передает QR-код перевозчику вместе с ДОПП",
+        "Перевозчик проверяет QR-код и везет товар в Россию",
+        "Таможня на границе сканирует QR-код, сверяет данные и подтверждает поставку",
+        "Импортер подает декларацию после ввоза",
+        "ФНС засчитывает соответствующие суммы ОП в счет уплаты косвенных налогов",
+        "Излишние суммы ОП импортер вправе вернуть"
+    ];
+
+    // timelineItems: массив длиной 9, null = пустое место, иначе текст шага
+    let timelineItems = new Array(9).fill(null);
+    let availableItems = [];
+
+    const timelineContainer = document.getElementById("timelineContainer");
+    const dragContainer = document.getElementById("dragContainer");
+    const messageBox = document.getElementById("messageBox");
+    const resetBtn = document.getElementById("resetBtn");
+    const checkBtn = document.getElementById("checkBtn");
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function getShuffledAvailable() {
+        return shuffleArray([...MASTER_STEPS]);
+    }
+
+    function showMessage(msg, type = "info") {
+        messageBox.innerHTML = msg;
+        messageBox.classList.remove("success", "error");
+        if (type === "success") messageBox.classList.add("success");
+        if (type === "error") messageBox.classList.add("error");
+        setTimeout(() => {
+            if (messageBox.innerHTML === msg) messageBox.classList.remove("success", "error");
+        }, 2500);
+    }
+
+    function isOrderCorrect() {
+        for (let i = 0; i < timelineItems.length; i++) {
+            if (timelineItems[i] !== MASTER_STEPS[i]) return false;
+        }
+        return true;
+    }
+
+    // Найти первый свободный слот
+    function getFirstEmptySlot() {
+        for (let i = 0; i < timelineItems.length; i++) {
+            if (timelineItems[i] === null) return i;
+        }
+        return -1;
+    }
+
+    // Добавление карточки из левой колонки (по клику)
+    function addFromAvailable(availIndex) {
+        const added = availableItems[availIndex];
+        if (!added) return;
+        
+        const emptySlot = getFirstEmptySlot();
+        if (emptySlot === -1) {
+            showMessage("❌ Все шаги уже заполнены! Сначала удалите какой-нибудь шаг.", "error");
+            return;
+        }
+        
+        availableItems.splice(availIndex, 1);
+        timelineItems[emptySlot] = added;
+        renderAll();
+        showMessage(`➕ Добавлено в шаг ${emptySlot + 1}`, "success");
+    }
+
+    // Удаление из timeline (возврат в левую колонку)
+    function removeFromTimeline(slotIndex) {
+        const removed = timelineItems[slotIndex];
+        if (!removed) return;
+        
+        timelineItems[slotIndex] = null;
+        availableItems.push(removed);
+        renderAll();
+        showMessage(`↩️ Шаг ${slotIndex + 1} возвращён`, "info");
+    }
+
+    // Перемещение вверх/вниз внутри timeline
+    function moveUp(slotIndex) {
+        if (slotIndex === 0) return;
+        if (timelineItems[slotIndex] === null) return;
+        
+        // ищем предыдущий заполненный слот
+        let prevFilled = -1;
+        for (let i = slotIndex - 1; i >= 0; i--) {
+            if (timelineItems[i] !== null) {
+                prevFilled = i;
+                break;
+            }
+        }
+        if (prevFilled === -1) return;
+        
+        // меняем местами
+        const temp = timelineItems[slotIndex];
+        timelineItems[slotIndex] = timelineItems[prevFilled];
+        timelineItems[prevFilled] = temp;
+        renderAll();
+    }
+
+    function moveDown(slotIndex) {
+        if (slotIndex === timelineItems.length - 1) return;
+        if (timelineItems[slotIndex] === null) return;
+        
+        // ищем следующий заполненный слот
+        let nextFilled = -1;
+        for (let i = slotIndex + 1; i < timelineItems.length; i++) {
+            if (timelineItems[i] !== null) {
+                nextFilled = i;
+                break;
+            }
+        }
+        if (nextFilled === -1) return;
+        
+        // меняем местами
+        const temp = timelineItems[slotIndex];
+        timelineItems[slotIndex] = timelineItems[nextFilled];
+        timelineItems[nextFilled] = temp;
+        renderAll();
+    }
+
+    // Рендер левой колонки (доступные карточки)
+    function renderDragZone() {
+        dragContainer.innerHTML = "";
+        if (availableItems.length === 0) {
+            const emptyMsg = document.createElement("div");
+            emptyMsg.className = "empty-placeholder";
+            emptyMsg.innerText = "✓ Все шаги в хронологии";
+            dragContainer.appendChild(emptyMsg);
+            return;
+        }
+
+        availableItems.forEach((item, idx) => {
+            const card = document.createElement("div");
+            card.className = "drag-card";
+            card.innerText = item;
+            card.addEventListener("click", () => {
+                addFromAvailable(idx);
+            });
+            dragContainer.appendChild(card);
+        });
+    }
+
+    // Рендер правой колонки (пронумерованные поля)
+    function renderTimeline() {
+        timelineContainer.innerHTML = "";
+        
+        for (let i = 0; i < timelineItems.length; i++) {
+            const slot = document.createElement("div");
+            const isFilled = timelineItems[i] !== null;
+            
+            slot.className = "step-slot";
+            if (!isFilled) slot.classList.add("empty");
+            else slot.classList.add("filled");
+            
+            // номер шага
+            const numberSpan = document.createElement("div");
+            numberSpan.className = "step-number";
+            numberSpan.innerText = (i + 1).toString();
+            
+            // содержимое (только если заполнено)
+            const contentSpan = document.createElement("div");
+            contentSpan.className = "step-content";
+            if (isFilled) {
+                contentSpan.innerText = timelineItems[i];
+            }
+            
+            // кнопки управления (только если заполнено)
+            const controlsDiv = document.createElement("div");
+            controlsDiv.className = "step-controls";
+            
+            if (isFilled) {
+                const upBtn = document.createElement("button");
+                upBtn.innerText = "▲";
+                upBtn.title = "Вверх";
+                upBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    moveUp(i);
+                });
+                
+                const downBtn = document.createElement("button");
+                downBtn.innerText = "▼";
+                downBtn.title = "Вниз";
+                downBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    moveDown(i);
+                });
+                
+                const removeBtn = document.createElement("button");
+                removeBtn.innerText = "✖";
+                removeBtn.className = "remove-btn";
+                removeBtn.title = "Вернуть";
+                removeBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    removeFromTimeline(i);
+                });
+                
+                controlsDiv.appendChild(upBtn);
+                controlsDiv.appendChild(downBtn);
+                controlsDiv.appendChild(removeBtn);
+            }
+            
+            slot.appendChild(numberSpan);
+            slot.appendChild(contentSpan);
+            slot.appendChild(controlsDiv);
+            
+            timelineContainer.appendChild(slot);
+        }
+    }
+
+    function renderAll() {
+        renderDragZone();
+        renderTimeline();
+    }
+
+    function resetGame() {
+        timelineItems = new Array(9).fill(null);
+        availableItems = getShuffledAvailable();
+        renderAll();
+        showMessage("🌀 Сброс. Нажимайте на карточки слева → они попадут в свободные шаги справа.", "info");
+    }
+
+    function checkOrder() {
+        const allFilled = timelineItems.every(item => item !== null);
+        if (!allFilled) {
+            const emptyCount = timelineItems.filter(item => item === null).length;
+            showMessage(`❌ Не все шаги заполнены. Осталось ${emptyCount} пустых полей.`, "error");
+            return;
+        }
+        
+        if (isOrderCorrect()) {
+            showMessage("✅ Идеально! Хронология построена верно.", "success");
+        } else {
+            showMessage("❌ Неправильный порядок. Меняйте расположение шагов кнопками ▲▼.", "error");
+        }
+    }
+
+    resetBtn.addEventListener("click", resetGame);
+    checkBtn.addEventListener("click", checkOrder);
+
+    resetGame();
+</script>
+</body>
+</html>
