@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>НДФЛ: Двойное резидентство</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+        }
+
+        .trainer-card {
+            max-width: 480px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 36px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.2);
+            padding: 1rem 0.9rem 0.9rem;
+            border: 1px solid #d0dceb;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e3b5c;
+            text-align: center;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.3px;
+            border-bottom: 3px solid #c7daf0;
+            padding-bottom: 0.3rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #2a5f8a;
+            margin-bottom: 1rem;
+            background: #e6f0fa;
+            padding: 0.3rem;
+            border-radius: 30px;
+        }
+
+        .carousel-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.2rem 0 0.5rem;
+        }
+
+        .card-wrapper {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .card-slide {
+            display: flex;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card-item {
+            flex: 0 0 100%;
+            padding: 0 0rem;
+            box-sizing: border-box;
+        }
+
+        .card-compact {
+            background: #ffffff;
+            border-radius: 24px;
+            border: 2px solid #dbe6f2;
+            padding: 0.8rem 0.8rem 0.6rem;
+            box-shadow: 0 8px 12px -8px rgba(0,35,70,0.12);
+            width: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0b263e;
+        }
+
+        .card-scenario {
+            background: #f5faff;
+            border-radius: 16px;
+            padding: 0.5rem 0.8rem;
+            border-left: 4px solid #2e7ab3;
+            margin-bottom: 0.7rem;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            color: #04335b;
+        }
+
+        .question-text {
+            font-weight: 600;
+            color: #021c30;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin: 0.3rem 0 0.5rem;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f3f9ff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            border: 2px solid transparent;
+            transition: 0.1s;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .option:hover {
+            background: #e3f0fd;
+            border-color: #8fb7da;
+        }
+        .option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1e6eb5;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        .option label {
+            font-size: 0.8rem;
+            color: #02243b;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .feedback-compact {
+            background: #f2f8fd;
+            border-radius: 14px;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #b9d3f0;
+            margin: 0.3rem 0 0.1rem;
+            font-size: 0.75rem;
+            line-height: 1.3;
+        }
+        .feedback-compact.correct {
+            background: #e2f3de;
+            color: #176b2c;
+            border-color: #5cb377;
+        }
+        .feedback-compact.incorrect {
+            background: #ffeae5;
+            color: #b13e3e;
+            border-color: #e09b9b;
+        }
+
+        .check-mini {
+            background: white;
+            border: 2px solid #1a5d8f;
+            border-radius: 60px;
+            padding: 0.3rem 1.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1a5d8f;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c6dd;
+            transition: 0.1s;
+            width: fit-content;
+            margin: 0.3rem 0 0.1rem;
+            align-self: flex-end;
+        }
+        .check-mini:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c6dd;
+        }
+        .check-mini:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .carousel-arrows {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.3rem;
+            margin-bottom: 0.1rem;
+        }
+        .arrow-btn {
+            background: white;
+            border: 2px solid #2a5f8a;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2a5f8a;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b3c9e0;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .arrow-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b3c9e0;
+        }
+        .arrow-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .counter {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            background: #e6f0fa;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+        }
+
+        .reset-area {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.1rem;
+        }
+        .reset-link {
+            background: transparent;
+            border: none;
+            color: #2a5f8a;
+            font-size: 0.75rem;
+            text-decoration: underline dotted;
+            cursor: pointer;
+            padding: 0.3rem;
+        }
+
+        .footnote {
+            text-align: center;
+            margin-top: 0.3rem;
+            color: #4f658d;
+            font-size: 0.65rem;
+            border-top: 1px dashed #cbd6e4;
+            padding-top: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="trainer-card" id="trainerContainer"></div>
+
+    <script>
+        (function() {
+            const cardsData = [
+                {
+                    title: 'Двойное: семья',
+                    scenario: 'У Марии есть квартира в Испании, там живет семья, и комната в России, где она работает вахтовым методом. Центр интересов — Испания. Время поровну.',
+                    question: 'Какой стране платить налог?',
+                    options: [
+                        { text: 'Испании (центр интересов — семья)', value: 'spain' },
+                        { text: 'России (постоянное жилье есть в обеих)', value: 'russia' },
+                        { text: 'Решается по гражданству', value: 'citizen' }
+                    ],
+                    correct: 'spain',
+                    explanation: 'Верно: постоянное жилье в обеих, центр интересов (семья) → Испания.'
+                },
+                {
+                    title: 'Постоянное жилье',
+                    scenario: 'Сергей снимает квартиру в Германии, а в России у него нет жилья. Центр интересов сложно определить.',
+                    question: 'Какой критерий применяется первым?',
+                    options: [
+                        { text: 'Гражданство (он гражданин РФ)', value: 'russia' },
+                        { text: 'Постоянное жилье есть только в Германии → Германия', value: 'germany' },
+                        { text: 'Центр интересов', value: 'center' }
+                    ],
+                    correct: 'germany',
+                    explanation: 'Верно: первым проверяем постоянное жилье. Оно есть только в Германии.'
+                },
+                {
+                    title: 'Ничья',
+                    scenario: 'Елена имеет жилье в обеих странах, центр интересов поровну, время 50/50, гражданство двойное.',
+                    question: 'Кому платить налог?',
+                    options: [
+                        { text: 'Стране, где больше времени (но время равно)', value: 'equal' },
+                        { text: 'Решают налоговые органы двух стран', value: 'mutual' },
+                        { text: 'Стране гражданства', value: 'citizen' }
+                    ],
+                    correct: 'mutual',
+                    explanation: 'Верно: если все критерии не дали ответа, уполномоченные органы договариваются.'
+                }
+            ];
+
+            let cardState = cardsData.map(() => ({
+                disabled: false,
+                selectedOption: null,
+                feedbackText: '',
+                feedbackClass: ''
+            }));
+
+            let currentIndex = 0;
+            const container = document.getElementById('trainerContainer');
+
+            function render() {
+                const total = cardsData.length;
+                if (currentIndex >= total) currentIndex = total - 1;
+                if (currentIndex < 0) currentIndex = 0;
+
+                container.innerHTML = `
+                    <div class="main-title">НДФЛ: Двойное резидентство</div>
+                    <div class="subtitle">Какой стране платить налог?</div>
+
+                    <div class="carousel-container">
+                        <div class="card-wrapper">
+                            <div class="card-slide" style="transform: translateX(0%);">
+                                <div class="card-item" id="carouselCard"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="carousel-arrows">
+                        <button class="arrow-btn" id="prevCard" ${total <= 1 || currentIndex === 0 ? 'disabled' : ''}>←</button>
+                        <span class="counter">${currentIndex+1} / ${total}</span>
+                        <button class="arrow-btn" id="nextCard" ${total <= 1 || currentIndex === total-1 ? 'disabled' : ''}>→</button>
+                    </div>
+
+                    <div class="reset-area">
+                        <button class="reset-link" id="resetAll">сбросить все ответы</button>
+                    </div>
+                    <div class="footnote">НДФЛ: при двойном резидентстве применяются критерии: жилье → центр интересов → взаимное соглашение</div>
+                `;
+
+                renderSingleCard(currentIndex);
+
+                document.getElementById('prevCard')?.addEventListener('click', () => {
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        render();
+                    }
+                });
+                document.getElementById('nextCard')?.addEventListener('click', () => {
+                    if (currentIndex < total - 1) {
+                        currentIndex++;
+                        render();
+                    }
+                });
+
+                document.getElementById('resetAll').addEventListener('click', () => {
+                    cardState = cardsData.map(() => ({
+                        disabled: false,
+                        selectedOption: null,
+                        feedbackText: '',
+                        feedbackClass: ''
+                    }));
+                    render();
+                });
+            }
+
+            function renderSingleCard(realIdx) {
+                const card = cardsData[realIdx];
+                const state = cardState[realIdx];
+                const containerDiv = document.getElementById('carouselCard');
+                if (!containerDiv) return;
+
+                let html = `
+                    <div class="card-compact">
+                        <div class="card-header">
+                            <div class="card-title">${card.title}</div>
+                        </div>
+                        <div class="card-scenario">${card.scenario}</div>
+                        <div class="question-text">${card.question}</div>
+                        <div class="options" id="options-${realIdx}"></div>
+                        <button class="check-mini" id="check-${realIdx}" ${state.disabled ? 'disabled' : ''}>Проверить</button>
+                `;
+
+                if (state.feedbackText) {
+                    html += `<div class="feedback-compact ${state.feedbackClass}">${state.feedbackText}</div>`;
+                }
+                html += `</div>`;
+
+                containerDiv.innerHTML = html;
+
+                const optionsDiv = document.getElementById(`options-${realIdx}`);
+                if (optionsDiv) {
+                    card.options.forEach((opt, optIdx) => {
+                        const optDiv = document.createElement('div');
+                        optDiv.className = 'option';
+
+                        const radio = document.createElement('input');
+                        radio.type = 'radio';
+                        radio.name = `card_${realIdx}`;
+                        radio.value = opt.value;
+                        radio.id = `card_${realIdx}_opt_${optIdx}`;
+                        radio.disabled = state.disabled;
+                        if (state.selectedOption === opt.value) {
+                            radio.checked = true;
+                        }
+
+                        radio.addEventListener('change', () => {
+                            cardState[realIdx].selectedOption = opt.value;
+                        });
+
+                        const label = document.createElement('label');
+                        label.htmlFor = radio.id;
+                        label.textContent = opt.text;
+
+                        optDiv.appendChild(radio);
+                        optDiv.appendChild(label);
+                        optionsDiv.appendChild(optDiv);
+                    });
+                }
+
+                const checkBtn = document.getElementById(`check-${realIdx}`);
+                if (checkBtn) {
+                    checkBtn.addEventListener('click', () => {
+                        const selected = cardState[realIdx].selectedOption;
+                        if (!selected) {
+                            alert('Выберите вариант ответа');
+                            return;
+                        }
+
+                        let feedbackText = '';
+                        let feedbackClass = '';
+                        if (selected === card.correct) {
+                            feedbackText = '✅ ' + card.explanation;
+                            feedbackClass = 'correct';
+                            cardState[realIdx].disabled = true;
+                        } else {
+                            feedbackText = '❌ Неправильно. Попробуйте ещё раз.';
+                            feedbackClass = 'incorrect';
+                        }
+
+                        cardState[realIdx].feedbackText = feedbackText;
+                        cardState[realIdx].feedbackClass = feedbackClass;
+                        renderSingleCard(realIdx);
+                    });
+                }
+            }
+
+            render();
+        })();
+    </script>
+</body>
+</html>
