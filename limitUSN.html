@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>УСН: лимиты и переход</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2ef 0%, #dce5df 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .carousel-container {
+            max-width: 1150px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* заголовок — мельче */
+        .main-title {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+        .main-title h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e4637, #2b7453);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.2px;
+        }
+        .main-title p {
+            font-size: 0.8rem;
+            color: #2f5c49;
+            background: #ffffffb3;
+            display: inline-block;
+            padding: 0.1rem 1rem;
+            border-radius: 40px;
+            margin-top: 0.2rem;
+            backdrop-filter: blur(2px);
+        }
+
+        /* карусель */
+        .carousel-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+        }
+
+        .carousel-track-container {
+            overflow: hidden;
+            border-radius: 2rem;
+            width: 100%;
+            padding: 0.3rem 0;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            gap: 2rem;
+        }
+
+        /* карточка-таб */
+        .tab-card {
+            flex: 0 0 calc(100% - 0rem);
+            min-width: 280px;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(1px);
+            border-radius: 1.8rem;
+            box-shadow: 0 18px 30px -12px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(170, 200, 180, 0.6);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .tab-card:hover {
+            background: white;
+            transform: translateY(-3px);
+            box-shadow: 0 24px 34px -14px rgba(0, 0, 0, 0.22);
+        }
+
+        /* вкладки */
+        .tabs-header {
+            display: flex;
+            background: #f2f8f4;
+            border-bottom: 1px solid #d4e3db;
+            padding: 0 0.2rem;
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.75rem 0.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #3e6b58;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            letter-spacing: -0.2px;
+            border-radius: 1rem 1rem 0 0;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #1b5e41;
+            border-bottom: 2px solid #2b8f64;
+            font-weight: 700;
+        }
+        .tab-content {
+            display: none;
+            padding: 1.1rem 1.2rem 1.2rem 1.2rem;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* компактные лимиты */
+        .compact-limit {
+            background: #f4f9f6;
+            border-radius: 1.2rem;
+            padding: 0.7rem 1rem;
+            margin-bottom: 0.9rem;
+            border-left: 5px solid;
+        }
+        .limit-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #135f40;
+            line-height: 1.2;
+        }
+        .limit-caption {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #517e66;
+            margin-top: 4px;
+        }
+        .info-compact {
+            font-size: 0.85rem;
+            background: #fefcf5;
+            border-radius: 1rem;
+            padding: 0.7rem 0.9rem;
+            margin-top: 0.7rem;
+            color: #2c5f48;
+            line-height: 1.4;
+        }
+        .list-note {
+            margin-left: 1.2rem;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        hr {
+            margin: 0.7rem 0;
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, #cbdcd2, transparent);
+        }
+        .badge-sm {
+            background: #e8f1ec;
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 24px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+        .mt-1 {
+            margin-top: 0.5rem;
+        }
+        .small-note {
+            font-size: 0.8rem;
+        }
+        /* специальные стили для уменьшения текста */
+        .smaller-text {
+            font-size: 0.72rem;
+            line-height: 1.35;
+        }
+        .extra-small-text {
+            font-size: 0.68rem;
+            line-height: 1.3;
+        }
+
+        /* кнопки навигации */
+        .nav-btn {
+            background: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 60px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            color: #226e4c;
+            font-weight: bold;
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+        }
+        .nav-btn:hover {
+            background: #ffffff;
+            transform: scale(1.03);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.15);
+            color: #0f5e3e;
+        }
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 1.4rem;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: #bbcbc1;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dot.active {
+            width: 28px;
+            background: #2b7453;
+        }
+
+        @media (max-width: 720px) {
+            .nav-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.5rem;
+            }
+            .tab-content {
+                padding: 0.9rem;
+            }
+            .limit-number {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="carousel-container">
+    <div class="main-title">
+        <h1>Лимиты УСН</h1>
+        <p>Доход · Численность · ОС и доля в УК · Коэффициент · Переход</p>
+    </div>
+
+    <div class="carousel-wrapper">
+        <button class="nav-btn" id="prevBtn">←</button>
+        <div class="carousel-track-container">
+            <div class="carousel-track" id="carouselTrack">
+                <!-- КАРТОЧКА 1: ТРИ ОСНОВНЫХ ЛИМИТА (вкладки) -->
+                <div class="tab-card">
+                    <div class="tabs-header" id="tabsMain">
+                        <button class="tab-btn active" data-tab="tab-income">Доходы</button>
+                        <button class="tab-btn" data-tab="tab-staff">Численность</button>
+                        <button class="tab-btn" data-tab="tab-os">ОС и доля в УК</button>
+                    </div>
+                    <!-- Вкладка Доходы -->
+                    <div class="tab-content active" id="tab-income">
+                        <div class="compact-limit" style="border-left-color: #f5b042;">
+                            <div class="limit-number">≤ 450 млн руб.</div>
+                            <div class="limit-caption">Лимит для работы на УСН — 450 млн руб. × коэффициент–дефлятор</div>
+                        </div>
+                        <div class="info-compact">
+                            <div style="font-weight: 700; margin-bottom: 6px;">Переход на УСН считают доход за 9 мес.: ≤ 337,5 млн руб. × коэффициент–дефлятор.</div>
+                            <div>Пример: для перехода с 2027 года: ≤ 367,875 млн руб. за 9 мес. 2026 (337,5 × 1,09).</div>
+                        </div>
+                    </div>
+                    <!-- Вкладка Численность -->
+                    <div class="tab-content" id="tab-staff">
+                        <div class="compact-limit" style="border-left-color: #3f9fd6;">
+                            <div class="limit-number">≤ 130 человек</div>
+                            <div class="limit-caption">Средняя численность сотрудников за период для работы на УСН</div>
+                        </div>
+                        <div class="info-compact">
+                            <div style="font-weight: 700;">Правила расчета</div>
+                            <div style="margin-top: 4px;">Считайте численность по правилам Росстата. До перехода показатель не контролируют, в уведомлении не указывают.</div>
+                        </div>
+                    </div>
+                    <!-- Вкладка ОС и доля в УК -->
+                    <div class="tab-content" id="tab-os">
+                        <div class="compact-limit" style="border-left-color: #6f9a82;">
+                            <div class="limit-number">≤ 200 млн руб.</div>
+                            <div class="limit-caption">Остаточная стоимость ОС по бухучету – 200 млн руб. × коэффициент–дефлятор</div>
+                        </div>
+                        <div class="info-compact" style="background: #faf5e9;">
+                            <div style="font-weight: 700;">Доля участия других компаний</div>
+                            <div style="font-size: 1.2rem; font-weight: 800; margin: 5px 0;">≤ 25%</div>
+                            <div class="small-note">При переходе на УСН лимиты по ОС и доле проверяются на 1 января стартового года. До перехода соблюдать необязательно, но стоит проверить за 9 месяцев и перед переходом привести в соответствие, чтобы не потерять право на УСН в году применения.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- КАРТОЧКА 2: КОЭФФИЦИЕНТ + ПРИМЕРЫ ПЕРЕХОДА (уменьшенные тексты) -->
+                <div class="tab-card">
+                    <div class="tabs-header" id="tabsExtra">
+                        <button class="tab-btn active" data-tab="tab-deflator">Коэффициент-дефлятор</button>
+                        <button class="tab-btn" data-tab="tab-transfer">Примеры перехода</button>
+                    </div>
+                    <!-- Вкладка Коэффициент-дефлятор: текст "Устанавливает Минэкономразвития ежегодно" сделан мельче -->
+                    <div class="tab-content active" id="tab-deflator">
+                        <div class="compact-limit" style="border-left-color: #4c9f8c;">
+                            <div class="limit-number extra-small-text" style="font-size: 0.85rem; font-weight: 600;">Устанавливает Минэкономразвития ежегодно</div>
+                        </div>
+                        <div class="info-compact">
+                            <div style="font-weight: 500;">Базовые лимиты умножаются на коэффициент:</div>
+                            <ul class="list-note">
+                                <li>Доход для работы 450 млн руб.</li>
+                                <li>Остаточная стоимость ОС 200 млн руб.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Вкладка Примеры перехода: уменьшен текст "Переход на УСН считают доход за 9 мес.: ..." -->
+                    <div class="tab-content" id="tab-transfer">
+                        <div class="compact-limit" style="border-left-color: #b58d4b;">
+                            <div class="limit-number smaller-text" style="font-size: 0.85rem; font-weight: 700; color: #135f40;">Переход на УСН считают доход за 9 мес.: ≤ 337,5 млн руб. × коэффициент–дефлятор.</div>
+                            <div class="limit-caption" style="font-size: 0.7rem;">Контроль за 9 месяцев перед переходом</div>
+                        </div>
+                        <div class="info-compact">
+                            <div><strong>Пример для перехода с 2027 года:</strong><br> Доход ≤ 367,875 млн руб. за 9 мес. 2026 (337,5 × 1,09).</div>
+                            <hr>
+                            <div class="small-note" style="background: #eef2ec; border-radius: 14px; padding: 8px; margin-top: 6px;">
+                                ⚡ Лимиты по численности, стоимости ОС и доле участия других компаний <strong>до перехода не обязательны</strong>. Главное — соблюсти ограничения на 1 января года начала применения УСН.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="nav-btn" id="nextBtn">→</button>
+    </div>
+    <div class="dots" id="carouselDots"></div>
+</div>
+
+<script>
+    (function() {
+        // Переключение вкладок внутри каждой карточки
+        function initTabsForCard(cardElement) {
+            if (!cardElement) return;
+            const btns = cardElement.querySelectorAll('.tab-btn');
+            const contents = cardElement.querySelectorAll('.tab-content');
+            if (!btns.length) return;
+            
+            function activateTab(tabId) {
+                contents.forEach(c => c.classList.remove('active'));
+                btns.forEach(b => b.classList.remove('active'));
+                const targetContent = cardElement.querySelector(`#${tabId}`);
+                if (targetContent) targetContent.classList.add('active');
+                const activeBtn = Array.from(btns).find(b => b.getAttribute('data-tab') === tabId);
+                if (activeBtn) activeBtn.classList.add('active');
+            }
+            
+            btns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tid = btn.getAttribute('data-tab');
+                    if (tid) activateTab(tid);
+                });
+            });
+            // если нет активного контента, активируем первый по data-tab
+            const hasActive = Array.from(contents).some(c => c.classList.contains('active'));
+            if (!hasActive && btns[0]) {
+                const firstId = btns[0].getAttribute('data-tab');
+                if (firstId) activateTab(firstId);
+            }
+        }
+        
+        const cards = document.querySelectorAll('.tab-card');
+        cards.forEach(card => initTabsForCard(card));
+        
+        // КАРУСЕЛЬ для двух карточек
+        const track = document.getElementById('carouselTrack');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.getElementById('carouselDots');
+        
+        if (!track) return;
+        
+        const slideItems = Array.from(track.children);
+        const totalSlides = slideItems.length;
+        let currentIndex = 0;
+        
+        function getSlideWidth() {
+            if (!slideItems.length) return 600;
+            const itemRect = slideItems[0].getBoundingClientRect();
+            const gap = parseFloat(getComputedStyle(track).gap) || 32;
+            return itemRect.width + gap;
+        }
+        
+        function updateTrackPosition() {
+            const slideWidth = getSlideWidth();
+            const shift = currentIndex * slideWidth;
+            track.style.transform = `translateX(-${shift}px)`;
+            updateDots();
+        }
+        
+        function updateDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, idx) => {
+                if (idx === currentIndex) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
+        
+        function createDots() {
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (i === currentIndex) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    currentIndex = i;
+                    updateTrackPosition();
+                });
+                dotsContainer.appendChild(dot);
+            }
+        }
+        
+        function nextSlide() {
+            if (currentIndex < totalSlides - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            updateTrackPosition();
+        }
+        
+        function prevSlide() {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = totalSlides - 1;
+            }
+            updateTrackPosition();
+        }
+        
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+        createDots();
+        
+        window.addEventListener('resize', () => {
+            updateTrackPosition();
+        });
+        
+        setTimeout(() => {
+            updateTrackPosition();
+        }, 30);
+        
+        window.addEventListener('load', () => {
+            updateTrackPosition();
+        });
+        
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => updateTrackPosition(), 100);
+        });
+    })();
+</script>
+</body>
+</html>
