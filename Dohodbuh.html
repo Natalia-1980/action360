@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Выручка · задачник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .step {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.completed {
+            background: #2b8c4a;
+            color: white;
+        }
+
+        .task-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #0a2942;
+            margin-bottom: 1.2rem;
+            white-space: pre-line;
+        }
+
+        .question-block {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e0eaf5;
+        }
+        .question-title {
+            font-weight: 600;
+            color: #1e3b5c;
+            margin-bottom: 0.6rem;
+            font-size: 0.95rem;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.6rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .input-group input {
+            flex: 1;
+            max-width: 250px;
+            padding: 0.6rem 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-group span {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.8rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+
+        .status-list {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #2c4e6e;
+            border-top: 1px solid #d8e2f2;
+            padding-top: 0.8rem;
+        }
+        .status-item {
+            margin: 0.3rem 0;
+        }
+        .status-answered {
+            color: #2b8c4a;
+            font-weight: 500;
+        }
+        .status-not-answered {
+            color: #8fa0b5;
+        }
+
+        .explanation-block {
+            margin-top: 0.8rem;
+            background: #eef3fa;
+            border-radius: 18px;
+            padding: 0.8rem;
+            font-size: 0.85rem;
+            border-left: 4px solid #1e6bb8;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .final-message {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #2b8c4a;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .progress { gap: 0.5rem; }
+            .step { width: 32px; height: 32px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="progress" id="progressContainer"></div>
+        <div id="taskContainer" class="task-container"></div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="nextBtn" disabled>Далее →</button>
+        </div>
+        <div id="finalMessage" class="hidden final-message"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Данные задач (без placeholder)
+            const tasks = [
+                {
+                    text: "Задача 1. Расчет выручки исходя из объема работ\n\nООО «СтройПроект» заключило договор на строительство ангара. Общая стоимость договора — 24 000 000 руб. Согласно договору, контроль над результатом работ переходит поэтапно по мере готовности квадратных метров. Общая площадь ангара — 1200 кв. м.\nНа отчетную дату (31 марта) приняты заказчиком и подтверждены актом 360 кв. м готовой площади. Оставшиеся работы будут завершены во II квартале.\nУчетной политикой установлен способ определения выручки по длящимся договорам: «исходя из объема выполненных работ» (подп. «а» п. 20 ФСБУ 9/2025).\nКакую сумму выручки за I квартал должен признать «СтройПроект» по данному договору?",
+                    questions: [
+                        { text: "Степень готовности (в долях)", correct: 0.3 },
+                        { text: "Выручка за I квартал (руб.)", correct: 7200000 }
+                    ],
+                    fullExplanation: "<strong>Правильный ответ: 7 200 000 руб.</strong><br><br><strong>Шаг 1.</strong> Степень готовности = Фактический объем / Общий объем = 360 кв. м / 1200 кв. м = 0,3 (30%).<br><br><strong>Шаг 2.</strong> Выручка за период = Стоимость договора × Степень готовности = 24 000 000 × 0,3 = 7 200 000 руб."
+                },
+                {
+                    text: "Задача 2. Расчет выручки по доле затрат\n\nООО «СофтТех» заключило договор на разработку уникальной ERP-системы под заказчика. Стоимость договора — 12 000 000 руб. Ожидаемые общие расходы по смете — 9 000 000 руб. Учетной политикой установлен способ: «по доле понесенных затрат» (подп. «б» п. 20 ФСБУ 9/2025).\nНа отчетную дату понесенные фактические расходы составили 3 600 000 руб.\nИз них 600 000 руб. — приобретение неисключительной лицензии на ПО стороннего производителя, без которой нельзя начать проект, но которая не создает прогресс в самой разработке (это «затратный аванс», не дающий прироста готовности). Остальные 3 млн руб. — зарплата разработчиков и начисления, пропорциональные прогрессу.\nКакую сумму выручки должен признать «СофтТех» на отчетную дату, если руководство решает не включать в расчет «бесполезные» затраты (не создающие готовность)?",
+                    questions: [
+                        { text: "Фактические затраты, относящиеся к прогрессу (руб.)", correct: 3000000 },
+                        { text: "Степень готовности (в долях)", correct: 0.3333333333 },
+                        { text: "Выручка на отчетную дату (руб.)", correct: 4000000 }
+                    ],
+                    fullExplanation: "<strong>Правильный ответ: 4 000 000 руб.</strong><br><br><strong>Шаг 1.</strong> Стоимость лицензии (600 тыс.) не дает реальной готовности → исключаем. Фактические затраты, относящиеся к прогрессу = 3 600 000 − 600 000 = 3 000 000 руб.<br><br><strong>Шаг 2.</strong> Степень готовности = 3 000 000 / 9 000 000 = 1/3 = 0,33333 (33,33%).<br><br><strong>Шаг 3.</strong> Выручка = 12 000 000 × 1/3 = 4 000 000 руб."
+                }
+            ];
+
+            let currentTask = 0;
+            let currentQuestion = 0;
+            let answered = new Array(tasks.length).fill().map(() => []);
+            let taskCompleted = new Array(tasks.length).fill(false);
+
+            for (let i = 0; i < tasks.length; i++) {
+                answered[i] = new Array(tasks[i].questions.length).fill(false);
+            }
+
+            const taskContainer = document.getElementById('taskContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const finalMessage = document.getElementById('finalMessage');
+
+            function updateProgress() {
+                let html = '';
+                for (let i = 0; i < tasks.length; i++) {
+                    let statusClass = '';
+                    if (i === currentTask && !taskCompleted[currentTask]) statusClass = 'active';
+                    else if (taskCompleted[i]) statusClass = 'completed';
+                    html += `<div class="step ${statusClass}">${i+1}</div>`;
+                }
+                progressContainer.innerHTML = html;
+            }
+
+            function renderCurrentQuestion() {
+                const task = tasks[currentTask];
+                const q = task.questions[currentQuestion];
+                const unit = q.text.includes('руб') ? '₽' : '';
+                
+                taskContainer.innerHTML = `<div class="task-text">${task.text}</div>`;
+                
+                const questionHtml = `
+                    <div class="question-block">
+                        <div class="question-title">Вопрос ${currentQuestion+1} из ${task.questions.length}: ${q.text}</div>
+                        <div class="input-group">
+                            <input type="number" id="valueInput" step="any" placeholder="" autocomplete="off">
+                            <span>${unit}</span>
+                        </div>
+                        <div class="button-row">
+                            <button class="btn" id="checkBtn">Проверить</button>
+                        </div>
+                    </div>
+                `;
+                taskContainer.insertAdjacentHTML('beforeend', questionHtml);
+                
+                // Статус вопросов (только отвечен/не отвечен, без цифр)
+                let statusHtml = '<div class="status-list"><strong>Статус вопросов:</strong><br>';
+                for (let i = 0; i < task.questions.length; i++) {
+                    const isAnswered = answered[currentTask][i];
+                    const statusText = isAnswered ? '✅ Отвечен' : '○ Не отвечен';
+                    const statusClass = isAnswered ? 'status-answered' : 'status-not-answered';
+                    statusHtml += `<div class="status-item"><span class="${statusClass}">${statusText}</span> — ${task.questions[i].text}</div>`;
+                }
+                statusHtml += '</div>';
+                taskContainer.insertAdjacentHTML('beforeend', statusHtml);
+                
+                // Пояснение, если задача завершена
+                if (taskCompleted[currentTask]) {
+                    const explanationHtml = `<div class="explanation-block">${task.fullExplanation}</div>`;
+                    taskContainer.insertAdjacentHTML('beforeend', explanationHtml);
+                }
+                
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (answered[currentTask][currentQuestion]) return;
+                    checkAnswer();
+                });
+                
+                updateProgress();
+            }
+            
+            function checkAnswer() {
+                const task = tasks[currentTask];
+                const q = task.questions[currentQuestion];
+                const input = document.getElementById('valueInput');
+                const rawValue = input.value.trim();
+                
+                if (rawValue === '') {
+                    alert('Введите значение');
+                    return;
+                }
+                
+                let numValue = parseFloat(rawValue.replace(/\s/g, '').replace(',', '.'));
+                if (isNaN(numValue)) {
+                    alert('Введите корректное число');
+                    return;
+                }
+                
+                // Отмечаем как отвеченный (без проверки правильности)
+                answered[currentTask][currentQuestion] = true;
+                
+                // Обновляем статус вопросов
+                let statusHtml = '<div class="status-list"><strong>Статус вопросов:</strong><br>';
+                for (let i = 0; i < task.questions.length; i++) {
+                    const isAnswered = answered[currentTask][i];
+                    const statusText = isAnswered ? '✅ Отвечен' : '○ Не отвечен';
+                    const statusClass = isAnswered ? 'status-answered' : 'status-not-answered';
+                    statusHtml += `<div class="status-item"><span class="${statusClass}">${statusText}</span> — ${task.questions[i].text}</div>`;
+                }
+                statusHtml += '</div>';
+                
+                const existingStatus = taskContainer.querySelector('.status-list');
+                if (existingStatus) {
+                    existingStatus.outerHTML = statusHtml;
+                }
+                
+                // Переход к следующему вопросу
+                if (currentQuestion + 1 < task.questions.length) {
+                    currentQuestion++;
+                    renderCurrentQuestion();
+                } else {
+                    // Все вопросы задачи отвечены
+                    taskCompleted[currentTask] = true;
+                    // Добавляем пояснение
+                    const explanationHtml = `<div class="explanation-block">${task.fullExplanation}</div>`;
+                    taskContainer.insertAdjacentHTML('beforeend', explanationHtml);
+                    updateProgress();
+                    
+                    if (currentTask < tasks.length - 1) {
+                        nextBtn.disabled = false;
+                    } else {
+                        nextBtn.textContent = 'Завершить';
+                        nextBtn.disabled = false;
+                    }
+                }
+            }
+            
+            nextBtn.addEventListener('click', () => {
+                if (currentTask < tasks.length - 1) {
+                    currentTask++;
+                    currentQuestion = 0;
+                    renderCurrentQuestion();
+                    nextBtn.disabled = true;
+                } else {
+                    taskContainer.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    finalMessage.classList.remove('hidden');
+                    finalMessage.innerHTML = '✅ Все задачи решены! Спасибо за работу!';
+                }
+            });
+            
+            renderCurrentQuestion();
+        })();
+    </script>
+</body>
+</html>
