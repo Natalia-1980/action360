@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Помощник на ПСН — в какую ИФНС подать заявление</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f8;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 16px;
+        }
+
+        .card {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 2.2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #1a5e68;
+            padding: 1.4rem 1.8rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-top: 8px;
+        }
+
+        .content {
+            padding: 1.8rem 1.6rem 2rem 1.6rem;
+        }
+
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e2eef1;
+            border-radius: 40px;
+            padding: 5px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #145c5c;
+            margin-bottom: 20px;
+        }
+
+        .question-block {
+            background: #fefcf8;
+            border-radius: 1.6rem;
+            padding: 1.4rem;
+            margin-bottom: 20px;
+            border: 1px solid #e4ecef;
+        }
+
+        .question-text {
+            font-size: 1.35rem;
+            font-weight: 630;
+            line-height: 1.35;
+            color: #0e3b42;
+            margin-bottom: 24px;
+        }
+
+        .buttons-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 12px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.1s linear;
+            font-family: inherit;
+        }
+
+        .btn-yes {
+            background: #1c7c68;
+            color: white;
+        }
+
+        .btn-yes:active {
+            transform: scale(0.97);
+            background: #146352;
+        }
+
+        .btn-no {
+            background: #dee5ec;
+            color: #235b5b;
+        }
+
+        .btn-no:active {
+            transform: scale(0.97);
+            background: #ced6df;
+        }
+
+        .result-card {
+            background: #eef7f3;
+            border-radius: 1.6rem;
+            padding: 1.4rem;
+            margin-top: 8px;
+            border-left: 6px solid #2f9b7c;
+        }
+
+        .result-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-answer {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 1.2rem;
+            margin-top: 12px;
+            font-weight: 500;
+            color: #11594b;
+            line-height: 1.45;
+            font-size: 0.95rem;
+        }
+
+        .restart-btn {
+            width: 100%;
+            background: #eef2f5;
+            border: none;
+            padding: 12px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 26px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #2b6262;
+        }
+
+        .restart-btn:active {
+            background: #e0e6ec;
+            transform: scale(0.98);
+        }
+
+        .footer-note {
+            font-size: 0.68rem;
+            text-align: center;
+            margin-top: 18px;
+            color: #6b8ba0;
+            border-top: 1px solid #e2eaf0;
+            padding-top: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="app">
+    <div class="header">
+        <h1>
+            🧭 Помощник на ПСН
+        </h1>
+        <p>Сервис даст точный ответ, в какую инспекцию подать заявление.</p>
+    </div>
+    <div class="content" id="dynamicContent"></div>
+</div>
+
+<script>
+    // Узлы сценария — краткие, без капса
+    const NODES = {
+        start: {
+            id: 'start',
+            text: 'Где действует патент?',
+            buttons: [
+                { label: 'Город федерального значения (Москва, СПБ, Севастополь)', next: 'city_federal' },
+                { label: 'Весь субъект РФ (весь регион, область, край)', next: 'full_subject' },
+                { label: 'Одно или несколько муниципальных образований', next: 'municipal' }
+            ]
+        },
+        // ----- ГОРОДА ФЕДЕРАЛЬНОГО ЗНАЧЕНИЯ -----
+        city_federal: {
+            id: 'city_federal',
+            text: 'Патент действует в городе федерального значения — Москва, СПБ, Севастополь.',
+            buttons: [
+                { label: 'Подаю патент одновременно с госрегистрацией ИП', next: 'city_federal_with_reg' },
+                { label: 'ИП уже зарегистрирован, получаю патент', next: 'city_federal_usual' }
+            ]
+        },
+        city_federal_with_reg: {
+            id: 'result',
+            title: 'По месту жительства',
+            answer: 'При регистрации ИП — заявление подается в ИФНС по месту жительства, не в любую инспекцию (абз. 2-3 п. 2 ст. 346.45 НК).'
+        },
+        city_federal_usual: {
+            id: 'result',
+            title: 'Любая ИФНС города',
+            answer: 'Можно выбрать любую налоговую инспекцию на территории Москвы, СПБ или Севастополя.'
+        },
+        // ----- ВЕСЬ СУБЪЕКТ РФ -----
+        full_subject: {
+            id: 'full_subject',
+            text: 'Патент действует на территории всего субъекта РФ.',
+            question: 'Состоит ли ИП на учете на этой территории по месту жительства?',
+            buttons: [
+                { label: 'Да', next: 'full_living_yes' },
+                { label: 'Нет', next: 'full_living_no' }
+            ]
+        },
+        full_living_yes: {
+            id: 'full_living_yes',
+            question: 'Состоит ли ИП на учете на этой территории в качестве плательщика ПСН?',
+            buttons: [
+                { label: 'Да', next: 'full_res_yes_yes' },
+                { label: 'Нет', next: 'full_res_yes_no' }
+            ]
+        },
+        full_living_no: {
+            id: 'full_living_no',
+            question: 'Состоит ли ИП на учете на этой территории в качестве плательщика ПСН?',
+            buttons: [
+                { label: 'Да', next: 'full_res_no_yes' },
+                { label: 'Нет', next: 'full_res_no_no' }
+            ]
+        },
+        full_res_yes_yes: {
+            id: 'result',
+            title: 'ИФНС по месту жительства',
+            answer: 'ИП стоит на учете в регионе по месту жительства — подает заявление в ИФНС по месту жительства.'
+        },
+        full_res_yes_no: {
+            id: 'result',
+            title: 'ИФНС по месту жительства',
+            answer: 'ИП стоит на учете в регионе по месту жительства — подает заявление в ИФНС по месту жительства.'
+        },
+        full_res_no_yes: {
+            id: 'result',
+            title: 'ИФНС по месту учета плательщика ПСН',
+            answer: 'ИП не состоит по месту жительства, но состоит на учете как плательщик ПСН — подает заявление в ИФНС по месту учета плательщика ПСН.'
+        },
+        full_res_no_no: {
+            id: 'result',
+            title: 'Любая ИФНС на территории субъекта',
+            answer: 'ИП не состоит ни по месту жительства, ни как плательщик ПСН — можно подать в любую ИФНС на территории субъекта РФ.'
+        },
+        // ----- МУНИЦИПАЛЬНЫЕ ОБРАЗОВАНИЯ -----
+        municipal: {
+            id: 'municipal',
+            text: 'Патент действует на территории одного или нескольких муниципальных образований.',
+            question: 'Состоит ли ИП на учете на территории этого субъекта по месту жительства?',
+            buttons: [
+                { label: 'Да', next: 'municipal_living_yes' },
+                { label: 'Нет', next: 'municipal_living_no' }
+            ]
+        },
+        municipal_living_yes: {
+            id: 'municipal_living_yes',
+            question: 'Состоит ли ИП на учете на этой территории в качестве плательщика ПСН?',
+            buttons: [
+                { label: 'Да', next: 'municipal_res_yes_yes' },
+                { label: 'Нет', next: 'municipal_res_yes_no' }
+            ]
+        },
+        municipal_living_no: {
+            id: 'municipal_living_no',
+            question: 'Состоит ли ИП на учете на этой территории в качестве плательщика ПСН?',
+            buttons: [
+                { label: 'Да', next: 'municipal_res_no_yes' },
+                { label: 'Нет', next: 'municipal_res_no_no' }
+            ]
+        },
+        municipal_res_yes_yes: {
+            id: 'result',
+            title: 'ИФНС по месту жительства',
+            answer: 'В ИФНС по местожительству, даже если ИП состоит на учете не в том муниципальном образовании, где планирует вести деятельность.'
+        },
+        municipal_res_yes_no: {
+            id: 'result',
+            title: 'ИФНС по месту жительства',
+            answer: 'В ИФНС по местожительству, даже если ИП состоит на учете не в том муниципальном образовании, где планирует вести деятельность.'
+        },
+        municipal_res_no_yes: {
+            id: 'result',
+            title: 'ИФНС по месту учета плательщика ПСН',
+            answer: 'ИП не состоит по месту жительства, но состоит на учете как плательщик ПСН — подает заявление в ИФНС по месту учета плательщика ПСН.'
+        },
+        municipal_res_no_no: {
+            id: 'result',
+            title: 'Любая ИФНС на дифференцированной территории',
+            answer: 'ИП не состоит ни по месту жительства, ни на учете ПСН — заявление подается в любую ИФНС, расположенную на дифференцированной территории субъекта.'
+        }
+    };
+
+    let currentNodeId = 'start';
+    const appContainer = document.getElementById('dynamicContent');
+
+    function getStepLabel(nodeId) {
+        if (nodeId === 'start') return 'Шаг 1/3';
+        if (nodeId === 'city_federal') return 'Шаг 2/2';
+        if (nodeId === 'full_subject') return 'Шаг 2/3';
+        if (nodeId === 'full_living_yes' || nodeId === 'full_living_no') return 'Шаг 3/3';
+        if (nodeId === 'municipal') return 'Шаг 2/3';
+        if (nodeId === 'municipal_living_yes' || nodeId === 'municipal_living_no') return 'Шаг 3/3';
+        return '';
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function attachRestart() {
+        const restartBtn = document.getElementById('restartBtn');
+        if (restartBtn) restartBtn.addEventListener('click', () => {
+            currentNodeId = 'start';
+            render();
+        });
+    }
+
+    function render() {
+        const node = NODES[currentNodeId];
+        if (!node) {
+            appContainer.innerHTML = `<div class="result-card"><div class="result-title">Ошибка</div><button class="restart-btn" id="restartBtn">Начать заново</button></div>`;
+            attachRestart();
+            return;
+        }
+
+        // Результат
+        if (node.id === 'result') {
+            const stepHtml = getStepLabel(currentNodeId) ? `<div class="step-badge">${getStepLabel(currentNodeId)}</div>` : '';
+            appContainer.innerHTML = `
+                ${stepHtml}
+                <div class="result-card">
+                    <div class="result-title">
+                        📍 ${escapeHtml(node.title)}
+                    </div>
+                    <div class="result-answer">
+                        ${escapeHtml(node.answer)}
+                    </div>
+                    <button class="restart-btn" id="restartBtn">🔄 Задать новый вопрос</button>
+                </div>
+                <div class="footer-note">
+                    Ст. 346.45 НК РФ, правила ПСН (2026)
+                </div>
+            `;
+            attachRestart();
+            return;
+        }
+
+        // Вопрос
+        const stepLabel = getStepLabel(node.id);
+        let questionHtml = '';
+        if (node.question) {
+            questionHtml = `<div class="question-text">${escapeHtml(node.question)}</div>`;
+        } else if (node.text) {
+            questionHtml = `<div class="question-text">${escapeHtml(node.text)}</div>`;
+        } else {
+            questionHtml = `<div class="question-text">Уточните параметры</div>`;
+        }
+
+        let buttonsHtml = '';
+        if (node.buttons && node.buttons.length) {
+            buttonsHtml = `<div class="buttons-group">
+                ${node.buttons.map(btn => `<button class="btn ${btn.label === 'Да' ? 'btn-yes' : (btn.label === 'Нет' ? 'btn-no' : 'btn-yes')}" data-next="${btn.next}">${escapeHtml(btn.label)}</button>`).join('')}
+            </div>`;
+        }
+
+        appContainer.innerHTML = `
+            ${stepLabel ? `<div class="step-badge">${stepLabel}</div>` : ''}
+            <div class="question-block">
+                ${questionHtml}
+                ${buttonsHtml}
+            </div>
+        `;
+
+        // Обработчики
+        if (node.buttons) {
+            node.buttons.forEach(btn => {
+                const btnEl = document.querySelector(`button[data-next="${btn.next}"]`);
+                if (btnEl) {
+                    btnEl.addEventListener('click', () => {
+                        if (NODES[btn.next]) {
+                            currentNodeId = btn.next;
+                            render();
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    render();
+</script>
+</body>
+</html>
