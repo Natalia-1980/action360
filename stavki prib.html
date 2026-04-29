@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Налог на прибыль · ставки 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+            max-height: 85vh;
+            overflow-y: auto;
+            transition: all 0.2s;
+        }
+
+        h1 {
+            font-weight: 400;
+            font-size: 1.4rem;
+            color: #1a344c;
+            margin-bottom: 0.3rem;
+            border-left: 4px solid #2e7ab3;
+            padding-left: 0.8rem;
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            color: #4f6f92;
+            margin-bottom: 1.2rem;
+            padding-left: 1.2rem;
+        }
+
+        /* Блоки ставок — кликабельные */
+        .rate-group {
+            background: #f9fcff;
+            border-radius: 24px;
+            border: 1px solid #c7daf5;
+            margin-bottom: 0.8rem;
+            padding: 0.7rem 1rem;
+            transition: 0.1s;
+            cursor: pointer;
+        }
+        .rate-group:hover {
+            background: #eef4fe;
+            border-color: #8da9cc;
+        }
+
+        .rate-header {
+            font-weight: 600;
+            color: #0d2f4e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .rate-preview {
+            font-size: 0.75rem;
+            color: #5e7290;
+            margin-top: 0.2rem;
+        }
+
+        .indicator {
+            font-size: 1rem;
+            color: #1e6bb8;
+        }
+
+        /* Детальное окно (внутри карточки) */
+        .detail-view {
+            display: none;
+        }
+        .detail-view.active {
+            display: block;
+        }
+        .main-view {
+            display: block;
+        }
+        .main-view.hidden {
+            display: none;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #d8e2f2;
+        }
+        .back-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .back-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .detail-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1a344c;
+        }
+
+        .rate-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .rate-table td, .rate-table th {
+            padding: 0.5rem 0.3rem;
+            border-bottom: 1px solid #e2eaf5;
+            vertical-align: top;
+        }
+        .rate-table th {
+            text-align: left;
+            font-weight: 500;
+            color: #1a344c;
+            width: 40%;
+        }
+        .rate-table td {
+            color: #2c4e6e;
+        }
+        .rate-value {
+            font-weight: 600;
+            color: #1e6bb8;
+            white-space: nowrap;
+        }
+
+        .small-note {
+            font-size: 0.7rem;
+            color: #5e7290;
+            margin-top: 0.8rem;
+            line-height: 1.4;
+            border-top: 1px solid #d8e2f2;
+            padding-top: 0.5rem;
+        }
+
+        .footer-note {
+            font-size: 0.7rem;
+            color: #4f6f92;
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #d8e2f2;
+        }
+
+        .tooltip-item {
+            position: relative;
+            border-bottom: 1px dashed #1e6bb8;
+            cursor: help;
+        }
+        .tooltip-item .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 140%;
+            left: 0;
+            background: #1e3b5c;
+            color: #fff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 16px;
+            font-size: 0.7rem;
+            width: 220px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: 0.15s;
+            pointer-events: none;
+            z-index: 100;
+            line-height: 1.4;
+        }
+        .tooltip-item:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Основной вид (список блоков) -->
+        <div id="mainView" class="main-view">
+            <h1>📊 Ставки налога на прибыль в 2026 году</h1>
+            <div class="subtitle">Общая ставка — 25% | Пониженные и специальные ставки</div>
+
+            <div class="rate-group" data-detail="common">
+                <div class="rate-header">🏢 Общая ставка <span class="rate-value">8% / 17%</span><span class="indicator">→</span></div>
+                <div class="rate-preview">Все доходы от предпринимательской деятельности</div>
+            </div>
+
+            <div class="rate-group" data-detail="dividends">
+                <div class="rate-header">💰 Дивиденды<span class="indicator">→</span></div>
+                <div class="rate-preview">0%, 5%, 10%, 13%, 15% – в зависимости от условий</div>
+            </div>
+
+            <div class="rate-group" data-detail="foreign">
+                <div class="rate-header">🌍 Доходы иностранных организаций<span class="indicator">→</span></div>
+                <div class="rate-preview">25%, 10%, 15%, 0% – в зависимости от вида дохода</div>
+            </div>
+
+            <div class="rate-group" data-detail="preferential">
+                <div class="rate-header">🌾 Сельхозпроизводители | ИТ | ОЭЗ | СЭЗ<span class="indicator">→</span></div>
+                <div class="rate-preview">0% / 0%, 5% / 0%, 2% / ≤13,5% и др.</div>
+            </div>
+
+            <div class="rate-group" data-detail="securities">
+                <div class="rate-header">📈 Ценные бумаги и доли<span class="indicator">→</span></div>
+                <div class="rate-preview">0%, 9%, 10%, 13%, 15%, 20%</div>
+            </div>
+
+            <div class="rate-group" data-detail="special">
+                <div class="rate-header">⚖️ Специальные ситуации<span class="indicator">→</span></div>
+                <div class="rate-preview">Личные фонды, ЦФА, МГК и др.</div>
+            </div>
+
+            <div class="footer-note">
+                <span class="tooltip-item">ⓘ Важно<span class="tooltip">Ставки могут быть изменены региональным законодательством. Для применения льгот требуются раздельный учёт и выполнение условий НК РФ. Данные актуальны на 2026 год.</span></span>
+            </div>
+        </div>
+
+        <!-- Детальный вид (подробная информация) -->
+        <div id="detailView" class="detail-view">
+            <div class="detail-header">
+                <button class="back-btn" id="backBtn">← Назад</button>
+                <div class="detail-title" id="detailTitle"></div>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Данные для детального просмотра
+            const detailsData = {
+                common: {
+                    title: "Общая ставка",
+                    html: `
+                        <table class="rate-table">
+                            <tr><th>Вид дохода</th><th>Ставка (фед. / регион.)</th></tr>
+                            <tr><td>Все доходы от предпринимательской деятельности (кроме льготных)</td>
+                                <td class="rate-value">8% / 17%</td>
+                            </tr>
+                        </table>
+                        <div class="small-note">📌 С 2026 года общую ставку применяют в том числе букмекерские конторы (подп. 56 п. 1 ст. 251 НК в ред. Закона от 28.11.2025 № 425-ФЗ). Регионы могут устанавливать пониженные ставки для отдельных категорий.</div>
+                    `
+                },
+                dividends: {
+                    title: "Дивиденды",
+                    html: `
+                        <table class="rate-table">
+                            <tr><th>Условия</th><th>Ставка</th></tr>
+                            <tr><td>Российская организация – доля ≥50%, срок владения ≥365 дней</td><td class="rate-value">0%</td></tr>
+                            <tr><td>Международная холдинговая компания (МХК) – доля ≥15%, срок ≥365 дней</td><td class="rate-value">0%</td></tr>
+                            <tr><td>Дивиденды российской организации (без права на 0%)</td><td class="rate-value">13%</td></tr>
+                            <tr><td>Дивиденды иностранной организации по акциям российских организаций</td><td class="rate-value">15%</td></tr>
+                            <tr><td>Дивиденды по акциям МХК (если нет права на 5%)</td><td class="rate-value">10%</td></tr>
+                        </table>
+                        <div class="small-note">📌 Возможно применение пониженных ставок по международным соглашениям. Подтверждение – ст. 312 НК.</div>
+                    `
+                },
+                foreign: {
+                    title: "Доходы иностранных организаций",
+                    html: `
+                        <table class="rate-table">
+                            <tr><th>Вид дохода</th><th>Ставка</th></tr>
+                            <tr><td>Прибыль КИК, доходы от распределения прибыли, долговые обязательства, роялти, продажа недвижимости и пр.</td><td class="rate-value">25%</td></tr>
+                            <tr><td>Доходы от международных перевозок (морские/воздушные суда, контейнеры)</td><td class="rate-value">10%</td></tr>
+                            <tr><td>Доходы от выполнения работ/услуг на территории РФ для взаимозависимого лица</td><td class="rate-value">15%</td></tr>
+                            <tr><td>Доходы иностранных лизингодателей по договорам до 05.03.2022 (при определённых условиях) — до 31.12.2028</td><td class="rate-value">0%</td></tr>
+                        </table>
+                        <div class="small-note">📌 Ставка 15% применяется, если международным соглашением не установлена более низкая. Для роялти с 2026 года – 25%.</div>
+                    `
+                },
+                preferential: {
+                    title: "Льготные категории (сельхоз, ИТ, ОЭЗ, СЭЗ и др.)",
+                    html: `
+                        <table class="rate-table">
+                            <tr><th>Деятельность</th><th>Ставка (фед. / регион.)</th></tr>
+                            <tr><td>Сельхозпроизводители (критерии ст. 346.2 НК)</td><td class="rate-value">0% / 0%</td></tr>
+                            <tr><td>Образовательные и медицинские организации</td><td class="rate-value">0%</td></tr>
+                            <tr><td>Участники «Сколково», ИНТЦ (до прибыли 300 млн руб.)</td><td class="rate-value">0% / 0%</td></tr>
+                            <tr><td>ИТ-компании (реестровые) на 2025–2030 гг.</td><td class="rate-value">5% / 0%</td></tr>
+                            <tr><td>Резиденты ОЭЗ (промышленно-производственные, технико-внедренческие, портовые)</td><td class="rate-value">2% / ≤13,5%</td></tr>
+                            <tr><td>Резиденты СЭЗ (Крым, Севастополь)</td><td class="rate-value">0% (10 лет) / ≤13,5%</td></tr>
+                            <tr><td>Резиденты ТОР, свободного порта Владивосток, Арктической зоны</td><td class="rate-value">0% (5 лет) / ≤5% (5 лет), затем ≥10%</td></tr>
+                            <tr><td>Участники региональных инвестиционных проектов (РИП)</td><td class="rate-value">0% (10 лет) / 0–10%</td></tr>
+                            <tr><td>Организации по добыче углеводородного сырья на новом морском месторождении</td><td class="rate-value">25%–40%–50%</td></tr>
+                        </table>
+                        <div class="small-note">📌 Для большинства льгот требуется раздельный учёт. При участии иностранных агентов (доля ≥10%) льготы с 2026 года не применяются.</div>
+                    `
+                },
+                securities: {
+                    title: "Ценные бумаги и доли",
+                    html: `
+                        <table class="rate-table">
+                            <tr><th>Вид дохода</th><th>Ставка</th></tr>
+                            <tr><td>Проценты по государственным и муниципальным облигациям (выпущенным до 20.01.1997)</td><td class="rate-value">0%</td></tr>
+                            <tr><td>Проценты по муниципальным ценным бумагам (срок ≥3 лет, выпуск до 01.01.2007)</td><td class="rate-value">9%</td></tr>
+                            <tr><td>Проценты по облигациям с ипотечным покрытием (выпуск до 01.01.2007)</td><td class="rate-value">9%</td></tr>
+                            <tr><td>Проценты по прочим государственным, муниципальным и рублёвым облигациям (с 01.01.2017, обращающимся на орг. рынке)</td><td class="rate-value">20%</td></tr>
+                            <tr><td>Доходы от выбытия акций (долей) при сроке владения более 5 лет (при условии, что ≤50% активов – недвижимость в РФ)</td><td class="rate-value">0%</td></tr>
+                            <tr><td>Доходы МХК от выбытия акций (долей) при владении ≥15% не менее 365 дней</td><td class="rate-value">0%</td></tr>
+                            <tr><td>Проценты по долговым обязательствам МХК</td><td class="rate-value">10%</td></td>
+                        </table>
+                        <div class="small-note">📌 Для акций, обращающихся на организованном рынке и реализованных в объёме ≤1% от общего количества, также может применяться 0% при владении более 5 лет.</div>
+                    `
+                },
+                special: {
+                    title: "Специальные ситуации",
+                    html: `
+                        <table class="rate-table">
+                            <tr><th>Ситуация</th><th>Ставка</th></tr>
+                            <tr><td>Личные фонды (при соблюдении ст. 284.12 НК)</td><td class="rate-value">2% / 13%</td></tr>
+                            <tr><td>Цифровые финансовые активы – доходы российской организации</td><td class="rate-value">13%</td></tr>
+                            <tr><td>ЦФА – доходы иностранной организации</td><td class="rate-value">15%</td></tr>
+                            <tr><td>Полиэфирное производство с вычетом акциза с коэффициентом 2</td><td class="rate-value">25% (первые 10 лет)</td></tr>
+                            <tr><td>Российские участники международных групп компаний (МГК) – доплата до эффективной ставки 15%</td><td class="rate-value">5% / 10% (доплата)</td></tr>
+                        </table>
+                        <div class="small-note">📌 С 2026 года организации с участием иностранных агентов (доля ≥10%) не вправе применять большинство пониженных ставок.</div>
+                    `
+                }
+            };
+
+            const mainView = document.getElementById('mainView');
+            const detailView = document.getElementById('detailView');
+            const detailTitle = document.getElementById('detailTitle');
+            const detailContent = document.getElementById('detailContent');
+            const backBtn = document.getElementById('backBtn');
+
+            // Обработчики для блоков
+            const rateGroups = document.querySelectorAll('.rate-group');
+            rateGroups.forEach(group => {
+                group.addEventListener('click', () => {
+                    const detailId = group.getAttribute('data-detail');
+                    if (detailId && detailsData[detailId]) {
+                        detailTitle.textContent = detailsData[detailId].title;
+                        detailContent.innerHTML = detailsData[detailId].html;
+                        mainView.classList.add('hidden');
+                        detailView.classList.add('active');
+                    }
+                });
+            });
+
+            // Кнопка назад
+            backBtn.addEventListener('click', () => {
+                mainView.classList.remove('hidden');
+                detailView.classList.remove('active');
+            });
+        })();
+    </script>
+</body>
+</html>
