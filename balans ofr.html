@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ОНО и налог на прибыль · практикум</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.8rem 1.5rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .task-text {
+            background: #f6faff;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #0a2942;
+            border: 1px solid #cbdaf0;
+        }
+
+        .question-block {
+            background: #f9fcff;
+            border-radius: 24px;
+            padding: 1rem;
+            border: 2px solid #e1eaf5;
+            margin: 1rem 0;
+        }
+
+        .question-title {
+            font-weight: 600;
+            color: #1d3b5e;
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            margin: 0.6rem 0;
+            flex-wrap: wrap;
+        }
+        .input-row label {
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.9rem;
+        }
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .input-wrapper input {
+            width: 110px;
+            padding: 0.5rem 0.6rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-wrapper span {
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.85rem;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.2rem 0 0.5rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+        }
+        .nav-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none;
+        }
+        .final-message {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #2b8c4a;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1rem; }
+            .input-row { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Условие задачи (без заголовка) -->
+        <div class="task-text">
+            <strong>ООО «Стандарт»</strong><br>
+            Ставка налога на прибыль: 25% (без разбивки по бюджетам)<br>
+            Основное средство (оборудование): первоначальная стоимость в БУ и НУ — 1 200 000 руб.<br>
+            СПИ в БУ — 6 лет, в НУ — 4 года. Амортизация линейная.<br>
+            Амортизация за 2024–2026: БУ — 200 000 руб./год, НУ — 300 000 руб./год.<br>
+            Финансовые результаты 2026 г. (тыс. руб.): выручка 10 000, материальные расходы 6 200, амортизация (БУ 200, НУ 300).<br>
+            Прибыль до налогообложения в БУ: 3 600 тыс. руб., в НУ: 3 500 тыс. руб.
+        </div>
+
+        <!-- Вкладки навигации -->
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevBtn" disabled>← Назад</button>
+            <span style="font-weight:500; color:#1e3b5c;">Шаг <span id="stepCounter">1</span>/5</span>
+            <button class="nav-btn" id="nextBtn">Вперёд →</button>
+        </div>
+
+        <!-- Контейнер для текущего вопроса -->
+        <div id="questionContainer"></div>
+
+        <div id="finalMessage" class="final-message hidden"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Этапы (шаги) — разделили баланс и ОФР
+            const steps = [
+                {
+                    title: "1. Расчёт ОНО на 31.12.2025 и 31.12.2026",
+                    fields: [
+                        { id: "ono2025", label: "ОНО на 31.12.2025 (руб.)", unit: "руб.", correct: 50000 },
+                        { id: "ono2026", label: "ОНО на 31.12.2026 (руб.)", unit: "руб.", correct: 75000 },
+                        { id: "deltaOno", label: "Изменение ОНО (ΔОНО) за 2026 г. (руб.)", unit: "руб.", correct: 25000 }
+                    ],
+                    explanation: "Балансовая стоимость БУ на 31.12.2025: 800 000 руб., налоговая стоимость НУ: 600 000 руб. Разница +200 000 → ОНО = 200 000 × 25% = 50 000 руб.<br>На 31.12.2026: БУ 600 000, НУ 300 000, разница +300 000 → ОНО = 75 000 руб.<br>ΔОНО = 75 000 − 50 000 = +25 000 руб."
+                },
+                {
+                    title: "2. Текущий налог на прибыль (ТНП) за 2026 год",
+                    fields: [
+                        { id: "tnp", label: "Текущий налог на прибыль (руб.)", unit: "руб.", correct: 875000 }
+                    ],
+                    explanation: "ТНП = Налоговая база × 25% = 3 500 000 × 25% = 875 000 руб."
+                },
+                {
+                    title: "3. Условный расход по налогу (УРНП) и отложенный налог",
+                    fields: [
+                        { id: "urnp", label: "Условный расход по налогу (УРНП) (руб.)", unit: "руб.", correct: 900000 },
+                        { id: "otlozhenny", label: "Отложенный налог (строка 2412 ОФР) (руб.)", unit: "руб.", correct: 25000 }
+                    ],
+                    explanation: "УРНП = Прибыль до налогообложения (БУ) × 25% = 3 600 000 × 25% = 900 000 руб.<br>Отложенный налог = –ΔОНО = +25 000 руб. (в ОФР показывается положительной суммой, так как отложенный налог уменьшает текущий платёж)."
+                },
+                {
+                    title: "4. Заполнение баланса (тыс. руб.)",
+                    fields: [
+                        { id: "balance1180", label: "Баланс стр. 1180 (Отложенные налоговые активы) (тыс. руб.)", unit: "тыс. руб.", correct: 0 },
+                        { id: "balance1420", label: "Баланс стр. 1420 (Отложенные налоговые обязательства) (тыс. руб.)", unit: "тыс. руб.", correct: 75 }
+                    ],
+                    explanation: "Баланс на 31.12.2026: ОНА = 0 (нет), ОНО = 75 тыс. руб."
+                },
+                {
+                    title: "5. Заполнение отчёта о финансовых результатах (тыс. руб.)",
+                    fields: [
+                        { id: "profit2300", label: "ОФР стр. 2300 (Прибыль до налогообложения) (тыс. руб.)", unit: "тыс. руб.", correct: 3600 },
+                        { id: "profit2410", label: "ОФР стр. 2410 (Налог на прибыль) (тыс. руб.)", unit: "тыс. руб.", correct: 875 },
+                        { id: "profit2411", label: "ОФР стр. 2411 (текущий налог) (тыс. руб.)", unit: "тыс. руб.", correct: 900 },
+                        { id: "profit2412", label: "ОФР стр. 2412 (отложенный налог) (тыс. руб.)", unit: "тыс. руб.", correct: 25 },
+                        { id: "profit2400", label: "ОФР стр. 2400 (Чистая прибыль) (тыс. руб.)", unit: "тыс. руб.", correct: 2725 }
+                    ],
+                    explanation: "ОФР за 2026 г.: Прибыль до налогообложения = 3 600 тыс. руб., налог на прибыль = 875 тыс. руб., текущий налог = 900 тыс. руб., отложенный налог = +25 тыс. руб., чистая прибыль = 3 600 − 875 = 2 725 тыс. руб."
+                }
+            ];
+
+            let currentStep = 0;
+            let answers = {};
+            let stepAnswered = [false, false, false, false, false];
+
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const stepCounterSpan = document.getElementById('stepCounter');
+            const questionContainer = document.getElementById('questionContainer');
+            const finalMessage = document.getElementById('finalMessage');
+
+            function renderStep() {
+                const step = steps[currentStep];
+                stepCounterSpan.textContent = currentStep + 1;
+                
+                let html = `<div class="question-block">
+                    <div class="question-title">${step.title}</div>`;
+                
+                step.fields.forEach(field => {
+                    const savedValue = answers[field.id] !== undefined ? answers[field.id] : '';
+                    html += `
+                        <div class="input-row">
+                            <label>${field.label}</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="${field.id}" value="${savedValue}" step="any">
+                                <span>${field.unit}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `<div class="button-row">
+                            <button class="btn" id="checkStepBtn">Проверить</button>
+                        </div>
+                        <div id="stepFeedback" class="feedback hidden"></div>
+                    </div>`;
+                
+                questionContainer.innerHTML = html;
+                
+                step.fields.forEach(field => {
+                    const input = document.getElementById(field.id);
+                    if (input) {
+                        input.addEventListener('input', (e) => {
+                            answers[field.id] = e.target.value;
+                            if (stepAnswered[currentStep]) {
+                                stepAnswered[currentStep] = false;
+                                document.getElementById('stepFeedback').classList.add('hidden');
+                            }
+                        });
+                    }
+                });
+                
+                document.getElementById('checkStepBtn').addEventListener('click', () => {
+                    checkStep();
+                });
+                
+                updateNavButtons();
+            }
+            
+            function checkStep() {
+                const step = steps[currentStep];
+                let allCorrect = true;
+                let resultsHtml = '';
+                
+                for (const field of step.fields) {
+                    const input = document.getElementById(field.id);
+                    const userValue = parseFloat(input.value.trim());
+                    const isCorrect = !isNaN(userValue) && Math.abs(userValue - field.correct) < 0.5;
+                    if (!isCorrect) allCorrect = false;
+                    const status = isCorrect ? '✅' : '❌';
+                    const expected = field.correct.toLocaleString('ru');
+                    resultsHtml += `<div><strong>${status} ${field.label}:</strong> Ваш ответ: ${isNaN(userValue) ? '—' : userValue.toLocaleString('ru')} ${field.unit}, правильный: ${expected} ${field.unit}</div>`;
+                }
+                
+                resultsHtml += `<div style="margin-top:0.8rem;"><strong>Пояснение:</strong><br>${step.explanation}</div>`;
+                
+                const feedbackDiv = document.getElementById('stepFeedback');
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.classList.add(allCorrect ? 'correct' : 'incorrect');
+                feedbackDiv.innerHTML = resultsHtml;
+                
+                if (allCorrect) {
+                    stepAnswered[currentStep] = true;
+                }
+                updateNavButtons();
+                
+                const allCompleted = stepAnswered.every(v => v === true);
+                if (allCompleted) {
+                    finalMessage.classList.remove('hidden');
+                    finalMessage.innerHTML = '✅ Все шаги пройдены! Спасибо за работу!';
+                } else {
+                    finalMessage.classList.add('hidden');
+                }
+            }
+            
+            function updateNavButtons() {
+                prevBtn.disabled = (currentStep === 0);
+                if (currentStep === steps.length - 1) {
+                    nextBtn.textContent = 'Завершить';
+                } else {
+                    nextBtn.textContent = 'Вперёд →';
+                }
+            }
+            
+            function goToStep(delta) {
+                const newStep = currentStep + delta;
+                if (newStep >= 0 && newStep < steps.length) {
+                    currentStep = newStep;
+                    renderStep();
+                } else if (newStep === steps.length) {
+                    const allCompleted = stepAnswered.every(v => v === true);
+                    if (allCompleted) {
+                        finalMessage.classList.remove('hidden');
+                        finalMessage.innerHTML = '✅ Все шаги пройдены! Спасибо за работу!';
+                        questionContainer.innerHTML = '<div class="question-block" style="text-align:center; padding:2rem;">🎉 Поздравляем! Все расчёты выполнены верно.</div>';
+                        nextBtn.disabled = true;
+                        prevBtn.disabled = false;
+                    } else {
+                        alert('Пожалуйста, сначала ответьте на все вопросы текущего шага и нажмите «Проверить».');
+                    }
+                }
+            }
+            
+            prevBtn.addEventListener('click', () => goToStep(-1));
+            nextBtn.addEventListener('click', () => goToStep(1));
+            
+            renderStep();
+        })();
+    </script>
+</body>
+</html>
