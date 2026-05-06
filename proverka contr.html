@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Анализ контрагента · тренажёр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.8rem 1.5rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            background: #f9fcff;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #c7daf5;
+            padding: 0.6rem 0.5rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        .data-table th {
+            background: #e2ecfe;
+            font-weight: 600;
+            color: #0d2f4e;
+            width: 35%;
+        }
+
+        .question-block {
+            background: #f9fcff;
+            border-radius: 24px;
+            padding: 1.2rem;
+            border: 2px solid #e1eaf5;
+            margin: 1.2rem 0;
+        }
+
+        .question-title {
+            font-weight: 600;
+            color: #1d3b5e;
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        .input-row {
+            margin: 0.8rem 0;
+        }
+        .input-row textarea, .input-row input {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .input-row textarea:focus, .input-row input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+        .radio-group input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #1e6bb8;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0 1rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+        }
+        .nav-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none;
+        }
+        .final-message {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #2b8c4a;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1rem; }
+            .radio-group { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Данные из открытых источников -->
+        <table class="data-table">
+            <tr><th>Параметр</th><th>Значение</th></tr>
+            <tr><td>Дата регистрации</td><td>02.10.2019</td></tr>
+            <tr><td>Юридический адрес</td><td>г. Москва, Хибинский проезд, д. 20</td></tr>
+            <tr><td>Уставный капитал</td><td>10 000 ₽</td></tr>
+            <tr><td>Руководитель</td><td>Хохлов И.В. (с 22.02.2023)</td></tr>
+            <tr><td>Налоговая задолженность</td><td>отсутствует</td></tr>
+            <tr><td>Госконтракты (44-ФЗ)</td><td>20 контрактов, 19 исполнены</td></tr>
+            <tr><td>Крупные заказчики</td><td>ГБУЗ «ГКБ», КП «ВДНХ»</td></tr>
+            <tr><td>Прибыль (2023–2025)</td><td>растёт с 1,4 млн до 5,2 млн ₽</td></tr>
+        </table>
+
+        <!-- Навигация по вопросам -->
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevBtn" disabled>← Назад</button>
+            <span style="font-weight:500; color:#1e3b5c;">Вопрос <span id="questionCounter">1</span>/4</span>
+            <button class="nav-btn" id="nextBtn">Вперёд →</button>
+        </div>
+
+        <!-- Контейнер для текущего вопроса -->
+        <div id="questionContainer"></div>
+
+        <div id="finalMessage" class="final-message hidden"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Эталонные ответы для проверки (ключевые слова)
+            const correctAnswers = {
+                1: {
+                    keywords: ["госконтракты", "44-ФЗ", "исполнены", "крупные заказчики", "бюджетные", "ГБУЗ", "ВДНХ", "прибыль растёт", "налоговая задолженность отсутствует"],
+                    example: "1) Есть исполненные госконтракты по 44-ФЗ; 2) Крупные заказчики — бюджетные организации (ГБУЗ, ВДНХ); 3) Прибыль растёт, нет налоговой задолженности.",
+                    explanation: "В пользу надёжности говорят: исполненные госконтракты (44-ФЗ), крупные заказчики — бюджетные организации (ГБУЗ, ВДНХ), рост прибыли и отсутствие налоговой задолженности."
+                },
+                2: {
+                    correctOption: "decision", // решение учредителей
+                    correctDoc: "Решение учредителей о назначении директора",
+                    explanation: "Именно решение учредителей (протокол собрания) подтверждает, что человек имеет право подписывать договоры. Устав и выписка из ЕГРЮЛ этого не дают — выписка лишь показывает, кто записан, но не подтверждает действующие полномочия."
+                },
+                3: {
+                    keywords: ["массовый", "много компаний", "адрес массовой регистрации", "массовый адрес"],
+                    explanation: "Необходимо проверить, не является ли адрес «массовым» — то есть зарегистрировано ли по этому адресу много организаций (признак фирм-однодневок)."
+                },
+                4: {
+                    correctDecision: "yes", // заключать
+                    keywords: ["госконтракты", "бюджетные заказчики", "прибыль растёт", "налоговая задолженность отсутствует", "реальная"],
+                    explanation: "Компания выглядит реальной: есть исполненные госконтракты, бюджетные заказчики, растёт прибыль, нет долгов. Для осторожности можно ограничить предоплату (например, 30%) и сохранить скриншоты проверки."
+                }
+            };
+
+            let currentQuestion = 0;
+            let answers = {
+                1: "",
+                2: { option: "", reason: "" },
+                3: "",
+                4: { decision: "", reason: "" }
+            };
+            let questionAnswered = [false, false, false, false];
+
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const questionCounterSpan = document.getElementById('questionCounter');
+            const questionContainer = document.getElementById('questionContainer');
+            const finalMessage = document.getElementById('finalMessage');
+
+            function renderQuestion() {
+                const qNum = currentQuestion + 1;
+                questionCounterSpan.textContent = qNum;
+                
+                let html = '';
+                
+                if (qNum === 1) {
+                    html = `
+                        <div class="question-block">
+                            <div class="question-title">1. Какие 3 факта из таблицы говорят в пользу того, что контрагент реальный и надёжный?</div>
+                            <div class="input-row">
+                                <textarea id="q1answer" rows="4" placeholder="Введите три пункта (каждый с новой строки или через запятую)">${answers[1]}</textarea>
+                            </div>
+                            <div class="button-row">
+                                <button class="btn" id="checkBtn">Проверить</button>
+                            </div>
+                            <div id="feedback" class="feedback hidden"></div>
+                        </div>
+                    `;
+                } else if (qNum === 2) {
+                    const selectedOption = answers[2].option;
+                    html = `
+                        <div class="question-block">
+                            <div class="question-title">2. Какой документ с подписью вы в первую очередь запросите у ООО «Ромашка» и почему?</div>
+                            <div class="radio-group">
+                                <label><input type="radio" name="docOption" value="charter" ${selectedOption === 'charter' ? 'checked' : ''}> Устав</label>
+                                <label><input type="radio" name="docOption" value="extract" ${selectedOption === 'extract' ? 'checked' : ''}> Выписка из ЕГРЮЛ</label>
+                                <label><input type="radio" name="docOption" value="decision" ${selectedOption === 'decision' ? 'checked' : ''}> Решение учредителей о назначении директора</label>
+                            </div>
+                            <div class="input-row">
+                                <textarea id="q2reason" rows="3" placeholder="Почему?">${answers[2].reason}</textarea>
+                            </div>
+                            <div class="button-row">
+                                <button class="btn" id="checkBtn">Проверить</button>
+                            </div>
+                            <div id="feedback" class="feedback hidden"></div>
+                        </div>
+                    `;
+                } else if (qNum === 3) {
+                    html = `
+                        <div class="question-block">
+                            <div class="question-title">3. Что нужно проверить на сайте ФНС в отношении юридического адреса?</div>
+                            <div class="input-row">
+                                <input type="text" id="q3answer" placeholder="Коротко — одним предложением" value="${answers[3]}">
+                            </div>
+                            <div class="button-row">
+                                <button class="btn" id="checkBtn">Проверить</button>
+                            </div>
+                            <div id="feedback" class="feedback hidden"></div>
+                        </div>
+                    `;
+                } else if (qNum === 4) {
+                    const selectedDecision = answers[4].decision;
+                    html = `
+                        <div class="question-block">
+                            <div class="question-title">4. Ваша рекомендация директору: заключать договор или нет?</div>
+                            <div class="radio-group">
+                                <label><input type="radio" name="decisionOption" value="yes" ${selectedDecision === 'yes' ? 'checked' : ''}> Заключить</label>
+                                <label><input type="radio" name="decisionOption" value="no" ${selectedDecision === 'no' ? 'checked' : ''}> Не заключать</label>
+                            </div>
+                            <div class="input-row">
+                                <textarea id="q4reason" rows="3" placeholder="Почему?">${answers[4].reason}</textarea>
+                            </div>
+                            <div class="button-row">
+                                <button class="btn" id="checkBtn">Проверить</button>
+                            </div>
+                            <div id="feedback" class="feedback hidden"></div>
+                        </div>
+                    `;
+                }
+                
+                questionContainer.innerHTML = html;
+                
+                // Сохраняем ответы при вводе
+                if (qNum === 1) {
+                    const textarea = document.getElementById('q1answer');
+                    textarea.addEventListener('input', (e) => {
+                        answers[1] = e.target.value;
+                        if (questionAnswered[0]) {
+                            questionAnswered[0] = false;
+                            document.getElementById('feedback').classList.add('hidden');
+                        }
+                    });
+                } else if (qNum === 2) {
+                    const radios = document.querySelectorAll('input[name="docOption"]');
+                    radios.forEach(radio => {
+                        radio.addEventListener('change', (e) => {
+                            answers[2].option = e.target.value;
+                            if (questionAnswered[1]) {
+                                questionAnswered[1] = false;
+                                document.getElementById('feedback').classList.add('hidden');
+                            }
+                        });
+                    });
+                    const reasonTextarea = document.getElementById('q2reason');
+                    reasonTextarea.addEventListener('input', (e) => {
+                        answers[2].reason = e.target.value;
+                        if (questionAnswered[1]) {
+                            questionAnswered[1] = false;
+                            document.getElementById('feedback').classList.add('hidden');
+                        }
+                    });
+                } else if (qNum === 3) {
+                    const input = document.getElementById('q3answer');
+                    input.addEventListener('input', (e) => {
+                        answers[3] = e.target.value;
+                        if (questionAnswered[2]) {
+                            questionAnswered[2] = false;
+                            document.getElementById('feedback').classList.add('hidden');
+                        }
+                    });
+                } else if (qNum === 4) {
+                    const radios = document.querySelectorAll('input[name="decisionOption"]');
+                    radios.forEach(radio => {
+                        radio.addEventListener('change', (e) => {
+                            answers[4].decision = e.target.value;
+                            if (questionAnswered[3]) {
+                                questionAnswered[3] = false;
+                                document.getElementById('feedback').classList.add('hidden');
+                            }
+                        });
+                    });
+                    const reasonTextarea = document.getElementById('q4reason');
+                    reasonTextarea.addEventListener('input', (e) => {
+                        answers[4].reason = e.target.value;
+                        if (questionAnswered[3]) {
+                            questionAnswered[3] = false;
+                            document.getElementById('feedback').classList.add('hidden');
+                        }
+                    });
+                }
+                
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    checkCurrentQuestion();
+                });
+                
+                updateNavButtons();
+            }
+            
+            function checkCurrentQuestion() {
+                const qNum = currentQuestion + 1;
+                let isCorrect = false;
+                let message = '';
+                
+                if (qNum === 1) {
+                    const userAnswer = answers[1].toLowerCase();
+                    const keywords = correctAnswers[1].keywords;
+                    let foundCount = 0;
+                    for (let kw of keywords) {
+                        if (userAnswer.includes(kw.toLowerCase())) {
+                            foundCount++;
+                        }
+                    }
+                    // Достаточно 2-3 ключевых признаков
+                    if (foundCount >= 2 && userAnswer.length > 20) {
+                        isCorrect = true;
+                        message = `✅ Верно!<br><br>${correctAnswers[1].explanation}`;
+                    } else {
+                        isCorrect = false;
+                        message = `❌ Неверно.<br><br>Правильные факты: ${correctAnswers[1].explanation}`;
+                    }
+                } else if (qNum === 2) {
+                    const selectedOption = answers[2].option;
+                    const reason = answers[2].reason.toLowerCase();
+                    if (selectedOption === 'decision' && reason.length > 10) {
+                        isCorrect = true;
+                        message = `✅ Верно!<br><br>${correctAnswers[2].explanation}`;
+                    } else {
+                        const correctDoc = correctAnswers[2].correctDoc;
+                        if (selectedOption !== 'decision') {
+                            message = `❌ Неверно. Правильный документ: ${correctDoc}.<br><br>${correctAnswers[2].explanation}`;
+                        } else {
+                            message = `❌ Неверно. Добавьте обоснование.<br><br>${correctAnswers[2].explanation}`;
+                        }
+                    }
+                } else if (qNum === 3) {
+                    const userAnswer = answers[3].toLowerCase();
+                    const keywords = correctAnswers[3].keywords;
+                    let found = false;
+                    for (let kw of keywords) {
+                        if (userAnswer.includes(kw.toLowerCase())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found && userAnswer.length > 10) {
+                        isCorrect = true;
+                        message = `✅ Верно!<br><br>${correctAnswers[3].explanation}`;
+                    } else {
+                        message = `❌ Неверно.<br><br>${correctAnswers[3].explanation}`;
+                    }
+                } else if (qNum === 4) {
+                    const decision = answers[4].decision;
+                    const reason = answers[4].reason.toLowerCase();
+                    const keywords = correctAnswers[4].keywords;
+                    let hasKeyword = false;
+                    for (let kw of keywords) {
+                        if (reason.includes(kw.toLowerCase())) {
+                            hasKeyword = true;
+                            break;
+                        }
+                    }
+                    if (decision === 'yes' && hasKeyword && reason.length > 15) {
+                        isCorrect = true;
+                        message = `✅ Верно!<br><br>Рекомендация: заключать договор.<br><br>${correctAnswers[4].explanation}`;
+                    } else if (decision !== 'yes') {
+                        message = `❌ Неверно. Рекомендация: заключать договор.<br><br>${correctAnswers[4].explanation}`;
+                    } else {
+                        message = `❌ Неверно. Добавьте обоснование (госконтракты, бюджетные заказчики, прибыль).<br><br>${correctAnswers[4].explanation}`;
+                    }
+                }
+                
+                const feedbackDiv = document.getElementById('feedback');
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.classList.add(isCorrect ? 'correct' : 'incorrect');
+                feedbackDiv.innerHTML = message;
+                
+                if (isCorrect) {
+                    questionAnswered[currentQuestion] = true;
+                }
+                updateNavButtons();
+                
+                const allCompleted = questionAnswered.every(v => v === true);
+                if (allCompleted) {
+                    finalMessage.classList.remove('hidden');
+                    finalMessage.innerHTML = '✅ Все вопросы пройдены! Спасибо за работу!';
+                } else {
+                    finalMessage.classList.add('hidden');
+                }
+            }
+            
+            function updateNavButtons() {
+                prevBtn.disabled = (currentQuestion === 0);
+                if (currentQuestion === 3) {
+                    nextBtn.textContent = 'Завершить';
+                } else {
+                    nextBtn.textContent = 'Вперёд →';
+                }
+            }
+            
+            function goToStep(delta) {
+                const newStep = currentQuestion + delta;
+                if (newStep >= 0 && newStep < 4) {
+                    currentQuestion = newStep;
+                    renderQuestion();
+                } else if (newStep === 4) {
+                    const allCompleted = questionAnswered.every(v => v === true);
+                    if (allCompleted) {
+                        finalMessage.classList.remove('hidden');
+                        finalMessage.innerHTML = '✅ Все вопросы пройдены! Спасибо за работу!';
+                        questionContainer.innerHTML = '<div class="question-block" style="text-align:center; padding:2rem;">🎉 Поздравляем! Анализ контрагента завершён.</div>';
+                        nextBtn.disabled = true;
+                        prevBtn.disabled = false;
+                    } else {
+                        alert('Пожалуйста, сначала ответьте на все вопросы и нажмите «Проверить» для каждого.');
+                    }
+                }
+            }
+            
+            prevBtn.addEventListener('click', () => goToStep(-1));
+            nextBtn.addEventListener('click', () => goToStep(1));
+            
+            renderQuestion();
+        })();
+    </script>
+</body>
+</html>
