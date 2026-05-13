@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>УСН Тренажер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #e5e5ea;
+            font-family: -apple-system, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 8px;
+            color: #1c1c1e;
+        }
+
+        .trainer {
+            max-width: 550px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .tabs {
+            display: flex;
+            background: #e9e9ef;
+            gap: 1px;
+        }
+        .tab-btn {
+            flex: 1;
+            background: #e9e9ef;
+            border: none;
+            padding: 12px 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #3a3a44;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: #fff;
+            color: #000;
+            border-bottom: 2px solid #888;
+        }
+
+        .tab-pane {
+            display: none;
+            background: #fff;
+        }
+        .tab-pane.active-pane {
+            display: block;
+        }
+
+        .pane-content {
+            padding: 8px 10px 10px 10px;
+        }
+
+        .stats {
+            background: #f6f6f8;
+            border-radius: 20px;
+            padding: 6px 12px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        .reset-btn {
+            background: transparent;
+            border: 1px solid #c6c6c8;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .reset-btn:active { background: #e9e9ef; }
+
+        .carousel-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .carousel-track {
+            overflow: hidden;
+        }
+        .carousel-slides {
+            display: flex;
+            transition: transform 0.25s ease;
+        }
+        .carousel-slide {
+            flex: 0 0 100%;
+        }
+
+        .question-card {
+            border: 1px solid #e5e5ea;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 6px;
+            background: #fff;
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9f9fb;
+            padding: 8px 12px;
+            border-radius: 14px;
+            border: 1px solid #e2e2e6;
+        }
+        .option input {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        .option label {
+            font-size: 0.95rem;
+            color: #2c2c2e;
+            line-height: 1.3;
+        }
+
+        .comment-box {
+            background: #f2f2f6;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #3a3a3e;
+            border-left: 3px solid #8e8e93;
+            display: none;
+        }
+        .comment-box.show {
+            display: block;
+        }
+
+        .correct-highlight {
+            background-color: #e0f2e6;
+            border-left: 4px solid #2b8c4a;
+        }
+        .wrong-highlight {
+            background-color: #ffe8e8;
+            border-left: 4px solid #c7362b;
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .nav-btn {
+            background: #e9e9ef;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 38px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .nav-btn:active { background: #d1d1d6; }
+        .dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+        .dot {
+            width: 7px;
+            height: 7px;
+            background: #c6c6c8;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+        .dot.active {
+            background: #1c1c1e;
+            width: 18px;
+        }
+        .progress-text {
+            font-size: 0.7rem;
+            color: #8e8e93;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .check-single-btn {
+            background: #1c1c1e;
+            border: none;
+            width: 100%;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: white;
+            border-radius: 30px;
+            margin: 8px 0 2px 0;
+            cursor: pointer;
+        }
+        .check-single-btn:active { background: #3a3a3e; }
+        .small-note {
+            font-size: 0.65rem;
+            color: #8e8e93;
+            text-align: center;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="trainer">
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="income">Доходы</button>
+        <button class="tab-btn" data-tab="expense">Расходы</button>
+    </div>
+
+    <div id="incomePane" class="tab-pane active-pane">
+        <div class="pane-content">
+            <div class="stats">
+                <span>✅ <span id="incomeCorrectCount">0</span> / <span id="incomeTotalCount">6</span></span>
+                <button class="reset-btn" id="resetIncomeBtn">Сбросить всё</button>
+            </div>
+            <div id="incomeCarousel" class="carousel-container"></div>
+            <div class="small-note">← → листайте | выберите ответ → Проверить</div>
+        </div>
+    </div>
+
+    <div id="expensePane" class="tab-pane">
+        <div class="pane-content">
+            <div class="stats">
+                <span>✅ <span id="expenseCorrectCount">0</span> / <span id="expenseTotalCount">6</span></span>
+                <button class="reset-btn" id="resetExpenseBtn">Сбросить всё</button>
+            </div>
+            <div id="expenseCarousel" class="carousel-container"></div>
+            <div class="small-note">← → листайте | объект «Доходы минус расходы»</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const incomeQuestions = [
+        { text: "Компания на УСН получила предоплату от покупателя. Нужно ли включить аванс в доходы сегодня?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "yes", comment: "Кассовый метод: доход при получении денег. Аванс включается сразу." },
+        { text: "Предприниматель на УСН взял кредит в банке. Включать ли заемные средства в доходы?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "no", comment: "Кредит — не доход, а обязательство. Ст. 251 НК исключает займы из доходов." },
+        { text: "Компания на УСН получила дивиденды от компании, которая уже заплатила налог на прибыль. Учитывать дивиденды?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "no", comment: "Дивиденды с удержанным налогом на прибыль не включаются в доходы УСН (ст. 251 НК)." },
+        { text: "На расчетный счет вернулась переплата поставщику. Это доход?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "no", comment: "Возврат переплаты — корректировка расхода, а не новый доход." },
+        { text: "Компания на УСН «Доходы» получила от учредителя с долей в УК 15% безвозмездно станок. Отражать доход?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "yes", comment: "Безвозмездно полученное имущество — внереализационный доход (ст. 250 НК). Доля учредителя не имеет значения." },
+        { text: "Предприниматель выдал заем и получил обратно с процентами. Что в доходах?", options: [{ value: "only_interest", label: "Только проценты" }, { value: "full_amount", label: "Все с процентами" }, { value: "nothing", label: "Ничего" }], correct: "only_interest", comment: "Займ — возврат собственных денег, в доход не входит, а проценты — доход." }
+    ];
+
+    const expenseQuestions = [
+        { text: "Компания на УСН «Доходы минус расходы» купила и оплатила принтер стоимостью 200 тыс. руб. для офиса. Учесть в расходах?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "yes", comment: "Принтер компания учтет для УСН как ОС, так как стоимость более 100 тыс.руб. Расходы компания спишет равномерно в течение налогового периода." },
+        { text: "Компания выдала сотруднику материальную помощь к юбилею. Можно учесть в расходах?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "no", comment: "Материальная помощь прямо запрещена ст. 270 НК РФ. Даже при УСН такие расходы не учитываются." },
+        { text: "Компания создала резерв на отпуска. Сразу учесть в расходах?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "no", comment: "На УСН резерв создать не получится, так как применяется кассовый метод учета расходов. Расход на отпуска возникает только при фактической выплате сотруднику." },
+        { text: "Компания купила подарочные сертификаты для клиентов и вручила их. Списать как расход?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "no", comment: "Подарки и сертификаты не учитываются в расходах при УСН (ст. 270 НК РФ). Это безвозмездная передача." },
+        { text: "Компания оплатила, но не списала сырье в производство. Учесть расход?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "no", comment: "Для материальных расходов должны выполняться условия: оплата + оприходование + списание в производство. Только тогда признаете расход." },
+        { text: "У компании возникла отрицательная курсовая разница по валютному контракту. Учесть в расходах?", options: [{ value: "yes", label: "Да" }, { value: "no", label: "Нет" }], correct: "no", comment: "Кассовый метод на УСН: курсовые разницы не признаются до момента реальной оплаты, поэтому отрицательные разницы учесть плательщик не может." }
+    ];
+
+    class Carousel {
+        constructor(containerId, questions, storageKey, updateStatsCallback) {
+            this.container = document.getElementById(containerId);
+            this.questions = questions;
+            this.storageKey = storageKey;
+            this.updateStatsCallback = updateStatsCallback;
+            this.currentIdx = 0;
+            this.answers = this.loadAnswers();
+            this.questionStatus = this.loadStatus(); // хранит проверен ли вопрос
+            this.render();
+        }
+
+        loadAnswers() {
+            const saved = sessionStorage.getItem(this.storageKey + '_answers');
+            if (saved) try { return JSON.parse(saved); } catch(e) { return {}; }
+            return {};
+        }
+        saveAnswers() { sessionStorage.setItem(this.storageKey + '_answers', JSON.stringify(this.answers)); }
+        
+        loadStatus() {
+            const saved = sessionStorage.getItem(this.storageKey + '_status');
+            if (saved) try { return JSON.parse(saved); } catch(e) { return {}; }
+            return {};
+        }
+        saveStatus() { sessionStorage.setItem(this.storageKey + '_status', JSON.stringify(this.questionStatus)); }
+        
+        getAnswer(idx) { return this.answers[`q${idx}`] || null; }
+        getStatus(idx) { return this.questionStatus[`q${idx}`] || false; }
+        
+        setAnswer(idx, val) {
+            this.answers[`q${idx}`] = val;
+            this.saveAnswers();
+            // при смене ответа сбрасываем статус проверки для этого вопроса
+            this.questionStatus[`q${idx}`] = false;
+            this.saveStatus();
+            this.updateRadioState();
+            this.updateQuestionUI(idx);
+            if (this.updateStatsCallback) this.updateStatsCallback();
+        }
+        
+        setChecked(idx) {
+            this.questionStatus[`q${idx}`] = true;
+            this.saveStatus();
+            this.updateQuestionUI(idx);
+            if (this.updateStatsCallback) this.updateStatsCallback();
+        }
+        
+        updateRadioState() {
+            const slide = this.container.querySelector(`.carousel-slide[data-idx="${this.currentIdx}"]`);
+            if (!slide) return;
+            const currVal = this.getAnswer(this.currentIdx);
+            const radios = slide.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => radio.checked = (currVal && radio.value === currVal));
+        }
+        
+        updateQuestionUI(idx) {
+            const slide = this.container.querySelector(`.carousel-slide[data-idx="${idx}"]`);
+            if (!slide) return;
+            const card = slide.querySelector('.question-card');
+            const userVal = this.getAnswer(idx);
+            const correctVal = this.questions[idx].correct;
+            const isChecked = this.getStatus(idx);
+            const isCorrect = (userVal && userVal === correctVal);
+            
+            // обновляем подсветку
+            if (card) {
+                card.classList.remove('correct-highlight', 'wrong-highlight');
+                if (isChecked && userVal) {
+                    card.classList.add(isCorrect ? 'correct-highlight' : 'wrong-highlight');
+                }
+            }
+            
+            // обновляем комментарий
+            const comm = document.getElementById(`comment_${idx}_${this.storageKey}`);
+            if (comm) {
+                if (isChecked) {
+                    comm.classList.add('show');
+                } else {
+                    comm.classList.remove('show');
+                }
+            }
+        }
+        
+        goToSlide(idx) {
+            const slides = this.container.querySelectorAll('.carousel-slide');
+            if (!slides.length) return;
+            if (idx < 0) idx = 0;
+            if (idx >= slides.length) idx = slides.length - 1;
+            this.currentIdx = idx;
+            const track = this.container.querySelector('.carousel-slides');
+            if (track) track.style.transform = `translateX(-${this.currentIdx * 100}%)`;
+            slides.forEach((s, i) => {
+                if (i === this.currentIdx) s.classList.add('active-slide');
+                else s.classList.remove('active-slide');
+            });
+            this.updateDots();
+            this.updateProgress();
+            this.updateRadioState();
+        }
+        
+        next() { if (this.currentIdx < this.questions.length-1) this.goToSlide(this.currentIdx+1); }
+        prev() { if (this.currentIdx > 0) this.goToSlide(this.currentIdx-1); }
+        
+        updateDots() {
+            const dotsDiv = this.container.querySelector('.dots');
+            if (!dotsDiv) return;
+            let html = '';
+            for (let i=0; i<this.questions.length; i++) {
+                html += `<span class="dot ${i===this.currentIdx ? 'active' : ''}" data-dot="${i}"></span>`;
+            }
+            dotsDiv.innerHTML = html;
+            dotsDiv.querySelectorAll('.dot').forEach(d => {
+                d.addEventListener('click', (e) => {
+                    const i = parseInt(d.dataset.dot,10);
+                    if (!isNaN(i)) this.goToSlide(i);
+                });
+            });
+        }
+        
+        updateProgress() {
+            const span = this.container.querySelector('.progress-text span');
+            if (span) span.innerText = `${this.currentIdx+1} / ${this.questions.length}`;
+        }
+        
+        checkCurrentQuestion() {
+            const idx = this.currentIdx;
+            const userVal = this.getAnswer(idx);
+            if (!userVal) {
+                alert('Пожалуйста, выберите ответ');
+                return false;
+            }
+            this.setChecked(idx);
+            return true;
+        }
+        
+        getCorrectCount() {
+            let count = 0;
+            for (let i=0; i<this.questions.length; i++) {
+                const userVal = this.getAnswer(i);
+                const correctVal = this.questions[i].correct;
+                const isChecked = this.getStatus(i);
+                if (isChecked && userVal && userVal === correctVal) {
+                    count++;
+                }
+            }
+            return count;
+        }
+        
+        render() {
+            let slidesHtml = '<div class="carousel-track"><div class="carousel-slides">';
+            this.questions.forEach((q, idx) => {
+                let optsHtml = '';
+                q.options.forEach(opt => {
+                    const savedVal = this.getAnswer(idx);
+                    const checkedAttr = (savedVal === opt.value) ? 'checked' : '';
+                    optsHtml += `
+                        <div class="option">
+                            <input type="radio" name="q_${idx}" id="q_${idx}_${opt.value}" value="${opt.value}" ${checkedAttr}>
+                            <label for="q_${idx}_${opt.value}">${this.escapeHtml(opt.label)}</label>
+                        </div>
+                    `;
+                });
+                slidesHtml += `
+                    <div class="carousel-slide" data-idx="${idx}">
+                        <div class="question-card" data-qidx="${idx}" data-correct="${q.correct}">
+                            <div class="question-text">${this.escapeHtml(q.text)}</div>
+                            <div class="options">${optsHtml}</div>
+                            <div class="comment-box" id="comment_${idx}_${this.storageKey}">${this.escapeHtml(q.comment)}</div>
+                            <button class="check-single-btn" data-check-idx="${idx}">Проверить ответ</button>
+                        </div>
+                    </div>
+                `;
+            });
+            slidesHtml += '</div></div>';
+            slidesHtml += `
+                <div class="carousel-nav">
+                    <button class="nav-btn" id="prev_${this.storageKey}">←</button>
+                    <div class="dots"></div>
+                    <button class="nav-btn" id="next_${this.storageKey}">→</button>
+                </div>
+                <div class="progress-text">Вопрос <span>1 / ${this.questions.length}</span></div>
+            `;
+            this.container.innerHTML = slidesHtml;
+
+            // слушатели для радио
+            this.questions.forEach((_, idx) => {
+                const radios = this.container.querySelectorAll(`input[name="q_${idx}"]`);
+                radios.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        this.setAnswer(idx, e.target.value);
+                    });
+                });
+                // слушатель для кнопки проверки
+                const checkBtn = this.container.querySelector(`.check-single-btn[data-check-idx="${idx}"]`);
+                if (checkBtn) {
+                    checkBtn.addEventListener('click', () => {
+                        this.checkCurrentQuestion();
+                        if (this.updateStatsCallback) this.updateStatsCallback();
+                    });
+                }
+            });
+
+            const prevBtn = this.container.querySelector(`#prev_${this.storageKey}`);
+            const nextBtn = this.container.querySelector(`#next_${this.storageKey}`);
+            if (prevBtn) prevBtn.addEventListener('click', () => this.prev());
+            if (nextBtn) nextBtn.addEventListener('click', () => this.next());
+            
+            // восстанавливаем UI для всех вопросов
+            for (let i=0; i<this.questions.length; i++) {
+                this.updateQuestionUI(i);
+            }
+            
+            this.goToSlide(0);
+        }
+        
+        reset() {
+            this.answers = {};
+            this.questionStatus = {};
+            this.saveAnswers();
+            this.saveStatus();
+            this.render();
+            if (this.updateStatsCallback) this.updateStatsCallback();
+        }
+        
+        escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+        }
+    }
+
+    let incomeCar, expenseCar;
+    
+    function updateAllStats() {
+        if (incomeCar) {
+            document.getElementById('incomeCorrectCount').innerText = incomeCar.getCorrectCount();
+        }
+        if (expenseCar) {
+            document.getElementById('expenseCorrectCount').innerText = expenseCar.getCorrectCount();
+        }
+    }
+    
+    function init() {
+        incomeCar = new Carousel('incomeCarousel', incomeQuestions, 'inc_car', updateAllStats);
+        expenseCar = new Carousel('expenseCarousel', expenseQuestions, 'exp_car', updateAllStats);
+        document.getElementById('incomeTotalCount').innerText = incomeQuestions.length;
+        document.getElementById('expenseTotalCount').innerText = expenseQuestions.length;
+
+        document.getElementById('resetIncomeBtn').onclick = () => {
+            incomeCar.reset();
+            updateAllStats();
+        };
+        document.getElementById('resetExpenseBtn').onclick = () => {
+            expenseCar.reset();
+            updateAllStats();
+        };
+
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panes = document.querySelectorAll('.tab-pane');
+        tabs.forEach(btn => {
+            btn.onclick = () => {
+                const tab = btn.dataset.tab;
+                tabs.forEach(b => b.classList.remove('active'));
+                panes.forEach(p => p.classList.remove('active-pane'));
+                btn.classList.add('active');
+                document.getElementById(`${tab}Pane`).classList.add('active-pane');
+            };
+        });
+    }
+    init();
+</script>
+</body>
+</html>
