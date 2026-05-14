@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Валютный контроль: административная и уголовная ответственность</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #e5e7eb;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 0.8rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-wrapper {
+            max-width: 560px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .unified-card {
+            background: #f3f4f6;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            width: 100%;
+            border: 1px solid #d1d5db;
+        }
+
+        .card-header {
+            padding: 0.8rem 1rem 0.55rem 1rem;
+            background: #e5e7eb;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .badge-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.2rem;
+        }
+        .tax-type {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #111827;
+        }
+        .code-badge {
+            background: #d1d5db;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .subheader {
+            font-size: 0.7rem;
+            color: #374151;
+            margin-top: 0.2rem;
+        }
+
+        .tabs-container {
+            padding: 0.7rem 0.8rem 0 0.8rem;
+            background: #f9fafb;
+        }
+        .tabs-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            row-gap: 0.5rem;
+            border-bottom: 1px solid #d4d8dd;
+            padding-bottom: 0.3rem;
+        }
+        .tab-btn {
+            background: #e5e7eb;
+            border: none;
+            padding: 0.45rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1f2937;
+            cursor: pointer;
+            transition: 0.15s;
+            border-radius: 1.5rem;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            background: #9ca3af;
+            color: #111827;
+            box-shadow: inset 0 0 0 1px #6b7280;
+        }
+        .tab-btn:hover:not(.active) {
+            background: #d4d8dd;
+        }
+
+        .content-pane {
+            padding: 0.9rem 0.9rem 0.9rem 0.9rem;
+            background: #f9fafb;
+        }
+        .tab-data {
+            display: none;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .tab-data.active-data {
+            display: flex;
+        }
+
+        .responsibility-block {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid #d4d8dd;
+            overflow: hidden;
+        }
+        .resp-header {
+            background: #e5e7eb;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #111827;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .sanctions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            padding: 0.8rem;
+        }
+        .sanction-card {
+            flex: 1 1 200px;
+            background: #fefefe;
+            border-radius: 0.8rem;
+            padding: 0.6rem 0.8rem;
+            border-left: 3px solid #6b7280;
+        }
+        .entity-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #4b5563;
+            text-transform: none;
+        }
+        .entity-value {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin: 0.2rem 0 0.3rem;
+            color: #111827;
+        }
+        .penalty {
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #111827;
+            line-height: 1.35;
+        }
+
+        .desc-row {
+            background: #ffffff;
+            border-radius: 0.9rem;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.75rem;
+            color: #111827;
+            border: 1px solid #d4d8dd;
+        }
+        .legal-note {
+            background: #e5e7eb;
+            border-radius: 1rem;
+            padding: 0.15rem 0.7rem;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: #1f2937;
+            display: inline-block;
+            margin-top: 0.3rem;
+        }
+        .info-note {
+            font-size: 0.7rem;
+            color: #374151;
+            margin-top: 0.25rem;
+        }
+        .status-badge {
+            display: inline-block;
+            background: #e5e7eb;
+            border-radius: 1rem;
+            padding: 0.1rem 0.6rem;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-left: 0.4rem;
+            color: #1f2937;
+        }
+
+        .card-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 0.7rem;
+            margin-bottom: 0;
+        }
+        .nav-arrow {
+            background: #f3f4f6;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #1f2937;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+        }
+        .nav-arrow:active {
+            transform: scale(0.94);
+            background: #e5e7eb;
+        }
+        .counter {
+            font-size: 0.75rem;
+            background: #e5e7eb;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #111827;
+        }
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.45rem;
+            margin-top: 0.6rem;
+            margin-bottom: 0;
+        }
+        .dot {
+            width: 7px;
+            height: 7px;
+            background: #9ca3af;
+            border-radius: 10px;
+        }
+        .dot.active {
+            background: #374151;
+            width: 18px;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.6rem;
+            color: #4b5563;
+            margin-top: 0.6rem;
+            padding-bottom: 0;
+        }
+
+        @media (max-width: 480px) {
+            .main-wrapper {
+                max-width: 100%;
+            }
+            .sanctions-grid {
+                flex-direction: column;
+                gap: 0.6rem;
+            }
+            .tab-btn {
+                padding: 0.4rem 0.85rem;
+                font-size: 0.75rem;
+            }
+            .tax-type {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <div class="unified-card">
+        <div class="card-header">
+            <div class="badge-row">
+                <span class="tax-type">Ответственность за валютные нарушения</span>
+                <span class="code-badge">КоАП + УК</span>
+            </div>
+            <div class="subheader">Административная и уголовная ответственность</div>
+        </div>
+
+        <div class="tabs-container">
+            <div class="tabs-row" id="tabsRow"></div>
+        </div>
+
+        <div class="content-pane" id="contentPane"></div>
+    </div>
+
+    <div class="card-nav">
+        <div class="nav-arrow" id="prevBtn">←</div>
+        <div class="counter" id="counterDisplay">1 / 4</div>
+        <div class="nav-arrow" id="nextBtn">→</div>
+    </div>
+    <div class="progress-dots" id="progressDots"></div>
+    <footer>Указ №529 приостановил ч.4 и ч.5 ст.15.25 КоАП</footer>
+</div>
+
+<script>
+    const violationsData = [
+        {
+            title: "Незаконные валютные операции",
+            norm: "ч. 1 ст. 15.25 КоАП РФ",
+            sub: "Расчеты минуя уполномоченный банк",
+            status: "Действует",
+            entities: [
+                { who: "Организация / ИП", penalty: "20–40% от суммы операции" }
+            ],
+            description: "Нельзя проводить валютные операции с нерезидентами мимо банка.",
+            note: "",
+            entityLabel: "Субъект"
+        },
+        {
+            title: "Нарушение репатриации",
+            norm: "ч. 4 и ч. 5 ст. 15.25 КоАП РФ",
+            sub: "Сроки возврата выручки / аванса",
+            status: "Приостановлено",
+            entities: [
+                { who: "Организация (ч.4, ч.5)", penalty: "3–10% от суммы, 75–100% от суммы при повторном нарушении" },
+                { who: "Должностное лицо (ч.4, ч.5)", penalty: "20–30 тыс. руб., дисквалификация при повторном нарушении" }
+            ],
+            description: "Привлекут за необеспечение получения валютной выручки или невозврат аванса нерезиденту. Повторное нарушение в течение года влечет более тяжелое наказание.",
+            note: "Требования ст.19 Закона №173-ФЗ приостановлены указом №529.",
+            entityLabel: "Субъект"
+        },
+        {
+            title: "Отчетность",
+            norm: "ч. 6, 6.3 ст. 15.25 КоАП РФ",
+            sub: "Документы, уведомления, справки",
+            status: "Действует",
+            entities: [
+                { who: "Организация", penalty: "40 000 – 50 000 руб." },
+                { who: "Должностное лицо", penalty: "4 000 – 5 000 руб." }
+            ],
+            description: "Резидент по-прежнему отчитывается перед банком. Это важно для подтверждения реальности сделок. Резидента накажут, если он не представил в уполномоченный банк документы валютного контроля либо представил документы с недостоверными сведениями.",
+            note: "",
+            entityLabel: "Субъект"
+        },
+        {
+            title: "Подложные документы",
+            norm: "ст. 193.1 УК РФ (ч.1-3)",
+            sub: "Перевод с использованием фиктивных документов",
+            status: "Уголовная ответственность",
+            entities: [
+                { who: "ч.1 ст.193.1 УК", penalty: "Штраф 200–500 тыс. руб. / Принудительные работы до 3 лет / Лишение свободы до 3 лет" },
+                { who: "ч.2 ст.193.1 УК", penalty: "Крупный размер, группа лиц — Лишение свободы до 5 лет + Штраф до 1 млн руб." },
+                { who: "ч.3 ст.193.1 УК", penalty: "Особо крупный размер, орг.группа — Лишение свободы от 5 до 10 лет + Штраф до 1 млн руб." }
+            ],
+            description: "Накажут за перевод денег на счета нерезидентов с представлением в банк документов с заведомо ложными сведениями. Крупный размер: >13,5 млн руб. Особо крупный: >65 млн руб. Указ №529 не влияет.",
+            note: "",
+            entityLabel: "Состав"
+        }
+    ];
+
+    let currentCard = 0;
+    const totalCards = violationsData.length;
+
+    const tabsRow = document.getElementById('tabsRow');
+    const contentPane = document.getElementById('contentPane');
+    const counterDisplay = document.getElementById('counterDisplay');
+    const progressDots = document.getElementById('progressDots');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function getShortLabel(item) {
+        if (item.title === "Незаконные валютные операции") return "Незаконные операции";
+        if (item.title === "Нарушение репатриации") return "Нарушение репатриации";
+        if (item.title === "Отчетность") return "Отчетность";
+        if (item.title === "Подложные документы") return "Подложные документы";
+        return item.title.substring(0, 18);
+    }
+
+    function renderTabs(activeIdx) {
+        tabsRow.innerHTML = '';
+        violationsData.forEach((item, idx) => {
+            const btn = document.createElement('button');
+            btn.className = `tab-btn ${idx === activeIdx ? 'active' : ''}`;
+            btn.textContent = getShortLabel(item);
+            btn.setAttribute('data-idx', idx);
+            btn.addEventListener('click', () => {
+                if (currentCard === idx) return;
+                currentCard = idx;
+                renderTabs(currentCard);
+                renderContent(currentCard);
+                updateCounterAndDots();
+            });
+            tabsRow.appendChild(btn);
+        });
+    }
+
+    function renderContent(index) {
+        const violation = violationsData[index];
+        if (!violation) return;
+
+        let sanctionsHtml = '';
+        violation.entities.forEach(entity => {
+            sanctionsHtml += `
+                <div class="sanction-card">
+                    <div class="entity-label">${violation.entityLabel}</div>
+                    <div class="entity-value">${entity.who}</div>
+                    <div class="penalty">${entity.penalty}</div>
+                </div>
+            `;
+        });
+
+        const statusIcon = violation.status === "Действует" ? "✅" : "⛔";
+        const statusText = violation.status === "Действует" ? "Действует" : "Приостановлено";
+        
+        let extraNote = violation.note ? `<div class="info-note">${violation.note}</div>` : '';
+
+        const fullHtml = `
+            <div class="tab-data active-data">
+                <div class="responsibility-block">
+                    <div class="resp-header">Меры ответственности <span class="status-badge">${statusIcon} ${statusText}</span></div>
+                    <div class="sanctions-grid">
+                        ${sanctionsHtml}
+                    </div>
+                </div>
+                <div class="desc-row">
+                    <span>${violation.description}</span>
+                    ${extraNote}
+                    <div class="legal-note">${violation.norm} • ${violation.sub}</div>
+                </div>
+            </div>
+        `;
+        contentPane.innerHTML = fullHtml;
+        
+        const pane = document.querySelector('.content-pane');
+        if (pane) {
+            pane.style.minHeight = 'auto';
+            pane.style.height = 'auto';
+        }
+    }
+
+    function updateCounterAndDots() {
+        counterDisplay.innerText = `${currentCard+1} / ${totalCards}`;
+        progressDots.innerHTML = '';
+        for (let i = 0; i < totalCards; i++) {
+            const dot = document.createElement('div');
+            dot.className = `dot ${i === currentCard ? 'active' : ''}`;
+            progressDots.appendChild(dot);
+        }
+    }
+
+    function goToCard(delta) {
+        const newIndex = currentCard + delta;
+        if (newIndex >= 0 && newIndex < totalCards) {
+            currentCard = newIndex;
+            renderTabs(currentCard);
+            renderContent(currentCard);
+            updateCounterAndDots();
+        }
+    }
+
+    prevBtn.addEventListener('click', () => goToCard(-1));
+    nextBtn.addEventListener('click', () => goToCard(1));
+
+    renderTabs(0);
+    renderContent(0);
+    updateCounterAndDots();
+</script>
+</body>
+</html>
