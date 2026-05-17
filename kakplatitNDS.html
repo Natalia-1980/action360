@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>НДС при импорте из ЕАЭС — схемы уплаты</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 0.8rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-wrapper {
+            max-width: 620px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .unified-card {
+            background: #ffffff;
+            border-radius: 1.6rem;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #dce5ec;
+        }
+
+        .card-header {
+            background: #eef3fa;
+            padding: 0.9rem 1rem 0.6rem 1rem;
+            border-bottom: 1px solid #d4e0ea;
+        }
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .title-main {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #1e4663;
+        }
+        .badge-small {
+            background: #dce5ef;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #1f547a;
+        }
+        .sub-header {
+            font-size: 0.68rem;
+            color: #5b6e88;
+            margin-top: 0.25rem;
+        }
+
+        .tabs-wrapper {
+            padding: 0.6rem 1rem 0 1rem;
+            background: #f9fbfd;
+        }
+        .tabs-row {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            padding-bottom: 0.25rem;
+        }
+        .tabs-row::-webkit-scrollbar {
+            height: 3px;
+        }
+        .tab-btn {
+            background: #eef2f7;
+            border: none;
+            padding: 0.45rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #2c5a7a;
+            cursor: pointer;
+            border-radius: 2rem;
+            white-space: nowrap;
+            transition: 0.15s;
+        }
+        .tab-btn.active {
+            background: #2c6e9e;
+            color: white;
+            box-shadow: 0 2px 6px rgba(44,110,158,0.2);
+        }
+        .tab-btn:hover:not(.active) {
+            background: #e0e8f0;
+        }
+
+        .content-pane {
+            padding: 1rem 1rem 1.2rem 1rem;
+            background: #ffffff;
+        }
+        .tab-step {
+            display: none;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        .tab-step.active-step {
+            display: flex;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 0.7rem;
+            align-items: flex-start;
+            border-bottom: 1px solid #eef2f8;
+            padding-bottom: 0.7rem;
+        }
+        .step-num {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            background: #eef3fa;
+            color: #1e5a7d;
+            font-weight: 800;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px;
+            border: 1px solid #cddeec;
+        }
+        .step-text {
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #1f2f3e;
+            flex: 1;
+        }
+        .step-text strong {
+            color: #0b4f6c;
+            font-weight: 700;
+        }
+        .step-note {
+            font-size: 0.68rem;
+            color: #6c7f96;
+            margin-top: 0.2rem;
+            padding-left: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+<div class="card-wrapper">
+    <div class="unified-card">
+        <div class="card-header">
+            <div class="title-row">
+                <span class="title-main">📦 Уплата НДС при импорте из ЕАЭС</span>
+                <span class="badge-small">Договор о ЕАЭС</span>
+            </div>
+            <div class="sub-header">Схемы для автомобильного и других видов транспорта (авиа, Ж/Д, морской, речной)</div>
+        </div>
+
+        <div class="tabs-wrapper">
+            <div class="tabs-row" id="tabsRow">
+                <button class="tab-btn active" data-tab="auto">🚛 Автомобильный транспорт</button>
+                <button class="tab-btn" data-tab="other">✈️🚆 Другие виды транспорта</button>
+            </div>
+        </div>
+
+        <div class="content-pane" id="contentPane">
+            <!-- панель для авто -->
+            <div class="tab-step" id="tabAuto">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-text"><strong>ДОПП до поставки</strong> — импортер подает Документ об условиях применения косвенных налогов (ДОПП).</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-text"><strong>Обеспечительный платеж (ОП)</strong> — не позднее чем за 2 календарных дня до дня ввоза импортер вносит обеспечительный платеж в размере ввозного НДС.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-text"><strong>QR-код от ФНС</strong> — налоговая выдает QR-код, после чего импортер ввозит товар и принимает его на учет.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-text"><strong>Декларация до 20-го числа</strong> — до 20-го числа месяца, следующего за месяцем ввоза, подается декларация по косвенным налогам. В ней указывают:
+                        <div class="step-note">✔ обеспечительный платеж<br>✔ суммы превышения<br>✔ сведения из ДОПП</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">5</div>
+                    <div class="step-text"><strong>Зачет ОП в счет уплаты НДС</strong> — налог уплачивается до 20-го числа месяца после месяца ввоза. ФНС засчитывает обеспечительный платеж как уплату НДС по декларации.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">6</div>
+                    <div class="step-text"><strong>Возврат переплаты</strong> — если сумма НДС меньше обеспечительного платежа, переплату импортер может вернуть.</div>
+                </div>
+            </div>
+
+            <!-- панель для других видов транспорта -->
+            <div class="tab-step" id="tabOther">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-text"><strong>Ввоз и принятие на учет</strong> — импортер ввозит товар и принимает его на учет без предварительных платежей.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-text"><strong>Перечисление НДС на ЕНС</strong> — до 20-го числа месяца, следующего за месяцем ввоза, импортер перечисляет сумму НДС на единый налоговый счет (ЕНС).</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-text"><strong>Подача декларации и заявления о ввозе</strong> — до 20-го числа месяца после месяца ввоза представляются:
+                        <div class="step-note">• декларация по косвенным налогам<br>• заявление о ввозе товаров<br>• транспортные / товаросопроводительные документы</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-text"><strong>Проверка налоговой (10 рабочих дней)</strong> — инспекция проверяет документы, сумму на ЕНС импортера и ставит отметку об уплате НДС на заявлении о ввозе.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">5</div>
+                    <div class="step-text"><strong>Передача отметки поставщику</strong> — импортер передает заявление с отметкой поставщику в стране ЕАЭС. Поставщик получает право применить нулевую ставку НДС в своей стране.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">6</div>
+                    <div class="step-text"><strong>Вычет НДС</strong> — импортер по заявлению с отметкой принимает НДС к вычету.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const autoPane = document.getElementById('tabAuto');
+        const otherPane = document.getElementById('tabOther');
+
+        function activateTab(tabId) {
+            tabBtns.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (autoPane) autoPane.classList.remove('active-step');
+            if (otherPane) otherPane.classList.remove('active-step');
+
+            if (tabId === 'auto') {
+                const activeBtn = document.querySelector('.tab-btn[data-tab="auto"]');
+                if (activeBtn) activeBtn.classList.add('active');
+                if (autoPane) autoPane.classList.add('active-step');
+            } else if (tabId === 'other') {
+                const activeBtn = document.querySelector('.tab-btn[data-tab="other"]');
+                if (activeBtn) activeBtn.classList.add('active');
+                if (otherPane) otherPane.classList.add('active-step');
+            }
+        }
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabValue = btn.getAttribute('data-tab');
+                if (tabValue === 'auto') activateTab('auto');
+                else if (tabValue === 'other') activateTab('other');
+            });
+        });
+
+        activateTab('auto');
+    })();
+</script>
+</body>
+</html>
