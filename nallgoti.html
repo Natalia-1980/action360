@@ -2,397 +2,370 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Налоговый тренажер: сортер льгот (компактный, крупный текст)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Налоговые льготы · тренажёр-сортер</title>
     <style>
         * {
             box-sizing: border-box;
-            user-select: none;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            background: #dadada;
-            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-            margin: 0;
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px 12px;
+            padding: 1.5rem;
         }
 
-        /* ОСНОВНОЙ КОНТЕЙНЕР — УЗКИЙ, компактный */
-        .trainer {
-            max-width: 860px;
-            width: 100%;
-            background: #e9e9e9;
-            border-radius: 1.25rem;
-            padding: 0.9rem 0.9rem 1rem 0.9rem;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+        .card {
+            width: 650px;
+            max-width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.08);
+            padding: 2rem 1.8rem 2.2rem 1.8rem;
+            border: 1px solid #e0e4e9;
         }
 
-        /* === КАРУСЕЛЬ: одна карточка, узкая === */
-        .carousel-section {
-            background: #f4f4f4;
-            border-radius: 1.1rem;
-            padding: 0.6rem 0.7rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        h1 {
+            font-weight: 400;
+            font-size: 1.9rem;
+            letter-spacing: -0.02em;
+            color: #1e1e1e;
+            margin-bottom: 1.8rem;
+            border-bottom: 2px solid #e8ecf0;
+            padding-bottom: 0.8rem;
         }
 
-        .carousel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 0.4rem;
-            padding: 0 0.2rem;
-        }
-
-        .carousel-header h2 {
-            margin: 0;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #2b2b2b;
-            letter-spacing: -0.2px;
-        }
-
-        .carousel-counter {
-            background: #d4d4d4;
-            padding: 0.2rem 0.7rem;
-            border-radius: 2rem;
-            font-size: 0.7rem;
+        h1 span {
             font-weight: 500;
-            color: #2c2c2c;
+            background: #f2f5f9;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 1rem;
+            margin-left: 0.8rem;
+            color: #3a4a5e;
         }
 
-        .carousel-wrapper {
+        .carousel-area {
+            background: #fafbfc;
+            border-radius: 24px;
+            padding: 1.8rem 1rem;
+            margin-bottom: 2rem;
+            border: 1px solid #dee4ea;
+        }
+
+        .carousel-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7e8b9c;
+            margin-bottom: 1rem;
+            margin-left: 0.3rem;
+        }
+
+        .carousel-container {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            justify-content: center;
+            gap: 0.6rem;
         }
 
         .carousel-btn {
             background: #c0c0c0;
             border: none;
-            width: 30px;
-            height: 30px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2b2b2b;
+            cursor: pointer;
+            transition: 0.08s;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #2b2b2b;
-            transition: 0.08s;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            flex-shrink: 0;
         }
 
-        .carousel-btn:hover {
+        .carousel-btn:hover:not(:disabled) {
             background: #ababab;
             transform: scale(0.96);
         }
-
-        .single-card-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            min-height: 175px;
+        .carousel-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
-        /* КАРТОЧКА ТЕКУЩЕЙ СИТУАЦИИ — УЗКАЯ, НО ТЕКСТ КРУПНЕЕ ЗА СЧЕТ УМЕНЬШЕНИЯ ПАДДИНГОВ И УВЕЛИЧЕНИЯ ШРИФТА */
-        .situation-card {
-            background: #ffffff;
-            border-radius: 0.9rem;
-            padding: 0.8rem 1rem;
-            width: 100%;
-            max-width: 440px;
-            margin: 0 auto;
-            cursor: grab;
-            transition: transform 0.1s, box-shadow 0.1s;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.07);
-            border: 1px solid #cfcfcf;
-        }
-        .situation-card:active { cursor: grabbing; }
-        .situation-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-            background: #fefefe;
-        }
-
-        /* текст карточки — крупнее, но стройно */
-        .card-text {
-            font-size: 0.92rem;
+        .tax-card {
+            width: 280px;
+            background: white;
+            border: 2px solid #bcc9d9;
+            border-radius: 18px;
+            padding: 1rem 0.9rem;
+            text-align: left;
+            font-size: 0.87rem;
             line-height: 1.45;
-            color: #1f1f1f;
             font-weight: 500;
-        }
-        .card-source {
-            margin-top: 0.6rem;
-            font-size: 0.68rem;
-            color: #505050;
-            font-family: monospace;
-            border-top: 1px solid #e0e0e0;
-            padding-top: 0.45rem;
+            color: #111;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+            cursor: grab;
+            user-select: none;
         }
 
-        /* === ТРИ КОЛОНКИ — УЗКИЕ === */
-        .columns-area {
+        .tax-card[draggable="true"]:hover {
+            border-color: #8f9fb2;
+            background: #fbfdff;
+            transform: scale(1.01);
+        }
+        .tax-card:active {
+            cursor: grabbing;
+        }
+
+        .card-source {
+            font-size: 0.65rem;
+            color: #5f6f82;
+            margin-top: 0.5rem;
+            font-family: monospace;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 0.5rem;
+        }
+
+        .carousel-counter {
+            font-size: 0.85rem;
+            color: #6b7d94;
+            margin-top: 0.6rem;
+            text-align: center;
+        }
+
+        .categories-row {
             display: flex;
-            flex-wrap: nowrap;
-            gap: 0.7rem;
+            gap: 0.9rem;
+            margin-top: 0.5rem;
             justify-content: space-between;
         }
 
-        .column {
+        .category-col {
             flex: 1;
-            min-width: 0; /* важно для сужения */
-            background: #e1e1e1;
-            border-radius: 0.9rem;
-            padding: 0.5rem 0.45rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-            transition: background 0.1s;
+            min-width: 0;
         }
 
-        .column-header {
+        .category-header {
+            background: white;
+            border: 2px solid #dbe1e9;
+            border-radius: 18px;
+            padding: 0.8rem 0.2rem;
             text-align: center;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding-bottom: 0.3rem;
-            border-bottom: 2px solid #b9b9b9;
-            margin-bottom: 0.6rem;
-            color: #2a2a2a;
+            font-weight: 500;
+            font-size: 1rem;
+            color: #1f2a36;
+            margin-bottom: 0.9rem;
+            background: #f8fafd;
         }
-        .local-header { border-bottom-color: #8f9bb2; }
-        .regional-header { border-bottom-color: #8aa9a3; }
-        .federal-header { border-bottom-color: #9f9fb3; }
 
-        .column-dropzone {
-            min-height: 260px;
-            max-height: 310px;
-            overflow-y: auto;
+        .dropzone-container {
+            background: #f2f5f9;
+            border: 2px dashed #b9c4d2;
+            border-radius: 18px;
+            min-height: 320px;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            padding: 0.1rem;
-        }
-        .column-dropzone::-webkit-scrollbar {
-            width: 3px;
-        }
-        .column-dropzone::-webkit-scrollbar-track {
-            background: #cbcbcb;
-            border-radius: 3px;
-        }
-        .column-dropzone::-webkit-scrollbar-thumb {
-            background: #8f8f8f;
-            border-radius: 3px;
+            gap: 0.6rem;
+            padding: 0.7rem;
+            overflow-y: auto;
+            transition: background 0.1s, border-color 0.1s;
         }
 
-        /* Карточки внутри колонок — текст крупнее */
+        .dropzone-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .dropzone-container::-webkit-scrollbar-track {
+            background: #d4dbe3;
+            border-radius: 4px;
+        }
+        .dropzone-container::-webkit-scrollbar-thumb {
+            background: #a0abb8;
+            border-radius: 4px;
+        }
+
         .dropped-card {
-            background: #efefef;
-            border-radius: 0.7rem;
-            padding: 0.6rem 0.65rem;
+            background: white;
+            border: 2px solid #b1c0d2;
+            border-radius: 14px;
+            padding: 0.65rem;
             cursor: pointer;
             transition: 0.08s linear;
-            border-left: 4px solid #b1b1b1;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         .dropped-card:hover {
-            background: #e3e3e3;
+            background: #f0f4fa;
             transform: scale(0.99);
         }
         .dropped-text {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             line-height: 1.4;
-            color: #272727;
+            color: #1f2a36;
             font-weight: 500;
         }
         .dropped-source {
-            font-size: 0.6rem;
-            color: #4f4f4f;
-            margin-top: 0.3rem;
+            font-size: 0.58rem;
+            color: #6f7e91;
+            margin-top: 0.35rem;
             font-family: monospace;
         }
 
         .empty-message {
-            color: #737373;
+            color: #8d9aa8;
             text-align: center;
-            padding: 1rem 0.2rem;
-            font-size: 0.68rem;
-            background: #d4d4d470;
-            border-radius: 0.7rem;
-            margin: 0.2rem 0;
+            padding: 2rem 0.5rem;
+            font-size: 0.75rem;
+            background: #eef2f7;
+            border-radius: 14px;
         }
 
         .footer-controls {
+            margin-top: 2rem;
             display: flex;
             justify-content: center;
-            margin-top: 0.9rem;
+            gap: 0.8rem;
         }
-        .reset-btn {
-            background: #c4c4c4;
-            border: none;
-            color: #2c2c2c;
-            font-weight: 600;
-            font-size: 0.72rem;
-            padding: 0.35rem 1.1rem;
-            border-radius: 2rem;
+        .reset-btn, .check-btn {
+            background: white;
+            border: 2px solid #222;
+            border-radius: 60px;
+            padding: 0.6rem 1.6rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #111;
             cursor: pointer;
-            transition: 0.08s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            transition: 0.15s;
+            box-shadow: 0 3px 0 #e0e4ea;
         }
-        .reset-btn:hover {
-            background: #afafaf;
-            transform: scale(0.97);
+        .reset-btn:hover, .check-btn:hover {
+            background: #f5f7f9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 #d0d8e2;
+        }
+        .reset-btn:active, .check-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #d0d8e2;
         }
 
-        /* фидбек */
-        .error-flash {
-            background-color: #d99999 !important;
-            transition: background 0.1s;
+        /* Анимация ошибки — красная подсветка колонки */
+        .dropzone-container.error-flash {
+            background: #f0c0c0 !important;
+            border-color: #c93a3a !important;
+            transition: 0.1s;
         }
-        .success-flash {
-            background-color: #b9dcb0 !important;
-            transition: background 0.15s;
+
+        /* Успешная подсветка */
+        .dropzone-container.success-flash {
+            background: #d0ecd0 !important;
+            border-color: #2b8c4a !important;
+            transition: 0.15s;
+        }
+
+        .correct-highlight {
+            border: 2px solid #2b8c4a !important;
+            background: #f0faf2 !important;
+        }
+        .incorrect-highlight {
+            border: 2px solid #c93a3a !important;
+            background: #fff6f6 !important;
         }
     </style>
 </head>
 <body>
-<div class="trainer">
-    <!-- Карусель: одна карточка + стрелки -->
-    <div class="carousel-section">
-        <div class="carousel-header">
-            <h2>🎯 Перетащите льготу в нужный уровень</h2>
-            <div class="carousel-counter" id="carouselCounter">0 ситуаций</div>
+<div class="card">
+    <h1>Налоговые льготы <span>перетащи в нужный уровень</span></h1>
+
+    <div class="carousel-area">
+        <div class="carousel-label">ЛЬГОТА (листай и перетаскивай)</div>
+        <div class="carousel-container">
+            <button class="carousel-btn" id="prevTaxBtn">←</button>
+            <div id="activeTaxCard" class="tax-card" draggable="true"></div>
+            <button class="carousel-btn" id="nextTaxBtn">→</button>
         </div>
-        <div class="carousel-wrapper">
-            <button class="carousel-btn" id="scrollLeftBtn" aria-label="предыдущая">◀</button>
-            <div class="single-card-container" id="singleCardContainer"></div>
-            <button class="carousel-btn" id="scrollRightBtn" aria-label="следующая">▶</button>
+        <div class="carousel-counter" id="taxCounter">0 / 0</div>
+    </div>
+
+    <div class="categories-row">
+        <div class="category-col">
+            <div class="category-header">🏘️ местные</div>
+            <div class="dropzone-container" id="localContainer"></div>
+        </div>
+        <div class="category-col">
+            <div class="category-header">🌍 региональные</div>
+            <div class="dropzone-container" id="regionalContainer"></div>
+        </div>
+        <div class="category-col">
+            <div class="category-header">⚖️ федеральные</div>
+            <div class="dropzone-container" id="federalContainer"></div>
         </div>
     </div>
 
-    <!-- Три колонки (узкие) -->
-    <div class="columns-area">
-        <div class="column" data-level="local">
-            <div class="column-header local-header">🏘️ МЕСТНЫЙ</div>
-            <div class="column-dropzone" id="dropzone-local"></div>
-        </div>
-        <div class="column" data-level="regional">
-            <div class="column-header regional-header">🌍 РЕГИОНАЛЬНЫЙ</div>
-            <div class="column-dropzone" id="dropzone-regional"></div>
-        </div>
-        <div class="column" data-level="federal">
-            <div class="column-header federal-header">⚖️ ФЕДЕРАЛЬНЫЙ</div>
-            <div class="column-dropzone" id="dropzone-federal"></div>
-        </div>
-    </div>
     <div class="footer-controls">
-        <button class="reset-btn" id="resetBtn">⟳ Сбросить все льготы</button>
+        <button class="reset-btn" id="resetBtn">⟳ Сбросить все</button>
+        <button class="check-btn" id="checkBtn">✓ Проверить</button>
     </div>
 </div>
 
 <script>
-    // ---------- ДАННЫЕ (все льготы) ----------
-    const situationsData = [
-        // Местные
-        { id: "loc1", text: "Образовательные организации на обеспечении местного бюджета не платят земельный налог", source: "п. 4.2 Решения Беломорского городского поселения от 17.11.2016 №131", level: "local" },
-        { id: "loc2", text: "Организации школьного питания платят земельный налог в размере 25% от ставки по виду разрешенного использования", source: "п. 4 Решение Ростовской-на-Дону городской Думы от 18.08.2020 № 915", level: "local" },
-        // Региональные
-        { id: "reg1", text: "Организации с автопарком не менее 300 грузовых автомобилей с мощностью двигателя свыше 250 л.с. освобождаются от уплаты транспортного налога в размере 25% суммы налога", source: "п 1.3 ст.7 Закона Ростовской области от 10.05.2012 № 843-ЗС", level: "regional" },
-        { id: "reg2", text: "Резиденты ОЭЗ не уплачивают транспортный налог с грузовых автомобилей", source: "п. 2 ст. 26.10 Закона Московской области от 24.11.2004 № 151/2004-ОЗ", level: "regional" },
-        { id: "reg3", text: "Организации не платят налог на имущество в течение 10 лет на комплекс по обращению с отходами производства и потребления", source: "ст.26.28 Закона Московской области от 24.11.2004 № 151/2004-ОЗ", level: "regional" },
-        { id: "reg4", text: "Организации общественного транспорта не платят налог на имущество", source: "ст.11.1 Закона Санкт-Петербурга от 14.07.1995 № 81-11", level: "regional" },
-        // Федеральные
-        { id: "fed1", text: "Владельцы лицензий на недропользование применяют ставку налога на прибыль 20% по доходам от недропользования", source: "подп.1.7 п. 1 ст. 284 НК", level: "federal" },
-        { id: "fed2", text: "Правообладатели исключительных прав при реализации российского ПО и баз данных не платят НДС", source: "подп. 26 п. 2 ст. 149 НК", level: "federal" },
-        { id: "fed3", text: "Компании при реализации детской мебели платят НДС по ставке 10%", source: "п. 2 ст.164 НК", level: "federal" },
-        { id: "fed4", text: "Малый и средний бизнес молочной промышленности платит страховые взносы по тарифу 7,6%", source: "п.13.2 ст 427 НК", level: "federal" },
-        { id: "fed5", text: "Участники специального административного района на территориях Калининградской области платят вознаграждения членам экипажа судов из РОРС", source: "подп.16 п. 1 ст. 427 НК", level: "federal" }
+    // ---------- ДАННЫЕ: все льготы ----------
+    const benefitsDB = [
+        { text: "Образовательные организации на обеспечении местного бюджета не платят земельный налог", source: "п. 4.2 Решения Беломорского городского поселения от 17.11.2016 №131", level: "local" },
+        { text: "Организации школьного питания платят земельный налог в размере 25% от ставки по виду разрешенного использования", source: "п. 4 Решение Ростовской-на-Дону городской Думы от 18.08.2020 № 915", level: "local" },
+        { text: "Организации с автопарком не менее 300 грузовых автомобилей с мощностью двигателя свыше 250 л.с. освобождаются от уплаты транспортного налога в размере 25% суммы налога", source: "п 1.3 ст.7 Закона Ростовской области от 10.05.2012 № 843-ЗС", level: "regional" },
+        { text: "Резиденты ОЭЗ не уплачивают транспортный налог с грузовых автомобилей", source: "п. 2 ст. 26.10 Закона Московской области от 24.11.2004 № 151/2004-ОЗ", level: "regional" },
+        { text: "Организации не платят налог на имущество в течение 10 лет на комплекс по обращению с отходами производства и потребления", source: "ст.26.28 Закона Московской области от 24.11.2004 № 151/2004-ОЗ", level: "regional" },
+        { text: "Организации общественного транспорта не платят налог на имущество", source: "ст.11.1 Закона Санкт-Петербурга от 14.07.1995 № 81-11", level: "regional" },
+        { text: "Владельцы лицензий на недропользование применяют ставку налога на прибыль 20% по доходам от недропользования", source: "подп.1.7 п. 1 ст. 284 НК", level: "federal" },
+        { text: "Правообладатели исключительных прав при реализации российского ПО и баз данных не платят НДС", source: "подп. 26 п. 2 ст. 149 НК", level: "federal" },
+        { text: "Компании при реализации детской мебели платят НДС по ставке 10%", source: "п. 2 ст.164 НК", level: "federal" },
+        { text: "Малый и средний бизнес молочной промышленности платит страховые взносы по тарифу 7,6%", source: "п.13.2 ст 427 НК", level: "federal" },
+        { text: "Участники специального административного района на территориях Калининградской области платят вознаграждения членам экипажа судов из РОРС", source: "подп.16 п. 1 ст. 427 НК", level: "federal" }
     ];
 
-    // Состояние
-    let pendingItems = [...situationsData];
-    let columns = {
-        local: [],
-        regional: [],
-        federal: []
-    };
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    let pendingBenefits = shuffleArray([...benefitsDB]);
+    let columns = { local: [], regional: [], federal: [] };
     let currentIndex = 0;
 
-    // DOM элементы
-    const singleCardContainer = document.getElementById('singleCardContainer');
-    const carouselCounterSpan = document.getElementById('carouselCounter');
-    const dropZones = {
-        local: document.getElementById('dropzone-local'),
-        regional: document.getElementById('dropzone-regional'),
-        federal: document.getElementById('dropzone-federal')
+    // DOM
+    const activeTaxCard = document.getElementById('activeTaxCard');
+    const prevBtn = document.getElementById('prevTaxBtn');
+    const nextBtn = document.getElementById('nextTaxBtn');
+    const taxCounter = document.getElementById('taxCounter');
+    const containers = {
+        local: document.getElementById('localContainer'),
+        regional: document.getElementById('regionalContainer'),
+        federal: document.getElementById('federalContainer')
     };
     const resetBtn = document.getElementById('resetBtn');
-    const leftBtn = document.getElementById('scrollLeftBtn');
-    const rightBtn = document.getElementById('scrollRightBtn');
-
-    // helpers
-    function updateCounter() {
-        carouselCounterSpan.innerText = `${pendingItems.length} / ${situationsData.length}`;
-    }
+    const checkBtn = document.getElementById('checkBtn');
 
     function escapeHtml(str) {
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
 
-    // Рендер текущей карточки в карусели (одна)
-    function renderCurrentCard() {
-        singleCardContainer.innerHTML = '';
-        if (pendingItems.length === 0) {
-            const emptyDiv = document.createElement('div');
-            emptyDiv.className = 'situation-card';
-            emptyDiv.style.cursor = 'default';
-            emptyDiv.style.background = '#fafafa';
-            emptyDiv.style.textAlign = 'center';
-            emptyDiv.innerHTML = `<div class="card-text" style="font-size:0.9rem;">✅ Все льготы распределены!<br><span style="font-size:0.7rem;">Сбросьте для новой попытки</span></div>`;
-            singleCardContainer.appendChild(emptyDiv);
-            return;
-        }
-        if (currentIndex >= pendingItems.length) currentIndex = pendingItems.length - 1;
-        if (currentIndex < 0 && pendingItems.length) currentIndex = 0;
-        const item = pendingItems[currentIndex];
-        if (!item) return;
-        const card = document.createElement('div');
-        card.className = 'situation-card';
-        card.setAttribute('data-id', item.id);
-        card.setAttribute('draggable', 'true');
-        card.innerHTML = `
-            <div class="card-text">${escapeHtml(item.text)}</div>
-            <div class="card-source">📌 ${escapeHtml(item.source)}</div>
-        `;
-        card.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', JSON.stringify({ id: item.id, type: 'pending', index: currentIndex }));
-            e.dataTransfer.effectAllowed = 'move';
-            card.style.opacity = '0.5';
-        });
-        card.addEventListener('dragend', (e) => {
-            card.style.opacity = '1';
-        });
-        singleCardContainer.appendChild(card);
-    }
-
-    // Рендер всех трех колонок с D&D
     function renderColumns() {
         for (const level of ['local', 'regional', 'federal']) {
-            const container = dropZones[level];
+            const container = containers[level];
             const items = columns[level];
             container.innerHTML = '';
+            
             if (items.length === 0) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'empty-message';
@@ -400,132 +373,199 @@
                 container.appendChild(emptyDiv);
             } else {
                 items.forEach(item => {
-                    const droppedCard = document.createElement('div');
-                    droppedCard.className = 'dropped-card';
-                    droppedCard.setAttribute('data-id', item.id);
-                    droppedCard.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        returnItemToPending(level, item.id);
-                    });
-                    droppedCard.innerHTML = `
+                    const card = document.createElement('div');
+                    card.className = 'dropped-card';
+                    card.addEventListener('click', () => returnToPending(level, item));
+                    card.innerHTML = `
                         <div class="dropped-text">${escapeHtml(item.text)}</div>
-                        <div class="dropped-source">${escapeHtml(item.source)}</div>
+                        <div class="dropped-source">📌 ${escapeHtml(item.source)}</div>
                     `;
-                    container.appendChild(droppedCard);
+                    container.appendChild(card);
                 });
             }
-            // Пересоздаем drop-зону, чтобы гарантировать свежие слушатели
-            const newContainer = container.cloneNode(true);
-            container.parentNode.replaceChild(newContainer, container);
-            dropZones[level] = newContainer;
-
-            newContainer.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-            });
-            newContainer.addEventListener('drop', (e) => {
-                e.preventDefault();
-                const rawData = e.dataTransfer.getData('text/plain');
-                if (!rawData) return;
-                let dragInfo;
-                try { dragInfo = JSON.parse(rawData); } catch(err) { return; }
-                if (dragInfo.type === 'pending') {
-                    const itemId = dragInfo.id;
-                    const pendingItem = pendingItems.find(i => i.id === itemId);
-                    if (!pendingItem) return;
-                    if (pendingItem.level !== level) {
-                        const columnDiv = document.querySelector(`.column[data-level="${level}"]`);
-                        if (columnDiv) {
-                            columnDiv.classList.add('error-flash');
-                            setTimeout(() => columnDiv.classList.remove('error-flash'), 220);
-                        }
-                        return;
-                    }
-                    const idxInPending = pendingItems.findIndex(i => i.id === itemId);
-                    if (idxInPending !== -1) {
-                        const [moved] = pendingItems.splice(idxInPending, 1);
-                        columns[level].push(moved);
-                        // Корректируем currentIndex
-                        if (idxInPending < currentIndex) currentIndex--;
-                        else if (idxInPending === currentIndex) {
-                            if (pendingItems.length > 0 && currentIndex >= pendingItems.length) currentIndex = pendingItems.length - 1;
-                            if (pendingItems.length === 0) currentIndex = 0;
-                        }
-                        fullRender();
-                        const colDiv = document.querySelector(`.column[data-level="${level}"]`);
-                        if (colDiv) {
-                            colDiv.classList.add('success-flash');
-                            setTimeout(() => colDiv.classList.remove('success-flash'), 200);
-                        }
-                    }
-                }
-            });
         }
     }
 
-    // Возврат из колонки обратно в карусель
-    function returnItemToPending(level, itemId) {
-        const columnItems = columns[level];
-        const idx = columnItems.findIndex(i => i.id === itemId);
+    function updateCarousel() {
+        if (pendingBenefits.length === 0) {
+            activeTaxCard.innerHTML = `✅ все льготы распределены<br><span style="font-size:0.7rem;">нажмите «Проверить»</span>`;
+            activeTaxCard.style.background = '#f0f4f9';
+            activeTaxCard.style.border = '2px solid #a0b8cf';
+            activeTaxCard.removeAttribute('draggable');
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            taxCounter.textContent = `0 / ${benefitsDB.length} (все распределены)`;
+            return;
+        }
+
+        if (currentIndex >= pendingBenefits.length) currentIndex = pendingBenefits.length - 1;
+        if (currentIndex < 0) currentIndex = 0;
+
+        const benefit = pendingBenefits[currentIndex];
+        activeTaxCard.innerHTML = `
+            <div>${escapeHtml(benefit.text)}</div>
+            <div class="card-source">📌 ${escapeHtml(benefit.source)}</div>
+        `;
+        activeTaxCard.setAttribute('draggable', 'true');
+        activeTaxCard.style.background = 'white';
+        activeTaxCard.style.border = '2px solid #bcc9d9';
+
+        prevBtn.disabled = (currentIndex === 0);
+        nextBtn.disabled = (currentIndex === pendingBenefits.length - 1);
+
+        const placedCount = benefitsDB.length - pendingBenefits.length;
+        taxCounter.textContent = `${placedCount + 1} / ${benefitsDB.length} (осталось ${pendingBenefits.length})`;
+    }
+
+    function returnToPending(level, item) {
+        const idx = columns[level].findIndex(i => i.text === item.text);
         if (idx !== -1) {
-            const [returned] = columnItems.splice(idx, 1);
-            pendingItems.push(returned);
-            currentIndex = pendingItems.length - 1;
+            columns[level].splice(idx, 1);
+            pendingBenefits.push(item);
+            currentIndex = pendingBenefits.length - 1;
             fullRender();
         }
     }
 
-    // Полный рендер
-    function fullRender() {
-        renderColumns();
-        renderCurrentCard();
-        updateCounter();
-        const noCards = pendingItems.length === 0;
-        leftBtn.disabled = noCards;
-        rightBtn.disabled = noCards;
-        leftBtn.style.opacity = noCards ? '0.5' : '1';
-        rightBtn.style.opacity = noCards ? '0.5' : '1';
+    // Drag & Drop с проверкой уровня
+    activeTaxCard.addEventListener('dragstart', (e) => {
+        if (pendingBenefits.length === 0) {
+            e.preventDefault();
+            return;
+        }
+        e.dataTransfer.setData('text/plain', JSON.stringify({ index: currentIndex }));
+        e.dataTransfer.effectAllowed = 'move';
+        activeTaxCard.style.opacity = '0.6';
+    });
+    activeTaxCard.addEventListener('dragend', () => {
+        activeTaxCard.style.opacity = '1';
+    });
+
+    function setupDropZones() {
+        for (const level of ['local', 'regional', 'federal']) {
+            const container = containers[level];
+            
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+            
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (pendingBenefits.length === 0) return;
+                
+                const rawData = e.dataTransfer.getData('text/plain');
+                if (!rawData) return;
+                let dragInfo;
+                try { dragInfo = JSON.parse(rawData); } catch(err) { return; }
+                const idx = dragInfo.index;
+                if (idx === undefined || idx >= pendingBenefits.length) return;
+                
+                const benefit = pendingBenefits[idx];
+                if (!benefit) return;
+                
+                // ГЛАВНОЕ: проверка уровня — если неверно, КРАСНАЯ ПОДСВЕТКА и НЕ ПЕРЕТАСКИВАЕТСЯ
+                if (benefit.level !== level) {
+                    container.classList.add('error-flash');
+                    setTimeout(() => container.classList.remove('error-flash'), 500);
+                    return; // ❌ НЕ ПЕРЕМЕЩАЕМ
+                }
+                
+                // ✅ ВЕРНО — перемещаем
+                pendingBenefits.splice(idx, 1);
+                columns[level].push(benefit);
+                
+                if (idx < currentIndex) currentIndex--;
+                else if (idx === currentIndex) {
+                    if (currentIndex >= pendingBenefits.length && pendingBenefits.length > 0) {
+                        currentIndex = pendingBenefits.length - 1;
+                    }
+                    if (pendingBenefits.length === 0) currentIndex = 0;
+                }
+                if (currentIndex < 0) currentIndex = 0;
+                
+                fullRender();
+                
+                container.classList.add('success-flash');
+                setTimeout(() => container.classList.remove('success-flash'), 300);
+            });
+        }
     }
 
-    function nextCard() {
-        if (pendingItems.length === 0) return;
-        if (currentIndex + 1 < pendingItems.length) currentIndex++;
-        else currentIndex = 0;
-        renderCurrentCard();
-        updateCounter();
-    }
-
-    function prevCard() {
-        if (pendingItems.length === 0) return;
-        if (currentIndex - 1 >= 0) currentIndex--;
-        else currentIndex = pendingItems.length - 1;
-        renderCurrentCard();
-        updateCounter();
+    function checkResults() {
+        for (const level of ['local', 'regional', 'federal']) {
+            const cards = containers[level].querySelectorAll('.dropped-card');
+            cards.forEach(card => {
+                card.classList.remove('correct-highlight', 'incorrect-highlight');
+            });
+        }
+        
+        let allCorrect = true;
+        let totalPlaced = 0;
+        
+        for (const level of ['local', 'regional', 'federal']) {
+            const items = columns[level];
+            totalPlaced += items.length;
+            const cards = containers[level].querySelectorAll('.dropped-card');
+            
+            items.forEach((item, idx) => {
+                const isCorrect = (item.level === level);
+                if (isCorrect) {
+                    cards[idx]?.classList.add('correct-highlight');
+                } else {
+                    cards[idx]?.classList.add('incorrect-highlight');
+                    allCorrect = false;
+                }
+            });
+        }
+        
+        if (totalPlaced < benefitsDB.length) {
+            alert(`❗ Осталось распределить ${benefitsDB.length - totalPlaced} льгот(ы). Заполните все колонки.`);
+            return;
+        }
+        
+        if (allCorrect) {
+            alert('🎉 Поздравляем! Все льготы распределены абсолютно верно!');
+        } else {
+            alert('⚠️ Некоторые льготы размещены неверно. Неправильные подсвечены красным.');
+        }
     }
 
     function resetGame() {
-        pendingItems = [...situationsData];
+        pendingBenefits = shuffleArray([...benefitsDB]);
         columns = { local: [], regional: [], federal: [] };
         currentIndex = 0;
         fullRender();
     }
 
-    // Инициализация событий
-    function bindEvents() {
-        leftBtn.addEventListener('click', prevCard);
-        rightBtn.addEventListener('click', nextCard);
-        resetBtn.addEventListener('click', resetGame);
-        document.body.addEventListener('dragover', (e) => e.preventDefault());
-        document.body.addEventListener('drop', (e) => e.preventDefault());
-        singleCardContainer.addEventListener('dragover', (e) => e.preventDefault());
-        singleCardContainer.addEventListener('drop', (e) => e.preventDefault());
+    function fullRender() {
+        renderColumns();
+        updateCarousel();
     }
 
-    function init() {
-        bindEvents();
-        fullRender();
-    }
-    init();
+    // Кнопки карусели
+    prevBtn.addEventListener('click', () => {
+        if (pendingBenefits.length > 0 && currentIndex > 0) {
+            currentIndex--;
+            updateCarousel();
+        }
+    });
+    nextBtn.addEventListener('click', () => {
+        if (pendingBenefits.length > 0 && currentIndex < pendingBenefits.length - 1) {
+            currentIndex++;
+            updateCarousel();
+        }
+    });
+
+    resetBtn.addEventListener('click', resetGame);
+    checkBtn.addEventListener('click', checkResults);
+    
+    // Запрет дропа на фон
+    document.body.addEventListener('dragover', (e) => e.preventDefault());
+    document.body.addEventListener('drop', (e) => e.preventDefault());
+
+    setupDropZones();
+    fullRender();
 </script>
 </body>
 </html>
