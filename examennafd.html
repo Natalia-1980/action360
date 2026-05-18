@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Экзамен · налогообложение</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .exam-wrapper {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .register-card input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            font-size: 1rem;
+            margin: 1rem 0;
+        }
+
+        .exam-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .question-card {
+            flex: 2;
+            min-width: 280px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.8rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .sidebar {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem;
+            border: 1px solid #dee6f0;
+            height: fit-content;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2ecfe;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .question-number {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #1a344c;
+        }
+
+        .timer {
+            background: #f0f5fc;
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            border: 1px solid #c7daf5;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #0a2942;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .option-text {
+            font-size: 0.95rem;
+            color: #1e3b5c;
+            line-height: 1.4;
+        }
+
+        .option-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #1e6bb8;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 2px 0 #b0c4dd;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+
+        .btn-primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1a344c;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2ecfe;
+        }
+
+        .questions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .q-num {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .q-num.answered {
+            background: #2b8c4a;
+            color: white;
+        }
+
+        .q-num.current {
+            background: #1e3b5c;
+            color: white;
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #1e6bb8;
+        }
+
+        .info-text {
+            font-size: 0.8rem;
+            color: #5e7290;
+            margin-top: 0.5rem;
+        }
+
+        .progress-badge {
+            font-size: 0.8rem;
+            color: #2b8c4a;
+            margin-top: 0.5rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .tab-btn {
+            background: #f0f5fc;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #2a4d70;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: #1e3b5c;
+            color: white;
+        }
+
+        .case-card {
+            background: #f9fcff;
+            border-radius: 24px;
+            padding: 1.2rem;
+            border: 2px solid #e1eaf5;
+            margin-bottom: 1rem;
+        }
+
+        .case-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.8rem;
+        }
+        .case-table td, .case-table th {
+            border: 1px solid #c7daf5;
+            padding: 0.4rem;
+            vertical-align: top;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 700px) {
+            .exam-container {
+                flex-direction: column;
+            }
+            .question-card, .sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="exam-wrapper" id="app"></div>
+
+<script>
+    // --------------------------------------------------------------
+    // ДАННЫЕ ЭКЗАМЕНА (25 вопросов части А + 4 кейса)
+    // --------------------------------------------------------------
+    const QUESTIONS = [
+        { text: "Иван отвечает за электронный документооборот. Он забыл отправить декларацию по налогу на прибыль в последний день срока. Сдал ее только на следующий день. Налог не уплатил. На ЕНС — положительное сальдо. Оно превышает сумму налога к уплате. Выберите верные последствия ситуации.",
+          options: [
+            "За просрочку декларации организация заплатит штраф в размере 5% от суммы налога по декларации. Сумма не может превышать 30% налога и быть менее 1000 руб.",
+            "Организация заплатит штраф за неуплату налога на прибыль.",
+            "Организации заплатит штраф 1000 руб. за просрочку декларации.",
+            "Иван заплатит административный штраф в размере от 300 до 500 рублей за просрочку декларации, либо получит предупреждение, как административное наказание."
+          ], correct: [2,3], explanation: "Верно — 3 и 4. На ЕНС положительно сальдо покрывает налог по декларации — неуплаты нет. Ответственности по ст. 122 НК не будет (п. 4 ст. 122 НК). За просрочку сдачи декларации есть две ответственности. Первая — налоговая по ст. 119 НК: штраф 5% от неуплаченной суммы за каждый месяц просрочки (минимум 1000 руб., максимум 30%). Поскольку неуплаты налога нет, штраф будет минимальным — 1000 руб. Вторая — административная по ст. 15.5 КоАП за нарушение срока сдачи декларации в виде предупреждения или штрафа.", type: "multiple" },
+        { text: "Выберите верные утверждения в отношении личного кабинета налогоплательщика и ЕНП:",
+          options: [
+            "Получить доступ к ЛК налогоплательщика–физлица можно только при наличии усиленной квалифицированной подписи.",
+            "ЛК налогоплательщики–физические лица используют для получения и передачи из/в налоговой документов, информации в электронной форме.",
+            "В платежке на ЕНП нужно указать за какой налог уплата.",
+            "Пени включаются в общую сумму долга на ЕНС с того дня, когда зафиксировали недоимку, по которой насчитали эти пени."
+          ], correct: [1,3], explanation: "Верно — 2 и 4. Вариант 2 описывает суть ЛК налогоплательщика – информационного ресурса для взаимодействия налогоплательщиков с налоговиками (п. 1 и 2 ст. 11.2 НК). Вариант 4 раскрывает суть ЕНС, где все платежи и обязанности по уплате учитываются совокупно. И в случае недостаточности денежных средств на ЕНС, сумма пеней учитывается в совокупной обязанности (п. 6 ст. 11.3 НК).", type: "multiple" },
+        { text: "В ООО “Стройка” идет выездная налоговая проверка... Выберите неверные утверждения касательно этого совета.",
+          options: [
+            "Если не представить документы, компания получит штраф.",
+            "Если представить документы на стадии обжалования решения, это усилит позицию компании.",
+            "НК дает ограниченный срок для того, чтобы представить документы.",
+            "Если компания откажется представить документы в срок, налоговики проведут выемку документов."
+          ], correct: [1], explanation: "Верно — 2. Совет юриста нарушает нормы НК. Кроме того, если компания последует этому совету, она нарушит принципы добросовестного и этичного поведения налогоплательщика. Это привлечет дополнительное внимание налоговиков. Такое поведение ослабит позицию компании: придется объяснять, почему не подали документы по требованию. А при обжаловании решения в налоговой или в суде эти документы, скорее всего, не примут — ни суд, ни вышестоящие налоговики не будут проводить повторные проверки.", type: "multiple" },
+        { text: "Срок уплаты налога на прибыль за налоговый период – 28 марта выпадает на субботу. ООО “Альфа” уплатила 12 апреля налог в сумме 1 млн руб. Укажите срок уплаты налога и сумму пени за несвоевременную уплату. Примите ставку рефинансирования равной 15%. На ЕНС отсутствует положительное сальдо.",
+          options: ["30 марта и 6 500 руб.", "30 марта и 5 342 руб.", "27 марта и 8 000 руб.", "27 марта и 6 575 руб."], correct: [0], explanation: "Верно — 1. Если крайний срок выпадает на выходной или праздник, он сдвигается на следующий рабочий день. В данном случае — 30 марта. Поскольку на ЕНС нет положительного сальдо, неуплаченный вовремя налог считается недоимкой. За каждый день просрочки начисляйте пеню — это процент от недоимки (п. 4 ст. 75 НК). Первые 30 дней просрочки ставка пени = 1/300 ключевой ставки ЦБ. Расчеты = 1 000 000 × 15% / 300 × 13 = 6 500 руб.", type: "single" }
+    ];
+    // Добавляем остальные вопросы (для краткости)
+    for (let i = QUESTIONS.length; i < 25; i++) {
+        QUESTIONS.push({
+            text: `Вопрос ${i+1}. Демонстрационный вопрос.`,
+            options: ["Вариант 1", "Вариант 2", "Вариант 3", "Вариант 4"],
+            correct: [0,1],
+            explanation: `Пояснение к вопросу ${i+1}.`,
+            type: "multiple"
+        });
+    }
+
+    // Кейсы с полными промежуточными таблицами (баллы скрыты от пользователя)
+    const CASES = [
+        { id:1, title: "Кейс 1. Страховые взносы", 
+          description: `Мария работает главным бухгалтером в ООО “Разные Проекты”. Компания применяет ОСН. 
+Заработная плата Марии составляет 300 000 руб. в месяц. За достижение поставленных целей компания выплатила Марии премию в сумме 400 000 руб.
+Компания оплатила курсы повышения квалификации по ведению учета по МСФО на сумму 50 000 рублей.
+По долгосрочной программе добровольного медицинского страхования компания оплатила страховой полис для Марии на весь год. Полис предусматривает медицинские услуги в сумме 120 000 руб. 
+Согласно политике компании по поощрению персонала Мария получила на день рождение подарок рыночной стоимостью 70 000 руб. 
+В составе делегации компании Мария ездила в командировку с 14 по 17 марта. Командировочные расходы составили: проживание в гостинице — 30 000 руб. билеты на поезд — 15 000 руб., суточные по локальному акту компании — 3 000 руб. в сутки. 
+Компания компенсировала Марии проценты, которые она уплачивает по ипотечному кредиту на покупку квартиры в сумме 10 000 000 руб., со ставкой 8% годовых. 
+Предельная база на год — 2 759 000 руб.
+Задание: Рассчитайте страховые взносы к уплате компанией с доходов Марии.`,
+          fields: [
+            { label: "Зарплата (не облагается, руб.)", correct: 0, points: 0 },
+            { label: "Зарплата (облагается, руб.)", correct: 3600000, points: 1 },
+            { label: "Премия (не облагается, руб.)", correct: 0, points: 0 },
+            { label: "Премия (облагается, руб.)", correct: 400000, points: 1 },
+            { label: "Курсы повышения квалификации (не облагается, руб.)", correct: 50000, points: 1 },
+            { label: "Курсы повышения квалификации (облагается, руб.)", correct: 0, points: 0 },
+            { label: "ДМС (не облагается, руб.)", correct: 120000, points: 1 },
+            { label: "ДМС (облагается, руб.)", correct: 0, points: 0 },
+            { label: "Подарок (не облагается, руб.)", correct: 0, points: 0 },
+            { label: "Подарок (облагается, руб.)", correct: 70000, points: 1 },
+            { label: "Проживание в командировке (не облагается, руб.)", correct: 30000, points: 1 },
+            { label: "Проживание в командировке (облагается, руб.)", correct: 0, points: 0 },
+            { label: "Билеты на поезд (не облагается, руб.)", correct: 15000, points: 1 },
+            { label: "Билеты на поезд (облагается, руб.)", correct: 0, points: 0 },
+            { label: "Суточные (не облагается, руб.)", correct: 2800, points: 1 },
+            { label: "Суточные (облагается, руб.)", correct: 9200, points: 0 },
+            { label: "Компенсация % по ипотеке (не облагается, руб.)", correct: 800000, points: 1 },
+            { label: "Компенсация % по ипотеке (облагается, руб.)", correct: 0, points: 0 },
+            { label: "Итого база по взносам (облагается, руб.)", correct: 4079200, points: 0 },
+            { label: "Предельная база (руб.)", correct: 2759000, points: 1 },
+            { label: "Ставка взносов с предельной базы (%)", correct: 30, points: 1 },
+            { label: "Страховые взносы с предельной базы (руб.)", correct: 827700, points: 1 },
+            { label: "База сверх предельной (руб.)", correct: 1320200, points: 1 },
+            { label: "Ставка свыше предельной базы (%)", correct: 15.1, points: 1 },
+            { label: "Взносы сверх предельной базы (руб.)", correct: 199350.2, points: 1 },
+            { label: "Итого взносы к уплате (руб.)", correct: 1027050.2, points: 1 }
+          ] },
+        { id:2, title: "Кейс 2. НДФЛ", 
+          description: `Светлана работает дизайнером в ООО “Креативное”. Компания применяет ОСН.
+Светлана использует все возможные вычеты, имея все необходимые документы. Заработная плата Светланы составляет 250 000 руб. в месяц.
+Светлана замужем, в их семье 3 детей - 23, 21, 16 лет. Старший ребенок учится по очной форме обучения в российском университете. Супруг Светланы отказался от стандартных вычетов на основании письменного заявления.
+Работодатель продал Светлане часы отечественного производства по себестоимости 70 000 руб. с НДС. Компания продает их на маркетплейсе за 120 000 руб.
+Компания оплатила Светлане страховой полис добровольного медицинского страхования на 3 года со страховым взносом в 100 000 руб. в год.
+Светлана израсходовала 150 000 руб. на оплату обучения своего старшего ребенка.
+Светлана купила квартиру в текущем году за 7 000 000 руб. Светлана уплатила сама 3 000 000 руб. и остальное за счет ипотеки. Ипотека выдана 15 февраля по ставке 12% на 5 лет и не предусматривает досрочного погашения. Ранее Светлана не покупала жилую недвижимость.
+На годовщину свадьбы супруг подарил Светлане серьги рыночной стоимостью 600 000 руб.
+Светлана продала котируемые ценные бумаги на сумму 2 600 000 руб., которые она купила в прошлом году за 1 800 000 руб. Эти ценные бумаги учитываются на ее ИИС. Доход от реализации поступил на этот ИИС. ИИС не был закрыт по состоянию на конец года.
+Задание: Рассчитайте сумму НДФЛ Светланы за год.`,
+          fields: [
+            { label: "Зарплата (не облагается, руб.)", correct: 0, points: 0 },
+            { label: "Зарплата (облагается, руб.)", correct: 3000000, points: 1 },
+            { label: "Стандартный вычет (руб.)", correct: 14800, points: 1 },
+            { label: "Материальная выгода (не облагается, руб.)", correct: 0, points: 0 },
+            { label: "Материальная выгода (облагается, руб.)", correct: 50000, points: 1 },
+            { label: "ДМС (не облагается, руб.)", correct: 100000, points: 1 },
+            { label: "ДМС (облагается, руб.)", correct: 0, points: 0 },
+            { label: "Социальный вычет на обучение (руб.)", correct: 110000, points: 1 },
+            { label: "Имущественный вычет на покупку жилья (руб.)", correct: 2000000, points: 1 },
+            { label: "Имущественный вычет на проценты по ипотеке (руб.)", correct: 419507, points: 1 },
+            { label: "Подарок супруга (не облагается, руб.)", correct: 600000, points: 1 },
+            { label: "Подарок супруга (облагается, руб.)", correct: 0, points: 0 },
+            { label: "Реализация ценных бумаг на ИИС (не облагается, руб.)", correct: 2600000, points: 1 },
+            { label: "Реализация ценных бумаг на ИИС (облагается, руб.)", correct: 0, points: 0 },
+            { label: "Итого доходы необлагаемые (руб.)", correct: 3300000, points: 0 },
+            { label: "Итого доходы облагаемые (руб.)", correct: 3050000, points: 0 },
+            { label: "Итого вычеты (руб.)", correct: 2544307, points: 0 },
+            { label: "Налоговая база (руб.)", correct: 505693, points: 1 },
+            { label: "Ставка (%)", correct: 13, points: 1 },
+            { label: "Итого НДФЛ к уплате (руб.)", correct: 65740, points: 1 }
+          ] },
+        { id:3, title: "Кейс 3. НДС", 
+          description: `ООО «Большой Рантье» (БР) и его подрядчики являются плательщиками НДС. БР владеет старым ангаром на земельном участке, который был разделен на две части.
+По первому участку (с ангаром на нем) все операции имели место в 1 кв. 2026 года.
+Для предпродажной подготовки этого участка ангар был демонтирован подрядчиком БР за 200 000 рублей. Материалы, оставшиеся после демонтажа, были проданы за 160 000 рублей, но не оплачены. Затраты на оплату работ другого подрядчика по рекультивации первого участка составили 400 000 рублей. Наконец, БР продало первый земельный участок за 6 млн рублей. Все подрядчики работ для БР предоставили БР все необходимые документы.
+Во 2 кв. 2026 года БР на втором земельном участке построило производственный цех собственными силами и имело следующие затраты:
+заработная плата работников — 2 млн рублей (не превысила 100 000 руб. в месяц на человека);
+затраты на материалы — 12 млн рублей;
+для монтажа коммуникаций БР привлекло подрядчика, стоимость работ — 800 000 руб. Однако ввиду недоделок эти работы не были приняты, акт сдачи-приемки не подписан, счет-фактура не получен по состоянию на конец второго квартала 2026 года.`,
+          fields: [
+            { label: "НДС к уплате/возмещению за 1 квартал (выберите вариант)", type: "choice", options: [
+                "1 223 200 руб. к уплате",
+                "8 800 руб. к возмещению",
+                "88 000 руб. к возмещению",
+                "1 188 000 руб. к уплате"
+            ], correctOpt: 1, points: 7 },
+            { label: "НДС к начислению и вычету за 2 квартал (выберите вариант)", type: "choice", options: [
+                "3 080 000 руб. и 3 080 000 руб.",
+                "2 800 000 руб. и 0 руб.",
+                "2 800 000 руб. и 2 800 000 руб.",
+                "3 080 000 руб. и 2 640 000 руб."
+            ], correctOpt: 0, points: 6 }
+          ] },
+        { id:4, title: "Кейс 4. Налог на прибыль", 
+          description: `ООО "Логика М"(ЛогикаМ) торгует металлическими изделиями и оборудованием.
+Учетная политика предусматривает применение амортизационной премии и амортизацию ОС нелинейным методом, одинаковые сроки полезного использования как для налогового, так и для бухгалтерского учета. Все суммы приведены с учетом НДС (где применимо). Все операции имели место в 2026 году.
+1. К концу 2026 года ЛогикаМ имело задолженность перед покупателями по полученным авансам на 35 млн. рублей. В течение 2026 года было отгружено товаров на 364 млн. рублей покупателям, из которых на товары стоимостью 70 млн. руб покупателям право собственности было передано в 2026 году.
+2. Зарубежным покупателям было отгружено товаров на 28 млн. руб., которые были сразу оплачены в 2026 году и подтверждены соответствующими документами.
+3. На начало года на складе хранились 2000 единиц металлических изделий по 12 000 рублей за единицу. В начале года была закуплена партия из 10 000 единиц по 13 000 рублей за единицу. Затем была продана партия из 9 000 единиц.
+4. На начало года остатки затрат на транспортировку товаров до склада Логики М составили 600 тыс. рублей без НДС. В течение года затраты на транспортировку составили 15 млн. руб. без НДС.
+5. Для своих торговых представителей ЛогикиМ приобрела 20 легковых автомобилей в ноябре 2025 года за 3 600 000 рублей каждый. В декабре 2025 года ввела их все в эксплуатацию со сроком полезного использования 15 лет. Мощность автомобиля - 165 л.с.
+6. Персонал Логики М состоит из 25 торговых представителей с заработной платой 200 тыс. руб/мес. и генерального директора с заработной платой 450 тыс. рублей.
+7. Логика М 01.10.2025 приобрела земельный участок за 38 000 000 рублей. Кадастровая стоимость которого - 18 000 000 рублей.
+Задание: Рассчитайте налоговую базу по налогу на прибыль ООО "ЛогикаМ" за 2026 год.`,
+          fields: [
+            { label: "Выручка в РФ (руб.)", correct: 245000000, points: 1 },
+            { label: "Экспорт (руб.)", correct: 28000000, points: 1 },
+            { label: "Себестоимость продажи 1 партии (руб.)", correct: 96250000, points: 1 },
+            { label: "Расходы на транспортировку (руб.)", correct: 11700000, points: 1 },
+            { label: "Амортизационная премия (руб.)", correct: 42000000, points: 1 },
+            { label: "Амортизация автомобилей (руб.)", correct: 2716009, points: 1 },
+            { label: "Заработная плата персонала (руб.)", correct: 65400000, points: 1 },
+            { label: "Страховые взносы (руб.)", correct: 19226491, points: 1 },
+            { label: "Земельный налог (руб.)", correct: 67500, points: 1 },
+            { label: "Транспортный налог (руб.)", correct: 6500, points: 1 },
+            { label: "Налоговая база по налогу на прибыль за 2026 год (руб.)", correct: 35623500, points: 10 }
+          ] }
+    ];
+
+    let state = {
+        name: "",
+        registered: false,
+        secondsLeft: 3 * 3600,
+        timerInterval: null,
+        activeTab: "A",
+        currentQuestionIdx: 0,
+        currentCaseIdx: 0,
+        answersA: new Array(25).fill(null),
+        answersB: [],
+        examFinished: false
+    };
+    for (let i = 0; i < CASES.length; i++) {
+        state.answersB.push(new Array(CASES[i].fields.length).fill(null));
+    }
+    for (let i = 0; i < 25; i++) state.answersA[i] = [];
+
+    function saveState() { localStorage.setItem("examState", JSON.stringify(state)); }
+    function loadState() {
+        let saved = localStorage.getItem("examState");
+        if (saved) {
+            try {
+                let s = JSON.parse(saved);
+                if (s.registered) {
+                    state.name = s.name;
+                    state.registered = s.registered;
+                    state.secondsLeft = s.secondsLeft;
+                    state.activeTab = s.activeTab;
+                    state.currentQuestionIdx = s.currentQuestionIdx;
+                    state.currentCaseIdx = s.currentCaseIdx;
+                    state.answersA = s.answersA;
+                    state.answersB = s.answersB;
+                    state.examFinished = s.examFinished;
+                    if (!state.examFinished && state.secondsLeft > 0) startTimer();
+                }
+            } catch(e) {}
+        }
+    }
+
+    function startTimer() {
+        if (state.timerInterval) clearInterval(state.timerInterval);
+        state.timerInterval = setInterval(() => {
+            if (state.secondsLeft <= 0) {
+                clearInterval(state.timerInterval);
+                finishExam();
+            } else {
+                state.secondsLeft--;
+                saveState();
+                updateTimerDisplay();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        let h = Math.floor(state.secondsLeft / 3600);
+        let m = Math.floor((state.secondsLeft % 3600) / 60);
+        let s = state.secondsLeft % 60;
+        let timers = document.querySelectorAll(".timer");
+        timers.forEach(t => t.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`);
+    }
+
+    function finishExam() {
+        if (state.examFinished) return;
+        state.examFinished = true;
+        if (state.timerInterval) clearInterval(state.timerInterval);
+        saveState();
+        renderResults();
+    }
+
+    function renderRegistration() {
+        return `
+            <div class="register-card">
+                <h2>Регистрация</h2>
+                <input type="text" id="userName" placeholder="Фамилия Имя">
+                <div class="timer" style="margin:1rem 0">03:00:00</div>
+                <button class="btn btn-primary" id="startExamBtn">Начать экзамен</button>
+            </div>
+        `;
+    }
+
+    function renderResults() {
+        let totalA = 0;
+        for (let i = 0; i < QUESTIONS.length; i++) {
+            let user = state.answersA[i];
+            if (!user || user.length === 0) continue;
+            let correct = QUESTIONS[i].correct;
+            if (user.length === correct.length && user.every(v => correct.includes(v))) totalA += 2;
+        }
+        let totalB = 0;
+        for (let c = 0; c < CASES.length; c++) {
+            for (let f = 0; f < CASES[c].fields.length; f++) {
+                let userVal = state.answersB[c][f];
+                if (userVal === null) continue;
+                let field = CASES[c].fields[f];
+                let correctVal = field.correctOpt !== undefined ? field.correctOpt : field.correct;
+                if (field.type === "choice") {
+                    if (userVal === correctVal) totalB += field.points;
+                } else {
+                    if (Math.abs(parseFloat(userVal) - correctVal) < 0.5) totalB += field.points;
+                }
+            }
+        }
+        let total = totalA + totalB;
+        let passed = total >= 50;
+        
+        let comments = `Фамилия Имя: ${state.name}\nБаллы: ${total} (часть А: ${totalA}, часть Б: ${totalB})\nРезультат: ${passed ? "Экзамен сдан" : "Экзамен не сдан"}\n\n`;
+        comments += "=== ПОЯСНЕНИЯ К ПРАВИЛЬНЫМ ОТВЕТАМ ===\n\n";
+        for (let i = 0; i < QUESTIONS.length; i++) {
+            comments += `Вопрос ${i+1}: ${QUESTIONS[i].explanation}\n`;
+            let user = state.answersA[i];
+            if (user) {
+                let userText = user.map(idx => QUESTIONS[i].options[idx]).join(", ");
+                comments += `  Ваш ответ: ${userText}\n`;
+            } else {
+                comments += `  Ваш ответ: не дан\n`;
+            }
+            comments += "\n";
+        }
+        comments += "\nЧАСТЬ Б (кейсы)\n";
+        for (let c = 0; c < CASES.length; c++) {
+            comments += `\n${CASES[c].title}\n`;
+            for (let f = 0; f < CASES[c].fields.length; f++) {
+                let userVal = state.answersB[c][f];
+                let field = CASES[c].fields[f];
+                let correctVal = field.correctOpt !== undefined ? field.options[field.correctOpt] : field.correct;
+                comments += `  ${field.label}: правильный ответ = ${correctVal}, ваш ответ = ${userVal !== null ? (field.type === "choice" ? field.options[userVal] : userVal) : "не заполнено"}\n`;
+            }
+        }
+        
+        const blob = new Blob([comments], {type: "text/plain"});
+        const url = URL.createObjectURL(blob);
+        return `
+            <div class="register-card">
+                <h2>Результаты экзамена</h2>
+                <p>${state.name}, вы набрали ${total} баллов (из 100)</p>
+                <p>${passed ? "✅ Экзамен сдан" : "❌ Экзамен не сдан"}</p>
+                <a href="${url}" download="comments.txt" class="btn">Скачать комментарии к ответам</a>
+                <button class="btn" id="restartBtn">Пройти заново</button>
+            </div>
+        `;
+    }
+
+    function renderExam() {
+        let progressA = state.answersA.filter(a => a && a.length > 0).length;
+        let totalB = CASES.reduce((s,c) => s + c.fields.length, 0);
+        let progressB = state.answersB.flat().filter(a => a !== null).length;
+        return `
+            <div class="exam-container">
+                <div class="question-card">
+                    <div class="question-header">
+                        <span class="question-number" id="questionNumber">Вопрос 1</span>
+                        <div class="timer">${formatTime(state.secondsLeft)}</div>
+                    </div>
+                    <div class="tab-buttons">
+                        <button class="tab-btn ${state.activeTab === 'A' ? 'active' : ''}" data-tab="A">Часть А (${progressA}/25)</button>
+                        <button class="tab-btn ${state.activeTab === 'B' ? 'active' : ''}" data-tab="B">Часть Б (${progressB}/${totalB})</button>
+                    </div>
+                    <div id="tabContent"></div>
+                    <div class="nav-buttons">
+                        <button class="btn" id="prevBtn">← Назад</button>
+                        <button class="btn btn-primary" id="nextBtn">Далее →</button>
+                    </div>
+                    <button class="btn" id="finishExamBtn" style="margin-top:1rem; width:100%;">Завершить экзамен</button>
+                </div>
+                <div class="sidebar">
+                    <div class="sidebar-title">Все вопросы</div>
+                    <div class="questions-grid" id="questionsGrid"></div>
+                    <div class="sidebar-title">Справочные материалы</div>
+                    <div class="info-text">Налоговый кодекс РФ</div>
+                    <div class="progress-badge" id="progressBadge">Решено: ${progressA} / 25</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function formatTime(sec) {
+        let h = Math.floor(sec / 3600);
+        let m = Math.floor((sec % 3600) / 60);
+        let s = sec % 60;
+        return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    }
+
+    function renderPartA() {
+        const q = QUESTIONS[state.currentQuestionIdx];
+        const saved = state.answersA[state.currentQuestionIdx] || [];
+        let optsHtml = q.options.map((opt, idx) => `
+            <div class="option-item">
+                <span class="option-text">${opt}</span>
+                <input type="checkbox" class="option-checkbox" data-opt-index="${idx}" ${saved.includes(idx) ? 'checked' : ''}>
+            </div>
+        `).join('');
+        return `<div class="question-text">${q.text}</div><div class="options-list" id="optionsList">${optsHtml}</div>`;
+    }
+
+    function renderPartB() {
+        const caseData = CASES[state.currentCaseIdx];
+        let fieldsHtml = '<table class="case-table">';
+        fieldsHtml += '<tr><th>Показатель</th><th>Не облагается, руб.</th><th>Облагается, руб.</th></tr>';
+        for (let i = 0; i < caseData.fields.length; i++) {
+            let saved = state.answersB[state.currentCaseIdx][i];
+            if (caseData.fields[i].type === "choice") {
+                let optsHtml = '';
+                caseData.fields[i].options.forEach((opt, idx) => {
+                    let checked = (saved === idx) ? 'checked' : '';
+                    optsHtml += `<label style="display:block; margin:0.2rem 0;"><input type="radio" name="field_${i}" value="${idx}" ${checked}> ${opt}</label>`;
+                });
+                fieldsHtml += `
+                    <tr>
+                        <td>${caseData.fields[i].label}</td>
+                        <td colspan="2">${optsHtml}</td>
+                    </tr>
+                `;
+            } else {
+                fieldsHtml += `
+                    <tr>
+                        <td>${caseData.fields[i].label}</td>
+                        <td><input type="number" class="case-field" data-field-idx="${i}" value="${saved !== null ? saved : ''}" style="width:100%; padding:0.3rem; border-radius:20px; border:1px solid #cbd5e1;"></td>
+                        <td><input type="number" class="case-field" data-field-idx="${i}" value="${saved !== null ? saved : ''}" style="width:100%; padding:0.3rem; border-radius:20px; border:1px solid #cbd5e1;"></td>
+                    </tr>
+                `;
+            }
+        }
+        fieldsHtml += '</table>';
+        let casesNav = CASES.map((c, idx) => `<div class="q-num ${state.answersB[idx].some(a=>a!==null) ? 'answered':''} ${idx===state.currentCaseIdx ? 'current':''}" data-caseidx="${idx}">${idx+1}</div>`).join('');
+        return `
+            <div><strong>Кейсы:</strong> <div class="questions-grid" style="margin-top:0.5rem">${casesNav}</div></div>
+            <div class="case-card">
+                <h3>${caseData.title}</h3>
+                <div style="white-space:pre-line; font-size:0.85rem; margin-bottom:0.8rem; background:#f0f7fe; padding:0.8rem; border-radius:16px;">${caseData.description}</div>
+                ${fieldsHtml}
+                <button class="btn" id="saveCaseAnswersBtn" style="margin-top:0.8rem">Сохранить все ответы кейса</button>
+            </div>
+        `;
+    }
+
+    function attachEvents() {
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                state.activeTab = btn.dataset.tab;
+                saveState();
+                renderMain();
+            });
+        });
+        document.querySelectorAll(".q-num[data-idx]").forEach(el => {
+            el.addEventListener("click", () => {
+                state.currentQuestionIdx = parseInt(el.dataset.idx);
+                saveState();
+                renderMain();
+            });
+        });
+        document.querySelectorAll(".q-num[data-caseidx]").forEach(el => {
+            el.addEventListener("click", () => {
+                state.currentCaseIdx = parseInt(el.dataset.caseidx);
+                saveState();
+                renderMain();
+            });
+        });
+        document.querySelectorAll('.option-checkbox').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                let optIdx = parseInt(e.target.dataset.optIndex);
+                let current = state.answersA[state.currentQuestionIdx] || [];
+                if (e.target.checked) {
+                    if (!current.includes(optIdx)) current.push(optIdx);
+                } else {
+                    current = current.filter(i => i !== optIdx);
+                }
+                state.answersA[state.currentQuestionIdx] = current;
+                saveState();
+                renderMain();
+            });
+        });
+        let prevBtn = document.getElementById("prevBtn");
+        let nextBtn = document.getElementById("nextBtn");
+        if (prevBtn) prevBtn.addEventListener("click", () => {
+            if (state.activeTab === "A") {
+                if (state.currentQuestionIdx > 0) state.currentQuestionIdx--;
+                else alert("Это первый вопрос");
+            } else {
+                if (state.currentCaseIdx > 0) state.currentCaseIdx--;
+                else alert("Это первый кейс");
+            }
+            saveState();
+            renderMain();
+        });
+        if (nextBtn) {
+            nextBtn.addEventListener("click", () => {
+                if (state.activeTab === "A") {
+                    if (state.currentQuestionIdx + 1 < 25) state.currentQuestionIdx++;
+                    else {
+                        state.activeTab = "B";
+                        state.currentCaseIdx = 0;
+                    }
+                } else {
+                    if (state.currentCaseIdx + 1 < CASES.length) state.currentCaseIdx++;
+                }
+                saveState();
+                renderMain();
+            });
+        }
+        let saveCase = document.getElementById("saveCaseAnswersBtn");
+        if (saveCase) {
+            saveCase.addEventListener("click", () => {
+                let caseData = CASES[state.currentCaseIdx];
+                for (let i = 0; i < caseData.fields.length; i++) {
+                    if (caseData.fields[i].type === "choice") {
+                        let selected = document.querySelector(`input[name="field_${i}"]:checked`);
+                        if (selected) {
+                            state.answersB[state.currentCaseIdx][i] = parseInt(selected.value);
+                        }
+                    } else {
+                        let inp = document.querySelector(`.case-field[data-field-idx="${i}"]`);
+                        if (inp) {
+                            let val = parseFloat(inp.value);
+                            if (!isNaN(val)) state.answersB[state.currentCaseIdx][i] = val;
+                        }
+                    }
+                }
+                saveState();
+                renderMain();
+            });
+        }
+        let finish = document.getElementById("finishExamBtn");
+        if (finish) finish.addEventListener("click", () => {
+            finishExam();
+        });
+    }
+
+    function renderMain() {
+        const app = document.getElementById("app");
+        if (!state.registered) {
+            app.innerHTML = renderRegistration();
+            document.getElementById("startExamBtn").addEventListener("click", () => {
+                let nameInput = document.getElementById("userName");
+                if (nameInput.value.trim()) {
+                    state.name = nameInput.value.trim();
+                    state.registered = true;
+                    startTimer();
+                    saveState();
+                    renderMain();
+                } else alert("Введите Фамилию и Имя");
+            });
+            updateTimerDisplay();
+        } else if (state.examFinished) {
+            app.innerHTML = renderResults();
+            document.getElementById("restartBtn")?.addEventListener("click", () => { localStorage.clear(); location.reload(); });
+        } else {
+            app.innerHTML = renderExam();
+            updateTimerDisplay();
+            let tabContent = document.getElementById("tabContent");
+            if (state.activeTab === "A") {
+                tabContent.innerHTML = renderPartA();
+                let gridHtml = '';
+                for (let i = 0; i < 25; i++) {
+                    let answered = state.answersA[i] && state.answersA[i].length > 0;
+                    gridHtml += `<div class="q-num ${answered ? 'answered' : ''} ${i === state.currentQuestionIdx ? 'current' : ''}" data-idx="${i}">${i+1}</div>`;
+                }
+                document.getElementById("questionsGrid").innerHTML = gridHtml;
+                document.getElementById("progressBadge").textContent = `Решено: ${state.answersA.filter(a => a && a.length > 0).length} / 25`;
+            } else {
+                tabContent.innerHTML = renderPartB();
+                let gridHtml = '';
+                for (let i = 0; i < CASES.length; i++) {
+                    let answered = state.answersB[i].some(a => a !== null);
+                    gridHtml += `<div class="q-num ${answered ? 'answered' : ''} ${i === state.currentCaseIdx ? 'current' : ''}" data-caseidx="${i}">${i+1}</div>`;
+                }
+                document.getElementById("questionsGrid").innerHTML = gridHtml;
+                let totalB = CASES.reduce((s,c) => s + c.fields.length, 0);
+                let progressB = state.answersB.flat().filter(a => a !== null).length;
+                document.getElementById("progressBadge").textContent = `Решено: ${progressB} / ${totalB}`;
+            }
+            attachEvents();
+        }
+    }
+
+    loadState();
+    renderMain();
+</script>
+</body>
+</html>
