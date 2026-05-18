@@ -328,32 +328,32 @@
 Предельная база на год — 2 759 000 руб.
 Задание: Рассчитайте страховые взносы к уплате компанией с доходов Марии.`,
           fields: [
-            { label: "Зарплата (не облагается, руб.)", correct: 0, points: 0 },
-            { label: "Зарплата (облагается, руб.)", correct: 3600000, points: 1 },
-            { label: "Премия (не облагается, руб.)", correct: 0, points: 0 },
-            { label: "Премия (облагается, руб.)", correct: 400000, points: 1 },
-            { label: "Курсы повышения квалификации (не облагается, руб.)", correct: 50000, points: 1 },
-            { label: "Курсы повышения квалификации (облагается, руб.)", correct: 0, points: 0 },
-            { label: "ДМС (не облагается, руб.)", correct: 120000, points: 1 },
-            { label: "ДМС (облагается, руб.)", correct: 0, points: 0 },
-            { label: "Подарок (не облагается, руб.)", correct: 0, points: 0 },
-            { label: "Подарок (облагается, руб.)", correct: 70000, points: 1 },
-            { label: "Проживание в командировке (не облагается, руб.)", correct: 30000, points: 1 },
-            { label: "Проживание в командировке (облагается, руб.)", correct: 0, points: 0 },
-            { label: "Билеты на поезд (не облагается, руб.)", correct: 15000, points: 1 },
-            { label: "Билеты на поезд (облагается, руб.)", correct: 0, points: 0 },
-            { label: "Суточные (не облагается, руб.)", correct: 2800, points: 1 },
-            { label: "Суточные (облагается, руб.)", correct: 9200, points: 0 },
-            { label: "Компенсация % по ипотеке (не облагается, руб.)", correct: 800000, points: 1 },
-            { label: "Компенсация % по ипотеке (облагается, руб.)", correct: 0, points: 0 },
-            { label: "Итого база по взносам (облагается, руб.)", correct: 4079200, points: 0 },
-            { label: "Предельная база (руб.)", correct: 2759000, points: 1 },
-            { label: "Ставка взносов с предельной базы (%)", correct: 30, points: 1 },
-            { label: "Страховые взносы с предельной базы (руб.)", correct: 827700, points: 1 },
-            { label: "База сверх предельной (руб.)", correct: 1320200, points: 1 },
-            { label: "Ставка свыше предельной базы (%)", correct: 15.1, points: 1 },
-            { label: "Взносы сверх предельной базы (руб.)", correct: 199350.2, points: 1 },
-            { label: "Итого взносы к уплате (руб.)", correct: 1027050.2, points: 1 }
+            { label: "Зарплата (не облагается, руб.)", correct: 0, points: 0, col: "notax" },
+            { label: "Зарплата (облагается, руб.)", correct: 3600000, points: 1, col: "tax" },
+            { label: "Премия (не облагается, руб.)", correct: 0, points: 0, col: "notax" },
+            { label: "Премия (облагается, руб.)", correct: 400000, points: 1, col: "tax" },
+            { label: "Курсы повышения квалификации (не облагается, руб.)", correct: 50000, points: 1, col: "notax" },
+            { label: "Курсы повышения квалификации (облагается, руб.)", correct: 0, points: 0, col: "tax" },
+            { label: "ДМС (не облагается, руб.)", correct: 120000, points: 1, col: "notax" },
+            { label: "ДМС (облагается, руб.)", correct: 0, points: 0, col: "tax" },
+            { label: "Подарок (не облагается, руб.)", correct: 0, points: 0, col: "notax" },
+            { label: "Подарок (облагается, руб.)", correct: 70000, points: 1, col: "tax" },
+            { label: "Проживание в командировке (не облагается, руб.)", correct: 30000, points: 1, col: "notax" },
+            { label: "Проживание в командировке (облагается, руб.)", correct: 0, points: 0, col: "tax" },
+            { label: "Билеты на поезд (не облагается, руб.)", correct: 15000, points: 1, col: "notax" },
+            { label: "Билеты на поезд (облагается, руб.)", correct: 0, points: 0, col: "tax" },
+            { label: "Суточные (не облагается, руб.)", correct: 2800, points: 1, col: "notax" },
+            { label: "Суточные (облагается, руб.)", correct: 9200, points: 0, col: "tax" },
+            { label: "Компенсация % по ипотеке (не облагается, руб.)", correct: 800000, points: 1, col: "notax" },
+            { label: "Компенсация % по ипотеке (облагается, руб.)", correct: 0, points: 0, col: "tax" },
+            { label: "Итого база по взносам (облагается, руб.)", correct: 4079200, points: 0, col: "tax" },
+            { label: "Предельная база (руб.)", correct: 2759000, points: 1, col: "tax" },
+            { label: "Ставка взносов с предельной базы (%)", correct: 30, points: 1, col: "tax" },
+            { label: "Страховые взносы с предельной базы (руб.)", correct: 827700, points: 1, col: "tax" },
+            { label: "База сверх предельной (руб.)", correct: 1320200, points: 1, col: "tax" },
+            { label: "Ставка свыше предельной базы (%)", correct: 15.1, points: 1, col: "tax" },
+            { label: "Взносы сверх предельной базы (руб.)", correct: 199350.2, points: 1, col: "tax" },
+            { label: "Итого взносы к уплате (руб.)", correct: 1027050.2, points: 1, col: "tax" }
           ] },
         { id:2, title: "Кейс 2. НДФЛ", 
           description: `Светлана работает дизайнером в ООО “Креативное”. Компания применяет ОСН.
@@ -367,26 +367,26 @@
 Светлана продала котируемые ценные бумаги на сумму 2 600 000 руб., которые она купила в прошлом году за 1 800 000 руб. Эти ценные бумаги учитываются на ее ИИС. Доход от реализации поступил на этот ИИС. ИИС не был закрыт по состоянию на конец года.
 Задание: Рассчитайте сумму НДФЛ Светланы за год.`,
           fields: [
-            { label: "Зарплата (не облагается, руб.)", correct: 0, points: 0 },
-            { label: "Зарплата (облагается, руб.)", correct: 3000000, points: 1 },
-            { label: "Стандартный вычет (руб.)", correct: 14800, points: 1 },
-            { label: "Материальная выгода (не облагается, руб.)", correct: 0, points: 0 },
-            { label: "Материальная выгода (облагается, руб.)", correct: 50000, points: 1 },
-            { label: "ДМС (не облагается, руб.)", correct: 100000, points: 1 },
-            { label: "ДМС (облагается, руб.)", correct: 0, points: 0 },
-            { label: "Социальный вычет на обучение (руб.)", correct: 110000, points: 1 },
-            { label: "Имущественный вычет на покупку жилья (руб.)", correct: 2000000, points: 1 },
-            { label: "Имущественный вычет на проценты по ипотеке (руб.)", correct: 419507, points: 1 },
-            { label: "Подарок супруга (не облагается, руб.)", correct: 600000, points: 1 },
-            { label: "Подарок супруга (облагается, руб.)", correct: 0, points: 0 },
-            { label: "Реализация ценных бумаг на ИИС (не облагается, руб.)", correct: 2600000, points: 1 },
-            { label: "Реализация ценных бумаг на ИИС (облагается, руб.)", correct: 0, points: 0 },
-            { label: "Итого доходы необлагаемые (руб.)", correct: 3300000, points: 0 },
-            { label: "Итого доходы облагаемые (руб.)", correct: 3050000, points: 0 },
-            { label: "Итого вычеты (руб.)", correct: 2544307, points: 0 },
-            { label: "Налоговая база (руб.)", correct: 505693, points: 1 },
-            { label: "Ставка (%)", correct: 13, points: 1 },
-            { label: "Итого НДФЛ к уплате (руб.)", correct: 65740, points: 1 }
+            { label: "Зарплата (не облагается, руб.)", correct: 0, points: 0, col: "notax" },
+            { label: "Зарплата (облагается, руб.)", correct: 3000000, points: 1, col: "tax" },
+            { label: "Стандартный вычет (руб.)", correct: 14800, points: 1, col: "tax" },
+            { label: "Материальная выгода (не облагается, руб.)", correct: 0, points: 0, col: "notax" },
+            { label: "Материальная выгода (облагается, руб.)", correct: 50000, points: 1, col: "tax" },
+            { label: "ДМС (не облагается, руб.)", correct: 100000, points: 1, col: "notax" },
+            { label: "ДМС (облагается, руб.)", correct: 0, points: 0, col: "tax" },
+            { label: "Социальный вычет на обучение (руб.)", correct: 110000, points: 1, col: "tax" },
+            { label: "Имущественный вычет на покупку жилья (руб.)", correct: 2000000, points: 1, col: "tax" },
+            { label: "Имущественный вычет на проценты по ипотеке (руб.)", correct: 419507, points: 1, col: "tax" },
+            { label: "Подарок супруга (не облагается, руб.)", correct: 600000, points: 1, col: "notax" },
+            { label: "Подарок супруга (облагается, руб.)", correct: 0, points: 0, col: "tax" },
+            { label: "Реализация ценных бумаг на ИИС (не облагается, руб.)", correct: 2600000, points: 1, col: "notax" },
+            { label: "Реализация ценных бумаг на ИИС (облагается, руб.)", correct: 0, points: 0, col: "tax" },
+            { label: "Итого доходы необлагаемые (руб.)", correct: 3300000, points: 0, col: "notax" },
+            { label: "Итого доходы облагаемые (руб.)", correct: 3050000, points: 0, col: "tax" },
+            { label: "Итого вычеты (руб.)", correct: 2544307, points: 0, col: "tax" },
+            { label: "Налоговая база (руб.)", correct: 505693, points: 1, col: "tax" },
+            { label: "Ставка (%)", correct: 13, points: 1, col: "tax" },
+            { label: "Итого НДФЛ к уплате (руб.)", correct: 65740, points: 1, col: "tax" }
           ] },
         { id:3, title: "Кейс 3. НДС", 
           description: `ООО «Большой Рантье» (БР) и его подрядчики являются плательщиками НДС. БР владеет старым ангаром на земельном участке, который был разделен на две части.
@@ -422,17 +422,17 @@
 7. Логика М 01.10.2025 приобрела земельный участок за 38 000 000 рублей. Кадастровая стоимость которого - 18 000 000 рублей.
 Задание: Рассчитайте налоговую базу по налогу на прибыль ООО "ЛогикаМ" за 2026 год.`,
           fields: [
-            { label: "Выручка в РФ (руб.)", correct: 245000000, points: 1 },
-            { label: "Экспорт (руб.)", correct: 28000000, points: 1 },
-            { label: "Себестоимость продажи 1 партии (руб.)", correct: 96250000, points: 1 },
-            { label: "Расходы на транспортировку (руб.)", correct: 11700000, points: 1 },
-            { label: "Амортизационная премия (руб.)", correct: 42000000, points: 1 },
-            { label: "Амортизация автомобилей (руб.)", correct: 2716009, points: 1 },
-            { label: "Заработная плата персонала (руб.)", correct: 65400000, points: 1 },
-            { label: "Страховые взносы (руб.)", correct: 19226491, points: 1 },
-            { label: "Земельный налог (руб.)", correct: 67500, points: 1 },
-            { label: "Транспортный налог (руб.)", correct: 6500, points: 1 },
-            { label: "Налоговая база по налогу на прибыль за 2026 год (руб.)", correct: 35623500, points: 10 }
+            { label: "Выручка в РФ (руб.)", correct: 245000000, points: 1, col: "tax" },
+            { label: "Экспорт (руб.)", correct: 28000000, points: 1, col: "tax" },
+            { label: "Себестоимость продажи 1 партии (руб.)", correct: 96250000, points: 1, col: "tax" },
+            { label: "Расходы на транспортировку (руб.)", correct: 11700000, points: 1, col: "tax" },
+            { label: "Амортизационная премия (руб.)", correct: 42000000, points: 1, col: "tax" },
+            { label: "Амортизация автомобилей (руб.)", correct: 2716009, points: 1, col: "tax" },
+            { label: "Заработная плата персонала (руб.)", correct: 65400000, points: 1, col: "tax" },
+            { label: "Страховые взносы (руб.)", correct: 19226491, points: 1, col: "tax" },
+            { label: "Земельный налог (руб.)", correct: 67500, points: 1, col: "tax" },
+            { label: "Транспортный налог (руб.)", correct: 6500, points: 1, col: "tax" },
+            { label: "Налоговая база по налогу на прибыль за 2026 год (руб.)", correct: 35623500, points: 10, col: "tax" }
           ] }
     ];
 
@@ -449,7 +449,8 @@
         examFinished: false
     };
     for (let i = 0; i < CASES.length; i++) {
-        state.answersB.push(new Array(CASES[i].fields.length).fill(null));
+        let fieldsCount = CASES[i].fields.length;
+        state.answersB.push(new Array(fieldsCount).fill(null));
     }
     for (let i = 0; i < 25; i++) state.answersA[i] = [];
 
@@ -541,7 +542,7 @@
         let total = totalA + totalB;
         let passed = total >= 50;
         
-        let comments = `Фамилия Имя: ${state.name}\nБаллы: ${total} (часть А: ${totalA}, часть Б: ${totalB})\nРезультат: ${passed ? "Экзамен сдан" : "Экзамен не сдан"}\n\n`;
+        let comments = `Фамилия Имя: ${state.name}\nБаллы: ${total} (часть А: ${totalA}, часть Б: ${totalB})\nРезультат: ${passed ? "Экзамен сдан" : "❌ Экзамен не сдан"}\n\n`;
         comments += "=== ПОЯСНЕНИЯ К ПРАВИЛЬНЫМ ОТВЕТАМ ===\n\n";
         for (let i = 0; i < QUESTIONS.length; i++) {
             comments += `Вопрос ${i+1}: ${QUESTIONS[i].explanation}\n`;
@@ -636,24 +637,27 @@
         fieldsHtml += '<tr><th>Показатель</th><th>Не облагается, руб.</th><th>Облагается, руб.</th></tr>';
         for (let i = 0; i < caseData.fields.length; i++) {
             let saved = state.answersB[state.currentCaseIdx][i];
-            if (caseData.fields[i].type === "choice") {
+            let field = caseData.fields[i];
+            if (field.type === "choice") {
                 let optsHtml = '';
-                caseData.fields[i].options.forEach((opt, idx) => {
+                field.options.forEach((opt, idx) => {
                     let checked = (saved === idx) ? 'checked' : '';
                     optsHtml += `<label style="display:block; margin:0.2rem 0;"><input type="radio" name="field_${i}" value="${idx}" ${checked}> ${opt}</label>`;
                 });
                 fieldsHtml += `
                     <tr>
-                        <td>${caseData.fields[i].label}</td>
+                        <td>${field.label}</td>
                         <td colspan="2">${optsHtml}</td>
                     </tr>
                 `;
             } else {
+                let notaxValue = (field.col === "notax" && saved !== null) ? saved : '';
+                let taxValue = (field.col === "tax" && saved !== null) ? saved : '';
                 fieldsHtml += `
                     <tr>
-                        <td>${caseData.fields[i].label}</td>
-                        <td><input type="number" class="case-field" data-field-idx="${i}" value="${saved !== null ? saved : ''}" style="width:100%; padding:0.3rem; border-radius:20px; border:1px solid #cbd5e1;"></td>
-                        <td><input type="number" class="case-field" data-field-idx="${i}" value="${saved !== null ? saved : ''}" style="width:100%; padding:0.3rem; border-radius:20px; border:1px solid #cbd5e1;"></td>
+                        <td>${field.label}</td>
+                        <td><input type="number" class="case-field-notax" data-field-idx="${i}" data-col="notax" value="${notaxValue}" style="width:100%; padding:0.3rem; border-radius:20px; border:1px solid #cbd5e1;"></td>
+                        <td><input type="number" class="case-field-tax" data-field-idx="${i}" data-col="tax" value="${taxValue}" style="width:100%; padding:0.3rem; border-radius:20px; border:1px solid #cbd5e1;"></td>
                     </tr>
                 `;
             }
@@ -740,16 +744,23 @@
             saveCase.addEventListener("click", () => {
                 let caseData = CASES[state.currentCaseIdx];
                 for (let i = 0; i < caseData.fields.length; i++) {
-                    if (caseData.fields[i].type === "choice") {
+                    let field = caseData.fields[i];
+                    if (field.type === "choice") {
                         let selected = document.querySelector(`input[name="field_${i}"]:checked`);
                         if (selected) {
                             state.answersB[state.currentCaseIdx][i] = parseInt(selected.value);
                         }
                     } else {
-                        let inp = document.querySelector(`.case-field[data-field-idx="${i}"]`);
-                        if (inp) {
-                            let val = parseFloat(inp.value);
-                            if (!isNaN(val)) state.answersB[state.currentCaseIdx][i] = val;
+                        let inpNotax = document.querySelector(`.case-field-notax[data-field-idx="${i}"]`);
+                        let inpTax = document.querySelector(`.case-field-tax[data-field-idx="${i}"]`);
+                        let val = null;
+                        if (field.col === "notax" && inpNotax) {
+                            val = parseFloat(inpNotax.value);
+                        } else if (field.col === "tax" && inpTax) {
+                            val = parseFloat(inpTax.value);
+                        }
+                        if (!isNaN(val)) {
+                            state.answersB[state.currentCaseIdx][i] = val;
                         }
                     }
                 }
