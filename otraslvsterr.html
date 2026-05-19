@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Тренажёр: льготы компаний</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: #eef2f7;
+            padding: 12px 10px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* карточка тренажера — компактная */
+        .trainer-card {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* таблица */
+        .table-wrapper {
+            padding: 0.8rem 0.8rem 0.4rem 0.8rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .trainer-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            min-width: 500px;
+        }
+
+        .trainer-table thead tr {
+            background: #eef3fa;
+            border-bottom: 2px solid #cbdde6;
+        }
+
+        .trainer-table th {
+            text-align: left;
+            padding: 0.7rem 0.6rem;
+            font-weight: 700;
+            color: #1f5575;
+            font-size: 0.75rem;
+        }
+
+        .trainer-table td {
+            padding: 0.7rem 0.6rem;
+            border-bottom: 1px solid #e2edf2;
+            vertical-align: middle;
+            background-color: #ffffff;
+        }
+
+        .company-name {
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #0d3f52;
+            display: inline-block;
+            background: #f0f6fc;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            margin-bottom: 4px;
+        }
+
+        .company-desc {
+            font-size: 0.65rem;
+            color: #5b7e92;
+            line-height: 1.3;
+            margin-top: 4px;
+        }
+
+        /* select компактные */
+        .principle-select, .reason-select {
+            width: 100%;
+            min-width: 120px;
+            padding: 0.5rem 0.5rem;
+            border-radius: 30px;
+            border: 1.5px solid #cbdde6;
+            background-color: white;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 0.7rem;
+            color: #1e4a6b;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .principle-select:focus, .reason-select:focus {
+            outline: none;
+            border-color: #2c7cb6;
+            box-shadow: 0 0 0 2px rgba(44,124,182,0.2);
+        }
+
+        /* панель кнопок — компактная */
+        .action-panel {
+            padding: 0.7rem 0.8rem 1rem 0.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+            border-top: 1px solid #e0edf3;
+            background: #fefefe;
+        }
+
+        .score-badge {
+            background: #eef2f7;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: #1f6390;
+            white-space: nowrap;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #f0f4f8;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: inherit;
+            color: #1a4f6e;
+            transition: 0.1s;
+            border: 1px solid #cbdae3;
+        }
+
+        button.primary {
+            background: #1f6e93;
+            color: white;
+            border: none;
+        }
+
+        button.primary:hover {
+            background: #0e577a;
+            transform: scale(0.96);
+        }
+
+        button:hover:not(.primary) {
+            background: #e2eaf0;
+        }
+
+        .feedback-area {
+            margin: 0.5rem 0.8rem 0.9rem 0.8rem;
+            background: #f9fbfd;
+            border-radius: 20px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.7rem;
+            border-left: 4px solid #2c7cb6;
+            transition: 0.1s;
+        }
+
+        /* для совсем маленьких экранов */
+        @media (max-width: 550px) {
+            .trainer-table th, .trainer-table td {
+                padding: 0.5rem 0.4rem;
+            }
+            .principle-select, .reason-select {
+                min-width: 100px;
+                font-size: 0.65rem;
+                padding: 0.4rem 0.4rem;
+            }
+            .company-name {
+                font-size: 0.75rem;
+            }
+            .btn-group button {
+                padding: 0.35rem 0.8rem;
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="trainer-card">
+    <!-- заголовок полностью убран по запросу -->
+    <div class="table-wrapper">
+        <table class="trainer-table" id="trainerTable">
+            <thead>
+                <tr>
+                    <th>Компания</th>
+                    <th>Принцип</th>
+                    <th>Обоснование</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- данные через js -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="action-panel">
+        <div class="score-badge" id="scoreDisplay">0/4</div>
+        <div class="btn-group">
+            <button id="checkBtn" class="primary">Проверить</button>
+            <button id="resetBtn">Сброс</button>
+            <button id="sampleBtn">Эталон</button>
+        </div>
+    </div>
+    <div class="feedback-area" id="feedbackMsg">
+        Выберите принцип и обоснование для каждой компании.
+    </div>
+</div>
+
+<script>
+    // Данные компаний (буква Ё заменена на Е везде в тексте)
+    const companies = [
+        {
+            id: 0,
+            name: "ООО «Код»",
+            description: "разработка ПО, Москва, есть аккредитация Минцифры",
+            correctPrinciple: "Отрасль",
+            correctReason: "Разработка ПО — отраслевая льгота ИТ, так как аккредитация есть"
+        },
+        {
+            id: 1,
+            name: "ООО «Рыбный порт»",
+            description: "погрузка рыбы, Владивосток, резидент СПВ",
+            correctPrinciple: "Территория",
+            correctReason: "Резидент СПВ — территориальная льгота"
+        },
+        {
+            id: 2,
+            name: "ООО «Здоровье»",
+            description: "платная клиника, лицензия есть, Рязань, доля медицинских доходов 92%",
+            correctPrinciple: "Отрасль",
+            correctReason: "Медицинские услуги по лицензии, доля 92% ≥90% — есть льгота 0% по прибыли"
+        },
+        {
+            id: 3,
+            name: "ООО «Вкусный обед»",
+            description: "доставка бизнес-ланчей, Казань, доход 100 млн руб./год",
+            correctPrinciple: "Без льгот",
+            correctReason: "Общепит без регистрации в ТОР/ОЭЗ и без специальных региональных льгот (нужно проверять региональный закон)"
+        }
+    ];
+
+    // Варианты для выпадающих списков
+    const principleOptions = ["Отрасль", "Территория", "Без льгот"];
+    
+    // Все варианты обоснований (без Ё)
+    const reasonOptions = [
+        "Разработка ПО — отраслевая льгота ИТ, так как аккредитация есть",
+        "Резидент СПВ — территориальная льгота",
+        "Медицинские услуги по лицензии, доля 92% ≥90% — есть льгота 0% по прибыли",
+        "Общепит без регистрации в ТОР/ОЭЗ и без специальных региональных льгот (нужно проверять региональный закон)"
+    ];
+
+    // Состояние выбранных значений
+    let userPrinciples = ["", "", "", ""];
+    let userReasons = ["", "", "", ""];
+
+    // Функция рендера таблицы
+    function renderTable() {
+        const tbody = document.getElementById("tableBody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        
+        companies.forEach((company, idx) => {
+            const row = tbody.insertRow();
+            
+            // Ячейка с названием и описанием
+            const cellCompany = row.insertCell(0);
+            cellCompany.innerHTML = `
+                <div class="company-name">${escapeHtml(company.name)}</div>
+                <div class="company-desc">${escapeHtml(company.description)}</div>
+            `;
+            
+            // Ячейка выбора принципа
+            const cellPrinciple = row.insertCell(1);
+            const selectPrinciple = document.createElement("select");
+            selectPrinciple.className = "principle-select";
+            selectPrinciple.setAttribute("data-idx", idx);
+            
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = "— выберите —";
+            defaultOption.disabled = true;
+            defaultOption.selected = (userPrinciples[idx] === "");
+            selectPrinciple.appendChild(defaultOption);
+            
+            principleOptions.forEach(opt => {
+                const option = document.createElement("option");
+                option.value = opt;
+                option.textContent = opt;
+                if (userPrinciples[idx] === opt) option.selected = true;
+                selectPrinciple.appendChild(option);
+            });
+            
+            selectPrinciple.addEventListener("change", (e) => {
+                userPrinciples[idx] = e.target.value;
+                updateScoreIndicator();
+            });
+            cellPrinciple.appendChild(selectPrinciple);
+            
+            // Ячейка выбора обоснования
+            const cellReason = row.insertCell(2);
+            const selectReason = document.createElement("select");
+            selectReason.className = "reason-select";
+            selectReason.setAttribute("data-idx", idx);
+            
+            const defaultReasonOption = document.createElement("option");
+            defaultReasonOption.value = "";
+            defaultReasonOption.textContent = "— выберите —";
+            defaultReasonOption.disabled = true;
+            defaultReasonOption.selected = (userReasons[idx] === "");
+            selectReason.appendChild(defaultReasonOption);
+            
+            reasonOptions.forEach(reasonText => {
+                const opt = document.createElement("option");
+                opt.value = reasonText;
+                opt.textContent = reasonText;
+                if (userReasons[idx] === reasonText) opt.selected = true;
+                selectReason.appendChild(opt);
+            });
+            
+            selectReason.addEventListener("change", (e) => {
+                userReasons[idx] = e.target.value;
+                updateScoreIndicator();
+            });
+            cellReason.appendChild(selectReason);
+        });
+        
+        updateScoreIndicator();
+    }
+    
+    // Обновление счётчика (сколько пар заполнено)
+    function updateScoreIndicator() {
+        let filledPairs = 0;
+        for (let i = 0; i < companies.length; i++) {
+            if (userPrinciples[i] && userReasons[i]) filledPairs++;
+        }
+        const scoreSpan = document.getElementById("scoreDisplay");
+        if (scoreSpan) {
+            scoreSpan.innerHTML = `${filledPairs}/4`;
+        }
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Проверка ответов с детальным фидбеком
+    function checkAnswers() {
+        let correctCount = 0;
+        const details = [];
+        
+        for (let i = 0; i < companies.length; i++) {
+            const company = companies[i];
+            const selectedPrinciple = userPrinciples[i] || "";
+            const selectedReason = userReasons[i] || "";
+            
+            const isPrincipleCorrect = (selectedPrinciple === company.correctPrinciple);
+            const isReasonCorrect = (selectedReason === company.correctReason);
+            const isFullCorrect = (isPrincipleCorrect && isReasonCorrect);
+            if (isFullCorrect) correctCount++;
+            
+            let principleStatus = "";
+            if (!selectedPrinciple) principleStatus = "не выбран";
+            else if (isPrincipleCorrect) principleStatus = "верно";
+            else principleStatus = `неверно (должен: ${company.correctPrinciple})`;
+            
+            let reasonStatus = "";
+            if (!selectedReason) reasonStatus = "не выбрано";
+            else if (isReasonCorrect) reasonStatus = "верно";
+            else reasonStatus = "не подходит";
+            
+            details.push({
+                name: company.name,
+                selectedPrinciple: selectedPrinciple || "(нет)",
+                correctPrinciple: company.correctPrinciple,
+                principleStatus: principleStatus,
+                selectedReason: selectedReason || "(нет)",
+                correctReason: company.correctReason,
+                reasonStatus: reasonStatus,
+                fullCorrect: isFullCorrect
+            });
+        }
+        
+        // формируем компактный фидбек
+        let feedbackHtml = `<div style="font-weight:700; margin-bottom:8px;">Результат: ${correctCount} из 4 верно</div>`;
+        feedbackHtml += `<div style="display:flex; flex-direction:column; gap:10px; font-size:0.7rem;">`;
+        details.forEach(d => {
+            const mark = d.fullCorrect ? "✅" : "❌";
+            feedbackHtml += `
+                <div style="border-bottom:1px solid #e2edf2; padding-bottom:6px;">
+                    <div><strong>${escapeHtml(d.name)}</strong> ${mark}</div>
+                    <div>Принцип: ${escapeHtml(d.selectedPrinciple)} — ${d.principleStatus}</div>
+                    <div>Обоснование: ${escapeHtml(d.selectedReason.length > 55 ? d.selectedReason.substring(0,55)+"…" : d.selectedReason)} — ${d.reasonStatus}</div>
+                    <div style="color:#2c7ba0; font-size:0.65rem;">✨ Верное обоснование: ${escapeHtml(d.correctReason)}</div>
+                </div>
+            `;
+        });
+        feedbackHtml += `</div><div style="margin-top:8px; background:#eef2fa; padding:8px 10px; border-radius:16px; font-size:0.7rem;">💡 Совет: выберите для каждой компании принцип и соответствующее ему обоснование.</div>`;
+        
+        const feedbackDiv = document.getElementById("feedbackMsg");
+        if (feedbackDiv) {
+            feedbackDiv.innerHTML = feedbackHtml;
+            feedbackDiv.style.borderLeftColor = correctCount === 4 ? "#2b8c5e" : "#f3a261";
+        }
+        
+        const scoreSpan = document.getElementById("scoreDisplay");
+        if (scoreSpan) {
+            scoreSpan.innerHTML = `${correctCount}/4`;
+        }
+    }
+    
+    // Сброс всех полей
+    function resetAll() {
+        userPrinciples = ["", "", "", ""];
+        userReasons = ["", "", "", ""];
+        renderTable();
+        const feedbackDiv = document.getElementById("feedbackMsg");
+        if (feedbackDiv) {
+            feedbackDiv.innerHTML = "Все поля сброшены. Выберите принцип и обоснование для каждой компании.";
+            feedbackDiv.style.borderLeftColor = "#2c7cb6";
+        }
+        updateScoreIndicator();
+        const scoreSpan = document.getElementById("scoreDisplay");
+        if (scoreSpan) scoreSpan.innerHTML = "0/4";
+    }
+    
+    // Заполнить эталонными ответами (без Ё)
+    function fillSample() {
+        for (let i = 0; i < companies.length; i++) {
+            userPrinciples[i] = companies[i].correctPrinciple;
+            userReasons[i] = companies[i].correctReason;
+        }
+        renderTable();
+        const feedbackDiv = document.getElementById("feedbackMsg");
+        if (feedbackDiv) {
+            feedbackDiv.innerHTML = "✅ Таблица заполнена верными ответами. Нажмите «Проверить» — будет 4/4.";
+            feedbackDiv.style.borderLeftColor = "#48a86c";
+        }
+        updateScoreIndicator();
+        const scoreSpan = document.getElementById("scoreDisplay");
+        if (scoreSpan) scoreSpan.innerHTML = "4/4";
+    }
+    
+    // Инициализация
+    document.addEventListener("DOMContentLoaded", () => {
+        renderTable();
+        
+        const checkBtn = document.getElementById("checkBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const sampleBtn = document.getElementById("sampleBtn");
+        
+        if (checkBtn) checkBtn.addEventListener("click", checkAnswers);
+        if (resetBtn) resetBtn.addEventListener("click", resetAll);
+        if (sampleBtn) sampleBtn.addEventListener("click", fillSample);
+    });
+</script>
+</body>
+</html>
