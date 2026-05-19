@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Выбор льготы: отрасль vs территория | Универсальный калькулятор</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #eef2f8;
+            font-family: 'Inter', sans-serif;
+            padding: 1.5rem 1rem;
+            color: #102b3b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 750px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* КАРУСЕЛЬ - УМЕНЬШЕННАЯ ВЫСОТА */
+        .carousel-section {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-bottom: 1.8rem;
+            padding: 0.9rem 0.8rem 1rem;
+        }
+        .carousel-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+            padding: 0 0.3rem;
+        }
+        .step-counter {
+            background: #e3f0f7;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .carousel-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            margin: 0.3rem 0 0.2rem;
+        }
+        .carousel-btn {
+            background: #e2edf5;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #1f6e8c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-card {
+            flex: 1;
+            max-width: 460px;
+            background: #f9feff;
+            border-radius: 1.2rem;
+            border: 1px solid #cde0ea;
+            padding: 0.7rem 0.9rem;
+            text-align: center;
+        }
+        .step-number-lg {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2c9bcb;
+            background: #e3f2f8;
+            display: inline-block;
+            width: 42px;
+            height: 42px;
+            line-height: 42px;
+            border-radius: 40px;
+            margin-bottom: 0.2rem;
+        }
+        .step-title-lg {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #124e69;
+            margin: 0.2rem 0;
+        }
+        .step-description {
+            font-size: 0.7rem;
+            color: #386f8a;
+            margin: 0.3rem 0;
+        }
+        .step-detail {
+            background: #eff6fb;
+            border-radius: 0.8rem;
+            padding: 0.4rem;
+            font-size: 0.65rem;
+            color: #1f5c76;
+            margin-top: 5px;
+        }
+        .nav-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #cbdde6;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .dot.active {
+            width: 20px;
+            background: #2c9bcb;
+        }
+
+        /* Вкладки */
+        .tabs-container {
+            background: white;
+            border-radius: 1.6rem;
+            box-shadow: 0 10px 22px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 1.2rem;
+        }
+        .tabs-header {
+            display: flex;
+            gap: 0.2rem;
+            background: #f0f7fc;
+            border-bottom: 1px solid #d9e2ea;
+            padding: 0 1rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.7rem 1.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: #487a94;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #1b7c9e;
+            border-bottom: 3px solid #2c9bcb;
+        }
+        .tab-content {
+            padding: 1.2rem;
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        /* Таблица */
+        .comparison-table {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+        th {
+            background: #1d5e7c;
+            color: white;
+            padding: 8px 6px;
+        }
+        td {
+            border: 1px solid #dde7ed;
+            padding: 8px 6px;
+        }
+        tr td:first-child {
+            font-weight: 600;
+            background: #f8fbfe;
+        }
+        .verdict-note {
+            background: #eaf7f0;
+            border-left: 5px solid #1f9a6e;
+            padding: 0.7rem;
+            border-radius: 0.8rem;
+            margin-top: 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        /* КАРТОЧКИ ВЕРТИКАЛЬНО: настройки -> результат -> рекомендации */
+        .calculator-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .card {
+            background: #fafeff;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #e2edf4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1d627c;
+            margin-bottom: 0.8rem;
+            border-left: 3px solid #2c9bcb;
+            padding-left: 0.6rem;
+        }
+        /* горизонтальные ряды внутри карточки настроек */
+        .params-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .param-group {
+            flex: 1;
+            min-width: 160px;
+            background: #f8fcfd;
+            border-radius: 1rem;
+            padding: 0.6rem;
+            border: 1px solid #e3eef5;
+        }
+        .param-group h4 {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #2c7da0;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .param-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+            gap: 6px;
+        }
+        .param-row label {
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #2c6079;
+        }
+        .param-row input {
+            width: 100px;
+            padding: 0.25rem 0.4rem;
+            border-radius: 0.7rem;
+            border: 1px solid #cbdfe9;
+            font-family: monospace;
+            font-size: 0.7rem;
+        }
+        .small-note {
+            font-size: 0.6rem;
+            color: #6f8ea3;
+            margin-top: 0.2rem;
+        }
+        .calc-btn {
+            background: #1d7e9c;
+            border: none;
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.6rem;
+            font-size: 0.7rem;
+            width: 100%;
+        }
+        .result-box {
+            background: #eef3f9;
+            border-radius: 1rem;
+            padding: 0.8rem;
+        }
+        .result-compare {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.8rem;
+        }
+        .result-col {
+            flex: 1;
+            background: white;
+            border-radius: 0.8rem;
+            padding: 0.6rem;
+            font-size: 0.7rem;
+        }
+        .total-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+        .total-it {
+            background: #e0eef6;
+        }
+        .total-terr {
+            background: #dcf3e8;
+        }
+        .recommend-card {
+            background: #1b5f7a;
+            color: white;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        hr {
+            margin: 0.4rem 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- КАРУСЕЛЬ -->
+    <div class="carousel-section">
+        <div class="carousel-header">
+            <div class="step-counter" id="stepCounter">шаг 1/10</div>
+        </div>
+        <div class="carousel-wrapper">
+            <button class="carousel-btn" id="prevStepBtn">←</button>
+            <div id="carouselCard" class="carousel-card">
+                <div class="step-number-lg" id="stepNumDisplay">01</div>
+                <div class="step-title-lg" id="stepTitleDisplay">Определите основной ОКВЭД</div>
+                <div class="step-description" id="stepDescDisplay">Начните с кода деятельности</div>
+                <div class="step-detail" id="stepDetailDisplay">ОКВЭД — база для проверки отраслевых льгот</div>
+            </div>
+            <button class="carousel-btn" id="nextStepBtn">→</button>
+        </div>
+        <div class="nav-dots" id="dotsContainer"></div>
+    </div>
+
+    <!-- Вкладки -->
+    <div class="tabs-container">
+        <div class="tabs-header">
+            <button class="tab-btn active" data-tab="tab1">📊 Таблица сравнения (пример)</button>
+            <button class="tab-btn" data-tab="tab2">🧮 Калькулятор: настройка ставок и баз</button>
+        </div>
+        <div class="tab-content">
+            <!-- Вкладка 1: таблица (пример для ИТ vs ОЭЗ, но с универсальными заголовками) -->
+            <div class="tab-pane active" id="tab1">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr><th>Параметр</th><th>Отраслевая льгота (пример: ИТ)</th><th>Территориальная льгота (пример: ОЭЗ/ТОР)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Налог на прибыль</td><td>5%</td><td>2% первые 5 лет</td></tr>
+                            <tr><td>Страховые взносы</td><td>15% в пределах базы, 7,6% сверх</td><td>7,6% в пределах базы, 0% сверх</td></tr>
+                            <tr><td>НДС при продаже ПО</td><td>Не облагается (пп.26 п.2 ст.149 НК)</td><td>Сохраняется льгота по пп.26 п.2</td></tr>
+                            <tr><td>Налог на имущество</td><td>Нет льготы</td><td>0% первые 10 лет</td></tr>
+                            <tr><td>Земельный налог</td><td>Нет льготы</td><td>Освобождение первые 5 лет</td></tr>
+                            <tr><td>Транспортный налог</td><td>Нет льготы</td><td>Освобождение первые 5 лет</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="verdict-note">
+                    💡 <strong>Вывод из файла:</strong> Для компании с высоким ФОТ (зарплаты в пределах базы) территориальная льгота выгоднее по взносам — 7,6% против 15%. Но нужно учитывать затраты на переезд и инвестиционные обязательства.
+                </div>
+            </div>
+
+            <!-- Вкладка 2: УНИВЕРСАЛЬНЫЙ КАЛЬКУЛЯТОР (предельная база задается вручную) -->
+            <div class="tab-pane" id="tab2">
+                <div class="calculator-stack">
+                    <!-- Карточка 1: Настройте налоговые параметры -->
+                    <div class="card">
+                        <div class="card-title">⚙️ Настройте налоговые параметры</div>
+                        <div class="params-grid">
+                            <!-- Группа: Прибыль, ФОТ и предельная база -->
+                            <div class="param-group">
+                                <h4>📊 Прибыль и ФОТ</h4>
+                                <div class="param-row"><label>Прибыль (руб.):</label><input type="number" id="profitVal" value="32000000" step="500000"></div>
+                                <div class="param-row"><label>ФОТ всего (руб.):</label><input type="number" id="payrollTotal" value="22800000" step="500000"></div>
+                                <div class="param-row"><label>Предельная база (руб.):</label><input type="number" id="limitBase" value="2759000" step="100000"></div>
+                                <div class="small-note">* Страховые взносы начисляются: в пределах базы — по одной ставке, сверх — по другой.</div>
+                            </div>
+                            <!-- Группа: Имущество, земля, транспорт -->
+                            <div class="param-group">
+                                <h4>🏭 Налог на имущество</h4>
+                                <div class="param-row"><label>База (руб.):</label><input type="number" id="propertyBase" value="15000000" step="1000000"></div>
+                                <div class="param-row"><label>Ставка для отрасли (%):</label><input type="number" id="propRateIt" value="2.2" step="0.1"></div>
+                                <div class="param-row"><label>Ставка для территории (%):</label><input type="number" id="propRateTerr" value="0" step="0.1"></div>
+                                <h4 style="margin-top:6px;">🌾 Земельный налог</h4>
+                                <div class="param-row"><label>Кадастр. стоимость (руб.):</label><input type="number" id="landBase" value="8000000" step="1000000"></div>
+                                <div class="param-row"><label>Ставка для отрасли (%):</label><input type="number" id="landRateIt" value="1.5" step="0.1"></div>
+                                <div class="param-row"><label>Ставка для территории (%):</label><input type="number" id="landRateTerr" value="0" step="0.1"></div>
+                                <h4 style="margin-top:6px;">🚛 Транспортный налог</h4>
+                                <div class="param-row"><label>Сумма без льгот (руб.):</label><input type="number" id="transportBase" value="45000" step="5000"></div>
+                                <div class="param-row"><label>Ставка для территории (%):</label><input type="number" id="transpRateTerr" value="0" step="1"></div>
+                                <div class="small-note">Для отрасли транспорт платится полностью</div>
+                            </div>
+                            <!-- Группа: Ставки для прибыли и взносов -->
+                            <div class="param-group">
+                                <h4>💼 Ставки налогов и взносов</h4>
+                                <div class="param-row"><label>Налог на прибыль (отрасль, %):</label><input type="number" id="profitRateIt" value="5" step="0.5"></div>
+                                <div class="param-row"><label>Налог на прибыль (территория, %):</label><input type="number" id="profitRateTerr" value="2" step="0.5"></div>
+                                <div class="param-row"><label>Взносы отрасль (в пределах базы, %):</label><input type="number" id="insRateItBase" value="15" step="0.5"></div>
+                                <div class="param-row"><label>Взносы территория (в пределах базы, %):</label><input type="number" id="insRateTerrBase" value="7.6" step="0.5"></div>
+                                <div class="param-row"><label>Взносы отрасль (сверх базы, %):</label><input type="number" id="insRateItAbove" value="7.6" step="0.5"></div>
+                                <div class="param-row"><label>Взносы территория (сверх базы, %):</label><input type="number" id="insRateTerrAbove" value="0" step="0.5"></div>
+                            </div>
+                        </div>
+                        <button class="calc-btn" id="recalcFullBtn">⟳ Пересчитать нагрузку</button>
+                    </div>
+
+                    <!-- Карточка 2: Результат сравнения -->
+                    <div class="card">
+                        <div class="card-title">📊 Результат сравнения</div>
+                        <div id="resultCompareContainer" class="result-box">
+                            <div style="font-weight:600; text-align:center;">Заполните данные</div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка 3: Рекомендация -->
+                    <div class="card">
+                        <div class="card-title">💡 Рекомендация</div>
+                        <div id="recommendBox" class="recommend-card">
+                            Рекомендация появится после расчёта
+                        </div>
+                    </div>
+                </div>
+                <div class="small-note" style="margin-top: 0.6rem; text-align:center;">
+                    🔄 Универсальный режим: вы можете менять ставки для любого режима, задавать свою предельную базу по взносам. Подходит для любых территорий (ОЭЗ, ТОР, СПВ, Сколково) и отраслей.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- КАРУСЕЛЬ (10 шагов) ----------
+    const steps = [
+        { number: "01", title: "Определите основной ОКВЭД", desc: "База для проверки отраслевых льгот", detail: "ОКВЭД — база для проверки отраслевых льгот" },
+        { number: "02", title: "Проверьте отраслевую льготу", desc: "Сверьте ОКВЭД с таблицами льгот", detail: "Пример: для ИТ-компаний действует пониженная ставка налога на прибыль 5%." },
+        { number: "03", title: "Условия для льготы", desc: "Проверьте выполнение требований", detail: "Пример: ИТ — аккредитация Минцифры, доля доходов ≥70%. Медицина — лицензия, доля ≥90%, штат≥15. Без условий льгота не применяется." },
+        { number: "04", title: "Оцените экономию отрасли", desc: "Приблизительный расчёт выгоды", detail: "Сравните ставки налогов и рассчитайте нагрузку: прибыль, страховые взносы." },
+        { number: "05", title: "Место регистрации", desc: "ТОР, СПВ, ОЭЗ, Сколково, технопарк?", detail: "Проверьте, находится ли компания на преференциальной территории." },
+        { number: "06", title: "Статус резидента", desc: "Заключено соглашение с управляющей компанией специальной территории?", detail: "Просто офис не даёт льгот — нужен официальный статус резидента и договор." },
+        { number: "07", title: "Экономия территории", desc: "Например, налог на имущество, земля, транспорт — 0%", detail: "Оцените эффект от освобождения: сравните с нагрузкой до." },
+        { number: "08", title: "Сравните льготы", desc: "Комбинируйте по разным налогам", detail: "По налогу на прибыль и взносам нужно применять ставку территории, по имущественным налогам — можно выбрать федеральную или региональную льготу, если специальной льготы нет." },
+        { number: "09", title: "Запрет двух льгот", desc: "Если подходит несколько льгот — надо выбрать одну.", detail: "Налоговый кодекс запрещает одновременное применение двух льгот по одним налогам." },
+        { number: "10", title: "Рекомендация руководителю", desc: "Плюсы, минусы, риски", detail: "Оцените затраты на переезд, инвестиционные обязательства." }
+    ];
+    let currentStepIndex = 0;
+    const stepNumSpan = document.getElementById('stepNumDisplay');
+    const stepTitleSpan = document.getElementById('stepTitleDisplay');
+    const stepDescSpan = document.getElementById('stepDescDisplay');
+    const stepDetailSpan = document.getElementById('stepDetailDisplay');
+    const stepCounterSpan = document.getElementById('stepCounter');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const prevBtn = document.getElementById('prevStepBtn');
+    const nextBtn = document.getElementById('nextStepBtn');
+
+    function updateCarousel() {
+        const step = steps[currentStepIndex];
+        stepNumSpan.innerText = step.number;
+        stepTitleSpan.innerText = step.title;
+        stepDescSpan.innerText = step.desc;
+        stepDetailSpan.innerText = step.detail;
+        stepCounterSpan.innerText = `шаг ${currentStepIndex+1}/${steps.length}`;
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, idx) => { if(idx === currentStepIndex) dot.classList.add('active'); else dot.classList.remove('active'); });
+    }
+    function buildDots() {
+        dotsContainer.innerHTML = '';
+        steps.forEach((_, idx) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if(idx === currentStepIndex) dot.classList.add('active');
+            dot.addEventListener('click', () => { currentStepIndex = idx; updateCarousel(); });
+            dotsContainer.appendChild(dot);
+        });
+    }
+    prevBtn.addEventListener('click', () => { if(currentStepIndex > 0) { currentStepIndex--; updateCarousel(); } });
+    nextBtn.addEventListener('click', () => { if(currentStepIndex < steps.length-1) { currentStepIndex++; updateCarousel(); } });
+    buildDots();
+    updateCarousel();
+
+    // Вкладки
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const panes = document.querySelectorAll('.tab-pane');
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-tab');
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            panes.forEach(pane => pane.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // ---------- УНИВЕРСАЛЬНЫЙ РАСЧЕТ (с учетом предельной базы, вводимой пользователем) ----------
+    function computeFull() {
+        // базовые данные
+        let profit = parseFloat(document.getElementById('profitVal').value) || 0;
+        let payrollTotal = parseFloat(document.getElementById('payrollTotal').value) || 0;
+        let limitBase = parseFloat(document.getElementById('limitBase').value) || 0;
+
+        // разбиваем ФОТ на часть в пределах базы и сверх
+        let payrollBase = Math.min(payrollTotal, limitBase);
+        let payrollAbove = Math.max(0, payrollTotal - limitBase);
+
+        // ставки для прибыли и взносов
+        let profitRateIt = parseFloat(document.getElementById('profitRateIt').value) / 100;
+        let profitRateTerr = parseFloat(document.getElementById('profitRateTerr').value) / 100;
+        let insBaseIt = parseFloat(document.getElementById('insRateItBase').value) / 100;
+        let insBaseTerr = parseFloat(document.getElementById('insRateTerrBase').value) / 100;
+        let insAboveIt = parseFloat(document.getElementById('insRateItAbove').value) / 100;
+        let insAboveTerr = parseFloat(document.getElementById('insRateTerrAbove').value) / 100;
+
+        // имущество
+        let propBase = parseFloat(document.getElementById('propertyBase').value) || 0;
+        let propRateIt = parseFloat(document.getElementById('propRateIt').value) / 100;
+        let propRateTerr = parseFloat(document.getElementById('propRateTerr').value) / 100;
+        let propTaxIt = propBase * propRateIt;
+        let propTaxTerr = propBase * propRateTerr;
+
+        // земля
+        let landBase = parseFloat(document.getElementById('landBase').value) || 0;
+        let landRateIt = parseFloat(document.getElementById('landRateIt').value) / 100;
+        let landRateTerr = parseFloat(document.getElementById('landRateTerr').value) / 100;
+        let landTaxIt = landBase * landRateIt;
+        let landTaxTerr = landBase * landRateTerr;
+
+        // транспорт
+        let transpBase = parseFloat(document.getElementById('transportBase').value) || 0;
+        let transpRateTerr = parseFloat(document.getElementById('transpRateTerr').value) / 100;
+        let transpTaxIt = transpBase;
+        let transpTaxTerr = transpBase * transpRateTerr;
+
+        // итоговые суммы
+        let profitIt = profit * profitRateIt;
+        let insIt = (payrollBase * insBaseIt) + (payrollAbove * insAboveIt);
+        let totalIt = profitIt + insIt + propTaxIt + landTaxIt + transpTaxIt;
+
+        let profitTerr = profit * profitRateTerr;
+        let insTerr = (payrollBase * insBaseTerr) + (payrollAbove * insAboveTerr);
+        let totalTerr = profitTerr + insTerr + propTaxTerr + landTaxTerr + transpTaxTerr;
+
+        let saving = totalIt - totalTerr;
+        let percent = totalIt > 0 ? (saving / totalIt * 100) : 0;
+
+        // отрисовка результата
+        document.getElementById('resultCompareContainer').innerHTML = `
+            <div class="result-compare">
+                <div class="result-col">
+                    <strong>🏷️ Отраслевая льгота</strong><br>
+                    Прибыль: ${profitIt.toLocaleString()} руб.<br>
+                    Взносы: ${insIt.toLocaleString()} руб.<br>
+                    Имущество: ${propTaxIt.toLocaleString()} руб.<br>
+                    Земля: ${landTaxIt.toLocaleString()} руб.<br>
+                    Транспорт: ${transpTaxIt.toLocaleString()} руб.<br>
+                    <span class="total-badge total-it">ИТОГО: ${totalIt.toLocaleString()} руб.</span>
+                </div>
+                <div class="result-col">
+                    <strong>🌍 Территориальная льгота</strong><br>
+                    Прибыль: ${profitTerr.toLocaleString()} руб.<br>
+                    Взносы: ${insTerr.toLocaleString()} руб.<br>
+                    Имущество: ${propTaxTerr.toLocaleString()} руб.<br>
+                    Земля: ${landTaxTerr.toLocaleString()} руб.<br>
+                    Транспорт: ${transpTaxTerr.toLocaleString()} руб.<br>
+                    <span class="total-badge total-terr">ИТОГО: ${totalTerr.toLocaleString()} руб.</span>
+                </div>
+            </div>
+            <div style="margin-top: 8px; background:#ffffffb3; border-radius: 12px; padding: 5px; text-align:center; font-size:0.7rem;">
+                ${saving >= 0 ? `✅ Территориальная льгота экономит <strong>${saving.toLocaleString()} руб.</strong> (на ${percent.toFixed(1)}% меньше)` : 
+                `⚠️ Отраслевая льгота выгоднее на <strong>${Math.abs(saving).toLocaleString()} руб.</strong> (на ${Math.abs(percent).toFixed(1)}% ниже)`}
+            </div>
+        `;
+
+        // рекомендация (без привязки к ОЭЗ/ТОР)
+        let recommendationText = '';
+        if (saving > 500000) {
+            recommendationText = `🏆 Территориальная льгота экономит ${saving.toLocaleString()} руб. в год. Однако учтите инвестиционные обязательства, переезд и другие требования для получения статуса резидента. Если бизнес готов к долгосрочному присутствию на льготной территории — выбирайте территориальную льготу. 🔥 Важно: высокий ФОТ в пределах базы делает территориальную льготу особенно привлекательной за счёт пониженных взносов.`;
+        } else if (saving > 0 && saving <= 500000) {
+            recommendationText = `📌 Территориальная льгота выгоднее на ${saving.toLocaleString()} руб. Оцените издержки на получение статуса резидента. При скромной экономии проще использовать отраслевую льготу.`;
+        } else if (saving < 0) {
+            recommendationText = `💡 Отраслевая льгота предпочтительнее: экономия ${Math.abs(saving).toLocaleString()} руб. без дополнительных обязательств по переезду и инвестпрограммам. Убедитесь в соблюдении всех отраслевых требований (доля доходов, аккредитация и т.д.).`;
+        } else {
+            recommendationText = `🔁 Налоговая нагрузка сопоставима. Выбирайте исходя из нефинансовых факторов: готовность к переезду, наличие аккредитации, административные издержки.`;
+        }
+        document.getElementById('recommendBox').innerHTML = recommendationText;
+    }
+
+    // привязка событий ко всем полям ввода
+    const allInputs = ['profitVal','payrollTotal','limitBase','propertyBase','propRateIt','propRateTerr','landBase','landRateIt','landRateTerr','transportBase','transpRateTerr','profitRateIt','profitRateTerr','insRateItBase','insRateTerrBase','insRateItAbove','insRateTerrAbove'];
+    allInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.addEventListener('input', computeFull);
+    });
+    const recalcFull = document.getElementById('recalcFullBtn');
+    if(recalcFull) recalcFull.addEventListener('click', computeFull);
+    computeFull();
+</script>
+</body>
+</html>
