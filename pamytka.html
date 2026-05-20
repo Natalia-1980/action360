@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Резидентские режимы РФ — чек-листы</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #eef2f7;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .frame {
+            width: 650px;
+            max-width: 100%;
+            background: #f0f4f9;
+            border-radius: 1.5rem;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .container {
+            padding: 1rem 1rem 0.8rem 1rem;
+        }
+        /* табы компактно */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            border-bottom: 1px solid #d4e0e8;
+            margin-bottom: 0.8rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 1.2rem 1.2rem 0 0;
+            cursor: pointer;
+            color: #5b7f9c;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: 0.15s;
+        }
+        .tab-btn i {
+            font-size: 0.85rem;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #1e6f5c;
+            border-bottom: 2px solid #2c8c6e;
+        }
+        .tab-pane {
+            display: none;
+            background: white;
+            border-radius: 1.2rem;
+            overflow: hidden;
+        }
+        .tab-pane.active-pane {
+            display: block;
+        }
+        .card-header {
+            padding: 0.7rem 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tor-header { background: #1e5f6c; }
+        .oez-header { background: #2c6e4e; }
+        .skolkovo-header { background: #003d6b; }
+        .spv-header { background: #b6482c; }
+        .card-body {
+            padding: 0.9rem 0.9rem 1rem 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .info-card {
+            background: #fafdff;
+            border-radius: 0.9rem;
+            padding: 0.75rem;
+            border: 1px solid #e2ecf2;
+        }
+        .section-title {
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #2c6e4e;
+            border-left: 3px solid #2c8c6e;
+            padding-left: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .checklist {
+            list-style: none;
+            margin: 0;
+        }
+        .checklist li {
+            margin-bottom: 0.4rem;
+            font-size: 0.73rem;
+            line-height: 1.28;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.45rem;
+        }
+        .checklist li i.fa-check-circle, .checklist li i.fa-circle-check {
+            color: #2c8c6e;
+            font-size: 0.7rem;
+            margin-top: 0.1rem;
+            flex-shrink: 0;
+        }
+        .risk-icon {
+            color: #bc4e2c !important;
+        }
+        .badge-risk {
+            background: #ffe8e6;
+            color: #bc4e2c;
+            border-radius: 30px;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.64rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.2rem;
+        }
+        .report-table {
+            font-size: 0.69rem;
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 0.7rem;
+            overflow: hidden;
+        }
+        .report-table th, .report-table td {
+            border-bottom: 1px solid #e2edf2;
+            padding: 0.45rem 0.3rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        .report-table th {
+            background: #eef3fc;
+            font-weight: 600;
+            color: #1f4e6e;
+            font-size: 0.68rem;
+        }
+        .small-note {
+            font-size: 0.64rem;
+            color: #6f8eac;
+            margin-top: 0.25rem;
+            padding-top: 0.2rem;
+            border-top: 1px dashed #cde0e8;
+        }
+        footer {
+            display: none;
+        }
+        /* полностью убрали футер и таблицу сравнения — нет даже скрытых блоков */
+        .no-compare {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="frame">
+    <div class="container">
+        <!-- ЗАГОЛОВОК ПОЛНОСТЬЮ УБРАН (ни "Резидентство в РФ", ни подзаголовков) -->
+        
+        <!-- Табы -->
+        <div class="tabs" id="tabHeaders">
+            <button class="tab-btn active" data-tab="tor"><i class="fas fa-chart-line"></i> ТОР</button>
+            <button class="tab-btn" data-tab="oez"><i class="fas fa-industry"></i> ОЭЗ</button>
+            <button class="tab-btn" data-tab="skolkovo"><i class="fas fa-flask"></i> Сколково</button>
+            <button class="tab-btn" data-tab="spv"><i class="fas fa-ship"></i> СПВ</button>
+        </div>
+
+        <!-- ТОР -->
+        <div id="tor" class="tab-pane active-pane">
+            <div class="card-header tor-header"><i class="fas fa-chart-line"></i> ТОР</div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-user-plus"></i> Как стать резидентом</div>
+                        <ul class="checklist">
+                            <li><i class="fas fa-check-circle"></i> Регистрация юрлица/ИП на территории ТОР.</li>
+                            <li><i class="fas fa-check-circle"></i> Инвестиции: от 500 тыс. руб. за 3 года.</li>
+                            <li><i class="fas fa-check-circle"></i> Запрещено: добыча нефти/газа, подакцизные товары (кроме авто), трейдинг.</li>
+                            <li><i class="fas fa-check-circle"></i> Подача заявки онлайн через УК (КРДВ, Атом-ТОР или региональную КР).</li>
+                            <li><i class="fas fa-check-circle"></i> Решение за 15 рабочих дней → подписание соглашения.</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-exclamation-triangle"></i> Последствия нарушений</div>
+                        <ul class="checklist">
+                            <li><i class="fas fa-circle-check risk-icon"></i> Исключение из реестра через суд → потеря льгот задним числом.</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Доначисление налога на прибыль (20%) и страховых взносов (30% вместо 7,6%).</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Штрафы, пени, расторжение договора аренды земли.</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> 5-летний мораторий на повторную заявку.</li>
+                        </ul>
+                        <div class="badge-risk"><i class="fas fa-gavel"></i> Риск: возврат налоговой экономии</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-file-alt"></i> Отчетность (УК + ФНС)</div>
+                        <table class="report-table">
+                            <tr><th>Куда</th><th>Документы / периодичность</th></tr>
+                            <tr><td style="width:38%">Управляющая компания</td><td>Ежегодно до 1 апреля: отчет об инвестициях, рабочих местах + бухгалтерская отчетность. Пропуск → расторжение.</td></tr>
+                            <tr><td>ФНС + СФР</td><td>Налог на прибыль (квартал, ставка 0–5%), ЕРСВ по ставке 7,6%, 6-НДФЛ, имущество (0%). Декларации сдаются всегда.</td></tr>
+                        </table>
+                        <div class="small-note">Льгота по взносам 7,6% действует при выполнении условий соглашения.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ОЭЗ -->
+        <div id="oez" class="tab-pane">
+            <div class="card-header oez-header"><i class="fas fa-industry"></i> ОЭЗ</div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-user-plus"></i> Как стать резидентом</div>
+                        <ul class="checklist">
+                            <li><i class="fas fa-check-circle"></i> Типы: ППТ, ТВТ, ТРТ, портовая.</li>
+                            <li><i class="fas fa-check-circle"></i> Инвестиции: ППТ — от 150 млн руб. (3 года), ТВТ — от 1 млн, ТРТ/порт — от 5 млн.</li>
+                            <li><i class="fas fa-check-circle"></i> Бизнес-план с оценкой ≥150 баллов (экспертный совет).</li>
+                            <li><i class="fas fa-check-circle"></i> Подача заявки в Минэкономразвития / региональную УК → соглашение до 49 лет.</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-exclamation-triangle"></i> Последствия нарушений</div>
+                        <ul class="checklist">
+                            <li><i class="fas fa-circle-check risk-icon"></i> Расторжение соглашения (ст.20 №116-ФЗ) → потеря статуса.</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Уплата неуплаченных налогов за весь период + штраф.</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Для портовых ОЭЗ — обязательное освобождение территории.</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Лишение льгот, если сэкономленные налоги > реальных инвестиций.</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-file-alt"></i> Отчетность</div>
+                        <table class="report-table">
+                            <tr><th>Куда</th><th>Документы</th></tr>
+                            <tr><td>УК (Минэк / регион)</td><td>Ежеквартально: отчет о бизнес-плане, капвложениях, рабочих местах. Годовой до 1 апреля.</td></tr>
+                            <tr><td>ФНС / СФР</td><td>Налог на прибыль 0% (ППТ/ТВТ), льгота по имуществу, страховые взносы 7,6% (ППТ/ТВТ). УСН-резиденты сдают декларации.</td></tr>
+                        </table>
+                        <div class="small-note">Непредставление отчетности в УК — существенное нарушение.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сколково -->
+        <div id="skolkovo" class="tab-pane">
+            <div class="card-header skolkovo-header"><i class="fas fa-flask"></i> Сколково</div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-user-plus"></i> Как стать резидентом</div>
+                        <ul class="checklist">
+                            <li><i class="fas fa-check-circle"></i> Юрлицо с ОКВЭД 72 (научные исследования). Без офшорных учредителей.</li>
+                            <li><i class="fas fa-check-circle"></i> Экспертиза проекта (4 критерия: инновационность, команда, коммерциализация).</li>
+                            <li><i class="fas fa-check-circle"></i> Протокол действует 6 мес → регистрация юрлица / проверка устава.</li>
+                            <li><i class="fas fa-check-circle"></i> Для МТК — ускоренный трек (презентация проекта, 6 дней).</li>
+                            <li><i class="fas fa-check-circle"></i> Подача заявки онлайн → внесение в реестр участников.</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-exclamation-triangle"></i> Последствия нарушений</div>
+                        <ul class="checklist">
+                            <li><i class="fas fa-circle-check risk-icon"></i> Исключение из реестра → потеря льгот (налог 0%, НДС, взносы 14%).</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Доначисление налогов с 1 января года утраты статуса + пени.</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> 5-летний мораторий на повторную заявку.</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Возврат грантов при невыполнении условий.</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-file-alt"></i> Отчетность</div>
+                        <table class="report-table">
+                            <tr><th>Куда</th><th>Документы</th></tr>
+                            <tr><td>Фонд «Сколково»</td><td>Ежеквартальный, полугодовой и годовой отчеты о деятельности, НИОКР, ИС. Отчет по грантам.</td></tr>
+                            <tr><td>ФНС (особенности)</td><td>НЕ сдаются НДС и налог на прибыль.<br>ЕРСВ по ставке 14%, 6-НДФЛ, имущество (0%). При выручке >1 млрд руб. — расчет совокупной прибыли.</td></tr>
+                        </table>
+                        <div class="small-note">Раздельный учет доходов/расходов по проекту.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- СПВ -->
+        <div id="spv" class="tab-pane">
+            <div class="card-header spv-header"><i class="fas fa-ship"></i> Свободный порт Владивосток</div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-user-plus"></i> Как стать резидентом</div>
+                        <ul class="checklist">
+                            <li><i class="fas fa-check-circle"></i> Регистрация в одном из 22 муниципалитетов СПВ (Приморье, Хабаровский край, Камчатка, Сахалин, Чукотка).</li>
+                            <li><i class="fas fa-check-circle"></i> Новый вид деятельности + инвестиции ≥500 тыс. руб. за 3 года.</li>
+                            <li><i class="fas fa-check-circle"></i> Запрещены: добыча нефти/газа, подакцизные товары (кроме авто/топливо).</li>
+                            <li><i class="fas fa-check-circle"></i> Онлайн-заявка через КРДВ → решение за 15 рабочих дней.</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-exclamation-triangle"></i> Последствия нарушений</div>
+                        <ul class="checklist">
+                            <li><i class="fas fa-circle-check risk-icon"></i> Расторжение соглашения по иску УК (КРДВ) → исключение из реестра.</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Потеря налоговых льгот (прибыль 0% первые 5 лет, имущество 0%, земля 0% на 3 года).</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Взыскание штрафа, изъятие земельных участков.</li>
+                            <li><i class="fas fa-circle-check risk-icon"></i> Страховые взносы — 30% (льгот по взносам в СПВ нет).</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <div class="section-title"><i class="fas fa-file-alt"></i> Отчетность</div>
+                        <table class="report-table">
+                            <tr><th>Куда</th><th>Периодичность</th></tr>
+                            <tr><td>УК (КРДВ)</td><td>Ежеквартальный отчет (инвестиции, рабочие места) до 20 числа следующего месяца + годовой отчет до 1 апреля.</td></tr>
+                            <tr><td>ФНС / СФР</td><td>Налог на прибыль (0% фед. часть + региональная 0–12% первые 5 лет), земельный налог (0% 3 года), взносы 30%.</td></tr>
+                        </table>
+                        <div class="small-note">Земля — только через торги, использование участка контролируется УК.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Таблица сравнения полностью удалена, футер удален -->
+    </div>
+</div>
+
+<script>
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const panes = document.querySelectorAll('.tab-pane');
+    function switchTab(tabId) {
+        panes.forEach(p => p.classList.remove('active-pane'));
+        const activePane = document.getElementById(tabId);
+        if(activePane) activePane.classList.add('active-pane');
+        tabBtns.forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.getAttribute('data-tab') === tabId) btn.classList.add('active');
+        });
+    }
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.getAttribute('data-tab');
+            if(id) switchTab(id);
+        });
+    });
+</script>
+</body>
+</html>
