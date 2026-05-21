@@ -304,7 +304,6 @@
         { text: "Срок уплаты налога на прибыль за налоговый период – 28 марта выпадает на субботу. ООО “Альфа” уплатила 12 апреля налог в сумме 1 млн руб. Укажите срок уплаты налога и сумму пени за несвоевременную уплату. Примите ставку рефинансирования равной 15%. На ЕНС отсутствует положительное сальдо.",
           options: ["30 марта и 6 500 руб.", "30 марта и 5 342 руб.", "27 марта и 8 000 руб.", "27 марта и 6 575 руб."], correct: [0], explanation: "Верно — 1. Если крайний срок выпадает на выходной или праздник, он сдвигается на следующий рабочий день. В данном случае — 30 марта. Поскольку на ЕНС нет положительного сальдо, неуплаченный вовремя налог считается недоимкой. За каждый день просрочки начисляйте пеню — это процент от недоимки (п. 4 ст. 75 НК). Первые 30 дней просрочки ставка пени = 1/300 ключевой ставки ЦБ. Расчеты = 1 000 000 × 15% / 300 × 13 = 6 500 руб.", type: "single" }
     ];
-    // Добавляем остальные вопросы (для краткости)
     for (let i = QUESTIONS.length; i < 25; i++) {
         QUESTIONS.push({
             text: `Вопрос ${i+1}. Демонстрационный вопрос.`,
@@ -315,7 +314,7 @@
         });
     }
 
-    // Кейсы с полными промежуточными таблицами (баллы скрыты от пользователя)
+    // Кейсы 
     const CASES = [
         { id:1, title: "Кейс 1. Страховые взносы", 
           description: `Мария работает главным бухгалтером в ООО “Разные Проекты”. Компания применяет ОСН. 
@@ -327,7 +326,7 @@
 Компания компенсировала Марии проценты, которые она уплачивает по ипотечному кредиту на покупку квартиры в сумме 10 000 000 руб., со ставкой 8% годовых. 
 Предельная база на год — 2 759 000 руб.
 Задание: Рассчитайте страховые взносы к уплате компанией с доходов Марии.`,
-          tableType: "split", // две колонки: не облагается / облагается
+          tableType: "single",
           fields: [
             { label: "Зарплата (не облагается, руб.)", correct: 0, points: 0 },
             { label: "Зарплата (облагается, руб.)", correct: 3600000, points: 1 },
@@ -367,7 +366,7 @@
 На годовщину свадьбы супруг подарил Светлане серьги рыночной стоимостью 600 000 руб.
 Светлана продала котируемые ценные бумаги на сумму 2 600 000 руб., которые она купила в прошлом году за 1 800 000 руб. Эти ценные бумаги учитываются на ее ИИС. Доход от реализации поступил на этот ИИС. ИИС не был закрыт по состоянию на конец года.
 Задание: Рассчитайте сумму НДФЛ Светланы за год.`,
-          tableType: "split",
+          tableType: "single",
           fields: [
             { label: "Зарплата (не облагается, руб.)", correct: 0, points: 0 },
             { label: "Зарплата (облагается, руб.)", correct: 3000000, points: 1 },
@@ -639,20 +638,8 @@
         const caseData = CASES[state.currentCaseIdx];
         let fieldsHtml = '<table class="case-table">';
         
-        if (caseData.tableType === "split") {
-            fieldsHtml += '<tr><th>Показатель</th><th>Не облагается, руб.</th><th>Облагается, руб.</th></tr>';
-            for (let i = 0; i < caseData.fields.length; i++) {
-                let saved = state.answersB[state.currentCaseIdx][i];
-                fieldsHtml += `
-                    <tr>
-                        <td>${caseData.fields[i].label}</td>
-                        <td><input type="number" class="case-field" data-field-idx="${i}" value="${saved !== null ? saved : ''}" style="width:100%; padding:0.3rem; border-radius:20px; border:1px solid #cbd5e1;"></td>
-                        <td><input type="number" class="case-field" data-field-idx="${i}" value="${saved !== null ? saved : ''}" style="width:100%; padding:0.3rem; border-radius:20px; border:1px solid #cbd5e1;"></td>
-                    </tr>
-                `;
-            }
-        } else if (caseData.tableType === "choice") {
-            fieldsHtml += '<td><th>Показатель</th><th>Выберите вариант</th></tr>';
+        if (caseData.tableType === "choice") {
+            fieldsHtml += '<tr><th>Показатель</th><th>Выберите вариант</th></tr>';
             for (let i = 0; i < caseData.fields.length; i++) {
                 let saved = state.answersB[state.currentCaseIdx][i];
                 let optsHtml = '';
@@ -667,7 +654,7 @@
                     </tr>
                 `;
             }
-        } else { // single
+        } else {
             fieldsHtml += '<tr><th>Показатель</th><th>Сумма (руб.)</th></tr>';
             for (let i = 0; i < caseData.fields.length; i++) {
                 let saved = state.answersB[state.currentCaseIdx][i];
