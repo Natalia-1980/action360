@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Раздельный учет — карусель карточек</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #eef2fc 0%, #e2e8f2 100%);
+            font-family: 'Inter', sans-serif;
+            padding: 2rem 1rem;
+            color: #0a2a3b;
+        }
+        .carousel-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .card {
+            background: rgba(255,255,255,0.97);
+            border-radius: 32px;
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.15);
+            height: auto;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s;
+            border: 1px solid rgba(255,255,255,0.7);
+            overflow: hidden;
+            max-width: 520px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 28px 38px -14px rgba(0, 32, 64, 0.25);
+        }
+        .card-header {
+            padding: 1.2rem 1.5rem 0.7rem;
+            border-bottom: 3px solid;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .card-header i {
+            font-size: 2rem;
+        }
+        .card-header h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .card-content {
+            padding: 1.3rem 1.5rem 1.8rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .status-chip {
+            background: #edf2f9;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+        .rule-list {
+            list-style: none;
+        }
+        .rule-list li {
+            margin-bottom: 0.9rem;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .rule-list li i.fa-check-circle {
+            color: #1e7e4a;
+            margin-top: 0.2rem;
+        }
+        .rule-list li i.fa-exclamation-triangle {
+            color: #c95a0f;
+        }
+        .rule-list li i.fa-ban, .rule-list li i.fa-gavel {
+            color: #b13a2c;
+        }
+        .warning-note {
+            background: #fff6e5;
+            border-left: 4px solid #e6a017;
+            padding: 0.7rem 1rem;
+            border-radius: 18px;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+        .flex-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0 0;
+        }
+        .tax-badge {
+            background: #eef2fa;
+            border-radius: 40px;
+            padding: 0.2rem 0.9rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #145c7a;
+        }
+        hr {
+            margin: 0.7rem 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, #cbd5e1, transparent);
+        }
+        .swiper {
+            width: 100%;
+            padding: 15px 5px 45px 5px;
+        }
+        .swiper-slide {
+            height: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            background: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 60px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(8px);
+            transition: all 0.2s;
+        }
+        .swiper-button-next:after, .swiper-button-prev:after {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #1f6e93;
+        }
+        .swiper-button-next:hover, .swiper-button-prev:hover {
+            background: #f0f6fe;
+            transform: scale(1.02);
+        }
+        .swiper-pagination-bullet {
+            background: #1f6e93;
+            opacity: 0.4;
+        }
+        .swiper-pagination-bullet-active {
+            background: #0f4b66;
+            opacity: 1;
+        }
+        @media (max-width: 680px) {
+            .card-header h2 { font-size: 1.25rem; }
+            .card { max-width: 94%; min-height: 480px; }
+            .swiper-button-next, .swiper-button-prev {
+                width: 38px;
+                height: 38px;
+            }
+            .swiper-button-next:after, .swiper-button-prev:after {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="carousel-wrapper">
+    <div class="swiper mySwiperCarousel">
+        <div class="swiper-wrapper">
+            
+            <!-- 1. НДС -->
+            <div class="swiper-slide">
+                <div class="card">
+                    <div class="card-header" style="border-bottom-color: #1f7b4d;">
+                        <i class="fas fa-percent" style="color: #1f7b4d;"></i>
+                        <h2>НДС</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="status-chip"><i class="fas fa-gavel"></i> раздельный учет — обязателен</div>
+                        <ul class="rule-list">
+                            <li><i class="fas fa-check-circle"></i> <span><strong>условие:</strong> есть облагаемые и необлагаемые операции. Входной НДС по общехозрасходам распределяется пропорционально выручке.</span></li>
+                            <li><i class="fas fa-exclamation-triangle"></i> <span><strong>правило 5%:</strong> если доля расходов на необлагаемые операции ≤5% от всех расходов, учет можно не вести, но налоговики часто оспаривают. Считать долю необлагаемых операций все равно нужно.</span></li>
+                            <li><i class="fas fa-ban"></i> <span><strong>последствия ошибки:</strong> отказ в вычете НДС, доначисление, штраф (ст.122 НК).</span></li>
+                        </ul>
+                        <div class="warning-note">
+                            <i class="fas fa-chart-line"></i> Основная ставка НДС — 22%. Не действует часть льгот, например на банковские услуги, по эквайрингу.
+                        </div>
+                        <div class="flex-badges">
+                            <span class="tax-badge"><i class="far fa-clock"></i> ставки 22, 10, 0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. налог на прибыль -->
+            <div class="swiper-slide">
+                <div class="card">
+                    <div class="card-header" style="border-bottom-color: #2c6e9e;">
+                        <i class="fas fa-chart-simple" style="color: #2c6e9e;"></i>
+                        <h2>Налог на прибыль</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="status-chip"><i class="fas fa-balance-scale"></i> раздельный учет — при разных базах / ставках</div>
+                        <ul class="rule-list">
+                            <li><i class="fas fa-arrows-split-up-and-left"></i> <strong>обязательные случаи:</strong> резиденты ОЭЗ, СПВ, организации с госфункциями, операции с ценными бумагами, дивиденды. Отдельное разделение убытков по видам деятельности.</li>
+                            <li><i class="fas fa-chart-line"></i> <strong>нулевой доход:</strong> раздельный учет нужен даже при подготовительных расходах (если доходов нет, но расходы есть).</li>
+                            <li><i class="fas fa-file-signature"></i> <strong>учетная политика:</strong> порядок закрепляется до налогового периода. Нарушение = потеря льготы с начала года + штраф 20% (ст.122).</li>
+                        </ul>
+                        <div class="flex-badges">
+                            <span class="tax-badge">Общая ставка → 25%</span>
+                            <span class="tax-badge">ОЭЗ / СПВ: до 13,5% (регион)</span>
+                            <span class="tax-badge">ИТ-ставка 5% (до 2030)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. страховые взносы -->
+            <div class="swiper-slide">
+                <div class="card">
+                    <div class="card-header" style="border-bottom-color: #b8631a;">
+                        <i class="fas fa-shield-heart" style="color: #b8631a;"></i>
+                        <h2>Страховые взносы</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="status-chip"><i class="fas fa-check-double"></i> раздельный учет не требуется</div>
+                        <ul class="rule-list">
+                            <li><i class="fas fa-lightbulb"></i> <span><strong>льготные тарифы (15% / 7,6%)</strong> применяются ко всем работникам, если выполнены условия: МСП в приоритетных отраслях с долей профильного дохода ≥70% или ИТ-аккредитация.</span></li>
+                            <li><i class="fas fa-chart-line"></i> <span><strong>контроль доли обязателен:</strong> падение ниже порога → потеря права с начала расчетного периода (пересчет 30% на все выплаты + штраф).</span></li>
+                            <li><i class="fas fa-qrcode"></i> <span><strong>актуально:</strong> код тарифа 32 — льготы только для МСП из приоритетных отраслей по распоряжению №4125-р.</span></li>
+                        </ul>
+                        <div class="flex-badges">
+                            <span class="tax-badge">приоритетные МСП: 15% сверх 1,5 МРОТ</span>
+                            <span class="tax-badge">обрабатывающие: 7,6% сверх 1,5 МРОТ</span>
+                            <span class="tax-badge">ИТ: 15% предельная / 7,6% сверх</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. налог на имущество -->
+            <div class="swiper-slide">
+                <div class="card">
+                    <div class="card-header" style="border-bottom-color: #488b8f;">
+                        <i class="fas fa-building" style="color: #488b8f;"></i>
+                        <h2>Налог на имущество</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="status-chip"><i class="fas fa-layer-group"></i> объектный раздельный учет</div>
+                        <ul class="rule-list">
+                            <li><i class="fas fa-building-user"></i> <strong>когда нужен:</strong> разные ставки для разных категорий (основная 2,2% / льгота 0%), кадастровые объекты vs среднегодовая стоимость, филиалы в разных регионах.</li>
+                            <li><i class="fas fa-envelope-open-text"></i> <strong>уведомительный порядок:</strong> без заявления в ИФНС льгота не применяется, даже при формальном праве.</li>
+                            <li><i class="fas fa-calendar-week"></i> <strong>особенность:</strong> многие региональные льготы отменены. Требуется ежегодная проверка регионального закона.</li>
+                        </ul>
+                        <div class="flex-badges">
+                            <span class="tax-badge">ставка до 2,2% (ср/год)</span>
+                            <span class="tax-badge">кадастр: до 2%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. транспортный налог -->
+            <div class="swiper-slide">
+                <div class="card">
+                    <div class="card-header" style="border-bottom-color: #4f6d5c;">
+                        <i class="fas fa-truck" style="color: #4f6d5c;"></i>
+                        <h2>Транспортный налог</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="status-chip"><i class="fas fa-list-check"></i> поштучный учет ТС</div>
+                        <ul class="rule-list">
+                            <li><i class="fas fa-car-side"></i> <strong>раздельный учет обязателен:</strong> при разных ставках (лошадиные силы, тип) и при региональных льготах на часть автопарка (электромобили, резиденты СПВ).</li>
+                            <li><i class="fas fa-ticket-alt"></i> <strong>льготы заявляются:</strong> через заявление в ИФНС. При льготе только для части ТС — четкая сегментация по ПТС.</li>
+                            <li><i class="fas fa-chart-simple"></i> <strong>актуально:</strong> актуализированы коды льгот, повышающие коэффициенты на дорогие авто (перечень Минпромторга).</li>
+                        </ul>
+                        <div class="flex-badges">
+                            <span class="tax-badge">ставки по регионам</span>
+                            <span class="tax-badge">электромобили: льготы уточнять</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. ОЭЗ / СПВ и убытки -->
+            <div class="swiper-slide">
+                <div class="card">
+                    <div class="card-header" style="border-bottom-color: #2a6b6b;">
+                        <i class="fas fa-chalkboard" style="color: #2a6b6b;"></i>
+                        <h2>ОЭЗ / СПВ: убытки и нулевой доход</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="status-chip"><i class="fas fa-arrows-spin"></i> строгое разделение баз</div>
+                        <ul class="rule-list">
+                            <li><i class="fas fa-building-user"></i> <strong>резиденты ОЭЗ и СПВ:</strong> обязаны разделять доходы, расходы и убытки по льготируемой и нельготируемой деятельности. Нельзя уменьшать льготную базу на убытки от аренды/иных операций.</li>
+                            <li><i class="fas fa-chart-line"></i> <strong>нулевой период:</strong> раздельный учет ведется даже при отсутствии выручки (подготовительные расходы). Иначе ИФНС отказывает в признании расходов будущих лет.</li>
+                            <li><i class="fas fa-file-contract"></i> <strong>учетная политика:</strong> порядок определения базы обязательно фиксируется до налогового периода, в котором получена первая прибыль по соглашению.</li>
+                        </ul>
+                        <div class="warning-note">
+                            <i class="fas fa-calculator"></i> <strong>пример:</strong> убыток от аренды 5 млн руб., прибыль от льготы 10 млн. Смешивать базы нельзя → доначисление налога, штраф.
+                        </div>
+                        <div class="flex-badges">
+                            <span class="tax-badge">пониженные ставки ОЭЗ: до 13,5%</span>
+                            <span class="tax-badge">СПВ: спецрежим</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. Когда учет не нужен (перенесено в конец) -->
+            <div class="swiper-slide">
+                <div class="card">
+                    <div class="card-header" style="border-bottom-color: #a5431e;">
+                        <i class="fas fa-chart-pie" style="color: #a5431e;"></i>
+                        <h2>Когда учет не нужен</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="status-chip"><i class="fas fa-clock"></i> ситуации без раздельного учета</div>
+                        <ul class="rule-list">
+                            <li><i class="fas fa-check-circle"></i> По налогу на прибыль: все доходы/расходы облагаются по единой ставке, без льгот по видам деятельности.</li>
+                            <li><i class="fas fa-check-circle"></i> Страховые взносы: раздельный учет не требуется, но обязательный контроль доли профильного дохода (≥70%).</li>
+                            <li><i class="fas fa-check-circle"></i> Для НДС — только если все операции облагаемые либо. При правиле 5% рассчитывайте долю необлагаемых расходов.</li>
+                        </ul>
+                        <hr>
+                        <div><strong><i class="fas fa-skull-crosswalk"></i> цена нарушения раздельного учета:</strong></div>
+                        <ul class="rule-list" style="margin-top: 0.5rem;">
+                            <li><i class="fas fa-exclamation-triangle"></i> Потеря льготы с начала налогового периода (пересчет по максимальной ставке).</li>
+                            <li><i class="fas fa-exclamation-triangle"></i> Штраф 20% / 40% по ст.122 НК + пени за каждый день.</li>
+                        </ul>
+                        <div class="warning-note" style="background:#eef3fc;">
+                            <i class="fas fa-chart-simple"></i> <strong>ежеквартальный аудит:</strong> доля профильного дохода, статус аккредитации, разделение убытков (ОЭЗ/СПВ), актуальность учетной политики.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+    </div>
+</div>
+
+<script>
+    const swiper = new Swiper('.mySwiperCarousel', {
+        slidesPerView: 1,
+        spaceBetween: 30,
+        loop: false,
+        centeredSlides: true,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+            dynamicBullets: true,
+        },
+        breakpoints: {
+            0: {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                centeredSlides: true,
+            },
+            640: {
+                slidesPerView: 1,
+                spaceBetween: 25,
+            },
+            1024: {
+                slidesPerView: 1,
+                spaceBetween: 30,
+            }
+        },
+        grabCursor: true,
+        keyboard: {
+            enabled: true,
+        },
+    });
+</script>
+</body>
+</html>
