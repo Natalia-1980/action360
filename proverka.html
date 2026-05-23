@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Чек-листы: льготы / лицензии и реестры</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f7 0%, #dae2ec 100%);
+            font-family: 'Inter', sans-serif;
+            padding: 1.2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .industry-dashboard {
+            max-width: 540px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .main-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+        }
+
+        .industry-header {
+            background: #0f2c38;
+            padding: 1rem 1.2rem;
+            color: white;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .industry-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .industry-icon {
+            font-size: 1.6rem;
+        }
+        .industry-badge {
+            background: #ffb347;
+            color: #1e2a36;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* вкладки — весь текст жирный */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e8ef;
+            background: #ffffff;
+            padding: 0 1rem;
+            gap: 1rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 700;          /* весь текст жирный */
+            padding: 0.85rem 0.2rem 0.7rem 0.2rem;
+            cursor: pointer;
+            color: #4b6f82;
+            transition: 0.2s;
+            position: relative;
+            white-space: normal;
+            word-break: break-word;
+            text-align: left;
+            line-height: 1.3;
+            max-width: 220px;
+        }
+        .tab-btn span {
+            display: block;
+            font-weight: 700;          /* все строки жирные */
+        }
+        .tab-btn .first-line {
+            font-weight: 700;
+        }
+        .tab-btn .second-line {
+            font-weight: 700;
+            font-size: 0.82rem;
+        }
+        .tab-btn.active {
+            color: #1f6e4a;
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2.5px;
+            background: #1f6e4a;
+            border-radius: 2px;
+        }
+        .tab-content {
+            display: none;
+            padding: 1.2rem 1.2rem 1.4rem 1.2rem;
+            background: #ffffff;
+            animation: fade 0.2s ease;
+        }
+        .tab-content.active-tab {
+            display: block;
+        }
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(2px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .checklist-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .checklist-category {
+            background: #f9fbfd;
+            border-left: 4px solid #2b7a4b;
+            padding: 0.9rem 1rem;
+            border-radius: 0.9rem;
+        }
+        .checklist-category.warning-cat {
+            border-left-color: #2b7a4b;
+        }
+        .cat-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #1a4d3a;
+        }
+        .warning-cat .cat-title {
+            color: #1a4d3a;
+        }
+        .checklist-items {
+            list-style: none;
+            padding-left: 0;
+        }
+        .checklist-items li {
+            margin-bottom: 0.65rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .checklist-items li::before {
+            content: "✓";
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #2b7a4b;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1;
+            margin-top: 2px;
+        }
+        .warning-list li::before {
+            content: "✓";
+            background-color: #2b7a4b;
+            color: white;
+        }
+        .subnote {
+            font-size: 0.72rem;
+            background: #eff3f8;
+            padding: 0.4rem 0.9rem;
+            border-radius: 24px;
+            color: #2c5a6e;
+            margin-top: 0.7rem;
+            display: inline-block;
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem 1rem 1rem;
+            background: #ffffff;
+            border-top: 1px solid #e5edf2;
+        }
+        .nav-btn {
+            background: #1f566b;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            width: 38px;
+            height: 38px;
+            border-radius: 38px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        .nav-btn:hover {
+            background: #0e3b4b;
+        }
+        .dots {
+            display: flex;
+            gap: 8px;
+            background: #eff3f8;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #b9cedb;
+            border-radius: 8px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .dot.active {
+            background: #1f566b;
+            width: 22px;
+        }
+        .counter-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #2a5f6e;
+        }
+
+        @media (max-width: 560px) {
+            .industry-dashboard {
+                max-width: 100%;
+            }
+            .tab-btn {
+                font-size: 0.75rem;
+            }
+            .tab-btn .second-line {
+                font-size: 0.7rem;
+            }
+            .industry-title {
+                font-size: 1.2rem;
+            }
+            .checklist-items li {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="industry-dashboard">
+    <div class="main-card">
+        <div id="dynamicHeader" class="industry-header"></div>
+        <div class="tabs" id="tabsContainer">
+            <button class="tab-btn active" data-tab="benefit">
+                <span class="first-line">✅ Что проверить для</span>
+                <span class="second-line">льготы</span>
+            </button>
+            <button class="tab-btn" data-tab="license">
+                <span class="first-line">📋 Что проверить для</span>
+                <span class="second-line">лицензии, аккредитации, реестра</span>
+            </button>
+        </div>
+        <div id="tabContentBenefit" class="tab-content active-tab"></div>
+        <div id="tabContentLicense" class="tab-content"></div>
+        <div class="carousel-nav">
+            <button class="nav-btn" id="prevIndustryBtn">←</button>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="dots" id="dotsPanel"></div>
+                <span class="counter-text" id="counterSpan"></span>
+            </div>
+            <button class="nav-btn" id="nextIndustryBtn">→</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Данные по отраслям (в радиоэлектронной промышленности добавлено "Производит продукцию на основе собственных разработок")
+    const industriesData = [
+        {   // 0: ИТ-компании
+            name: "ИТ-компании",
+            icon: "💻",
+            badge: "аккредитация / налог на прибыль",
+            benefitChecks: [
+                "Аккредитация в реестре Минцифры (актуальный статус).",
+                "Доля профильных доходов ≥ 70% от общей суммы доходов (расчет по данным бухучета и деклараций).",
+                "Среднемесячная зарплата сотрудников за последние 3 месяца ≥ средней по РФ или региону (данные Росстата, РСВ).",
+                "Ежегодное подтверждение аккредитации не позднее 1 июня.",
+                "При доходе ≥ 1 млрд руб. и численности >100 чел. — соглашение с вузами (содействие образовательным программам)."
+            ],
+            licenseTitle: "Требования для сохранения аккредитации",
+            licenseChecks: [
+                "Деятельность строго соответствует перечню (приложение 1 к постановлению № 1729).",
+                "На официальном сайте размещены актуальные данные об ИТ-деятельности по требованиям Минцифры.",
+                "Наличие согласия на раскрытие налоговой тайны (льготы, доходы, численность, зарплата).",
+                "Ежегодно до 1 июня — подтверждение аккредитации (выписка из реестра).",
+                "Минцифры проводит проверки: нарушение требований → исключение из реестра, потеря льгот.",
+                "Контроль за долей доходов и зарплатой на протяжении всего налогового периода."
+            ]
+        },
+        {   // 1: Радиоэлектронная промышленность — добавлен пункт про собственные разработки
+            name: "Радиоэлектронная промышленность",
+            icon: "📡",
+            badge: "реестр Минпромторга",
+            benefitChecks: [
+                "Компания включена в реестр организаций РЭП Минпромторга (выписка из ГИПС).",
+                "Доля профильных доходов ≥ 70% (подтверждается договорами, актами, счетами-фактурами, УПД, регистрами налогового учета).",
+                "Подтверждение основного вида деятельности — проектирование, разработка, производство ЭКБ, модулей или электроники.",
+                "Производит продукцию на основе собственных разработок."
+            ],
+            licenseTitle: "Сохранение места в реестре",
+            licenseChecks: [
+                "Вид деятельности точно соответствует: ЭКБ, электронные модули, продукция, материалы для производства компонентной базы.",
+                "Регистрация в ГИПС с использованием усиленной квалифицированной электронной подписи (УКЭП).",
+                "Наличие экспертного заключения ФГБУ «ВНИИР» о соответствии организации.",
+                "Подача заявления и полного пакета в Минпромторг (учредительные документы, штатное расписание, сведения об оборудовании, топологии ИС, лицензионные соглашения).",
+                "Подтверждение соответствия требованиям ежегодно; изменение сведений — риск исключения из реестра."
+            ]
+        },
+        {   // 2: Медицина
+            name: "Медицина",
+            icon: "🏥",
+            badge: "НДС, налог на прибыль, лицензия",
+            benefitChecks: [
+                "НДС (медуслуги): медлицензия, услуги из перечня ПП №132, раздельный учет.",
+                "НДС (медизделия): регистрационное удостоверение, код товара из ПП №1042, раздельный учет.",
+                "Налог на прибыль 0%: деятельность по ПП №917, лицензия, штат ≥15 чел., из них ≥50% — аккредитованные/сертифицированные медики, доля доходов от медицины+образования+НИОКР ≥90%.",
+                "Ежегодное подтверждение в ИФНС (форма № ММВ-7-3/892) до 25 марта следующего года."
+            ],
+            licenseTitle: "Требования для сохранения лицензии",
+            licenseChecks: [
+                "Недвижимость в собственности/аренде — санэпидзаключение, оборудование зарегистрировано (ПП №1416).",
+                "Договор с лицензированной организацией / обученный сотрудник для обслуживания медтехники.",
+                "Руководители имеют высшее медобразование и стаж, все сотрудники-медики — сертификаты/аккредитацию.",
+                "Организация в ЕГИСЗ, сотрудники в Федеральном регистре медработников.",
+                "Доп. требования для донорства, трансплантации, МСЭ (спецзаконы №125-ФЗ, №4180-1, №181-ФЗ).",
+                "Лицензия бессрочная, но Росздравнадзор проводит плановые/внеплановые проверки. Нарушение — основание для приостановления или аннулирования лицензии."
+            ]
+        },
+        {   // 3: Образование
+            name: "Образование",
+            icon: "🎓",
+            badge: "льгота 0% / лицензия",
+            benefitChecks: [
+                "Действующая лицензия на образовательную деятельность.",
+                "Доход от льготной деятельности (образование + медицина + соцобслуживание) ≥90% от всех доходов по налоговому учету.",
+                "Штат не менее 15 сотрудников непрерывно в течение всего налогового периода.",
+                "Отсутствие операций с векселями и производными финансовыми инструментами.",
+                "Для новых организаций — льгота только со следующего года. При утрате права — повторное применение не ранее чем через 5 лет (кроме добровольного отказа или перехода с УСН)."
+            ],
+            licenseTitle: "Сохранение лицензии, аккредитации",
+            licenseChecks: [
+                "Недвижимость на законном основании + санитарно-эпидемиологическое заключение Роспотребнадзора.",
+                "Материально-техническая база по ФГОС, утвержденные образовательные программы.",
+                "Трудовые договоры с педагогами, наличие образования, квалификации, стажа.",
+                "Лицензия бессрочная, но при нарушении лицензионных требований — приостановление/аннулирование."
+            ]
+        },
+        {   // 4: Общепит
+            name: "Общепит",
+            icon: "🍽️",
+            badge: "НДС / страховые взносы",
+            benefitChecks: [
+                "НДС-льгота (подп.38 п.3 ст.149 НК): ОКВЭД 56 в ЕГРЮЛ/ЕГРИП, доход за предыдущий год ≤3 млрд руб., доля дохода от общепита ≥70%, среднемесячные выплаты за предыдущий период ≥ региональной среднемесячной зарплаты. В год создания применяют льготу без ограничений.",
+                "Пониженные взносы (численность до 250 чел.): в реестре МСП, ОКВЭД 56 на 1 января текущего года, доля дохода от ОКВЭД 56 ≥70%.",
+                "Пониженные взносы (численность 251–1500 чел.): МСП, ОКВЭД 56, доход за предыдущий год ≤2 млрд руб., среднемесячная зарплата ≥ среднеотраслевой по региону, доля дохода от общепита ≥70%."
+            ],
+            licenseTitle: "Сохранение лицензии и реестра",
+            licenseChecks: [
+                "Санитарные нормы: внедрена система ХАССП (HACCP), помещения по СанПиН 2.3/2.4.3590-20, отдельная вентиляция, цеховое деление (сырье / полуфабрикаты).",
+                "У всех сотрудников, работающих с продуктами, действующие медицинские книжки.",
+                "Пожарная безопасность (123-ФЗ, ПП №1479): огнетушители, оповещение, эвакуационные выходы.",
+                "Уведомление Роспотребнадзора о начале деятельности, при продаже алкоголя — лицензия (171-ФЗ).",
+                "ККТ зарегистрирована, уголок потребителя с установленным перечнем документов.",
+                "Ежегодный контроль доли дохода ≥70%, лимитов 3 млрд (НДС-льгота) / 2 млрд (МСП), статус МСП, среднеотраслевая зарплата."
+            ]
+        }
+    ];
+
+    let currentIndustryIdx = 0;
+    let activeTab = "benefit";
+
+    const dynamicHeader = document.getElementById("dynamicHeader");
+    const benefitDiv = document.getElementById("tabContentBenefit");
+    const licenseDiv = document.getElementById("tabContentLicense");
+    const dotsPanel = document.getElementById("dotsPanel");
+    const counterSpan = document.getElementById("counterSpan");
+    const prevBtn = document.getElementById("prevIndustryBtn");
+    const nextBtn = document.getElementById("nextIndustryBtn");
+
+    function renderHeader() {
+        const ind = industriesData[currentIndustryIdx];
+        dynamicHeader.innerHTML = `
+            <div class="industry-title">
+                <span class="industry-icon">${ind.icon}</span>
+                <span>${ind.name}</span>
+            </div>
+            <div class="industry-badge">${ind.badge}</div>
+        `;
+    }
+
+    function renderActiveTab() {
+        const ind = industriesData[currentIndustryIdx];
+        if (activeTab === "benefit") {
+            let itemsHtml = `<div class="checklist-grid"><div class="checklist-category"><div class="cat-title">📋 Условия для применения налоговых льгот</div><ul class="checklist-items">`;
+            ind.benefitChecks.forEach(item => {
+                itemsHtml += `<li>${item}</li>`;
+            });
+            itemsHtml += `</ul><div class="subnote">💡 Документальное подтверждение: бухгалтерская отчетность, регистры, декларации, РСВ, договоры, акты.</div></div></div>`;
+            benefitDiv.innerHTML = itemsHtml;
+            benefitDiv.classList.add("active-tab");
+            licenseDiv.classList.remove("active-tab");
+        } else {
+            const titleText = ind.licenseTitle || "Требования для сохранения";
+            let shortTitle = titleText;
+            if (titleText.length > 42) {
+                shortTitle = titleText.substring(0, 39) + "...";
+            }
+            let itemsHtml = `<div class="checklist-grid"><div class="checklist-category warning-cat"><div class="cat-title">🛡️ ${shortTitle}</div><ul class="checklist-items warning-list">`;
+            ind.licenseChecks.forEach(item => {
+                itemsHtml += `<li>${item}</li>`;
+            });
+            itemsHtml += `</ul><div class="subnote">🔍 Регулярный мониторинг: своевременное подтверждение, проверки контролирующих органов, устранение нарушений.</div></div></div>`;
+            licenseDiv.innerHTML = itemsHtml;
+            licenseDiv.classList.add("active-tab");
+            benefitDiv.classList.remove("active-tab");
+        }
+    }
+
+    function setActiveTab(tabId) {
+        activeTab = tabId;
+        const btns = document.querySelectorAll(".tab-btn");
+        btns.forEach(btn => {
+            if (btn.getAttribute("data-tab") === tabId) btn.classList.add("active");
+            else btn.classList.remove("active");
+        });
+        renderActiveTab();
+    }
+
+    function updateDotsAndCounter() {
+        const total = industriesData.length;
+        let dotsHtml = "";
+        for (let i = 0; i < total; i++) {
+            dotsHtml += `<div class="dot ${i === currentIndustryIdx ? 'active' : ''}" data-idx="${i}"></div>`;
+        }
+        dotsPanel.innerHTML = dotsHtml;
+        counterSpan.innerText = `${currentIndustryIdx+1} / ${total}`;
+        document.querySelectorAll(".dot").forEach(dot => {
+            dot.addEventListener("click", (e) => {
+                const idx = parseInt(e.currentTarget.getAttribute("data-idx"), 10);
+                if (!isNaN(idx) && idx !== currentIndustryIdx) {
+                    currentIndustryIdx = idx;
+                    fullRefresh();
+                }
+            });
+        });
+    }
+
+    function fullRefresh() {
+        renderHeader();
+        updateDotsAndCounter();
+        renderActiveTab();
+        const btns = document.querySelectorAll(".tab-btn");
+        btns.forEach(btn => {
+            if (btn.getAttribute("data-tab") === activeTab) btn.classList.add("active");
+            else btn.classList.remove("active");
+        });
+    }
+
+    function nextIndustry() {
+        currentIndustryIdx = (currentIndustryIdx + 1) % industriesData.length;
+        fullRefresh();
+    }
+
+    function prevIndustry() {
+        currentIndustryIdx = (currentIndustryIdx - 1 + industriesData.length) % industriesData.length;
+        fullRefresh();
+    }
+
+    function init() {
+        renderHeader();
+        const tabBtns = document.querySelectorAll(".tab-btn");
+        tabBtns.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const tabId = btn.getAttribute("data-tab");
+                if (tabId === "benefit") setActiveTab("benefit");
+                else setActiveTab("license");
+            });
+        });
+        activeTab = "benefit";
+        setActiveTab("benefit");
+        updateDotsAndCounter();
+        prevBtn.addEventListener("click", prevIndustry);
+        nextBtn.addEventListener("click", nextIndustry);
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft") prevIndustry();
+            if (e.key === "ArrowRight") nextIndustry();
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
