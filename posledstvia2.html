@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Памятка | Последствия несоблюдения условий</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #eef2f7 0%, #d4dfe9 100%);
+            font-family: 'Inter', sans-serif;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wrapper { max-width: 650px; width: 100%; margin: 0 auto; position: relative; }
+        .card {
+            background: #ffffff;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+            background: #0b2b38;
+            padding: 0.8rem 1rem;
+            color: white;
+        }
+        .header h1 { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .badge {
+            background: #ffb347;
+            color: #1e2a36;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 0.2rem;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            background: #fff;
+            padding: 0 0.8rem;
+            gap: 0.5rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.7rem 0.3rem 0.5rem;
+            cursor: pointer;
+            color: #4a5b68;
+            position: relative;
+        }
+        .tab-btn.active { color: #1f6e4a; }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #1f6e4a;
+        }
+        .tab-content { display: none; padding: 1rem; background: #fff; max-height: 65vh; overflow-y: auto; }
+        .tab-content.active-tab { display: block; }
+        .list { list-style: none; }
+        .list li {
+            margin-bottom: 0.6rem;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .list li::before { content: "⚠️"; font-size: 0.7rem; }
+        .subnote {
+            font-size: 0.65rem;
+            background: #fef0e8;
+            padding: 0.4rem 0.7rem;
+            border-radius: 20px;
+            margin-top: 0.6rem;
+            color: #b45f1b;
+        }
+        .territory-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef2f6;
+            padding: 0.35rem 0.7rem;
+            border-radius: 30px;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #2c3e47;
+        }
+        .nav-arrows {
+            position: absolute;
+            top: 50%;
+            left: -50px;
+            right: -50px;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .nav-arrow {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            color: #1f566b;
+            font-size: 1.2rem;
+            pointer-events: auto;
+            border: none;
+            transition: all 0.2s;
+        }
+        .nav-arrow:hover { background: #1f566b; color: white; transform: scale(1.05); }
+        @media (max-width: 770px) { .nav-arrows { left: -40px; right: -40px; } .nav-arrow { width: 34px; height: 34px; font-size: 1rem; } }
+        @media (max-width: 750px) { .nav-arrows { display: none; } }
+        .dots-group { display: flex; gap: 5px; justify-content: center; margin-top: 0.8rem; padding-bottom: 0.8rem; }
+        .dot { width: 6px; height: 6px; background: #b9cedb; border-radius: 6px; cursor: pointer; }
+        .dot.active { background: #1f566b; width: 18px; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="nav-arrows">
+        <button class="nav-arrow" id="prevTab"><i class="fas fa-chevron-left"></i></button>
+        <button class="nav-arrow" id="nextTab"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="card">
+        <div class="header">
+            <h1><i class="fas fa-exclamation-triangle"></i> Последствия несоблюдения условий</h1>
+            <div class="badge">территориальные и отраслевые льготы</div>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="territorial">🗺️ Территориальные</button>
+            <button class="tab-btn" data-tab="industry">🏭 Отраслевые</button>
+        </div>
+        <div id="territorialTab" class="tab-content active-tab"></div>
+        <div id="industryTab" class="tab-content"></div>
+        <div class="dots-group" id="dotsGroup"></div>
+    </div>
+</div>
+
+<script>
+    const territorialData = [
+        {
+            name: "ТОР",
+            icon: "🏭",
+            items: [
+                "Исключение из реестра через суд (ст.15 №473-ФЗ) → потеря льгот задним числом.",
+                "Доначисление налога на прибыль (20%) и страховых взносов (30% вместо 7,6%) с начала года.",
+                "Расторжение договора аренды земли, изъятие участков.",
+                "5-летний мораторий на повторную заявку.",
+                "Для моногородов: запрет на статус, если компания является градообразующей."
+            ]
+        },
+        {
+            name: "ОЭЗ",
+            icon: "🏗️",
+            items: [
+                "Расторжение соглашения (ст.20 №116-ФЗ) → потеря статуса.",
+                "Уплата неуплаченных налогов за весь период + штраф 20-40% (ст.122 НК).",
+                "Лишение льгот, если сэкономленные налоги > реальных инвестиций.",
+                "Для портовых ОЭЗ — принудительное освобождение территории.",
+                "Доля доходов от основного вида < 90% → потеря пониженных ставок."
+            ]
+        },
+        {
+            name: "СПВ",
+            icon: "🚢",
+            items: [
+                "Расторжение соглашения по иску КРДВ (ст.13 №212-ФЗ).",
+                "Потеря налоговых льгот: налог на прибыль 0% первые 5 лет, земельный налог 0% 3 года.",
+                "Взыскание штрафа, изъятие земельных участков.",
+                "Для резидентов после 1.04.2026: при нарушении соотношения капвложений и налоговой экономии (ТВмакс) → утрата пониженных тарифов взносов.",
+                "Новые резиденты имеют 3-летний переходный период без проверки соотношения."
+            ]
+        },
+        {
+            name: "Сколково",
+            icon: "⚡",
+            items: [
+                "Исключение из реестра участников → потеря льгот (налог 0%, НДС, взносы 14%).",
+                "Превышение выручки 1 млрд руб. + прибыли 300 млн руб. → потеря льгот с начала года.",
+                "5-летний мораторий на повторную заявку.",
+                "Возврат грантов при невыполнении условий."
+            ]
+        },
+        {
+            name: "Риски по ст. 56.1 НК",
+            icon: "⚠️",
+            items: [
+                "Налоговая вправе отказать в льготах, если компания 2+ раза за 3 года не сдавала бухотчетность.",
+                "Контроль соотношения: капвложения / налоговая экономия (ТВмакс). Если экономия превышает инвестиции → доначисления.",
+                "Расчет ТВмакс сдается до 25 марта. Несдача расчета → приостановление льгот.",
+                "Переходный период: для новых резидентов (после 1 апреля 2026) проверки начнутся через 3 года.",
+                "Для старых резидентов (до 1 апреля 2026) новые критерии не применяются."
+            ]
+        }
+    ];
+
+    const industryData = [
+        {
+            name: "ИТ-компании",
+            icon: "💻",
+            items: [
+                "Утрата аккредитации → потеря права на пониженную ставку налога на прибыль (5%) и страховых взносов (15%).",
+                "Налоговая может запросить документы на камералке: договоры, акты, расшифровки доходов, выписки из реестра.",
+                "Доля профильных доходов < 70% → потеря льгот.",
+                "Среднемесячная зарплата сотрудников за 3 месяца < средней по региону → риск исключения из реестра аккредитованных организаций.",
+                "Несвоевременное подтверждение аккредитации (до 1 июня) → исключение из реестра."
+            ]
+        },
+        {
+            name: "Радиоэлектронная промышленность (РЭП)",
+            icon: "📡",
+            items: [
+                "Исключение из реестра РЭП Минпромторга → потеря льготы по налогу на прибыль.",
+                "Доля профильных доходов < 70% → утрата права на пониженные ставки.",
+                "Отсутствие экспертного заключения ФГБУ «ВНИИР» → отказ во включении в реестр.",
+                "Несоответствие вида деятельности перечню (проектирование, разработка, производство ЭКБ) → исключение из реестра."
+            ]
+        },
+        {
+            name: "Медицина",
+            icon: "🏥",
+            items: [
+                "Отсутствие лицензии → штраф до 50 тыс. руб. (ст.14.1 КоАП) или уголовная ответственность (ст.171 УК).",
+                "Штат < 15 чел. или доля аккредитованных врачей < 50% → потеря нулевой ставки по налогу на прибыль.",
+                "Доля доходов от медицины+образования+НИОКР < 90% → потеря льгот.",
+                "Отсутствие раздельного учета → риск доначисления НДС.",
+                "Росздравнадзор может провести проверку и приостановить лицензию при нарушении требований."
+            ]
+        },
+        {
+            name: "Образование",
+            icon: "🎓",
+            items: [
+                "Отсутствие лицензии → штраф до 50 тыс. руб. (ст.14.1 КоАП).",
+                "Штат < 15 сотрудников → потеря нулевой ставки по налогу на прибыль.",
+                "Доля доходов от льготной деятельности < 90% → утрата права на ставку 0%.",
+                "Операции с векселями и производными финансовыми инструментами → запрет на применение льготы.",
+                "Утрата права на льготу → повторное применение не ранее чем через 5 лет (кроме добровольного отказа или перехода с УСН)."
+            ]
+        },
+        {
+            name: "Общепит",
+            icon: "🍽️",
+            items: [
+                "Нарушение санитарных норм (СанПиН 2.3/2.4.3590-20) → штраф до 50 тыс. руб. или приостановление деятельности до 90 суток.",
+                "Доход за предыдущий год > 60 млн руб. (для НДС-льготы) или > 2 млрд руб. (для статуса МСП) → потеря льгот.",
+                "Доля дохода от общепита < 70% → утрата права на освобождение от НДС и пониженные взносы.",
+                "Для численности 251-1500 чел.: зарплата за предыдущий год < среднеотраслевой → потеря льгот.",
+                "Исключение из реестра МСП → утрата пониженных тарифов страховых взносов.",
+                "Отсутствие медицинских книжек у персонала → штраф до 10 тыс. руб."
+            ]
+        }
+    ];
+
+    let currentIdx = 0, activeTab = "territorial";
+    const territorialDiv = document.getElementById("territorialTab"), industryDiv = document.getElementById("industryTab"), dotsGroup = document.getElementById("dotsGroup");
+
+    function render() {
+        const data = activeTab === "territorial" ? territorialData : industryData;
+        const container = activeTab === "territorial" ? territorialDiv : industryDiv;
+        container.innerHTML = `<div class="territory-name"><span>${data[currentIdx].icon}</span> ${data[currentIdx].name}</div><ul class="list">${data[currentIdx].items.map(i => `<li>${i}</li>`).join('')}</ul><div class="subnote">🔍 Храните подтверждающие документы 5 лет. При камеральной проверке ИФНС запросит расчет ТВмакс, договоры, акты, штатное расписание.</div>`;
+        dotsGroup.innerHTML = data.map((_, i) => `<div class="dot ${i === currentIdx ? 'active' : ''}" data-idx="${i}"></div>`).join('');
+        document.querySelectorAll(".dot").forEach(dot => dot.addEventListener("click", (e) => { currentIdx = parseInt(e.currentTarget.dataset.idx); render(); }));
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === activeTab));
+        document.getElementById(`${activeTab}Tab`).classList.add("active-tab");
+        document.getElementById(`${activeTab === "territorial" ? "industry" : "territorial"}Tab`).classList.remove("active-tab");
+    }
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => { activeTab = btn.dataset.tab; currentIdx = 0; render(); }));
+    document.getElementById("prevTab").addEventListener("click", () => { const max = (activeTab === "territorial" ? territorialData : industryData).length; currentIdx = (currentIdx - 1 + max) % max; render(); });
+    document.getElementById("nextTab").addEventListener("click", () => { const max = (activeTab === "territorial" ? territorialData : industryData).length; currentIdx = (currentIdx + 1) % max; render(); });
+    render();
+</script>
+</body>
+</html>
