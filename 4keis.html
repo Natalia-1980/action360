@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Кейс-практикум | Выбор режима</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #e0e8f0 100%);
+            font-family: 'Inter', system-ui, 'Segoe UI', 'Roboto', sans-serif;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        .carousel-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3rem;
+            backdrop-filter: blur(2px);
+            padding: 1rem 0.5rem;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .carousel-track-container {
+            flex: 1;
+            overflow: hidden;
+            border-radius: 2rem;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            will-change: transform;
+        }
+
+        .case-card {
+            flex: 0 0 100%;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            max-height: 85vh;
+            border: 1px solid #eef2fa;
+        }
+
+        .case-card::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .case-header {
+            padding: 1.2rem 1.5rem 0.6rem 1.5rem;
+            background: #ffffff;
+            border-bottom: 2px solid #e9f0f5;
+        }
+
+        .case-title {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.75rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a4a4f;
+        }
+
+        .case-title span:first-child {
+            font-size: 1rem;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+
+        .case-badge {
+            background: #cff2e6;
+            color: #146b3a;
+            padding: 0.2rem 0.8rem;
+            border-radius: 60px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .case-desc {
+            background: #f8fafd;
+            margin-top: 0.8rem;
+            padding: 0.7rem 1rem;
+            border-radius: 1.2rem;
+            font-size: 0.85rem;
+            color: #1f3e48;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .interactive-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding: 1.5rem 1.5rem;
+        }
+
+        .options-panel {
+            flex: 2;
+            min-width: 240px;
+        }
+
+        .options-title {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            color: #1e5a6b;
+            border-left: 4px solid #2c7da0;
+            padding-left: 10px;
+        }
+
+        .opt-btn {
+            width: 100%;
+            background: #f1f5f9;
+            border: 1px solid #cfdfed;
+            border-radius: 60px;
+            padding: 10px 16px;
+            margin-bottom: 10px;
+            text-align: left;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+            color: #0f2c38;
+        }
+
+        .opt-btn:hover {
+            background: #e4edf5;
+            transform: translateX(5px);
+        }
+
+        .opt-btn.selected {
+            background: #1b6d5e;
+            border-color: #1b6d5e;
+            color: white;
+            box-shadow: 0 8px 18px rgba(27,109,94,0.2);
+        }
+
+        .verdict-panel {
+            flex: 3;
+            background: #fffcf0;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            border: 1px solid #ffe4bc;
+            transition: all 0.2s;
+        }
+
+        .verdict-placeholder {
+            text-align: center;
+            color: #b8956e;
+            padding: 1.5rem 0.5rem;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+
+        .verdict-label {
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            color: #b85c00;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .verdict-text {
+            font-size: 1rem;
+            font-weight: 800;
+            margin: 0.3rem 0 0.6rem;
+            color: #1b4d3e;
+        }
+
+        .reason {
+            background: #fff6e8;
+            border-left: 4px solid #f4b942;
+            padding: 10px 14px;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            margin: 10px 0;
+        }
+
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.72rem;
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-top: 0.6rem;
+        }
+
+        .comp-table th {
+            background: #eef3fa;
+            padding: 8px 5px;
+            text-align: left;
+            font-size: 0.7rem;
+        }
+
+        .comp-table td {
+            padding: 6px 5px;
+            border-bottom: 1px solid #e9eef2;
+        }
+
+        hr {
+            margin: 0.8rem 0;
+            border: none;
+            border-top: 1px solid #eadbbd;
+        }
+
+        .carousel-btn {
+            background: #ffffffcc;
+            backdrop-filter: blur(8px);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 60px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: #1e5a6b;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            color: #0f3b42;
+            transform: scale(1.02);
+        }
+
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.7rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #b9cfdf;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .dot.active {
+            background: #1b6d5e;
+            width: 22px;
+        }
+
+        .counter {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 0.6rem;
+            font-weight: 500;
+            color: #3a6b5e;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            color: #3a6659;
+        }
+
+        @media (max-width: 720px) {
+            .interactive-area {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            .case-title span:first-child {
+                font-size: 0.9rem;
+            }
+            .carousel-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="carousel-container">
+    <div class="carousel-wrapper">
+        <button class="carousel-btn" id="prevBtn">❮</button>
+        <div class="carousel-track-container">
+            <div class="carousel-track" id="carouselTrack"></div>
+        </div>
+        <button class="carousel-btn" id="nextBtn">❯</button>
+    </div>
+    <div class="dots" id="dotsContainer"></div>
+    <div class="counter" id="caseCounter"></div>
+</div>
+<footer>Выберите вариант для каждой компании — бухгалтер даст обоснованную рекомендацию</footer>
+
+<script>
+    // Предельная база для взносов 2026 года
+    const LIMIT_2026 = 2759000;
+    
+    // Данные кейсов
+    const casesData = [
+        { // Кейс 1
+            id: 1,
+            title: "ООО «Айти-Старт» (Екатеринбург)",
+            desc: "Разработка ПО (ОКВЭД 62.01), 10 программистов, внутренний рынок. ФОТ 20 млн руб. Вопрос: ИТ-льгота или переезд в ТОР?",
+            options: [
+                { val: "it_ekb", label: "✅ ИТ-льгота (Екатеринбург): налог 5%, взносы 15%/7,6%, НДС освобождение" },
+                { val: "tor_vlad", label: "🚀 Переезд в ТОР: налог 0% (5 лет), взносы 7,6% на весь ФОТ" },
+                { val: "common", label: "❌ Общий режим: налог 25%, взносы 30%, НДС 22%" }
+            ],
+            defaultVal: "it_ekb",
+            getVerdict: function(selected) {
+                const fot = 20000000;
+                const itVznosy = (LIMIT_2026 * 0.15) + ((fot - LIMIT_2026) * 0.076);
+                const torVznosy = fot * 0.076;
+                const obshVznosy = LIMIT_2026 * 0.30;
+                
+                if(selected === "it_ekb") {
+                    return {
+                        verdict: "Оптимально: ИТ-льгота в Екатеринбурге",
+                        reason: "Налог на прибыль 5% (при доле ИТ-доходов 70% и более и аккредитации). Освобождение от НДС. Страховые взносы: 15% в пределах базы и 7,6% сверх. Без переезда и инвестобязательств.",
+                        rows: [
+                            { param: "Налог на прибыль", optA: "5%", optB: "0% (ТОР)", optC: "25%" },
+                            { param: "Страховые взносы (ФОТ 20 млн)", optA: Math.round(itVznosy/1000000)+" млн руб", optB: Math.round(torVznosy/1000000)+" млн руб", optC: Math.round(obshVznosy/1000000)+" млн руб" },
+                            { param: "НДС (продажа ПО)", optA: "Освобождение", optB: "Освобождение", optC: "22%" }
+                        ]
+                    };
+                }
+                if(selected === "tor_vlad") {
+                    return {
+                        verdict: "Переезд в ТОР — максимальная выгода при готовности инвестировать",
+                        reason: "Налог на прибыль 0% первые 5 лет, страховые взносы 7,6% с каждого рубля ФОТ. Освобождение НДС сохраняется. Требуется создание офиса и выполнение инвестиционных обязательств.",
+                        rows: [
+                            { param: "Налог на прибыль", optA: "5%", optB: "0%", optC: "25%" },
+                            { param: "Страховые взносы (ФОТ 20 млн)", optA: Math.round(itVznosy/1000000)+" млн руб", optB: Math.round(torVznosy/1000000)+" млн руб", optC: Math.round(obshVznosy/1000000)+" млн руб" },
+                            { param: "НДС", optA: "освобождение", optB: "освобождение", optC: "22%" }
+                        ]
+                    };
+                }
+                return {
+                    verdict: "Общий режим — потеря всех льгот",
+                    reason: "Налог на прибыль 25%, страховые взносы 30% в пределах базы, НДС 22%. Категорически не рекомендован.",
+                    rows: [{ param: "Потеря экономии", optA: "Экономия более 60%", optB: "Экономия более 75%", optC: "0%" }]
+                };
+            }
+        },
+        { // Кейс 2: ОЭЗ Санкт-Петербург
+            id: 2,
+            title: "ИТ-разработка, Санкт-Петербург",
+            desc: "Высокий ФОТ (100 млн руб). Сравнение ИТ-льготы и ОЭЗ СПб: налог на прибыль 0% первые 6 лет, взносы по общим ставкам.",
+            options: [
+                { val: "it_spb", label: "💻 ИТ-льгота: налог 5%, взносы 15% / 7,6%" },
+                { val: "oez", label: "🏭 ОЭЗ Санкт-Петербург: налог 0% (6 лет), взносы общие 30%/15,1%" },
+                { val: "common_spb", label: "📉 Общий режим: налог 25%, взносы 30%/15,1%" }
+            ],
+            defaultVal: "it_spb",
+            getVerdict: function(selected) {
+                const fot = 100000000;
+                const itVznosy = (LIMIT_2026 * 0.15) + ((fot - LIMIT_2026) * 0.076);
+                const obshVznosy = (LIMIT_2026 * 0.30) + ((fot - LIMIT_2026) * 0.151);
+                
+                if(selected === "it_spb") {
+                    return {
+                        verdict: "ИТ-льгота — лучший выбор при высоком ФОТ",
+                        reason: "Налог на прибыль 5% (против 0% в ОЭЗ). ОЭЗ проигрывает на взносах: при ФОТ 100 млн разница " + Math.round((obshVznosy - itVznosy)/1000000) + " млн руб в пользу ИТ-льготы.",
+                        rows: [
+                            { param: "Налог на прибыль", optA: "5%", optB: "0% (6 лет)", optC: "25%" },
+                            { param: "Страховые взносы (ФОТ 100 млн)", optA: Math.round(itVznosy/1000000)+" млн руб", optB: Math.round(obshVznosy/1000000)+" млн руб", optC: Math.round(obshVznosy/1000000)+" млн руб" }
+                        ]
+                    };
+                }
+                if(selected === "oez") {
+                    return {
+                        verdict: "ОЭЗ СПб — выгоден по налогу, но проигрывает на взносах",
+                        reason: "Налог на прибыль 0% первые 6 лет — отличное преимущество. Но взносы по общим ставкам: " + Math.round(obshVznosy/1000000) + " млн руб, что на " + Math.round((obshVznosy - itVznosy)/1000000) + " млн руб больше, чем при ИТ-льготе.",
+                        rows: [
+                            { param: "Налог на прибыль", optA: "5%", optB: "0%", optC: "25%" },
+                            { param: "Страховые взносы", optA: Math.round(itVznosy/1000000)+" млн руб", optB: Math.round(obshVznosy/1000000)+" млн руб", optC: Math.round(obshVznosy/1000000)+" млн руб" }
+                        ]
+                    };
+                }
+                return {
+                    verdict: "Общий режим — недопустим",
+                    reason: "Налог на прибыль 25% и взносы " + Math.round(obshVznosy/1000000) + " млн руб делают бизнес неконкурентоспособным.",
+                    rows: [{ param: "Переплата vs ИТ", optA: "0", optB: "+" + Math.round((obshVznosy - itVznosy)/1000000) + " млн", optC: "+" + Math.round((obshVznosy - itVznosy)/1000000) + " млн" }]
+                };
+            }
+        },
+        { // Кейс 3: Моногород
+            id: 3,
+            title: "Производство в моногороде",
+            desc: "Предприятие может стать резидентом ТОР: взносы 7,6% на весь ФОТ, налог на прибыль 5%. Инвестиции составляют 10 млн руб.",
+            options: [
+                { val: "tor", label: "🏭 Резидент ТОР: взносы 7,6%, налог на прибыль 5%" },
+                { val: "usn", label: "📊 УСН (взносы стандартные 30% в пределах базы)" },
+                { val: "common", label: "⚙️ Обычная ОСНО: налог 25%, взносы 30%" }
+            ],
+            defaultVal: "tor",
+            getVerdict: function(selected) {
+                const fot = 10000000;
+                const torVznosy = fot * 0.076;
+                const obshVznosy = LIMIT_2026 * 0.30;
+                
+                if(selected === "tor") {
+                    return {
+                        verdict: "Резидент ТОР — оптимально для моногорода",
+                        reason: "Страховые взносы 7,6% на весь ФОТ, налог на прибыль 5%, освобождение от налога на имущество. Инвестиции 10 млн руб — порог выполнен.",
+                        rows: [
+                            { param: "Налог на прибыль", optA: "5%", optB: "УСН 6/15%", optC: "25%" },
+                            { param: "Страховые взносы (ФОТ 10 млн)", optA: Math.round(torVznosy/1000000)+" млн руб", optB: Math.round(obshVznosy/1000000)+" млн руб", optC: Math.round(obshVznosy/1000000)+" млн руб" }
+                        ]
+                    };
+                }
+                if(selected === "usn") {
+                    return {
+                        verdict: "УСН — не лучший выбор при наличии ТОР",
+                        reason: "УСН не снижает страховые взносы. ТОР даёт ставку 7,6% на весь ФОТ, что значительно выгоднее.",
+                        rows: [
+                            { param: "Страховые взносы (ФОТ 10 млн)", optA: Math.round(torVznosy/1000000)+" млн руб", optB: Math.round(obshVznosy/1000000)+" млн руб", optC: Math.round(obshVznosy/1000000)+" млн руб" }
+                        ]
+                    };
+                }
+                return {
+                    verdict: "Обычный режим невыгоден в моногороде",
+                    reason: "Потеря пониженных взносов. Рекомендовано заявиться на ТОР.",
+                    rows: [{ param: "Потеря выгоды", optA: "Экономия более 50%", optB: "Средняя", optC: "Нет льгот" }]
+                };
+            }
+        },
+        { // Кейс 4: Медицинский центр
+            id: 4,
+            title: "Медицинский центр",
+            desc: "Медцентр оказывает косметологические услуги, которых нет в лицензии. Общая выручка 50 млн руб, из них от косметологических услуг 5 млн руб.",
+            options: [
+                { val: "separate", label: "⚖️ Раздельный учёт + получить лицензию на косметологию" },
+                { val: "risk", label: "💸 Не делить доходы / игнорировать лицензию (риск потери всей льготы)" },
+                { val: "clean", label: "🔬 Убрать косметологию или перевести в отдельное юрлицо" }
+            ],
+            defaultVal: "separate",
+            getVerdict: function(selected) {
+                if(selected === "separate") {
+                    return {
+                        verdict: "Оптимальное решение: раздельный учёт + лицензия",
+                        reason: "Медицинские услуги по лицензии освобождены от НДС. С 5 млн руб косметологии без лицензии платите НДС 22% → 1,1 млн руб. Раздельный учёт исключает претензии ФНС.",
+                        rows: [
+                            { param: "НДС к уплате в год", optA: "1,1 млн руб", optB: "11 млн руб (риск)", optC: "0 руб" },
+                            { param: "Риск доначислений", optA: "Низкий", optB: "Крайне высокий", optC: "Нулевой" }
+                        ]
+                    };
+                }
+                if(selected === "risk") {
+                    return {
+                        verdict: "Опасно: потеря льготы по НДС + доначисления",
+                        reason: "Без раздельного учёта налоговая может снять освобождение по НДС со всего оборота — доначислят 22% с 50 млн (11 млн руб) + пени и штрафы.",
+                        rows: [
+                            { param: "НДС + санкции", optA: "1,1 млн", optB: "около 14 млн руб", optC: "0" }
+                        ]
+                    };
+                }
+                return {
+                    verdict: "Допустимый вариант, но теряете часть выручки",
+                    reason: "Убрать косметологию или выделить в ООО — тогда медцентр полностью освобождён от НДС.",
+                    rows: [
+                        { param: "Налоговый эффект", optA: "НДС 1,1 млн", optB: "риск более 11 млн", optC: "0" }
+                    ]
+                };
+            }
+        }
+    ];
+
+    // Инициализация состояния
+    let currentIndex = 0;
+    let selectedMap = {};
+    let hasUserSelected = {};
+
+    casesData.forEach(c => {
+        selectedMap[c.id] = c.defaultVal;
+        hasUserSelected[c.id] = false;
+    });
+
+    const track = document.getElementById('carouselTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const counterSpan = document.getElementById('caseCounter');
+
+    function escapeHtml(str) {
+        if(!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function renderTable(rows) {
+        if(!rows || rows.length===0) return '<div style="font-size:0.7rem;">Нет данных сравнения</div>';
+        let html = '<table class="comp-table"><thead><tr><th>Параметр</th><th>Вариант А</th><th>Вариант Б</th><th>Вариант В</th></tr></thead><tbody>';
+        for(let r of rows) {
+            html += '<tr>' +
+                        '<td>' + escapeHtml(r.param) + '</td>' +
+                        '<td>' + escapeHtml(r.optA || '—') + '</td>' +
+                        '<td>' + escapeHtml(r.optB || '—') + '</td>' +
+                        '<td>' + escapeHtml(r.optC || '—') + '</td>' +
+                    '</tr>';
+        }
+        html += '</tbody></table>';
+        return html;
+    }
+
+    function renderVerdictContent(caseItem, selectedVal, show) {
+        if (!show) {
+            return '<div class="verdict-placeholder">🤝 Выберите один из вариантов выше, чтобы получить рекомендацию бухгалтера</div>';
+        }
+        const result = caseItem.getVerdict(selectedVal);
+        const tableHtml = result.rows ? renderTable(result.rows) : '';
+        return '<div class="verdict-label">📢 РЕКОМЕНДАЦИЯ БУХГАЛТЕРА</div>' +
+               '<div class="verdict-text">' + escapeHtml(result.verdict) + '</div>' +
+               '<div class="reason">🔍 Обоснование: ' + escapeHtml(result.reason) + '</div>' +
+               '<hr />' +
+               '<div id="table-dynamic-' + caseItem.id + '">' + tableHtml + '</div>';
+    }
+
+    function renderCard(caseItem) {
+        const selectedVal = selectedMap[caseItem.id];
+        const showVerdict = hasUserSelected[caseItem.id] === true;
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'case-card';
+        cardDiv.setAttribute('data-case-id', caseItem.id);
+        const verdictHtml = renderVerdictContent(caseItem, selectedVal, showVerdict);
+        cardDiv.innerHTML = '<div class="case-header">' +
+                                '<div class="case-title">' +
+                                    '<span>📌 Кейс ' + caseItem.id + '. ' + escapeHtml(caseItem.title) + '</span>' +
+                                    '<span class="case-badge">выбор режима</span>' +
+                                '</div>' +
+                                '<div class="case-desc">' + escapeHtml(caseItem.desc) + '</div>' +
+                            '</div>' +
+                            '<div class="interactive-area">' +
+                                '<div class="options-panel">' +
+                                    '<div class="options-title">🔽 Выберите вариант решения</div>' +
+                                    '<div class="options-list" id="options-list-' + caseItem.id + '"></div>' +
+                                '</div>' +
+                                '<div class="verdict-panel" id="verdict-panel-' + caseItem.id + '">' +
+                                    verdictHtml +
+                                '</div>' +
+                            '</div>';
+        return cardDiv;
+    }
+
+    function updateSingleCard(caseId) {
+        const caseItem = casesData.find(c => c.id === caseId);
+        if(!caseItem) return;
+        const selected = selectedMap[caseId];
+        const showVerdict = hasUserSelected[caseId] === true;
+        const verdictPanel = document.querySelector('.case-card[data-case-id="' + caseId + '"] .verdict-panel');
+        if(verdictPanel) {
+            verdictPanel.innerHTML = renderVerdictContent(caseItem, selected, showVerdict);
+        }
+        const btns = document.querySelectorAll('.case-card[data-case-id="' + caseId + '"] .opt-btn');
+        btns.forEach(function(btn) {
+            const btnText = btn.textContent;
+            const matchedOpt = caseItem.options.find(function(opt) { return opt.label === btnText; });
+            if(matchedOpt && matchedOpt.val === selected) {
+                btn.classList.add('selected');
+            } else {
+                btn.classList.remove('selected');
+            }
+        });
+    }
+
+    function rebuildCarousel() {
+        track.innerHTML = '';
+        for(let i = 0; i < casesData.length; i++) {
+            const card = renderCard(casesData[i]);
+            track.appendChild(card);
+        }
+        for(let i = 0; i < casesData.length; i++) {
+            const caseItem = casesData[i];
+            const optContainer = document.getElementById('options-list-' + caseItem.id);
+            if(!optContainer) continue;
+            for(let j = 0; j < caseItem.options.length; j++) {
+                const opt = caseItem.options[j];
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn ' + (selectedMap[caseItem.id] === opt.val ? 'selected' : '');
+                btn.textContent = opt.label;
+                btn.addEventListener('click', (function(cId, optVal) {
+                    return function() {
+                        selectedMap[cId] = optVal;
+                        hasUserSelected[cId] = true;
+                        updateSingleCard(cId);
+                    };
+                })(caseItem.id, opt.val));
+                optContainer.appendChild(btn);
+            }
+        }
+        updateDotsAndCounter();
+        updateTrackPosition();
+    }
+
+    function updateDotsAndCounter() {
+        dotsContainer.innerHTML = '';
+        for(let i = 0; i < casesData.length; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if(i === currentIndex) dot.classList.add('active');
+            dot.addEventListener('click', (function(idx) {
+                return function() {
+                    currentIndex = idx;
+                    updateTrackPosition();
+                    updateDotsAndCounter();
+                };
+            })(i));
+            dotsContainer.appendChild(dot);
+        }
+        counterSpan.innerText = (currentIndex+1) + ' / ' + casesData.length;
+    }
+
+    function updateTrackPosition() {
+        const percentage = -currentIndex * 100;
+        track.style.transform = 'translateX(' + percentage + '%)';
+        updateDotsAndCounter();
+    }
+
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % casesData.length;
+        updateTrackPosition();
+    }
+
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + casesData.length) % casesData.length;
+        updateTrackPosition();
+    }
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+    rebuildCarousel();
+</script>
+</body>
+</html>
