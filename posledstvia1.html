@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Последствия несоблюдения условий</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #eef2f6;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-tabs {
+            display: flex;
+            gap: 0;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 16px;
+        }
+        .main-tab {
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #5a6e7c;
+            transition: 0.2s;
+        }
+        .main-tab.active {
+            color: #1d8f7a;
+            border-bottom: 2px solid #1d8f7a;
+        }
+        .two-columns {
+            display: flex;
+        }
+        .sidebar {
+            width: 200px;
+            background: #fafcff;
+            border-right: 1px solid #e9edf2;
+            padding: 12px 0;
+            flex-shrink: 0;
+        }
+        .sidebar-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: #8ba0b0;
+            padding: 0 12px 8px 12px;
+        }
+        .cat-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .cat-item {
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #2c5a77;
+            background: transparent;
+            border: none;
+            text-align: left;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .cat-item:hover {
+            background: #eef3fa;
+        }
+        .cat-item.active {
+            background: #e3f5f0;
+            color: #107a66;
+            font-weight: 600;
+            border-left: 3px solid #1d8f7a;
+        }
+        .content-area {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            min-width: 0;
+        }
+        .info-card {
+            background: #f9fdfb;
+            border-radius: 14px;
+            padding: 12px;
+            border: 1px solid #e2efe9;
+        }
+        .list {
+            list-style: none;
+        }
+        .list li {
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+            line-height: 1.4;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .list li:last-child {
+            margin-bottom: 0;
+        }
+        .list li::before {
+            content: "⚠️";
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+        @media (max-width: 550px) {
+            .two-columns { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e9edf2; padding: 8px 0; }
+            .cat-list { flex-direction: row; flex-wrap: wrap; }
+            .cat-item { width: auto; padding: 6px 12px; }
+            .cat-item.active { border-left: none; border-bottom: 2px solid #1d8f7a; background: transparent; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="main-tabs">
+        <button class="main-tab active" data-main-tab="territorial">🗺️ Территориальные</button>
+        <button class="main-tab" data-main-tab="industry">🏭 Отраслевые</button>
+    </div>
+
+    <!-- Панель Территориальные -->
+    <div id="territorialPanel" class="two-columns">
+        <div class="sidebar">
+            <div class="sidebar-title">ТЕРРИТОРИАЛЬНЫЕ РЕЖИМЫ</div>
+            <div class="cat-list" id="territorialSidebar"></div>
+        </div>
+        <div class="content-area" id="territorialContent"></div>
+    </div>
+
+    <!-- Панель Отраслевые -->
+    <div id="industryPanel" class="two-columns" style="display: none;">
+        <div class="sidebar">
+            <div class="sidebar-title">ОТРАСЛИ</div>
+            <div class="cat-list" id="industrySidebar"></div>
+        </div>
+        <div class="content-area" id="industryContent"></div>
+    </div>
+</div>
+
+<script>
+    // ======================= ТЕРРИТОРИАЛЬНЫЕ ДАННЫЕ =======================
+    const territorialData = {
+        tor: {
+            name: "🏢 ТОР",
+            items: [
+                "Исключение из реестра через суд (ст.15 №473-ФЗ) → потеря льгот задним числом.",
+                "Доначисление налога на прибыль (25%) и страховых взносов (общие тарифы вместо 7,6%/0%) с начала года.",
+                "Расторжение договора аренды земли, изъятие участков.",
+                "5-летний мораторий на повторную заявку.",
+                "Для моногородов: запрет на статус, если компания является градообразующей.",
+                "Налоговая вправе отказать в льготах, если компания 2+ раза за 3 года не сдавала бухотчетность.",
+                "Контроль соотношения: капвложения / налоговая экономия (ТВмакс). Если экономия превышает инвестиции → доначисления.",
+                "Расчет ТВмакс сдается до 25 марта. Несдача расчета → приостановление льгот."
+            ]
+        },
+        oez: {
+            name: "🏗️ ОЭЗ",
+            items: [
+                "Расторжение соглашения (ст.20 №116-ФЗ) → потеря статуса.",
+                "Уплата неуплаченных налогов за весь период + штраф 20-40% (ст.122 НК).",
+                "Лишение льгот, если сэкономленные налоги > реальных инвестиций.",
+                "Для портовых ОЭЗ — принудительное освобождение территории.",
+                "Доля доходов от основного вида < 90% → потеря пониженных ставок.",
+                "Налоговая вправе отказать в льготах, если компания 2+ раза за 3 года не сдавала бухотчетность.",
+                "Контроль соотношения: капвложения / налоговая экономия (ТВмакс). Если экономия превышает инвестиции → доначисления.",
+                "Расчет ТВмакс сдается до 25 марта. Несдача расчета → приостановление льгот."
+            ]
+        },
+        spv: {
+            name: "🚢 СПВ",
+            items: [
+                "Расторжение соглашения по иску КРДВ (ст.13 №212-ФЗ).",
+                "Потеря налоговых льгот: налог на прибыль 0% первые 5 лет, земельный налог 0% — 3 года.",
+                "Взыскание штрафа, изъятие земельных участков.",
+                "Для резидентов после 1.04.2026: при нарушении соотношения капвложений и налоговой экономии (ТВмакс) → утрата пониженных тарифов взносов.",
+                "Новые резиденты имеют 3-летний переходный период без проверки соотношения.",
+                "Налоговая вправе отказать в льготах, если компания 2+ раза за 3 года не сдавала бухотчетность.",
+                "Контроль соотношения: капвложения / налоговая экономия (ТВмакс). Если экономия превышает инвестиции → доначисления.",
+                "Расчет ТВмакс сдается до 25 марта. Несдача расчета → приостановление льгот.",
+                "Переходный период: для новых резидентов (после 1 апреля 2026) проверки начнутся через 3 года.",
+                "Для старых резидентов (до 1 апреля 2026) новые критерии не применяются."
+            ]
+        },
+        skolkovo: {
+            name: "⚡ Сколково",
+            items: [
+                "Исключение из реестра участников → потеря льгот (налог на прибыль 0%, НДС освобождение, страховые взносы: 30% вместо льготного тарифа).",
+                "Превышение выручки 1 млрд руб. → потеря льгот с начала года.",
+                "5-летний мораторий на повторную заявку.",
+                "Возврат грантов при невыполнении условий."
+            ]
+        }
+    };
+
+    // ======================= ОТРАСЛЕВЫЕ ДАННЫЕ =======================
+    const industryData = {
+        it: {
+            name: "💻 ИТ-компании",
+            items: [
+                "Утрата аккредитации → потеря права на пониженную ставку налога на прибыль (5% вместо 25%) и страховых взносов (15%/7,6% вместо 30%/15%).",
+                "Налоговая может запросить документы на камералке: договоры, акты, расшифровки доходов, выписки из реестра.",
+                "Доля профильных доходов < 70% → потеря льгот.",
+                "Среднемесячная зарплата сотрудников за 3 месяца < средней по региону → риск исключения из реестра аккредитованных организаций.",
+                "Несвоевременное подтверждение аккредитации (до 1 июня) → исключение из реестра."
+            ]
+        },
+        radio: {
+            name: "📡 Радиоэлектронная промышленность",
+            items: [
+                "Исключение из реестра РЭП Минпромторга → потеря льготы по налогу на прибыль (8% вместо 25%).",
+                "Доля профильных доходов < 70% → утрата права на пониженные ставки.",
+                "Отсутствие экспертного заключения ФГБУ «ВНИИР» → отказ во включении в реестр.",
+                "Несоответствие вида деятельности перечню (проектирование, разработка, производство ЭКБ) → исключение из реестра."
+            ]
+        },
+        med: {
+            name: "🏥 Медицина",
+            items: [
+                "Отсутствие лицензии → штраф до 50 тыс. руб. (ст.14.1 КоАП) или уголовная ответственность (ст.171 УК).",
+                "Штат < 15 чел. или доля аккредитованных врачей < 50% → потеря нулевой ставки по налогу на прибыль (переход на 25%).",
+                "Доля доходов от медицины+образования+НИОКР < 90% → потеря льгот.",
+                "Отсутствие раздельного учета → риск доначисления НДС.",
+                "Росздравнадзор может провести проверку и приостановить лицензию при нарушении требований."
+            ]
+        },
+        edu: {
+            name: "🎓 Образование",
+            items: [
+                "Отсутствие лицензии → штраф до 50 тыс. руб. (ст.14.1 КоАП).",
+                "Штат < 15 сотрудников → потеря нулевой ставки по налогу на прибыль (переход на 25%).",
+                "Доля доходов от льготной деятельности < 90% → утрата права на ставку 0%.",
+                "Операции с векселями и производными финансовыми инструментами → запрет на применение льготы.",
+                "Утрата права на льготу → повторное применение не ранее чем через 5 лет."
+            ]
+        },
+        catering: {
+            name: "🍽️ Общепит",
+            items: [
+                "Нарушение санитарных норм (СанПиН 2.3/2.4.3590-20) → штраф до 50 тыс. руб. или приостановление деятельности до 90 суток.",
+                "Доход за предыдущий год > 3 млрд руб. (для НДС-льготы) → потеря льгот.",
+                "Доля дохода от общепита < 70% → утрата права на освобождение от НДС и пониженные взносы.",
+                "Для численности 251-1500 чел.: зарплата за предыдущий год < среднеотраслевой → потеря льгот.",
+                "Исключение из реестра МСП → утрата пониженных тарифов страховых взносов (30% в пределах 1,5 МРОТ / 15% сверх вместо льготных).",
+                "Отсутствие медицинских книжек у персонала → штраф до 10 тыс. руб."
+            ]
+        }
+    };
+
+    // Состояние
+    let activeMainTab = 'territorial';
+    let activeTerritorialCat = 'tor';
+    let activeIndustryCat = 'it';
+
+    // Построение левого меню для территорий
+    function buildTerritorialSidebar() {
+        const sidebar = document.getElementById('territorialSidebar');
+        sidebar.innerHTML = Object.entries(territorialData).map(([key, val]) => 
+            `<button class="cat-item ${key === activeTerritorialCat ? 'active' : ''}" data-cat="${key}">${val.name}</button>`
+        ).join('');
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeTerritorialCat = btn.dataset.cat;
+                refreshTerritorial();
+            });
+        });
+    }
+
+    // Построение левого меню для отраслей
+    function buildIndustrySidebar() {
+        const sidebar = document.getElementById('industrySidebar');
+        sidebar.innerHTML = Object.entries(industryData).map(([key, val]) => 
+            `<button class="cat-item ${key === activeIndustryCat ? 'active' : ''}" data-cat="${key}">${val.name}</button>`
+        ).join('');
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeIndustryCat = btn.dataset.cat;
+                refreshIndustry();
+            });
+        });
+    }
+
+    // Обновление правой панели для территорий
+    function refreshTerritorial() {
+        const terr = territorialData[activeTerritorialCat];
+        const contentDiv = document.getElementById('territorialContent');
+        
+        contentDiv.innerHTML = `
+            <div class="info-card">
+                <ul class="list">${terr.items.map(item => `<li>${item}</li>`).join('')}</ul>
+            </div>
+        `;
+        
+        document.querySelectorAll('#territorialSidebar .cat-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.cat === activeTerritorialCat);
+        });
+    }
+
+    // Обновление правой панели для отраслей
+    function refreshIndustry() {
+        const ind = industryData[activeIndustryCat];
+        const contentDiv = document.getElementById('industryContent');
+        
+        contentDiv.innerHTML = `
+            <div class="info-card">
+                <ul class="list">${ind.items.map(item => `<li>${item}</li>`).join('')}</ul>
+            </div>
+        `;
+        
+        document.querySelectorAll('#industrySidebar .cat-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.cat === activeIndustryCat);
+        });
+    }
+
+    // Переключение между основными вкладками
+    function switchMainTab(tabId) {
+        activeMainTab = tabId;
+        document.querySelectorAll('.main-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mainTab === tabId);
+        });
+        
+        const territorialPanel = document.getElementById('territorialPanel');
+        const industryPanel = document.getElementById('industryPanel');
+        
+        if (tabId === 'territorial') {
+            territorialPanel.style.display = 'flex';
+            industryPanel.style.display = 'none';
+            refreshTerritorial();
+        } else {
+            territorialPanel.style.display = 'none';
+            industryPanel.style.display = 'flex';
+            refreshIndustry();
+        }
+    }
+
+    // Инициализация
+    function init() {
+        buildTerritorialSidebar();
+        buildIndustrySidebar();
+        
+        // Верхние вкладки
+        document.querySelectorAll('.main-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchMainTab(btn.dataset.mainTab);
+            });
+        });
+        
+        refreshTerritorial();
+    }
+    
+    init();
+</script>
+</body>
+</html>
