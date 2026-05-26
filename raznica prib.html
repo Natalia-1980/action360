@@ -34,7 +34,6 @@
             position: relative;
         }
 
-        /* Контейнер для задания и результатов (переключение) */
         .task-container {
             display: block;
         }
@@ -48,17 +47,18 @@
             display: block;
         }
 
+        /* Убираем все границы в таблице задания */
         .task-table {
             width: 100%;
-            border-collapse: collapse;
             margin: 1rem 0;
             font-size: 0.85rem;
+            border-collapse: collapse;
         }
         .task-table th, .task-table td {
-            border: 1px solid #c7daf5;
             padding: 0.8rem 0.5rem;
             vertical-align: top;
             text-align: left;
+            border: none; /* убрали все рамки */
         }
         .task-table th {
             background: #e2ecfe;
@@ -123,7 +123,7 @@
             border-color: #0e2b44;
         }
 
-        /* Таблица с результатами (аналог исходной) */
+        /* Таблица с результатами (с лёгкими границами) */
         .results-table {
             width: 100%;
             border-collapse: collapse;
@@ -255,7 +255,6 @@
 
     <script>
         (function() {
-            // Правильные ответы и комментарии
             const situations = [
                 { text: "В бухгалтерском учёте амортизация начислена 80 000 руб., в налоговом — 120 000 руб.", correct: "ono", comment: "Расходов в НУ больше, чем в БУ → налог сейчас меньше → <strong>ОНО</strong>" },
                 { text: "Доход от продажи товаров в БУ отражён в этом году, в НУ — в следующем году. Сумма дохода — 500 000 руб.", correct: "ono", comment: "Доходов в БУ больше → налог сейчас больше → <strong>ОНО</strong>" },
@@ -281,7 +280,6 @@
             }
 
             function checkAll() {
-                // Проверяем, все ли вопросы отмечены
                 let allSelected = true;
                 for (let i = 1; i <= 5; i++) {
                     if (getSelectedValue(i) === null) {
@@ -295,14 +293,12 @@
                     return;
                 }
 
-                // Формируем строки таблицы результатов
                 let rowsHtml = '';
                 for (let i = 1; i <= 5; i++) {
                     const selected = getSelectedValue(i);
                     const correct = situations[i-1].correct;
                     const isCorrect = (selected === correct);
                     const statusIcon = isCorrect ? '✅' : '❌';
-                    // Текст пояснения с указанием правильности ответа
                     let statusText = isCorrect ? 'Верно' : 'Неверно';
                     const comment = situations[i-1].comment;
                     
@@ -313,7 +309,7 @@
                             <td>
                                 <strong>${statusText}</strong><br>
                                 ${comment}
-                            </td>
+                              </td>
                         </tr>
                     `;
                 }
