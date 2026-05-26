@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ПБУ 18/02 · тренажёр проводок</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 750px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .entries-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            background: #f9fcff;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #c7daf5;
+        }
+        .entries-table th, .entries-table td {
+            border: 1px solid #c7daf5;
+            padding: 0.6rem 0.3rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .entries-table th {
+            background: #e2ecfe;
+            font-weight: 600;
+        }
+        .entries-table input {
+            width: 100%;
+            padding: 0.4rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .entries-table input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0 1rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn-primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 550px) {
+            .card { padding: 1rem; }
+            .entries-table th, .entries-table td { font-size: 0.7rem; padding: 0.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <!-- Таблица для заполнения проводок -->
+    <table class="entries-table" id="entriesTable">
+        <thead>
+            <tr>
+                <th>Операция</th>
+                <th>ДЕБЕТ</th>
+                <th>КРЕДИТ</th>
+                <th>Сумма</th>
+            </tr>
+        </thead>
+        <tbody id="entriesBody">
+            <tr>
+                <td>Условный расход по налогу на прибыль</td>
+                <td><input type="text" id="op1_debet" placeholder=""></td>
+                <td><input type="text" id="op1_credit" placeholder=""></td>
+                <td><input type="number" id="op1_sum" step="any" placeholder=""></td>
+            </tr>
+            <tr>
+                <td>Постоянное налоговое обязательство</td>
+                <td><input type="text" id="op2_debet" placeholder=""></td>
+                <td><input type="text" id="op2_credit" placeholder=""></td>
+                <td><input type="number" id="op2_sum" step="any" placeholder=""></td>
+            </tr>
+            <tr>
+                <td>Погашение отложенного налогового обязательства (ОС №1)</td>
+                <td><input type="text" id="op3_debet" placeholder=""></td>
+                <td><input type="text" id="op3_credit" placeholder=""></td>
+                <td><input type="number" id="op3_sum" step="any" placeholder=""></td>
+            </tr>
+            <tr>
+                <td>Признание отложенного налогового актива (ОС №2)</td>
+                <td><input type="text" id="op4_debet" placeholder=""></td>
+                <td><input type="text" id="op4_credit" placeholder=""></td>
+                <td><input type="number" id="op4_sum" step="any" placeholder=""></td>
+            </tr>
+            <tr>
+                <td>Признание отложенного налогового актива (оценочные обязательства и резервы)</td>
+                <td><input type="text" id="op5_debet" placeholder=""></td>
+                <td><input type="text" id="op5_credit" placeholder=""></td>
+                <td><input type="number" id="op5_sum" step="any" placeholder=""></td>
+            </tr>
+            <tr>
+                <td>Налог на прибыль в федеральный бюджет</td>
+                <td><input type="text" id="op6_debet" placeholder=""></td>
+                <td><input type="text" id="op6_credit" placeholder=""></td>
+                <td><input type="number" id="op6_sum" step="any" placeholder=""></td>
+            </tr>
+            <tr>
+                <td>Налог на прибыль в региональный бюджет</td>
+                <td><input type="text" id="op7_debet" placeholder=""></td>
+                <td><input type="text" id="op7_credit" placeholder=""></td>
+                <td><input type="number" id="op7_sum" step="any" placeholder=""></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="button-row">
+        <button class="btn" id="checkBtn">Проверить все проводки</button>
+        <button class="btn" id="resetBtn">Сбросить</button>
+    </div>
+    <div id="feedback" class="feedback hidden"></div>
+    <div style="text-align: center;">
+        <button class="btn btn-primary" id="showAnswersBtn">Показать правильные ответы</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Эталонные значения
+        const correctData = {
+            op1_debet: "99", op1_credit: "68", op1_sum: 36000,
+            op2_debet: "99", op2_credit: "68", op2_sum: 1250,
+            op3_debet: "77", op3_credit: "68", op3_sum: 650,
+            op4_debet: "09", op4_credit: "68", op4_sum: 29375,
+            op5_debet: "09", op5_credit: "68", op5_sum: 1250,
+            op6_debet: "68", op6_credit: "68.1", op6_sum: 22400,
+            op7_debet: "68", op7_credit: "68.2", op7_sum: 47600
+        };
+
+        // Получение элементов
+        const inputs = {
+            op1_debet: document.getElementById('op1_debet'),
+            op1_credit: document.getElementById('op1_credit'),
+            op1_sum: document.getElementById('op1_sum'),
+            op2_debet: document.getElementById('op2_debet'),
+            op2_credit: document.getElementById('op2_credit'),
+            op2_sum: document.getElementById('op2_sum'),
+            op3_debet: document.getElementById('op3_debet'),
+            op3_credit: document.getElementById('op3_credit'),
+            op3_sum: document.getElementById('op3_sum'),
+            op4_debet: document.getElementById('op4_debet'),
+            op4_credit: document.getElementById('op4_credit'),
+            op4_sum: document.getElementById('op4_sum'),
+            op5_debet: document.getElementById('op5_debet'),
+            op5_credit: document.getElementById('op5_credit'),
+            op5_sum: document.getElementById('op5_sum'),
+            op6_debet: document.getElementById('op6_debet'),
+            op6_credit: document.getElementById('op6_credit'),
+            op6_sum: document.getElementById('op6_sum'),
+            op7_debet: document.getElementById('op7_debet'),
+            op7_credit: document.getElementById('op7_credit'),
+            op7_sum: document.getElementById('op7_sum')
+        };
+
+        function normalizeStr(str) {
+            if (!str) return '';
+            return str.toString().trim().toLowerCase().replace(/\s+/g, '').replace(/[.,/#!$%^&*;:{}=?`~()]/g, '');
+        }
+
+        function compareDebitCredit(user, correct) {
+            const normUser = normalizeStr(user);
+            const normCorrect = normalizeStr(correct);
+            return normUser === normCorrect;
+        }
+
+        function compareNumber(user, correct) {
+            if (user === '' || user === null) return false;
+            const num = parseFloat(user);
+            return !isNaN(num) && Math.abs(num - correct) < 0.5;
+        }
+
+        function checkAll() {
+            let allCorrect = true;
+            let errors = [];
+
+            const ops = [
+                { name: "Условный расход по налогу на прибыль", fields: { debet: 'op1_debet', credit: 'op1_credit', sum: 'op1_sum' } },
+                { name: "Постоянное налоговое обязательство", fields: { debet: 'op2_debet', credit: 'op2_credit', sum: 'op2_sum' } },
+                { name: "Погашение отложенного налогового обязательства (ОС №1)", fields: { debet: 'op3_debet', credit: 'op3_credit', sum: 'op3_sum' } },
+                { name: "Признание отложенного налогового актива (ОС №2)", fields: { debet: 'op4_debet', credit: 'op4_credit', sum: 'op4_sum' } },
+                { name: "Признание отложенного налогового актива (оценочные обязательства и резервы)", fields: { debet: 'op5_debet', credit: 'op5_credit', sum: 'op5_sum' } },
+                { name: "Налог на прибыль в федеральный бюджет", fields: { debet: 'op6_debet', credit: 'op6_credit', sum: 'op6_sum' } },
+                { name: "Налог на прибыль в региональный бюджет", fields: { debet: 'op7_debet', credit: 'op7_credit', sum: 'op7_sum' } }
+            ];
+
+            ops.forEach(op => {
+                const debetInput = inputs[op.fields.debet];
+                const creditInput = inputs[op.fields.credit];
+                const sumInput = inputs[op.fields.sum];
+                
+                const correctDebet = correctData[op.fields.debet];
+                const correctCredit = correctData[op.fields.credit];
+                const correctSum = correctData[op.fields.sum];
+                
+                const debetOk = compareDebitCredit(debetInput.value, correctDebet);
+                const creditOk = compareDebitCredit(creditInput.value, correctCredit);
+                const sumOk = compareNumber(sumInput.value, correctSum);
+                
+                if (!debetOk || !creditOk || !sumOk) {
+                    allCorrect = false;
+                    errors.push(`${op.name}: ДТ ${debetOk ? '✓' : '✗'} (должно быть ${correctDebet}), КТ ${creditOk ? '✓' : '✗'} (должно быть ${correctCredit}), Сумма ${sumOk ? '✓' : '✗'} (должно быть ${correctSum})`);
+                }
+            });
+
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+            
+            if (allCorrect) {
+                feedbackDiv.classList.add('correct');
+                feedbackDiv.innerHTML = '✅ Отлично! Все проводки заполнены верно.';
+            } else {
+                feedbackDiv.classList.add('incorrect');
+                let html = '❌ Найдены ошибки:<br><ul>';
+                errors.forEach(err => {
+                    html += `<li>${err}</li>`;
+                });
+                html += '</ul>';
+                feedbackDiv.innerHTML = html;
+            }
+        }
+
+        function resetAll() {
+            for (let key in inputs) {
+                if (inputs[key]) {
+                    inputs[key].value = '';
+                }
+            }
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.classList.add('hidden');
+        }
+
+        function showCorrectAnswers() {
+            for (let key in correctData) {
+                if (inputs[key]) {
+                    inputs[key].value = correctData[key];
+                }
+            }
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+            feedbackDiv.classList.add('correct');
+            feedbackDiv.innerHTML = '📋 Правильные ответы подставлены. Можете сверить с эталоном.';
+        }
+
+        document.getElementById('checkBtn').addEventListener('click', checkAll);
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
+        document.getElementById('showAnswersBtn').addEventListener('click', showCorrectAnswers);
+    })();
+</script>
+</body>
+</html>
