@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карусель шагов</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #eef2f8;
+            font-family: 'Inter', sans-serif;
+            padding: 1.5rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 750px;
+            width: 100%;
+        }
+        .carousel-section {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            padding: 0.9rem 0.8rem 1rem;
+        }
+        .carousel-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+            padding: 0 0.3rem;
+        }
+        .step-counter {
+            background: #e3f0f7;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .carousel-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            margin: 0.3rem 0 0.2rem;
+        }
+        .carousel-btn {
+            background: #e2edf5;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #1f6e8c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-btn:hover {
+            background: #cde0ea;
+        }
+        .carousel-card {
+            flex: 1;
+            max-width: 460px;
+            background: #f9feff;
+            border-radius: 1.2rem;
+            border: 1px solid #cde0ea;
+            padding: 0.7rem 0.9rem;
+            text-align: center;
+        }
+        .step-number-lg {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2c9bcb;
+            background: #e3f2f8;
+            display: inline-block;
+            width: 42px;
+            height: 42px;
+            line-height: 42px;
+            border-radius: 40px;
+            margin-bottom: 0.2rem;
+        }
+        .step-title-lg {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #124e69;
+            margin: 0.2rem 0;
+        }
+        .step-description {
+            font-size: 0.7rem;
+            color: #386f8a;
+            margin: 0.3rem 0;
+        }
+        .step-detail {
+            background: #eff6fb;
+            border-radius: 0.8rem;
+            padding: 0.4rem;
+            font-size: 0.65rem;
+            color: #1f5c76;
+            margin-top: 5px;
+        }
+        .nav-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #cbdde6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dot.active {
+            width: 20px;
+            background: #2c9bcb;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="carousel-section">
+        <div class="carousel-header">
+            <div class="step-counter" id="stepCounter">шаг 1/10</div>
+        </div>
+        <div class="carousel-wrapper">
+            <button class="carousel-btn" id="prevStepBtn">←</button>
+            <div id="carouselCard" class="carousel-card">
+                <div class="step-number-lg" id="stepNumDisplay">01</div>
+                <div class="step-title-lg" id="stepTitleDisplay">Определите основной ОКВЭД</div>
+                <div class="step-description" id="stepDescDisplay">Начните с кода деятельности</div>
+                <div class="step-detail" id="stepDetailDisplay">ОКВЭД — база для проверки отраслевых льгот</div>
+            </div>
+            <button class="carousel-btn" id="nextStepBtn">→</button>
+        </div>
+        <div class="nav-dots" id="dotsContainer"></div>
+    </div>
+</div>
+
+<script>
+    const steps = [
+        { number: "01", title: "Определите основной ОКВЭД", desc: "База для проверки отраслевых льгот", detail: "ОКВЭД — база для проверки отраслевых льгот" },
+        { number: "02", title: "Проверьте отраслевую льготу", desc: "Сверьте ОКВЭД с таблицами льгот", detail: "Пример: для ИТ-компаний действует пониженная ставка налога на прибыль 5%." },
+        { number: "03", title: "Условия для льготы", desc: "Проверьте выполнение требований", detail: "Пример: ИТ — аккредитация Минцифры, доля доходов ≥70%. Медицина — лицензия, доля ≥90%, штат≥15. Без условий льгота не применяется." },
+        { number: "04", title: "Оцените экономию отрасли", desc: "Приблизительный расчёт выгоды", detail: "Сравните ставки налогов и рассчитайте нагрузку: прибыль, страховые взносы." },
+        { number: "05", title: "Место регистрации", desc: "ТОР, СПВ, ОЭЗ, Сколково, технопарк?", detail: "Проверьте, находится ли компания на преференциальной территории." },
+        { number: "06", title: "Статус резидента", desc: "Заключено соглашение с управляющей компанией специальной территории?", detail: "Просто офис не даёт льгот — нужен официальный статус резидента и договор." },
+        { number: "07", title: "Экономия территории", desc: "Например, налог на имущество, земля, транспорт — 0%", detail: "Оцените эффект от освобождения: сравните с нагрузкой до." },
+        { number: "08", title: "Сравните льготы", desc: "Комбинируйте по разным налогам", detail: "Если два льготных основания, компания сама выбирает льготу. Например, ИТ-компания может платить налог на прибыль как резидент ТОР, а страховые взносы – по тарифу для ИТ. Для НДС учтите, по операциям из п.3 ст.149 НК плательщик может отказаться от льготы, для п.2 — нет." },
+        { number: "09", title: "Запрет двух льгот", desc: "Если подходит несколько льгот — надо выбрать одну.", detail: "Налоговый кодекс запрещает одновременное применение двух льгот по одним налогам." },
+        { number: "10", title: "Рекомендация руководителю", desc: "Плюсы, минусы, риски", detail: "Оцените затраты на переезд, инвестиционные обязательства." }
+    ];
+    
+    let currentStepIndex = 0;
+    const stepNumSpan = document.getElementById('stepNumDisplay');
+    const stepTitleSpan = document.getElementById('stepTitleDisplay');
+    const stepDescSpan = document.getElementById('stepDescDisplay');
+    const stepDetailSpan = document.getElementById('stepDetailDisplay');
+    const stepCounterSpan = document.getElementById('stepCounter');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const prevBtn = document.getElementById('prevStepBtn');
+    const nextBtn = document.getElementById('nextStepBtn');
+
+    function updateCarousel() {
+        const step = steps[currentStepIndex];
+        stepNumSpan.innerText = step.number;
+        stepTitleSpan.innerText = step.title;
+        stepDescSpan.innerText = step.desc;
+        stepDetailSpan.innerText = step.detail;
+        stepCounterSpan.innerText = `шаг ${currentStepIndex+1}/${steps.length}`;
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, idx) => { 
+            if(idx === currentStepIndex) dot.classList.add('active'); 
+            else dot.classList.remove('active'); 
+        });
+    }
+    
+    function buildDots() {
+        dotsContainer.innerHTML = '';
+        steps.forEach((_, idx) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if(idx === currentStepIndex) dot.classList.add('active');
+            dot.addEventListener('click', () => { currentStepIndex = idx; updateCarousel(); });
+            dotsContainer.appendChild(dot);
+        });
+    }
+    
+    prevBtn.addEventListener('click', () => { if(currentStepIndex > 0) { currentStepIndex--; updateCarousel(); } });
+    nextBtn.addEventListener('click', () => { if(currentStepIndex < steps.length-1) { currentStepIndex++; updateCarousel(); } });
+    
+    buildDots();
+    updateCarousel();
+</script>
+</body>
+</html>
