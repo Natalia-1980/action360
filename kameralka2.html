@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Камеральная проверка | Льготы и документы</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #eef2f6;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-tabs {
+            display: flex;
+            gap: 0;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 16px;
+        }
+        .main-tab {
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #5a6e7c;
+            transition: 0.2s;
+        }
+        .main-tab.active {
+            color: #1d8f7a;
+            border-bottom: 2px solid #1d8f7a;
+        }
+        .two-columns {
+            display: flex;
+        }
+        .sidebar {
+            width: 200px;
+            background: #fafcff;
+            border-right: 1px solid #e9edf2;
+            padding: 12px 0;
+            flex-shrink: 0;
+        }
+        .sidebar-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: #8ba0b0;
+            padding: 0 12px 8px 12px;
+        }
+        .cat-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .cat-item {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #2c5a77;
+            background: transparent;
+            border: none;
+            text-align: left;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .cat-item:hover {
+            background: #eef3fa;
+        }
+        .cat-item.active {
+            background: #e3f5f0;
+            color: #107a66;
+            font-weight: 600;
+            border-left: 3px solid #1d8f7a;
+        }
+        .content-area {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            min-width: 0;
+        }
+        .right-sub-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eef2f8;
+            padding-bottom: 8px;
+        }
+        .right-sub-tab {
+            background: #f0f4f9;
+            padding: 4px 12px;
+            border-radius: 32px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #2a577b;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .right-sub-tab.active {
+            background: #1d8f7a;
+            color: white;
+        }
+        .info-card {
+            background: #f9fdfb;
+            border-radius: 14px;
+            padding: 12px;
+            border: 1px solid #e2efe9;
+        }
+        .checklist {
+            list-style: none;
+        }
+        .checklist li {
+            margin-bottom: 6px;
+            font-size: 0.7rem;
+            line-height: 1.4;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .checklist li:last-child {
+            margin-bottom: 0;
+        }
+        .decl-list li::before {
+            content: "📄";
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+        .request-list li::before {
+            content: "🔍";
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="main-tabs">
+        <button class="main-tab active" data-main-tab="industry">🏭 Отраслевые</button>
+        <button class="main-tab" data-main-tab="territory">🗺️ Территориальные</button>
+    </div>
+
+    <!-- Панель Отраслевые -->
+    <div id="industryPanel" class="two-columns">
+        <div class="sidebar">
+            <div class="sidebar-title">ОТРАСЛИ</div>
+            <div class="cat-list" id="industrySidebar"></div>
+        </div>
+        <div class="content-area">
+            <div class="right-sub-tabs" id="industrySubTabs">
+                <div class="right-sub-tab active" data-sub="submit">📋 Представляют в ИФНС</div>
+                <div class="right-sub-tab" data-sub="request">🔍 Могут запросить дополнительно</div>
+            </div>
+            <div id="industryContent"></div>
+        </div>
+    </div>
+
+    <!-- Панель Территориальные -->
+    <div id="territoryPanel" class="two-columns" style="display: none;">
+        <div class="sidebar">
+            <div class="sidebar-title">ТЕРРИТОРИАЛЬНЫЕ РЕЖИМЫ</div>
+            <div class="cat-list" id="territorySidebar"></div>
+        </div>
+        <div class="content-area">
+            <div class="right-sub-tabs" id="territorySubTabs">
+                <div class="right-sub-tab active" data-sub="submit">📋 Представляют в ИФНС</div>
+                <div class="right-sub-tab" data-sub="request">🔍 Могут запросить дополнительно</div>
+            </div>
+            <div id="territoryContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ======================= ОТРАСЛЕВЫЕ ДАННЫЕ =======================
+    const industriesData = {
+        it: {
+            name: "💻 ИТ-компании",
+            submitList: [
+                "Декларацию по налогу на прибыль или НДС (в зависимости от режима)",
+                "Реестр по форме КНД 1155127 при льготе по НДС в разделе 7"
+            ],
+            requestList: [
+                "Выписку из реестра аккредитованных ИТ-компаний Минцифры",
+                "Договоры с заказчиками на ИТ-услуги, ИТ-продукты (разработка ПО, внедрение, сопровождение, консультации)",
+                "Акты выполненных работ и оказанных услуг к договорам",
+                "Счета-фактуры и УПД",
+                "Расшифровку доходов по субсчетам бухучета (например, 90.1 с аналитикой)",
+                "Сведения о продуктах в реестре российского ПО (наименование, номер, доход)",
+                "Соглашение с вузом (для крупных ИТ-компаний с выручкой от 1 млрд руб.)"
+            ]
+        },
+        radio: {
+            name: "📡 Радиоэлектронная промышленность",
+            submitList: [
+                "Декларацию по налогу на прибыль",
+                "Бухгалтерскую отчетность, РСВ"
+            ],
+            requestList: [
+                "Выписку из ГИПС",
+                "Расчет доли доходов от деятельности, договоры, акты, счета-фактуры, УПД",
+                "Патенты на изобретения, полезные модели, конструкторскую и технологическую документацию",
+                "Протоколы испытаний, результаты разработок, договоры на разработку и проектирование",
+                "Трудовые договоры инженеров-разработчиков, штатное расписание, должностные инструкции"
+            ]
+        },
+        med: {
+            name: "🏥 Медицина",
+            submitList: [
+                "Вместе с годовой декларацией по прибыли — форму КНД 1150022 (доля доходов, численность штата, численность медиков)",
+                "Декларацию по НДС с разделом 7 (код операции 1010211)",
+                "Электронный реестр по форме КНД 1155127 при льготе по НДС"
+            ],
+            requestList: [
+                "Копии лицензий на медицинскую деятельность",
+                "Договоры, акты, подтверждающие доходы от меддеятельности",
+                "Штатное расписание, трудовые договоры, приказы, сертификаты специалистов, свидетельства об аккредитации",
+                "Данные об отсутствии операций с векселями и ПФИ",
+                "Для освобождения от НДС: протоколы врачебных комиссий, направления, медицинские карты",
+                "Договоры и акты с пациентами (медицинская терминология), документы по ОМС",
+                "Регистрационные удостоверения на медицинские изделия",
+                "Пояснения или реестр подтверждающих документов в электронной форме"
+            ]
+        },
+        edu: {
+            name: "🎓 Образование",
+            submitList: [
+                "Заявление на ставку 0% (за месяц до начала налогового периода)",
+                "Сведения о дате выдачи и регистрационном номере лицензии",
+                "По итогам года — форму КНД 1150022 (доля доходов, численность штата)",
+                "Декларацию по НДС с разделом 7 (код 1010245) и электронный реестр по форме КНД 1155127"
+            ],
+            requestList: [
+                "Копию лицензии на образовательную деятельность",
+                "Договоры, акты, подтверждающие доходы от образовательной деятельности",
+                "Штатное расписание, трудовые договоры, приказы",
+                "Данные об отсутствии операций с векселями и ПФИ",
+                "Документы, подтверждающие включение вида деятельности в Перечень №917",
+                "Для НДС: договоры с формулировками образовательных услуг, программы обучения",
+                "Акты, реестры обучающихся, журналы занятий, отчеты",
+                "Документы по раздельному учету"
+            ]
+        },
+        catering: {
+            name: "🍽️ Общепит",
+            submitList: [
+                "Декларацию по НДС: титульный лист, раздел 1 с прочерками, раздел 7",
+                "В разделе 7 — код 1011214, стоимость услуг, данные по покупкам без НДС",
+                "При восстановлении НДС — раздел 3 и приложение 1"
+            ],
+            requestList: [
+                "Выписку из ЕГРЮЛ или ЕГРИП с кодом ОКВЭД 56",
+                "Бухгалтерскую справку-расчет: доходы и удельный вес от общепита за прошлый год",
+                "Регистры налогового учета",
+                "РСВ и бухгалтерскую справку о среднемесячных выплатах сотрудникам",
+                "Скриншот из ЕМИСС со среднеотраслевой зарплатой в общепите",
+                "Реестр по форме КНД 1155127 в электронном виде",
+                "Пояснения, договоры, акты, документы по раздельному учету"
+            ]
+        }
+    };
+
+    // ======================= ТЕРРИТОРИАЛЬНЫЕ ДАННЫЕ =======================
+    const territoriesData = {
+        torSpv: {
+            name: "🏢 ТОР и СПВ",
+            submitList: [
+                "Пониженные ставки налога на прибыль — код «03» в Листе 02 и приложениях по реквизиту «Признак налогоплательщика (код)»",
+                "Расчет капвложений, расходов на НИОКР, а также сумм преференций на 31 декабря прошлого года (срок — не позднее 25 марта текущего года)"
+            ],
+            requestList: [
+                "Бухотчетность с отметкой налоговиков",
+                "Акты налоговых проверок",
+                "Платежные документы на инвестиции (поручения, выписки банка)",
+                "Договоры с контрагентами, допсоглашения или выписки из них",
+                "Акты о приемке выполненных работ и услуг",
+                "Штатное расписание с приказами о приеме на работу",
+                "Для объектов капстроительства — заключение госэкспертизы проектной документации",
+                "Для СПВ дополнительно: приказ о создании новых рабочих мест, список сотрудников на новых местах, копии трудовых договоров, копия соглашения с АО «КРДВ» с перечнем рабочих мест"
+            ]
+        },
+        oez: {
+            name: "🏗️ ОЭЗ",
+            submitList: [
+                "Стандартные отчеты + раздельный учет доходов и расходов в ОЭЗ и за ее пределами",
+                "Расчет пропорции — не менее 90% дохода от основного вида деятельности"
+            ],
+            requestList: [
+                "Документы о деятельности резидента за период проверки",
+                "Документы о выполнении обязательств по соглашению (создание рабочих мест, объем капвложений и др.)",
+                "Регистры налогового и бухучета, бухотчетность, расшифровки строк декларации",
+                "Документы о соблюдении пропорции по доходам"
+            ]
+        },
+        skolkovo: {
+            name: "⚡ Сколково",
+            submitList: [
+                "Годовую отчетность в Фонд: данные о НИОКР, результатах, коммерциализации, финансовом состоянии. Приложения: бухотчетность, копии ключевых договоров, актов, патенты или заявки на ИС",
+                "Квартальные и полугодовые отчеты с ключевыми показателями, промежуточными результатами НИОКР, численностью персонала, финансовыми показателями",
+                "При ставке 0% после прекращения освобождения — декларацию по налогу на прибыль",
+                "Декларацию по налогу на имущество (при наличии объектов)"
+            ],
+            requestList: [
+                "К годовой отчетности: технический отчет о НИОКР, лабораторные журналы, исходный код, фото прототипов",
+                "Бухотчетность, документы для проверки доходных и расходных операций",
+                "Договоры для проверки связи с инновационным проектом",
+                "Документы об отсутствии перепродажи товаров, работ или услуг",
+                "Документацию на доработку объекта коммерциализации (для ИТ — скриншоты с новым функционалом ПО)",
+                "Договоры займа",
+                "Пояснения об агентской деятельности и расходную базу при привлечении подрядчиков"
+            ]
+        }
+    };
+
+    // Состояние
+    let activeMainTab = 'industry';
+    let activeIndustryCat = 'it';
+    let activeIndustrySub = 'submit';
+    let activeTerritoryCat = 'torSpv';
+    let activeTerritorySub = 'submit';
+
+    // Построение левого меню для отраслей
+    function buildIndustrySidebar() {
+        const sidebar = document.getElementById('industrySidebar');
+        sidebar.innerHTML = Object.entries(industriesData).map(([key, val]) => 
+            `<button class="cat-item ${key === activeIndustryCat ? 'active' : ''}" data-cat="${key}">${val.name}</button>`
+        ).join('');
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeIndustryCat = btn.dataset.cat;
+                refreshIndustry();
+            });
+        });
+    }
+
+    // Построение левого меню для территорий
+    function buildTerritorySidebar() {
+        const sidebar = document.getElementById('territorySidebar');
+        sidebar.innerHTML = Object.entries(territoriesData).map(([key, val]) => 
+            `<button class="cat-item ${key === activeTerritoryCat ? 'active' : ''}" data-cat="${key}">${val.name}</button>`
+        ).join('');
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeTerritoryCat = btn.dataset.cat;
+                refreshTerritory();
+            });
+        });
+    }
+
+    // Обновление правой панели для отраслей
+    function refreshIndustry() {
+        const ind = industriesData[activeIndustryCat];
+        const contentDiv = document.getElementById('industryContent');
+        
+        if (activeIndustrySub === 'submit') {
+            contentDiv.innerHTML = `
+                <div class="info-card">
+                    <ul class="checklist decl-list">${ind.submitList.map(item => `<li>${item}</li>`).join('')}</ul>
+                </div>
+            `;
+        } else {
+            contentDiv.innerHTML = `
+                <div class="info-card">
+                    <ul class="checklist request-list">${ind.requestList.map(item => `<li>${item}</li>`).join('')}</ul>
+                </div>
+            `;
+        }
+        
+        document.querySelectorAll('#industrySidebar .cat-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.cat === activeIndustryCat);
+        });
+    }
+
+    // Обновление правой панели для территорий
+    function refreshTerritory() {
+        const terr = territoriesData[activeTerritoryCat];
+        const contentDiv = document.getElementById('territoryContent');
+        const isSkolkovo = activeTerritoryCat === 'skolkovo';
+        
+        // Обновляем текст вкладки
+        const submitTab = document.querySelector('#territorySubTabs .right-sub-tab:first-child');
+        if (submitTab) {
+            submitTab.innerHTML = isSkolkovo ? "📋 Представляют в ИФНС и Фонд" : "📋 Представляют в ИФНС";
+        }
+        
+        if (activeTerritorySub === 'submit') {
+            contentDiv.innerHTML = `
+                <div class="info-card">
+                    <ul class="checklist decl-list">${terr.submitList.map(item => `<li>${item}</li>`).join('')}</ul>
+                </div>
+            `;
+        } else {
+            contentDiv.innerHTML = `
+                <div class="info-card">
+                    <ul class="checklist request-list">${terr.requestList.map(item => `<li>${item}</li>`).join('')}</ul>
+                </div>
+            `;
+        }
+        
+        document.querySelectorAll('#territorySidebar .cat-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.cat === activeTerritoryCat);
+        });
+    }
+
+    // Переключение между основными вкладками
+    function switchMainTab(tabId) {
+        activeMainTab = tabId;
+        document.querySelectorAll('.main-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mainTab === tabId);
+        });
+        
+        const industryPanel = document.getElementById('industryPanel');
+        const territoryPanel = document.getElementById('territoryPanel');
+        
+        if (tabId === 'industry') {
+            industryPanel.style.display = 'flex';
+            territoryPanel.style.display = 'none';
+            refreshIndustry();
+        } else {
+            industryPanel.style.display = 'none';
+            territoryPanel.style.display = 'flex';
+            refreshTerritory();
+        }
+    }
+
+    // Инициализация
+    function init() {
+        buildIndustrySidebar();
+        buildTerritorySidebar();
+        
+        // Подвкладки для отраслей
+        document.querySelectorAll('#industrySubTabs .right-sub-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeIndustrySub = btn.dataset.sub;
+                document.querySelectorAll('#industrySubTabs .right-sub-tab').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                refreshIndustry();
+            });
+        });
+        
+        // Подвкладки для территорий
+        document.querySelectorAll('#territorySubTabs .right-sub-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeTerritorySub = btn.dataset.sub;
+                document.querySelectorAll('#territorySubTabs .right-sub-tab').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                refreshTerritory();
+            });
+        });
+        
+        // Верхние вкладки
+        document.querySelectorAll('.main-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchMainTab(btn.dataset.mainTab);
+            });
+        });
+        
+        refreshIndustry();
+    }
+    
+    init();
+</script>
+</body>
+</html>
