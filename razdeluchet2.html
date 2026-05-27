@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Раздельный учет по налогам</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #eef2f6;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+        }
+        .left-menu {
+            width: 160px;
+            background: #fafcff;
+            border-right: 1px solid #e9edf2;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .menu-item {
+            padding: 16px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #2c5a77;
+            background: transparent;
+            border: none;
+            text-align: left;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .menu-item:hover {
+            background: #eef3fa;
+        }
+        .menu-item.active {
+            background: #e3f5f0;
+            color: #107a66;
+            border-left: 3px solid #1d8f7a;
+        }
+        .right-area {
+            flex: 1;
+            padding: 16px;
+            background: white;
+            min-width: 0;
+        }
+        .sub-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #eef2f8;
+            padding-bottom: 10px;
+        }
+        .sub-tab {
+            background: #f0f4f9;
+            padding: 5px 12px;
+            border-radius: 32px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #2a577b;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .sub-tab.active {
+            background: #1d8f7a;
+            color: white;
+        }
+        .info-card {
+            background: #f9fdfb;
+            border-radius: 14px;
+            padding: 12px;
+            border: 1px solid #e2efe9;
+        }
+        .rule-list {
+            list-style: none;
+        }
+        .rule-list li {
+            margin-bottom: 8px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            font-size: 0.7rem;
+            line-height: 1.4;
+        }
+        .rule-list li i {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .warning-note {
+            background: #fff6e5;
+            border-left: 3px solid #e6a017;
+            padding: 8px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin: 10px 0;
+        }
+        .flex-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0 0;
+        }
+        .tax-badge {
+            background: #eef2fa;
+            border-radius: 30px;
+            padding: 3px 10px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #145c7a;
+        }
+        @media (max-width: 550px) {
+            .container { flex-direction: column; }
+            .left-menu { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid #e9edf2; }
+            .menu-item { padding: 12px; text-align: center; flex: 1; border-left: none; border-bottom: 2px solid transparent; }
+            .menu-item.active { border-left: none; border-bottom: 2px solid #1d8f7a; background: transparent; }
+            .sub-tabs { overflow-x: auto; flex-wrap: nowrap; }
+            .sub-tab { white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="left-menu">
+        <button class="menu-item active" data-menu="need">📋 Когда нужен учет</button>
+        <button class="menu-item" data-menu="noneed">❌ Когда не нужен учет</button>
+    </div>
+    <div class="right-area" id="rightArea"></div>
+</div>
+
+<script>
+    // Данные для вкладки "Когда нужен учет"
+    const needData = {
+        nds: {
+            name: "💰 НДС",
+            items: [
+                "<strong>условие:</strong> есть облагаемые и необлагаемые операции. Входной НДС по общехозрасходам распределяется пропорционально выручке.",
+                "<strong>правило 5%:</strong> если доля расходов на необлагаемые операции ≤5% от всех расходов, учет можно не вести, но налоговики часто оспаривают. Считать долю необлагаемых операций все равно нужно.",
+                "<strong>последствия ошибки:</strong> отказ в вычете НДС, доначисление, штраф (ст.122 НК)."
+            ],
+            badges: ["ставки 22, 10, 0%"]
+        },
+        profit: {
+            name: "📈 Налог на прибыль",
+            items: [
+                "<strong>обязательные случаи:</strong> резиденты ОЭЗ, СПВ, деятельность по разным налоговым ставкам, операции, в которых убыток и прибыли считаются по специальным правилам (операции с ценными бумагами, дивиденды). Отдельное разделение убытков по видам деятельности.",
+                "<strong>резиденты ОЭЗ и СПВ:</strong> обязаны разделять доходы, расходы и убытки по льготируемой и нельготируемой деятельности. Нельзя уменьшать льготную базу на убытки от аренды/иных операций.",
+                "<strong>нулевой доход:</strong> раздельный учет нужен даже при подготовительных расходах (если доходов нет, но расходы есть).",
+                "<strong>учетная политика:</strong> порядок закрепляется до налогового периода. Нарушение = потеря льготы с начала года + штраф 20% (ст.122)."
+            ],
+            badges: ["Общая ставка → 25%", "ОЭЗ / СПВ: до 13,5%", "ИТ-ставка 5% (до 2030)"]
+        },
+        property: {
+            name: "🏢 Имущественные налоги",
+            items: [
+                "<strong>налог на имущество:</strong> раздельный учет нужен при разных ставках для разных категорий (основная 2,2% / льгота 0%), кадастровые объекты vs среднегодовая стоимость, филиалы в разных регионах. Без заявления в ИФНС льгота не применяется.",
+                "<strong>транспортный налог:</strong> раздельный учет обязателен при разных ставках (лошадиные силы, тип) и при региональных льготах на часть автопарка (электромобили, резиденты СПВ). Льготы — через заявление в ИФНС."
+            ],
+            badges: ["налог на имущество: до 2,2%", "транспортный налог: ставки по регионам"]
+        }
+    };
+
+    // Данные для вкладки "Когда не нужен учет"
+    const noneedData = {
+        info: {
+            items: [
+                "По налогу на прибыль: все доходы/расходы облагаются по единой ставке, без льгот по видам деятельности.",
+                "Страховые взносы: льготные тарифы применяются ко всем работникам, если выполнены условия. Но для контроля доли профильных доходов вести нужно. Падение ниже порога → потеря права с начала расчетного периода (пересчет 30% на все выплаты + штраф).",
+                "Для НДС — только если все операции облагаемые. При правиле 5% рассчитывайте долю необлагаемых расходов."
+            ],
+            badges: []
+        }
+    };
+
+    let activeMenu = 'need';
+    let activeSubTab = 'nds';
+
+    function render() {
+        const rightArea = document.getElementById('rightArea');
+        
+        if (activeMenu === 'need') {
+            const currentData = needData[activeSubTab];
+            
+            let warningHtml = "";
+            if (currentData.warning) {
+                warningHtml = `<div class="warning-note"><i class="fas fa-calculator"></i> <strong>${currentData.warning}</strong></div>`;
+            }
+            
+            rightArea.innerHTML = `
+                <div class="sub-tabs" id="subTabs">
+                    ${Object.entries(needData).map(([key, val]) => `
+                        <div class="sub-tab ${key === activeSubTab ? 'active' : ''}" data-sub="${key}">${val.name}</div>
+                    `).join('')}
+                </div>
+                <div class="info-card">
+                    <ul class="rule-list">${currentData.items.map(item => `<li><i class="fas fa-check-circle" style="color:#1d8f7a;"></i> <span>${item}</span></li>`).join('')}</ul>
+                    ${warningHtml}
+                    <div class="flex-badges">${currentData.badges.map(b => `<span class="tax-badge">${b}</span>`).join('')}</div>
+                </div>
+            `;
+            
+            document.querySelectorAll('#subTabs .sub-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    activeSubTab = tab.dataset.sub;
+                    render();
+                });
+            });
+        } 
+        else {
+            const data = noneedData.info;
+            rightArea.innerHTML = `
+                <div class="info-card">
+                    <ul class="rule-list">${data.items.map(item => `<li><i class="fas fa-check-circle" style="color:#1d8f7a;"></i> <span>${item}</span></li>`).join('')}</ul>
+                    <div class="flex-badges">${data.badges.map(b => `<span class="tax-badge">${b}</span>`).join('')}</div>
+                </div>
+            `;
+        }
+        
+        document.querySelectorAll('.menu-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.menu === activeMenu);
+        });
+    }
+
+    function switchMenu(menuId) {
+        activeMenu = menuId;
+        if (menuId === 'need') {
+            activeSubTab = 'nds';
+        }
+        render();
+    }
+
+    function init() {
+        document.querySelectorAll('.menu-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchMenu(btn.dataset.menu);
+            });
+        });
+        render();
+    }
+    
+    init();
+</script>
+</body>
+</html>
