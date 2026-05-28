@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>НДС · раздельный учёт</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .task-text {
+            background: #f6faff;
+            border-radius: 18px;
+            padding: 1rem;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #0a2942;
+            border: 1px solid #cbdaf0;
+        }
+        .task-text p {
+            margin-bottom: 0.4rem;
+        }
+        .task-text strong {
+            color: #1e3b5c;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0.8rem 0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .input-row label {
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.85rem;
+            min-width: 160px;
+        }
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex: 1;
+        }
+        .input-wrapper input {
+            flex: 1;
+            padding: 0.4rem 0.8rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            min-width: 100px;
+        }
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-wrapper span {
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.85rem;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0 0.2rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 16px;
+            padding: 0.7rem;
+            border: 2px solid #b9d3f0;
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1rem; }
+            .input-row { flex-direction: column; align-items: flex-start; }
+            .input-row label { min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="task-text">
+        <p>ООО «Бета» за квартал получило выручку (без НДС):</p>
+        <p>— от облагаемых операций — <strong>70 000 000 руб.</strong>;</p>
+        <p>— от необлагаемых операций — <strong>10 000 000 руб.</strong></p>
+        <p>Общая сумма входного НДС по услугам аренды офиса (используется для обоих видов деятельности) составила <strong>900 000 руб.</strong></p>
+    </div>
+
+    <div class="input-row">
+        <label>Доля необлагаемой выручки:</label>
+        <div class="input-wrapper">
+            <input type="number" id="shareInput" step="any" placeholder="">
+            <span>%</span>
+        </div>
+    </div>
+
+    <div class="input-row">
+        <label>НДС в расходы:</label>
+        <div class="input-wrapper">
+            <input type="number" id="expenseInput" step="any" placeholder="">
+            <span>₽</span>
+        </div>
+    </div>
+
+    <div class="input-row">
+        <label>НДС к вычету:</label>
+        <div class="input-wrapper">
+            <input type="number" id="deductInput" step="any" placeholder="">
+            <span>₽</span>
+        </div>
+    </div>
+
+    <div class="button-row">
+        <button class="btn primary" id="checkAllBtn">Проверить все ответы</button>
+    </div>
+    <div id="feedbackBlock" class="feedback hidden"></div>
+</div>
+
+<script>
+    (function() {
+        const correctShare = 12.5;
+        const correctExpense = 112500;
+        const correctDeduct = 787500;
+
+        const shareInput = document.getElementById('shareInput');
+        const expenseInput = document.getElementById('expenseInput');
+        const deductInput = document.getElementById('deductInput');
+        const checkBtn = document.getElementById('checkAllBtn');
+        const feedbackDiv = document.getElementById('feedbackBlock');
+
+        function checkAll() {
+            const shareVal = parseFloat(shareInput.value.trim());
+            const expenseVal = parseFloat(expenseInput.value.trim());
+            const deductVal = parseFloat(deductInput.value.trim());
+
+            let shareOk = !isNaN(shareVal) && Math.abs(shareVal - correctShare) < 0.01;
+            let expenseOk = !isNaN(expenseVal) && Math.abs(expenseVal - correctExpense) < 0.5;
+            let deductOk = !isNaN(deductVal) && Math.abs(deductVal - correctDeduct) < 0.5;
+
+            let allCorrect = shareOk && expenseOk && deductOk;
+
+            feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+            if (allCorrect) {
+                feedbackDiv.classList.add('correct');
+                feedbackDiv.innerHTML = `
+                    <strong>✅ Все ответы верны!</strong><br><br>
+                    📌 Расчёт:<br>
+                    Доля необлагаемой выручки = 10 000 000 / 80 000 000 × 100% = <strong>12,5%</strong><br>
+                    НДС в расходы = 900 000 × 12,5% = <strong>112 500 ₽</strong><br>
+                    НДС к вычету = 900 000 – 112 500 = <strong>787 500 ₽</strong>
+                `;
+            } else {
+                feedbackDiv.classList.add('incorrect');
+                feedbackDiv.innerHTML = `
+                    <strong>❌ Есть ошибки</strong><br><br>
+                    📌 <strong>Правильный расчёт:</strong><br>
+                    Доля = 10 000 000 / (70 000 000 + 10 000 000) × 100% = 12,5%<br>
+                    НДС в расходы = 900 000 × 12,5% = 112 500 ₽<br>
+                    НДС к вычету = 900 000 – 112 500 = 787 500 ₽
+                `;
+            }
+        }
+
+        checkBtn.addEventListener('click', checkAll);
+    })();
+</script>
+</body>
+</html>
