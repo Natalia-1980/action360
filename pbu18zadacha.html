@@ -59,10 +59,20 @@
             border-radius: 12px;
             font-size: 0.8rem;
             text-align: center;
+            transition: all 0.1s;
         }
         .entries-table input:focus {
             outline: none;
             border-color: #1e6bb8;
+        }
+        /* Стили для подсветки полей */
+        .entries-table input.correct-field {
+            background-color: #d4edda;
+            border-color: #2b8c4a;
+        }
+        .entries-table input.incorrect-field {
+            background-color: #f8d7da;
+            border-color: #b13e3e;
         }
 
         .button-row {
@@ -244,6 +254,28 @@
             return !isNaN(num) && Math.abs(num - correct) < 0.5;
         }
 
+        // Сброс подсветки всех полей
+        function clearHighlight() {
+            for (let key in inputs) {
+                const input = inputs[key];
+                if (input) {
+                    input.classList.remove('correct-field', 'incorrect-field');
+                }
+            }
+        }
+
+        // Подсветка конкретного поля
+        function highlightField(input, isCorrect) {
+            if (input) {
+                input.classList.remove('correct-field', 'incorrect-field');
+                if (isCorrect) {
+                    input.classList.add('correct-field');
+                } else if (input.value.trim() !== '') {
+                    input.classList.add('incorrect-field');
+                }
+            }
+        }
+
         function checkAll() {
             let allCorrect = true;
             let errors = [];
@@ -258,6 +290,9 @@
                 { name: "Налог на прибыль в региональный бюджет", fields: { debet: 'op7_debet', credit: 'op7_credit', sum: 'op7_sum' } }
             ];
 
+            // Сначала сбрасываем подсветку
+            clearHighlight();
+
             ops.forEach(op => {
                 const debetInput = inputs[op.fields.debet];
                 const creditInput = inputs[op.fields.credit];
@@ -270,6 +305,11 @@
                 const debetOk = compareDebitCredit(debetInput.value, correctDebet);
                 const creditOk = compareDebitCredit(creditInput.value, correctCredit);
                 const sumOk = compareNumber(sumInput.value, correctSum);
+                
+                // Подсвечиваем каждое поле
+                highlightField(debetInput, debetOk);
+                highlightField(creditInput, creditOk);
+                highlightField(sumInput, sumOk);
                 
                 if (!debetOk || !creditOk || !sumOk) {
                     allCorrect = false;
@@ -300,6 +340,7 @@
                     inputs[key].value = '';
                 }
             }
+            clearHighlight();
             const feedbackDiv = document.getElementById('feedback');
             feedbackDiv.classList.add('hidden');
         }
@@ -308,6 +349,14 @@
             for (let key in correctData) {
                 if (inputs[key]) {
                     inputs[key].value = correctData[key];
+                }
+            }
+            // После подстановки правильных ответов подсвечиваем их зелёным
+            for (let key in correctData) {
+                const input = inputs[key];
+                if (input) {
+                    input.classList.remove('incorrect-field', 'correct-field');
+                    input.classList.add('correct-field');
                 }
             }
             const feedbackDiv = document.getElementById('feedback');
