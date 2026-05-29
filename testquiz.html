@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Налоговый квиз — 3 тура</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3b5c 0%, #2a4b72 100%);
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .quiz-card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .quiz-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            min-height: 0;
+            margin-bottom: 0.5rem;
+            scroll-behavior: smooth;
+            max-height: 65vh;
+        }
+
+        .cover-title {
+            font-size: 2.5rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            text-align: center;
+            margin: 2rem 0 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .round-title {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            margin-bottom: 1rem;
+            border-left: 5px solid #4b7bb8;
+            padding-left: 1rem;
+        }
+
+        .round-sub {
+            font-size: 1rem;
+            color: #4f6f92;
+            margin-bottom: 1.8rem;
+            text-align: center;
+        }
+
+        .btn-center {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .btn-start {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 60px;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #cbd6e6;
+            transition: 0.1s;
+            width: fit-content;
+        }
+
+        .btn-start:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #cbd6e6;
+        }
+
+        .question-header {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1b3a5e;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .timer {
+            background: #f0f5fe;
+            border-radius: 40px;
+            padding: 0.2rem 1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e3b5c;
+            border: 1px solid #b5cef0;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin: 0.5rem 0 1rem;
+        }
+
+        .question-image {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 16px;
+            border: 1px solid #d0ddeb;
+            background: #fafcff;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            line-height: 1.45;
+            background: #f7faff;
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid #d9e5f5;
+            margin-bottom: 1rem;
+            white-space: pre-line;
+        }
+
+        .answers-area {
+            margin-bottom: 1.2rem;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #dde3ec;
+            border-radius: 20px;
+            padding: 0.7rem 1rem;
+            margin-bottom: 0.6rem;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.95rem;
+        }
+
+        .option:hover {
+            border-color: #8fa8c9;
+            background: #f5faff;
+        }
+
+        .option.selected {
+            background: #e1eeff;
+            border-color: #1e6bb8;
+        }
+
+        .option.correct-highlight {
+            background: #c8f0d0;
+            border-color: #1f8b4c;
+        }
+
+        .free-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 30px;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .free-input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+
+        .action-btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 1.6rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #cbd6e6;
+            transition: 0.1s;
+            min-width: 130px;
+        }
+
+        .action-btn.center {
+            margin: 0 auto;
+            display: block;
+        }
+
+        .action-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0px 0 #cbd6e6;
+        }
+
+        .action-btn.small {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            min-width: 110px;
+        }
+
+        .action-btn.timeout-btn {
+            background: #f0f5fe;
+            border-color: #a0b8d6;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 0.9rem;
+            border: 2px solid #c2d6f0;
+            margin: 0.8rem 0;
+            font-size: 0.9rem;
+        }
+
+        .feedback .correct-ans {
+            font-weight: 700;
+            color: #146b3a;
+        }
+
+        .nav-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .show-answer-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .sticky-next {
+            border-top: 1px solid #e2eaf2;
+            padding-top: 0.8rem;
+            margin-top: 0.3rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .score-badge {
+            background: #e8f0fe;
+            border-radius: 40px;
+            padding: 0.2rem 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            margin-left: 0.5rem;
+        }
+
+        .final-score {
+            text-align: center;
+            font-size: 1.8rem;
+            color: #1e3b5c;
+            margin: 2rem 0 1rem;
+        }
+
+        @media (max-width: 500px) {
+            .quiz-card { padding: 1rem; }
+            .cover-title { font-size: 2rem; }
+            .round-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-card" id="quizContainer"></div>
+
+<script>
+    (function(){
+        // ТУРЫ (3 тура по 4 вопроса)
+        const rounds = [
+            { // Тур 1: разминка, варианты ответов
+                name: "Тур 1. Разминка",
+                pointsPerQuestion: 50,
+                questions: [
+                    { text: "Что в переводе с латинского означает термин «дебет»?",
+                      options: ["Долг", "Расход", "Он должен", "Запись"],
+                      correct: "Он должен",
+                      comment: "Термин «дебет» восходит к латинскому слову debet, что в буквальном переводе означает «он должен».",
+                      type: "choice" },
+                    { text: "Что изображено на лицевой стороне банкноты номиналом 5000 рублей выпуска 2023 года?",
+                      options: ["Стела «Европа — Азия»", "Мост через Амур", "Скульптура Муравьёву-Амурскому", "Памятник «Сказ об Урале»"],
+                      correct: "Стела «Европа — Азия»",
+                      comment: "Основное изображение лицевой стороны — стела «Европа — Азия». Памятник «Сказ об Урале» изображен на оборотной стороне новой купюры.",
+                      type: "choice",
+                      image: "Screenshot_3.png"   // Ваш рисунок (файл должен быть рядом с HTML)
+                    },
+                    { text: "В одной стране налоговая система устроена так: каждый гражданин платит налог в размере 10% от своего дохода, но если доход превышает 1000 монет, то с суммы превышения берут 20%. Человек заплатил 150 монет налога. Каков его доход?",
+                      options: ["1000 монет", "1250 монет", "1500 монет", "2000 монет"],
+                      correct: "1250 монет",
+                      comment: "С 1000 монет он заплатил бы 100 монет (10%). Остаток налога — 50 монет — это 20% от превышения. Превышение = 50 : 20% = 250 монет. Итого доход = 1250 монет.",
+                      type: "choice" },
+                    { text: "Какое животное изображено на гербе Федеральной налоговой службы России?",
+                      options: ["Орел", "Лев", "Медведь", "Змея"],
+                      correct: "Орел",
+                      comment: "На гербе ФНС России изображен двуглавый орел.",
+                      type: "choice" }
+                ]
+            },
+            { // Тур 2: налоги — первые 3 free, 4-й choice
+                name: "Тур 2. Налоги",
+                pointsPerQuestion: 50,
+                questions: [
+                    { text: "Рассказывают, что в Тибете для не желающих служить в армии одно время был введен необычный налог. Заплатить его, вообще говоря, мог любой бедняк, но не каждый мужчина решался на такой поступок. Назовите европейца, который, сам того не сознавая, мог бы 'откосить' от службы в тибетской армии.",
+                      options: null,
+                      correct: "Винсент ван Гог",
+                      comment: "В Тибете был введен 'налог на ухо'. А все знают, что у ван Гога не было одного уха.",
+                      type: "free",
+                      alt_correct: ["ван гог", "винсент ван гог", "ван гог (винсент)", "Vincent van Gogh"] },
+                    { text: "Этот налог был упразднен в Британии накануне строительства Хрустального дворца. Утверждают, что из-за этого налога британские бедняки были еще более мрачными. Назовите, на что был этот налог?",
+                      options: null,
+                      correct: "На окна",
+                      comment: "Не будь упразднен налог, строительство дворца было бы невозможным из-за огромных затрат. Бедняки не могли позволить себе окна и стекла, потому жили в полумраке.",
+                      type: "free",
+                      alt_correct: ["окна", "налог на окна", "на окна", "налог на стекла"] },
+                    { text: "При церкви Олд-Норт в административном центре штата Массачусетс открыт магазинчик, торгующий всякой всячиной. За один товар в этом магазинчике налог с продаж не берут. За какой товар?",
+                      options: null,
+                      correct: "За чай",
+                      comment: "Административный центр — Бостон. Налог не берут в память о событиях американской революции, которая началась в Бостоне с протеста против повышения налогов на чай.",
+                      type: "free",
+                      alt_correct: ["чай", "за чай", "чайный налог"] },
+                    { text: "В какой стране НДС был введен впервые в мире и стал затем обязательным для всех стран Евросоюза?",
+                      options: ["Германия", "Франция", "Швеция", "Великобритания"],
+                      correct: "Франция",
+                      comment: "Идею НДС предложил немецкий промышленник Вильгельм фон Сименс еще в 1919 году, а саму концепцию разработал французский экономист Морис Лорено. Впервые внедрила налог Франция — сначала в колонии Кот-д’Ивуар, а с 1958 года и на своей территории.",
+                      type: "choice" }
+                ]
+            },
+            { // Тур 3: сложный — все free
+                name: "Тур 3. Сложный тур",
+                pointsPerQuestion: 100,
+                questions: [
+                    { text: "Профессиональный детектив Ниро Вульф неохотно брался за расследования в конце года из-за НЕЕ. Назовите ЕЕ из двух или трех слов, использовав прилагательное с удвоенной согласной.",
+                      options: null,
+                      correct: "Прогрессивная шкала",
+                      comment: "В прогрессивной шкале по мере роста заработка растет и налоговая ставка. К концу финансового года Ниро Вульф зарабатывал крупную сумму, и брать новое дело ему было экономически невыгодно.",
+                      type: "free",
+                      alt_correct: ["прогрессивная шкала налогообложения", "прогрессивная шкала", "прогрессивный налог"] },
+                    { text: "В XIX веке в Мексике действовал закон, обязывающий родственников платить налог за то, чтобы тела их родных находились на кладбище. Этим фактом объясняется появление ИКСА в одном из мексиканских городов. Назовите ИКС двумя словами, начинающимися на один и тот же слог.",
+                      options: null,
+                      correct: "Музей мумий",
+                      comment: "Если налог не выплачивался вовремя, то родственники теряли право на место захоронения, и мертвые тела вынимались из каменных гробниц. Так те из них, что сами мумифицировались, и стали экспонатами музея.",
+                      type: "free",
+                      alt_correct: ["музей мумий", "мумии музей"] },
+                    { text: "Приезжавшие в Испанию XVII века иностранцы встречались с представителем властей еще до прохождения таможни. Вещи приезжих подвергались осмотру. А какие предметы багажа путешественников просматривались наиболее тщательно?",
+                      options: null,
+                      correct: "Книги",
+                      comment: "Испанская инквизиция строго следила за тем, чтобы в страну не попадала «неблагонадежная» литература.",
+                      type: "free",
+                      alt_correct: ["книги", "книги и рукописи", "литература"] },
+                    { text: "Политик Байрон Лупер понимал, что избиратели проголосуют за низкие налоги. Так что перед очередными выборами он официально... Ответьте точно: что сделал?",
+                      options: null,
+                      correct: "Изменил имя на 'Низкий налог'",
+                      comment: "Байрон изменил одно из своих имен на 'Низкий налог' (Энтони на «Low Tax») и под таким именем выиграл выборы.",
+                      type: "free",
+                      alt_correct: ["изменил имя на низкий налог", "сменил имя на низкий налог", "поменял имя", "взял имя низкий налог"] }
+                ]
+            }
+        ];
+
+        let currentRound = 0;
+        let currentQ = 0;
+        let timerInterval = null;
+        let timeLeft = 60;
+        let questionActive = true;
+        let roundStarted = false;
+        let answerRevealed = false;
+        let totalScore = 0;
+        let gameStarted = false;
+        let answerSubmitted = false;
+
+        const container = document.getElementById('quizContainer');
+
+        function render() {
+            if (!gameStarted) {
+                renderCover();
+            } else if (!roundStarted) {
+                renderRoundStart();
+            } else {
+                renderQuestionScreen();
+            }
+        }
+
+        function renderCover() {
+            container.innerHTML = `
+                <div class="quiz-scroll" style="display: flex; flex-direction: column; justify-content: center;">
+                    <div class="cover-title">🏛 НАЛОГОВЫЙ КВИЗ</div>
+                    <div style="text-align:center; color:#1e3b5c; margin-bottom:2rem;">3 тура · История · Налоги · Логика</div>
+                    <div class="btn-center">
+                        <button class="btn-start" id="startGameBtn">Начать квиз</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('startGameBtn').addEventListener('click', () => {
+                gameStarted = true;
+                currentRound = 0;
+                totalScore = 0;
+                roundStarted = false;
+                render();
+            });
+        }
+
+        function renderRoundStart() {
+            const r = rounds[currentRound];
+            const qCount = r.questions.length;
+            container.innerHTML = `
+                <div class="quiz-scroll">
+                    <div class="round-title">${r.name}</div>
+                    <div class="round-sub">${qCount} вопроса · за каждый ${r.pointsPerQuestion} баллов</div>
+                    <div class="btn-center">
+                        <button class="btn-start" id="startRoundBtn">▶ Начать тур</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('startRoundBtn').addEventListener('click', () => {
+                roundStarted = true;
+                currentQ = 0;
+                render();
+            });
+        }
+
+        function normalizeAnswer(str) {
+            return str.trim().toLowerCase().replace(/[^\wа-яё]/gi, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        function isAnswerCorrect(userRaw, q) {
+            const userNorm = normalizeAnswer(userRaw);
+            const correctNorm = normalizeAnswer(q.correct);
+            if (userNorm === correctNorm) return true;
+            if (q.alt_correct && Array.isArray(q.alt_correct)) {
+                return q.alt_correct.some(alt => normalizeAnswer(alt) === userNorm);
+            }
+            if (q.correct === "Прогрессивная шкала" && (userNorm.includes("прогрессивная шкала") || userNorm.includes("прогрессивный налог"))) return true;
+            if (q.correct === "Музей мумий" && (userNorm.includes("музей мумий") || userNorm === "мумии")) return true;
+            if (q.correct === "Книги" && (userNorm === "книги" || userNorm === "книга")) return true;
+            if (q.correct === "Изменил имя на 'Низкий налог'" && (userNorm.includes("низкий налог") || userNorm.includes("изменил имя"))) return true;
+            if (q.correct === "На окна" && (userNorm === "окна" || userNorm === "налог на окна")) return true;
+            if (q.correct === "За чай" && (userNorm === "чай" || userNorm === "за чай")) return true;
+            if (q.correct === "Винсент ван Гог" && (userNorm.includes("ван гог") || userNorm === "вангог")) return true;
+            return false;
+        }
+
+        function renderQuestionScreen() {
+            const r = rounds[currentRound];
+            const q = r.questions[currentQ];
+            const isChoice = (q.type === 'choice');
+            answerRevealed = false;
+            answerSubmitted = false;
+            questionActive = true;
+
+            let answersHtml = '';
+            if (isChoice) {
+                q.options.forEach((opt, idx) => {
+                    answersHtml += `<div class="option" data-opt-index="${idx}">${opt}</div>`;
+                });
+            } else {
+                answersHtml = `<input class="free-input" id="freeAnswer" placeholder="Введите ответ" autocomplete="off">`;
+            }
+
+            let imageHtml = '';
+            if (q.image) {
+                imageHtml = `<div class="image-container"><img class="question-image" src="${q.image}" alt="Банкнота 5000 рублей" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Banknote_5000_rubles_2023_obverse.jpg/800px-Banknote_5000_rubles_2023_obverse.jpg'"></div>`;
+            }
+
+            container.innerHTML = `
+                <div class="quiz-scroll" id="quizScroll">
+                    <div class="question-header">
+                        <span>Вопрос ${currentQ+1} из ${r.questions.length} <span class="score-badge">${r.pointsPerQuestion} баллов</span></span>
+                        <span class="timer" id="timerDisplay">1:00</span>
+                    </div>
+                    ${imageHtml}
+                    <div class="question-text">${q.text.replace(/\n/g, '<br>')}</div>
+                    <div class="answers-area" id="answersArea">
+                        ${answersHtml}
+                    </div>
+                    <div id="feedbackArea" class="feedback hidden"></div>
+                    <div class="nav-row" id="navRow">
+                        ${isChoice ? '<button class="action-btn center" id="submitChoice">Подтвердить</button>' : '<button class="action-btn center" id="submitFree">Подтвердить ответ</button>'}
+                    </div>
+                    <div id="showAnswerContainer" class="show-answer-container hidden">
+                        <button class="action-btn timeout-btn" id="showAnswerBtn">Показать ответ</button>
+                    </div>
+                </div>
+                <div class="sticky-next">
+                    <button class="action-btn small" id="nextQuestionBtn" disabled>Далее</button>
+                </div>
+            `;
+
+            timeLeft = 60;
+            updateTimerDisplay();
+            startTimer();
+
+            if (isChoice) {
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.addEventListener('click', () => {
+                        if (!questionActive || answerSubmitted) return;
+                        document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                        opt.classList.add('selected');
+                    });
+                });
+                const submitBtn = document.getElementById('submitChoice');
+                submitBtn.addEventListener('click', () => {
+                    if (!questionActive || answerSubmitted) {
+                        if (!questionActive) showTimeoutMessage(true);
+                        return;
+                    }
+                    const selected = document.querySelector('.option.selected');
+                    if (!selected) { alert('Выберите вариант ответа'); return; }
+                    const userAnswer = selected.textContent.trim();
+                    const isCorrect = (userAnswer === q.correct);
+                    if (isCorrect) totalScore += r.pointsPerQuestion;
+                    highlightCorrectChoice(q.correct);
+                    showFeedback(isCorrect, q.correct, q.comment, r.pointsPerQuestion);
+                    disableTimerAndInputs();
+                    answerSubmitted = true;
+                    submitBtn.classList.add('hidden');
+                });
+            } else {
+                const submitBtn = document.getElementById('submitFree');
+                submitBtn.addEventListener('click', () => {
+                    if (!questionActive || answerSubmitted) {
+                        if (!questionActive) showTimeoutMessage(true);
+                        return;
+                    }
+                    const input = document.getElementById('freeAnswer');
+                    const userAnswer = input.value.trim();
+                    if (userAnswer === "") { alert("Введите ответ"); return; }
+                    const isCorrect = isAnswerCorrect(userAnswer, q);
+                    if (isCorrect) totalScore += r.pointsPerQuestion;
+                    showFeedback(isCorrect, q.correct, q.comment, r.pointsPerQuestion);
+                    disableTimerAndInputs();
+                    answerSubmitted = true;
+                    submitBtn.classList.add('hidden');
+                });
+            }
+
+            document.getElementById('nextQuestionBtn').addEventListener('click', () => {
+                const rCur = rounds[currentRound];
+                if (currentQ + 1 < rCur.questions.length) {
+                    currentQ++;
+                    if (timerInterval) clearInterval(timerInterval);
+                    timerInterval = null;
+                    renderQuestionScreen();
+                } else {
+                    if (timerInterval) clearInterval(timerInterval);
+                    timerInterval = null;
+                    if (currentRound + 1 < rounds.length) {
+                        currentRound++;
+                        roundStarted = false;
+                        render();
+                    } else {
+                        container.innerHTML = `
+                            <div class="quiz-scroll" style="text-align:center; padding:2rem;">
+                                <div style="font-size:2.5rem;">🏆</div>
+                                <div class="final-score">Итоговый счёт: ${totalScore} баллов</div>
+                                <div style="margin:1rem 0;">Спасибо за участие в квизе!</div>
+                                <div class="btn-center">
+                                    <button class="btn-start" id="restartBtn">Пройти заново</button>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('restartBtn').addEventListener('click', () => {
+                            gameStarted = false;
+                            render();
+                        });
+                    }
+                }
+            });
+
+            const showBtn = document.getElementById('showAnswerBtn');
+            if (showBtn) {
+                showBtn.addEventListener('click', () => {
+                    if (!answerRevealed) {
+                        showCorrectAnswerOnly(q.correct, q.comment);
+                        disableTimerAndInputs();
+                        answerRevealed = true;
+                        showBtn.parentElement.classList.add('hidden');
+                        if (document.getElementById('submitChoice')) document.getElementById('submitChoice')?.classList.add('hidden');
+                        if (document.getElementById('submitFree')) document.getElementById('submitFree')?.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        function highlightCorrectChoice(correctAnswer) {
+            document.querySelectorAll('.option').forEach(opt => {
+                if (opt.textContent.trim() === correctAnswer) {
+                    opt.classList.add('correct-highlight');
+                }
+            });
+        }
+
+        function showFeedback(isCorrect, correctAns, comment, points) {
+            const fbDiv = document.getElementById('feedbackArea');
+            fbDiv.classList.remove('hidden');
+            fbDiv.innerHTML = `
+                <div style="font-weight:600; margin-bottom:6px;">${isCorrect ? '✅ Верно' : '❌ Неверно'}</div>
+                <div><span class="correct-ans">Правильный ответ: ${correctAns}</span></div>
+                <div style="margin-top:8px;">${comment}</div>
+                ${isCorrect ? `<div style="margin-top:6px;">+${points} баллов</div>` : ''}
+            `;
+            document.getElementById('nextQuestionBtn').disabled = false;
+            const showContainer = document.getElementById('showAnswerContainer');
+            if (showContainer) showContainer.classList.add('hidden');
+        }
+
+        function showCorrectAnswerOnly(correctAns, comment) {
+            const fbDiv = document.getElementById('feedbackArea');
+            fbDiv.classList.remove('hidden');
+            fbDiv.innerHTML = `<div><span class="correct-ans">Правильный ответ: ${correctAns}</span></div><div style="margin-top:8px;">${comment}</div>`;
+            document.getElementById('nextQuestionBtn').disabled = false;
+            const showContainer = document.getElementById('showAnswerContainer');
+            if (showContainer) showContainer.classList.add('hidden');
+        }
+
+        function showTimeoutMessage(isFull = true) {
+            const fbDiv = document.getElementById('feedbackArea');
+            fbDiv.classList.remove('hidden');
+            fbDiv.innerHTML = `<div style="color:#b13e3e;">⏱ Время вышло! Ответ не засчитан.</div>`;
+            document.getElementById('nextQuestionBtn').disabled = false;
+            const showContainer = document.getElementById('showAnswerContainer');
+            if (showContainer) showContainer.classList.remove('hidden');
+        }
+
+        function disableTimerAndInputs() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            questionActive = false;
+            document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
+            const freeInp = document.getElementById('freeAnswer');
+            if (freeInp) freeInp.disabled = true;
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!questionActive) return;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    questionActive = false;
+                    updateTimerDisplay();
+                    showTimeoutMessage();
+                    if (document.getElementById('submitChoice')) document.getElementById('submitChoice')?.classList.add('hidden');
+                    if (document.getElementById('submitFree')) document.getElementById('submitFree')?.classList.add('hidden');
+                    const showContainer = document.getElementById('showAnswerContainer');
+                    if (showContainer) showContainer.classList.remove('hidden');
+                    document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
+                    const freeInp2 = document.getElementById('freeAnswer');
+                    if (freeInp2) freeInp2.disabled = true;
+                } else {
+                    timeLeft--;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const t = document.getElementById('timerDisplay');
+            if (t) {
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                t.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+        }
+
+        render();
+    })();
+</script>
+</body>
+</html>
