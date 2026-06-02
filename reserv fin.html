@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Резервы под обесценение · тренажёр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+        }
+
+        /* Вкладки с номерами задач */
+        .task-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #e2ecfe;
+            padding-bottom: 0.5rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4f658d;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .tab-btn.active {
+            background: #1e3b5c;
+            color: white;
+        }
+
+        .task-container {
+            display: none;
+        }
+        .task-container.active {
+            display: block;
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1a344c;
+            margin-bottom: 0.8rem;
+        }
+
+        .task-text {
+            background: #f6faff;
+            border-radius: 18px;
+            padding: 0.9rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #0a2942;
+            border: 1px solid #cbdaf0;
+            white-space: pre-line;
+        }
+
+        .input-group {
+            margin: 0.8rem 0;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin: 0.6rem 0;
+            flex-wrap: wrap;
+        }
+        .input-row label {
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.85rem;
+            min-width: 160px;
+        }
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex: 1;
+        }
+        .input-wrapper input {
+            flex: 1;
+            padding: 0.4rem 0.8rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            min-width: 100px;
+        }
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-wrapper span {
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.85rem;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0 0.5rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 16px;
+            padding: 0.7rem;
+            border: 2px solid #b9d3f0;
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Подсветка полей */
+        input.correct-field {
+            background-color: #d4edda;
+            border-color: #2b8c4a;
+        }
+        input.incorrect-field {
+            background-color: #f8d7da;
+            border-color: #b13e3e;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1rem; }
+            .input-row { flex-direction: column; align-items: flex-start; }
+            .task-text { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <!-- Вкладки с номерами задач -->
+    <div class="task-tabs">
+        <button class="tab-btn active" data-task="1">Задача 1</button>
+        <button class="tab-btn" data-task="2">Задача 2</button>
+        <button class="tab-btn" data-task="3">Задача 3</button>
+        <button class="tab-btn" data-task="4">Задача 4</button>
+    </div>
+
+    <!-- Контейнеры для задач -->
+    <div id="task1" class="task-container active">
+        <div class="task-title">Задача 1</div>
+        <div class="task-text">
+            ООО «Вектор» в 2020 году внесло вклад в уставный капитал ООО «Сигма» в сумме 900 000 руб. Доля вклада составляет 25%.
+            В 2024–2025 годах «Сигма» работала с убытком, дивиденды не выплачивала.
+            По состоянию на 31 декабря 2026 года величина чистых активов «Сигмы» составила 2 400 000 руб.
+            Комиссия признала снижение стоимости вклада устойчивым.
+            Рассчитайте расчетную стоимость финансового вложения и сумму резерва под обесценение на 31.12.2026.
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Расчетная стоимость (руб.):</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task1_val" step="any" placeholder="">
+                    <span>₽</span>
+                </div>
+            </div>
+            <div class="input-row">
+                <label>Резерв под обесценение (руб.):</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task1_reserve" step="any" placeholder="">
+                    <span>₽</span>
+                </div>
+            </div>
+        </div>
+        <div class="button-row">
+            <button class="btn" data-check="1">Проверить</button>
+        </div>
+        <div id="feedback1" class="feedback hidden"></div>
+    </div>
+
+    <div id="task2" class="task-container">
+        <div class="task-title">Задача 2</div>
+        <div class="task-text">
+            ООО «Вектор» в июле 2025 года выдало ООО «Сигма» процентный заем в сумме 2 500 000 руб. сроком на 3 года.
+            По состоянию на 31 декабря 2026 года заемщик не произвел ни одного платежа.
+            Бухгалтер использует коэффициент снижения чистых активов заемщика для расчета.
+            Данные о чистых активах «Сигмы»:
+            на 30 июня 2025 года (перед выдачей займа): 4 000 000 руб.
+            на 30 июня 2026 года: 2 200 000 руб.
+            Рассчитайте коэффициент снижения, расчетную стоимость займа и сумму резерва на 31.12.2026.
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Коэффициент снижения:</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task2_coef" step="any" placeholder="">
+                    <span></span>
+                </div>
+            </div>
+            <div class="input-row">
+                <label>Расчетная стоимость (руб.):</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task2_val" step="any" placeholder="">
+                    <span>₽</span>
+                </div>
+            </div>
+            <div class="input-row">
+                <label>Резерв под обесценение (руб.):</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task2_reserve" step="any" placeholder="">
+                    <span>₽</span>
+                </div>
+            </div>
+        </div>
+        <div class="button-row">
+            <button class="btn" data-check="2">Проверить</button>
+        </div>
+        <div id="feedback2" class="feedback hidden"></div>
+    </div>
+
+    <div id="task3" class="task-container">
+        <div class="task-title">Задача 3</div>
+        <div class="task-text">
+            ООО «Вектор» владеет долей 40% в уставном капитале ООО «Сигма». Первоначальный вклад — 1 200 000 руб.
+            На 31 декабря 2026 года чистые активы «Сигмы» стали отрицательными и составили −500 000 руб.
+            Признаки обесценения очевидны.
+            Определите расчетную стоимость доли (минимальное значение не может быть отрицательным — ограничение 0 руб.) и рассчитайте резерв.
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Расчетная стоимость (руб.):</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task3_val" step="any" placeholder="">
+                    <span>₽</span>
+                </div>
+            </div>
+            <div class="input-row">
+                <label>Резерв под обесценение (руб.):</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task3_reserve" step="any" placeholder="">
+                    <span>₽</span>
+                </div>
+            </div>
+        </div>
+        <div class="button-row">
+            <button class="btn" data-check="3">Проверить</button>
+        </div>
+        <div id="feedback3" class="feedback hidden"></div>
+    </div>
+
+    <div id="task4" class="task-container">
+        <div class="task-title">Задача 4</div>
+        <div class="task-text">
+            У ООО «Вектор» на балансе два финансовых вложения в 2026 году:
+            Вклад в УК ООО «Дельта»: 700 000 руб. (доля 15%). Чистые активы «Дельты» на 31.12.2026 = 3 000 000 руб.
+            Выданный заем ООО «Дельта»: 1 800 000 руб., выдан в январе 2025 года.
+            Чистые активы «Дельты»:
+            на 31.12.2024 (перед займом): 5 000 000 руб.
+            на 31.12.2025: 3 750 000 руб.
+            Рассчитайте резерв отдельно по каждому вложению и общую сумму резерва.
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Резерв по вкладу в УК (руб.):</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task4_uk" step="any" placeholder="">
+                    <span>₽</span>
+                </div>
+            </div>
+            <div class="input-row">
+                <label>Резерв по займу (руб.):</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task4_loan" step="any" placeholder="">
+                    <span>₽</span>
+                </div>
+            </div>
+            <div class="input-row">
+                <label>Общий резерв (руб.):</label>
+                <div class="input-wrapper">
+                    <input type="number" id="task4_total" step="any" placeholder="">
+                    <span>₽</span>
+                </div>
+            </div>
+        </div>
+        <div class="button-row">
+            <button class="btn" data-check="4">Проверить</button>
+        </div>
+        <div id="feedback4" class="feedback hidden"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 1rem;">
+        <button class="btn" id="resetAllBtn">Сбросить всё</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Эталонные ответы
+        const correct = {
+            1: { val: 600000, reserve: 300000 },
+            2: { coef: 0.55, val: 1375000, reserve: 1125000 },
+            3: { val: 0, reserve: 1200000 },
+            4: { uk: 250000, loan: 450000, total: 700000 }
+        };
+
+        // Элементы полей ввода
+        const inputs = {
+            1: {
+                val: document.getElementById('task1_val'),
+                reserve: document.getElementById('task1_reserve')
+            },
+            2: {
+                coef: document.getElementById('task2_coef'),
+                val: document.getElementById('task2_val'),
+                reserve: document.getElementById('task2_reserve')
+            },
+            3: {
+                val: document.getElementById('task3_val'),
+                reserve: document.getElementById('task3_reserve')
+            },
+            4: {
+                uk: document.getElementById('task4_uk'),
+                loan: document.getElementById('task4_loan'),
+                total: document.getElementById('task4_total')
+            }
+        };
+
+        // Функции проверки
+        function compareNumber(user, correct, tolerance = 0.5) {
+            if (user === '' || user === null) return false;
+            const num = parseFloat(user);
+            return !isNaN(num) && Math.abs(num - correct) < tolerance;
+        }
+
+        function highlightField(field, isCorrect) {
+            if (!field) return;
+            field.classList.remove('correct-field', 'incorrect-field');
+            if (isCorrect) {
+                field.classList.add('correct-field');
+            } else if (field.value.trim() !== '') {
+                field.classList.add('incorrect-field');
+            }
+        }
+
+        function checkTask(taskId) {
+            let allCorrect = true;
+            let explanation = '';
+            let feedbackDiv = document.getElementById(`feedback${taskId}`);
+            
+            if (taskId === 1) {
+                const valOk = compareNumber(inputs[1].val.value, correct[1].val);
+                const reserveOk = compareNumber(inputs[1].reserve.value, correct[1].reserve);
+                highlightField(inputs[1].val, valOk);
+                highlightField(inputs[1].reserve, reserveOk);
+                allCorrect = valOk && reserveOk;
+                explanation = `Расчётная стоимость = 2 400 000 × 25% = 600 000 руб.<br>Резерв = 900 000 − 600 000 = 300 000 руб.`;
+            } 
+            else if (taskId === 2) {
+                const coefOk = compareNumber(inputs[2].coef.value, correct[2].coef, 0.01);
+                const valOk = compareNumber(inputs[2].val.value, correct[2].val);
+                const reserveOk = compareNumber(inputs[2].reserve.value, correct[2].reserve);
+                highlightField(inputs[2].coef, coefOk);
+                highlightField(inputs[2].val, valOk);
+                highlightField(inputs[2].reserve, reserveOk);
+                allCorrect = coefOk && valOk && reserveOk;
+                explanation = `Коэффициент = 2 200 000 / 4 000 000 = 0,55<br>Расчётная стоимость = 2 500 000 × 0,55 = 1 375 000 руб.<br>Резерв = 2 500 000 − 1 375 000 = 1 125 000 руб.`;
+            }
+            else if (taskId === 3) {
+                const valOk = compareNumber(inputs[3].val.value, correct[3].val);
+                const reserveOk = compareNumber(inputs[3].reserve.value, correct[3].reserve);
+                highlightField(inputs[3].val, valOk);
+                highlightField(inputs[3].reserve, reserveOk);
+                allCorrect = valOk && reserveOk;
+                explanation = `Расчётная стоимость = max(40% × (−500 000), 0) = 0 руб.<br>Резерв = 1 200 000 − 0 = 1 200 000 руб.`;
+            }
+            else if (taskId === 4) {
+                const ukOk = compareNumber(inputs[4].uk.value, correct[4].uk);
+                const loanOk = compareNumber(inputs[4].loan.value, correct[4].loan);
+                const totalOk = compareNumber(inputs[4].total.value, correct[4].total);
+                highlightField(inputs[4].uk, ukOk);
+                highlightField(inputs[4].loan, loanOk);
+                highlightField(inputs[4].total, totalOk);
+                allCorrect = ukOk && loanOk && totalOk;
+                explanation = `Вклад в УК: расчётная стоимость = 15% × 3 000 000 = 450 000 руб., резерв = 700 000 − 450 000 = 250 000 руб.<br>Заем: коэффициент = 3 750 000 / 5 000 000 = 0,75, расчётная стоимость = 1 800 000 × 0,75 = 1 350 000 руб., резерв = 1 800 000 − 1 350 000 = 450 000 руб.<br>Общий резерв = 250 000 + 450 000 = 700 000 руб.`;
+            }
+
+            feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+            if (allCorrect) {
+                feedbackDiv.classList.add('correct');
+                feedbackDiv.innerHTML = `<strong>✅ Верно!</strong><br><br>${explanation}`;
+            } else {
+                feedbackDiv.classList.add('incorrect');
+                feedbackDiv.innerHTML = `<strong>❌ Неверно.</strong><br><br>Правильный ответ:<br>${explanation}`;
+            }
+        }
+
+        // Переключение вкладок
+        const tabs = document.querySelectorAll('.tab-btn');
+        const containers = document.querySelectorAll('.task-container');
+        
+        function switchTask(taskNum) {
+            containers.forEach(container => container.classList.remove('active'));
+            document.getElementById(`task${taskNum}`).classList.add('active');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.task === String(taskNum)) {
+                    tab.classList.add('active');
+                }
+            });
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const taskNum = parseInt(tab.dataset.task);
+                switchTask(taskNum);
+            });
+        });
+
+        // Кнопки проверки
+        document.querySelectorAll('[data-check]').forEach(btn => {
+            const taskNum = parseInt(btn.dataset.check);
+            btn.addEventListener('click', () => checkTask(taskNum));
+        });
+
+        // Сброс всех полей и подсветки
+        function resetAll() {
+            for (let taskId = 1; taskId <= 4; taskId++) {
+                for (let key in inputs[taskId]) {
+                    const field = inputs[taskId][key];
+                    if (field) {
+                        field.value = '';
+                        field.classList.remove('correct-field', 'incorrect-field');
+                    }
+                }
+                const feedbackDiv = document.getElementById(`feedback${taskId}`);
+                if (feedbackDiv) feedbackDiv.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('resetAllBtn').addEventListener('click', resetAll);
+    })();
+</script>
+</body>
+</html>
