@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Электронный документооборот транспортных накладных</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: #f0f5fc;
+            border-radius: 60px;
+            padding: 0.3rem;
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.8rem 0.3rem;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #2a4d70;
+            cursor: pointer;
+            transition: 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .tab-btn .emoji {
+            font-size: 1.5rem;
+        }
+        .tab-btn.active {
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            color: #1a344c;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1a344c;
+            margin: 1rem 0 0.6rem 0;
+            border-left: 4px solid #2e7ab3;
+            padding-left: 0.8rem;
+        }
+
+        .rule-list {
+            background: #f9fcff;
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid #c7daf5;
+            margin: 0.8rem 0;
+        }
+        .rule-item {
+            margin: 0.6rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .rule-item::before {
+            content: "•";
+            color: #1e6bb8;
+            font-weight: bold;
+            position: absolute;
+            left: 0.2rem;
+        }
+
+        .situation-card {
+            background: #f6faff;
+            border-radius: 18px;
+            padding: 0.6rem 0.8rem;
+            margin: 0.5rem 0;
+            border-left: 4px solid #2e7ab3;
+        }
+        .situation-title {
+            font-weight: 600;
+            color: #1d3b5e;
+            font-size: 0.85rem;
+            display: inline;
+        }
+        .situation-reason {
+            font-size: 0.8rem;
+            color: #0a2942;
+            line-height: 1.4;
+            display: inline;
+        }
+
+        .badge {
+            display: none;
+        }
+
+        .footer-note {
+            font-size: 0.7rem;
+            color: #5e7290;
+            margin-top: 1rem;
+            text-align: center;
+            border-top: 1px solid #d8e2f2;
+            padding-top: 0.8rem;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1rem; }
+            .tab-btn { font-size: 0.7rem; }
+            .tab-btn .emoji { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="tab3">
+            <span class="emoji">💻📄</span>
+            <span>Электронная</span>
+        </button>
+        <button class="tab-btn" data-tab="tab2">
+            <span class="emoji">📄📝</span>
+            <span>Бумажная</span>
+        </button>
+        <button class="tab-btn" data-tab="tab1">
+            <span class="emoji">🚫📄</span>
+            <span>Не нужна</span>
+        </button>
+    </div>
+
+    <!-- Электронная (с основанием) -->
+    <div id="tab3" class="tab-content active">
+        <div class="section-title">⚡ Обязательное оформление ЭТРН в электронном виде</div>
+        <div class="situation-card" style="background:#eefaee; border-left-color:#2b8c4a;">
+            <div class="situation-title">Общее правило:</div>
+            <div class="situation-reason"> С 1 сентября 2026 года транспортная накладная оформляется <strong>только в электронном виде (ЭТрН)</strong>, за исключением случаев, предусмотренных Приказом Минтранса № 262 (см. вкладку «Бумажная»).<br>
+            <strong>Кому обязательно?</strong> Юридическим лицам, ИП при коммерческой перевозке грузов. ЭТрН формируется в ГИС ЭПД.<br>
+            <strong>Штрафы</strong> за отсутствие ЭТрН — по ст. 12.5 КоАП.</div>
+        </div>
+        <div class="footer-note" style="margin-top:0.5rem;">
+            📌 Основание: Федеральный закон от 30.06.2003 № 87-ФЗ «О транспортно-экспедиционной деятельности», Устав автомобильного транспорта (Федеральный закон от 08.11.2007 № 259-ФЗ)
+        </div>
+    </div>
+
+    <!-- Бумажная (Приказ Минтранса № 262) -->
+    <div id="tab2" class="tab-content">
+        <div class="section-title">📜 Когда можно оформить бумажную транспортную накладную</div>
+        <div class="rule-list">
+            <div class="rule-item"><strong>Перевозки военного назначения</strong> — когда Минобороны является грузоотправителем или грузополучателем.</div>
+            <div class="rule-item"><strong>Иностранный грузоотправитель или грузополучатель</strong>, не включенный в РАФП.</div>
+            <div class="rule-item"><strong>Каботажные перевозки иностранных перевозчиков</strong> из ЕАЭС.</div>
+            <div class="rule-item"><strong>Перевозки для клиента – физического лица</strong> (личные, семейные нужды). Физлицо — грузоотправитель или грузополучатель.</div>
+            <div class="rule-item"><strong>Отсутствие технической возможности</strong> направить электронные документы в ГИС ЭПД из-за сбоя.</div>
+            <div class="rule-item"><strong>Отсутствие доступа к сети Интернет</strong> (в населённых пунктах без услуг).</div>
+            <div class="rule-item"><strong>Услуги по перевозке</strong>, если грузоотправитель и грузополучатель — одно лицо.</div>
+            <div class="rule-item"><strong>Перевозка драгоценных металлов и камней</strong>.</div>
+        </div>
+        <div class="footer-note" style="margin-top:0.5rem;">
+            📌 Приказ Минтранса от 01.06.2026 № 262
+        </div>
+    </div>
+
+    <!-- Не нужна (без основания) -->
+    <div id="tab1" class="tab-content">
+        <div class="section-title">📌 Когда транспортная накладная не нужна</div>
+        
+        <div class="situation-card">
+            <span class="situation-title">Саморазвоз на своих грузовиках.</span>
+            <span class="situation-reason"> Свой груз, свои машины, свои водители. Договора перевозки нет, есть трудовые отношения. Оформляется только путевой лист.</span>
+        </div>
+
+        <div class="situation-card">
+            <span class="situation-title">Отгрузка силами продавца, доставка в цене товара.</span>
+            <span class="situation-reason"> Доставка включена в стоимость товара, отдельная плата не взимается, перевозка осуществляется силами продавца. Договора перевозки нет.</span>
+        </div>
+
+        <div class="situation-card">
+            <span class="situation-title">Аренда транспорта без экипажа.</span>
+            <span class="situation-reason"> Арендатор управляет сам (свой водитель). Перевозка силами грузовладельца, договора перевозки нет.</span>
+        </div>
+
+        <div class="situation-card">
+            <span class="situation-title">Внутрихозяйственная перевозка.</span>
+            <span class="situation-reason"> Своё зерно на своём комбайне. Технологическая перевозка без коммерческой составляющей. Оформляется путевой лист.</span>
+        </div>
+
+        <div class="situation-card">
+            <span class="situation-title">Самовывоз силами покупателя.</span>
+            <span class="situation-reason"> Продавец не является стороной договора перевозки. Он только передаёт товар по УПД. Оформлять ЭТрН не требуется.</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.getAttribute('data-tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    })();
+</script>
+</body>
+</html>
