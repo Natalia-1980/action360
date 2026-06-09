@@ -46,7 +46,6 @@
             padding-left: 10px;
         }
 
-        /* схема этапов */
         .stages-container {
             background: #f9fcff;
             border-radius: 28px;
@@ -85,8 +84,8 @@
         }
 
         .stage-icon {
-            font-size: 1.6rem;
-            margin-bottom: 4px;
+            font-size: 1.8rem;
+            margin-bottom: 6px;
         }
 
         .stage-name {
@@ -137,7 +136,7 @@
             letter-spacing: 0.3px;
         }
 
-        /* компактное модальное окно — по высоте как карточка */
+        /* компактное модальное окно */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -218,13 +217,10 @@
             flex: 1;
         }
 
-        .titul-title {
-            font-weight: 800;
-            font-size: 0.95rem;
-            color: #1e3b5c;
-            margin-bottom: 8px;
-            border-left: 3px solid #1e6bb8;
-            padding-left: 10px;
+        .titul-description {
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: #2c4e6e;
         }
 
         .info-list {
@@ -284,12 +280,6 @@
             justify-content: flex-end;
             margin-top: 6px;
         }
-
-        hr {
-            margin: 8px 0;
-            border: none;
-            border-top: 1px solid #e2e8f2;
-        }
     </style>
 </head>
 <body>
@@ -298,25 +288,25 @@
     <div class="card-sub">Нажмите на любой этап — откроется компактное описание титула</div>
 
     <div class="stages-container">
-        <!-- 4 этапа: оформление, погрузка, приемка, разгрузка -->
+        <!-- 4 этапа с уникальными значками, не повторяющими участников -->
         <div class="stage-row">
             <div class="stage-card" data-stage="titul1">
-                <div class="stage-icon">📄</div>
+                <div class="stage-icon">✍️</div>
                 <div class="stage-name">Оформление</div>
                 <div class="stage-titul">Титул 1</div>
             </div>
             <div class="stage-card" data-stage="titul2">
-                <div class="stage-icon">🚛</div>
+                <div class="stage-icon">⬇️</div>
                 <div class="stage-name">Погрузка</div>
                 <div class="stage-titul">Титул 2</div>
             </div>
             <div class="stage-card" data-stage="titul3">
-                <div class="stage-icon">📋</div>
+                <div class="stage-icon">🔍</div>
                 <div class="stage-name">Приемка</div>
                 <div class="stage-titul">Титул 3</div>
             </div>
             <div class="stage-card" data-stage="titul4">
-                <div class="stage-icon">🏭</div>
+                <div class="stage-icon">🏗️</div>
                 <div class="stage-name">Разгрузка</div>
                 <div class="stage-titul">Титул 4</div>
             </div>
@@ -334,10 +324,10 @@
 </div>
 
 <script>
-    // Данные по титулам (компактные, но полные списки)
+    // Данные по титулам (без дублирования заголовка — заголовок только в шапке модалки)
     const titulData = {
         titul1: {
-            title: "📄 Титул 1 · Оформление",
+            title: "Титул 1 · Оформление",
             description: "Создаётся грузоотправителем. Включает:",
             items: [
                 "сведения о грузоотправителе",
@@ -351,7 +341,7 @@
             footer: "После заполнения Титул 1 подписывается грузоотправителем и направляется в ГИС ЭПД."
         },
         titul2: {
-            title: "🚛 Титул 2 · Погрузка",
+            title: "Титул 2 · Погрузка",
             description: "Оформляется перевозчиком в момент погрузки. Содержит:",
             items: [
                 "информация о приемке груза к перевозке",
@@ -361,7 +351,7 @@
             footer: "После подписания Т2 перевозчик получает QR-код для водителя."
         },
         titul3: {
-            title: "📋 Титул 3 · Приемка",
+            title: "Титул 3 · Приемка",
             description: "Заполняется грузополучателем при приёме груза. Содержит:",
             items: [
                 "информация о приеме груза или об отказе",
@@ -372,7 +362,7 @@
             footer: "Титул 3 подписывается с замечаниями или без них."
         },
         titul4: {
-            title: "🏭 Титул 4 · Разгрузка",
+            title: "Титул 4 · Разгрузка",
             description: "Заполняется перевозчиком после выгрузки. Включает:",
             items: [
                 "информация о выдаче груза (дата, время, отметки)",
@@ -384,20 +374,21 @@
         }
     };
 
-    // Функция открытия компактного модального окна (по высоте не больше карточки)
+    // Функция открытия компактного модального окна (без дублирования заголовка)
     function openModal(titulKey) {
         const data = titulData[titulKey];
         if (!data) return;
 
-        // формируем компактный список
+        // формируем список
         let itemsHtml = '';
         data.items.forEach(item => {
             itemsHtml += `<li>${escapeHtml(item)}</li>`;
         });
 
+        // В теле модального окна НЕ выводим повторно заголовок "Титул 1 · Оформление", 
+        // только описание и список. Заголовок уже есть в шапке модалки (modal-header h3)
         const modalContent = `
-            <div class="titul-title">${escapeHtml(data.title)}</div>
-            <p style="margin-bottom: 6px; font-size:0.8rem;">${escapeHtml(data.description)}</p>
+            <div class="titul-description">${escapeHtml(data.description)}</div>
             <ul class="info-list">
                 ${itemsHtml}
             </ul>
