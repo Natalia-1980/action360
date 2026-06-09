@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ЭТрН · этапы перевозки и титулы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 650px;
+            max-width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1d3b5e;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-sub {
+            font-size: 0.75rem;
+            color: #5e7290;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #8da9cc;
+            padding-left: 10px;
+        }
+
+        /* схема этапов */
+        .stages-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.2rem;
+            border: 2px solid #e1eaf5;
+            margin-bottom: 0.5rem;
+        }
+
+        .stage-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stage-card {
+            flex: 1;
+            min-width: 120px;
+            background: white;
+            border-radius: 20px;
+            padding: 12px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #cbd5e1;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .stage-card:hover {
+            transform: translateY(-3px);
+            border-color: #8da9cc;
+            background: #f5faff;
+            box-shadow: 0 8px 18px -8px rgba(0,0,0,0.12);
+        }
+
+        .stage-icon {
+            font-size: 1.6rem;
+            margin-bottom: 4px;
+        }
+
+        .stage-name {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1d3b5e;
+            margin-bottom: 4px;
+        }
+
+        .stage-titul {
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: #e9eff6;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 30px;
+            color: #1e6bb8;
+            margin-top: 4px;
+        }
+
+        .participants-line {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            background: #eef3fa;
+            border-radius: 40px;
+            padding: 6px 10px;
+        }
+
+        .participant-badge {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            background: white;
+            padding: 3px 10px;
+            border-radius: 30px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .divider {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #8da0bb;
+            margin: 8px 0 4px;
+            letter-spacing: 0.3px;
+        }
+
+        /* компактное модальное окно — по высоте как карточка */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-window {
+            width: 540px;
+            max-width: 90%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.25);
+            overflow: hidden;
+            animation: fadeInUp 0.18s ease;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: #1e3b5c;
+            color: white;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .modal-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 6px;
+            border-radius: 40px;
+            transition: 0.1s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-body {
+            padding: 1rem 1.2rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #1a324a;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .titul-title {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: #1e3b5c;
+            margin-bottom: 8px;
+            border-left: 3px solid #1e6bb8;
+            padding-left: 10px;
+        }
+
+        .info-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 8px 0 6px;
+        }
+
+        .info-list li {
+            margin-bottom: 5px;
+            padding-left: 16px;
+            position: relative;
+            font-size: 0.8rem;
+            line-height: 1.35;
+        }
+
+        .info-list li::before {
+            content: "⊲";
+            position: absolute;
+            left: 0;
+            color: #1e6bb8;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .subnote {
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: #6c86a3;
+            border-top: 1px solid #e2e8f2;
+            padding-top: 6px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #eef2f7;
+            border: 1px solid #cbd5e1;
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: 0.1s;
+        }
+
+        .back-button:hover {
+            background: #e3e9f1;
+            border-color: #8da9cc;
+        }
+
+        .modal-footer-compact {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 6px;
+        }
+
+        hr {
+            margin: 8px 0;
+            border: none;
+            border-top: 1px solid #e2e8f2;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-title">📋 Этапы перевозки и титулы ЭТрН</div>
+    <div class="card-sub">Нажмите на любой этап — откроется компактное описание титула</div>
+
+    <div class="stages-container">
+        <!-- 4 этапа: оформление, погрузка, приемка, разгрузка -->
+        <div class="stage-row">
+            <div class="stage-card" data-stage="titul1">
+                <div class="stage-icon">📄</div>
+                <div class="stage-name">Оформление</div>
+                <div class="stage-titul">Титул 1</div>
+            </div>
+            <div class="stage-card" data-stage="titul2">
+                <div class="stage-icon">🚛</div>
+                <div class="stage-name">Погрузка</div>
+                <div class="stage-titul">Титул 2</div>
+            </div>
+            <div class="stage-card" data-stage="titul3">
+                <div class="stage-icon">📋</div>
+                <div class="stage-name">Приемка</div>
+                <div class="stage-titul">Титул 3</div>
+            </div>
+            <div class="stage-card" data-stage="titul4">
+                <div class="stage-icon">🏭</div>
+                <div class="stage-name">Разгрузка</div>
+                <div class="stage-titul">Титул 4</div>
+            </div>
+        </div>
+
+        <!-- Кто участвует в этапах -->
+        <div class="participants-line">
+            <span class="participant-badge">📦 Грузоотправитель</span>
+            <span class="participant-badge">🚛 Перевозчик</span>
+            <span class="participant-badge">🏭 Грузополучатель</span>
+            <span class="participant-badge">🚛 Перевозчик</span>
+        </div>
+        <div class="divider">▼ нажмите на этап — подробности титула ▼</div>
+    </div>
+</div>
+
+<script>
+    // Данные по титулам (компактные, но полные списки)
+    const titulData = {
+        titul1: {
+            title: "📄 Титул 1 · Оформление",
+            description: "Создаётся грузоотправителем. Включает:",
+            items: [
+                "сведения о грузоотправителе",
+                "информация о грузе",
+                "пункты погрузки и выгрузки",
+                "кто производит погрузку",
+                "решение о переадресовке",
+                "сведения о перевозчике и грузополучателе",
+                "данные о ТС, водителе и времени доставки"
+            ],
+            footer: "После заполнения Титул 1 подписывается грузоотправителем и направляется в ГИС ЭПД."
+        },
+        titul2: {
+            title: "🚛 Титул 2 · Погрузка",
+            description: "Оформляется перевозчиком в момент погрузки. Содержит:",
+            items: [
+                "информация о приемке груза к перевозке",
+                "замечания о состоянии груза",
+                "время прибытия и убытия ТС на погрузке"
+            ],
+            footer: "После подписания Т2 перевозчик получает QR-код для водителя."
+        },
+        titul3: {
+            title: "📋 Титул 3 · Приемка",
+            description: "Заполняется грузополучателем при приёме груза. Содержит:",
+            items: [
+                "информация о приеме груза или об отказе",
+                "замечания о времени прибытия и убытия ТС",
+                "о состоянии груза",
+                "иные замечания"
+            ],
+            footer: "Титул 3 подписывается с замечаниями или без них."
+        },
+        titul4: {
+            title: "🏭 Титул 4 · Разгрузка",
+            description: "Заполняется перевозчиком после выгрузки. Включает:",
+            items: [
+                "информация о выдаче груза (дата, время, отметки)",
+                "замечания о времени прибытия и убытия ТС",
+                "о состоянии груза при выгрузке",
+                "о разгрузочных работах"
+            ],
+            footer: "После подписания Т4 документооборот может быть завершен."
+        }
+    };
+
+    // Функция открытия компактного модального окна (по высоте не больше карточки)
+    function openModal(titulKey) {
+        const data = titulData[titulKey];
+        if (!data) return;
+
+        // формируем компактный список
+        let itemsHtml = '';
+        data.items.forEach(item => {
+            itemsHtml += `<li>${escapeHtml(item)}</li>`;
+        });
+
+        const modalContent = `
+            <div class="titul-title">${escapeHtml(data.title)}</div>
+            <p style="margin-bottom: 6px; font-size:0.8rem;">${escapeHtml(data.description)}</p>
+            <ul class="info-list">
+                ${itemsHtml}
+            </ul>
+            <div class="subnote">${escapeHtml(data.footer)}</div>
+            <div class="modal-footer-compact">
+                <button class="back-button" id="modalBackBtn">← Вернуться назад</button>
+            </div>
+        `;
+
+        // Удаляем предыдущее окно
+        const existingModal = document.querySelector('.modal-overlay');
+        if (existingModal) existingModal.remove();
+
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        modalOverlay.innerHTML = `
+            <div class="modal-window">
+                <div class="modal-header">
+                    <h3>${escapeHtml(data.title)}</h3>
+                    <button class="modal-close" id="modalCloseBtn">✕</button>
+                </div>
+                <div class="modal-body">
+                    ${modalContent}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalOverlay);
+
+        // Закрытие по крестику
+        const closeBtn = document.getElementById('modalCloseBtn');
+        if (closeBtn) closeBtn.addEventListener('click', () => modalOverlay.remove());
+        
+        // Кнопка "Вернуться назад"
+        const backBtn = document.getElementById('modalBackBtn');
+        if (backBtn) backBtn.addEventListener('click', () => modalOverlay.remove());
+        
+        // Закрытие по клику на фон
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) modalOverlay.remove();
+        });
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Обработчики кликов на карточки этапов
+    document.addEventListener('DOMContentLoaded', () => {
+        const stageCards = document.querySelectorAll('.stage-card');
+        stageCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                const stage = card.getAttribute('data-stage');
+                if (stage === 'titul1') openModal('titul1');
+                else if (stage === 'titul2') openModal('titul2');
+                else if (stage === 'titul3') openModal('titul3');
+                else if (stage === 'titul4') openModal('titul4');
+            });
+        });
+    });
+</script>
+</body>
+</html>
