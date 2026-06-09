@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ЭТрН · схема ГИС ЭПД</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 650px;
+            max-width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1d3b5e;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-sub {
+            font-size: 0.75rem;
+            color: #5e7290;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #8da9cc;
+            padding-left: 10px;
+        }
+
+        .scheme-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.2rem;
+            border: 2px solid #e1eaf5;
+            margin-bottom: 0.5rem;
+        }
+
+        /* центральный блок ГИС ЭПД */
+        .gis-center {
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .gis-badge {
+            display: inline-block;
+            background: #1e3b5c;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 8px 24px;
+            border-radius: 48px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            letter-spacing: 0.3px;
+            transition: 0.1s;
+        }
+
+        .gis-badge:hover {
+            background: #0f2c46;
+            transform: scale(1.01);
+        }
+
+        .gis-label {
+            font-size: 0.7rem;
+            color: #6b85a2;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* оператор под ГИС, над участниками */
+        .operator-section {
+            margin-bottom: 24px;
+            padding-bottom: 8px;
+        }
+
+        .operator-card {
+            background: #f0f5fa;
+            border-radius: 20px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .operator-card:hover {
+            border-color: #8da9cc;
+            background: #ecf3fc;
+        }
+
+        .operator-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .operator-icon {
+            font-size: 1.6rem;
+        }
+
+        .operator-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1d3b5e;
+        }
+
+        .operator-hint {
+            font-size: 0.7rem;
+            color: #5e7290;
+        }
+
+        /* участники — сетка 4 блока */
+        .participants {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .participant-card {
+            flex: 1;
+            min-width: 110px;
+            background: white;
+            border-radius: 20px;
+            padding: 14px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #cbd5e1;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .participant-card:hover {
+            transform: translateY(-3px);
+            border-color: #8da9cc;
+            background: #f5faff;
+            box-shadow: 0 8px 18px -8px rgba(0,0,0,0.12);
+        }
+
+        .participant-icon {
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+
+        .participant-name {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1d3b5e;
+        }
+
+        /* модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-window {
+            width: 520px;
+            max-width: 90%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: fadeInUp 0.2s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: #1e3b5c;
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 6px;
+            border-radius: 40px;
+            transition: 0.1s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #1a324a;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-body p {
+            margin-bottom: 12px;
+        }
+
+        .modal-body strong {
+            color: #1e6bb8;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef2f7;
+            border: 1px solid #cbd5e1;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: 0.1s;
+        }
+
+        .back-button:hover {
+            background: #e3e9f1;
+            border-color: #8da9cc;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-title">📡 Взаимодействие участников ЭТрН</div>
+    <div class="card-sub">Нажмите на любой элемент схемы — откроется подробное описание</div>
+
+    <div class="scheme-container">
+        <!-- ГИС ЭПД (центр) -->
+        <div class="gis-center" id="gisCenter">
+            <div class="gis-badge">🏛️ ГИС ЭПД</div>
+            <div class="gis-label">государственная информационная система</div>
+        </div>
+
+        <!-- Оператор ИС ЭПД — сразу под ГИС, выше всех участников -->
+        <div class="operator-section">
+            <div class="operator-card" data-key="operator">
+                <div class="operator-left">
+                    <div class="operator-icon">🔄</div>
+                    <div>
+                        <div class="operator-title">Оператор ИС ЭПД</div>
+                        <div class="operator-hint">коммерческий оператор электронного документооборота</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- основные участники (4 блока) -->
+        <div class="participants">
+            <div class="participant-card" data-key="shipper">
+                <div class="participant-icon">📦</div>
+                <div class="participant-name">Грузоотправитель</div>
+            </div>
+            <div class="participant-card" data-key="carrier">
+                <div class="participant-icon">🚛</div>
+                <div class="participant-name">Перевозчик</div>
+            </div>
+            <div class="participant-card" data-key="consignee">
+                <div class="participant-icon">🏭</div>
+                <div class="participant-name">Грузополучатель</div>
+            </div>
+            <div class="participant-card" data-key="driver">
+                <!-- только значок лица, без самолёта и других деталей -->
+                <div class="participant-icon">🧑</div>
+                <div class="participant-name">Водитель</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Описания участников (в точности по заданию)
+    const descriptions = {
+        gis: {
+            title: "🏛️ ГИС ЭПД",
+            content: `<p><strong>Государственная информационная система электронных перевозочных документов</strong> для обмена, учета и хранения ЭТрН и других перевозочных документов. Данные в ГИС ЭПД попадают о каждом этапе перевозки и одновременно становятся доступны ФНС, ГИБДД, Ространснадзору, Минздраву и другим ведомствам.</p>`
+        },
+        operator: {
+            title: "🔄 Оператор ИС ЭПД",
+            content: `<p><strong>Операторы ИС ЭПД</strong> – коммерческие организации, которые предоставляют услуги по оформлению электронных перевозочных документов и передают их в ГИС ЭПД. Для этого операторы должны быть зарегистрированы в специальном реестре Минтранса (п. 31 ч. 1 ст. 2 Закона от 08.11.2007 № 259-ФЗ).</p>`
+        },
+        shipper: {
+            title: "📦 Грузоотправитель",
+            content: `<p><strong>Грузоотправитель</strong> создает ЭТрН, в титуле 1 указывает данные о грузе, о ТС, об участниках документооборота (грузоперевозчик, грузополучатель), о точках погрузки и выгрузке и т. д. Грузоотправитель подписывает титул и отправляет в ГИС ЭПД. После проверки следующий участник перевозки получит свой титул.</p>`
+        },
+        carrier: {
+            title: "🚛 Перевозчик",
+            content: `<p><strong>Перевозчик</strong> оформляет Титул 2 в момент погрузки груза в ТС. В титуле можно отразить замечания к погрузке при их наличии (помяли коробку, загрузили пять мест вместо шести, фактическая погрузка началась с опозданием на 50 минут и т. д.) или же принять груз без замечаний. По итогу отправки Т2 в ГИС ЭПД перевозчику возвращается QR-код. После получения QR-кода водитель может выезжать к адресу доставки. Заполняет Титул 4 по завершении разгрузки. Титул можно как подписать без замечаний, так и указать их при наличии (например, помяли борты при разгрузке). После подписания Т4 документооборот может быть завершен или же могут возникнуть опциональные титулы.</p>`
+        },
+        consignee: {
+            title: "🏭 Грузополучатель",
+            content: `<p><strong>Грузополучатель</strong> заполняет Титул 3 при приемке груза. Может быть подписан без замечаний или с указанием замечаний к полученному грузу или перевозчику. Например, помято пять коробок или расхождения в весе. Также можно принять часть груза или отказать в приеме вовсе.</p>`
+        },
+        driver: {
+            title: "🧑 Водитель",
+            content: `<p><strong>Водитель</strong> участвует в обмене документов со стороны перевозчика и подтверждает факт приема/выгрузки с замечаниями или без. Для этого достаточно простой электронной подписи (ПЭП). Обычно это происходит через мобильное приложение оператора ИС ЭПД на смартфоне или планшете. Итоговый файл обмена Т2 должен быть подписан усиленной квалифицированной (УКЭП) или через «Госключ» усиленной неквалифицированной электронной подписью (УНЭП) перевозчика. После этого водитель получает QR-код – его генерирует ГИС ЭПД. Если инспектор ГИБДД потребует предъявить документы на груз, водитель из приложения должен показать QR-код.</p>`
+        }
+    };
+
+    // Функция открытия модального окна
+    function openModal(title, contentHtml) {
+        const existingModal = document.querySelector('.modal-overlay');
+        if (existingModal) existingModal.remove();
+
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        
+        modalOverlay.innerHTML = `
+            <div class="modal-window">
+                <div class="modal-header">
+                    <h3>${escapeHtmlSimple(title)}</h3>
+                    <button class="modal-close" id="modalCloseBtn">✕</button>
+                </div>
+                <div class="modal-body">
+                    ${contentHtml}
+                    <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
+                        <button class="back-button" id="modalBackBtn">← Вернуться назад</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modalOverlay);
+        
+        const closeBtn = document.getElementById('modalCloseBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => modalOverlay.remove());
+        }
+        const backBtn = document.getElementById('modalBackBtn');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => modalOverlay.remove());
+        }
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) modalOverlay.remove();
+        });
+    }
+
+    function escapeHtmlSimple(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // ГИС ЭПД
+        const gisCenter = document.getElementById('gisCenter');
+        if (gisCenter) {
+            gisCenter.addEventListener('click', () => {
+                openModal(descriptions.gis.title, descriptions.gis.content);
+            });
+        }
+
+        // Оператор
+        const operatorCard = document.querySelector('.operator-card[data-key="operator"]');
+        if (operatorCard) {
+            operatorCard.addEventListener('click', () => {
+                openModal(descriptions.operator.title, descriptions.operator.content);
+            });
+        }
+
+        // Участники
+        const shipperCard = document.querySelector('.participant-card[data-key="shipper"]');
+        const carrierCard = document.querySelector('.participant-card[data-key="carrier"]');
+        const consigneeCard = document.querySelector('.participant-card[data-key="consignee"]');
+        const driverCard = document.querySelector('.participant-card[data-key="driver"]');
+        
+        if (shipperCard) {
+            shipperCard.addEventListener('click', () => openModal(descriptions.shipper.title, descriptions.shipper.content));
+        }
+        if (carrierCard) {
+            carrierCard.addEventListener('click', () => openModal(descriptions.carrier.title, descriptions.carrier.content));
+        }
+        if (consigneeCard) {
+            consigneeCard.addEventListener('click', () => openModal(descriptions.consignee.title, descriptions.consignee.content));
+        }
+        if (driverCard) {
+            driverCard.addEventListener('click', () => openModal(descriptions.driver.title, descriptions.driver.content));
+        }
+    });
+</script>
+</body>
+</html>
