@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ЭТрН · последовательность действий</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 650px;
+            max-width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1d3b5e;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-sub {
+            font-size: 0.75rem;
+            color: #5e7290;
+            margin-bottom: 1.2rem;
+            border-left: 3px solid #8da9cc;
+            padding-left: 10px;
+        }
+
+        /* две колонки */
+        .drag-drop-layout {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .actions-column {
+            flex: 1;
+            min-width: 200px;
+            background: #f9fcff;
+            border-radius: 24px;
+            padding: 0.8rem;
+            border: 2px solid #e1eaf5;
+        }
+
+        .sequence-column {
+            flex: 1;
+            min-width: 240px;
+            background: #f9fcff;
+            border-radius: 24px;
+            padding: 0.8rem;
+            border: 2px solid #e1eaf5;
+        }
+
+        .column-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1d3b5e;
+            margin-bottom: 12px;
+            text-align: center;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #dce5f0;
+        }
+
+        /* стили для draggable элементов */
+        .drag-item {
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: 0.1s;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            user-select: none;
+        }
+        .drag-item:active {
+            cursor: grabbing;
+        }
+        .drag-item.dragging {
+            opacity: 0.4;
+            cursor: grabbing;
+        }
+
+        /* элементы в правой колонке (последовательность) */
+        .slot-item {
+            background: #ffffff;
+            border: 2px dashed #8da9cc;
+            border-radius: 20px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .slot-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #1e3b5c;
+            color: white;
+            font-weight: 700;
+            font-size: 0.7rem;
+            width: 22px;
+            height: 22px;
+            border-radius: 30px;
+            flex-shrink: 0;
+        }
+        .slot-text {
+            flex: 1;
+        }
+        .slot-empty {
+            background: #f2f6fc;
+            border: 2px dashed #b9cee8;
+            color: #7b95b5;
+            justify-content: center;
+            font-style: italic;
+        }
+        .slot-item.drag-over {
+            border-color: #1e6bb8;
+            background: #e1ecfe;
+        }
+
+        /* кнопки */
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+            transition: 0.07s linear;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 0.8rem 1rem;
+            border: 2px solid #b9d3f0;
+            margin-top: 0.8rem;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+        .reset-icon {
+            font-size: 0.8rem;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-title">📋 Расставьте действия в правильной последовательности</div>
+    <div class="card-sub">Перетащите действия из левой колонки в правую в нужном порядке (от 1 до 6)</div>
+
+    <div class="drag-drop-layout">
+        <!-- Левая колонка: исходные действия (неупорядоченные, перемещаются) -->
+        <div class="actions-column">
+            <div class="column-title">📌 Доступные действия</div>
+            <div id="actionsList" class="actions-list">
+                <!-- сюда будут вставляться элементы динамически -->
+            </div>
+        </div>
+
+        <!-- Правая колонка: последовательность (слоты 1..6) -->
+        <div class="sequence-column">
+            <div class="column-title">🔢 Правильная последовательность</div>
+            <div id="sequenceContainer" class="sequence-list">
+                <!-- 6 слотов будут созданы JS -->
+            </div>
+        </div>
+    </div>
+
+    <div class="button-row">
+        <button class="btn" id="resetBtn">⟳ Сбросить всё</button>
+        <button class="btn primary" id="checkBtn">✓ Проверить порядок</button>
+    </div>
+    <div id="feedbackArea" class="feedback" style="display: none;"></div>
+</div>
+
+<script>
+    // Исходные данные: массив действий (текст) в ПРАВИЛЬНОМ порядке (эталон)
+    const CORRECT_ORDER = [
+        "Грузоотправитель формирует титул 1 и подписывает его УКЭП",
+        "Перевозчик сверяет фактические данные с титулом 1",
+        "Водитель подписывает погрузку в мобильном приложении (ПЭП)",
+        "Менеджер перевозчика подписывает титул 2 УКЭП",
+        "Грузополучатель подписывает титул 3 (приемка)",
+        "Перевозчик подписывает титул 4 (завершение перевозки)"
+    ];
+
+    // Массив для хранения текущего порядка в слотах (индексы из CORRECT_ORDER или null, если пусто)
+    let sequenceSlots = [null, null, null, null, null, null];
+
+    // Массив исходных (левая колонка): храним объекты { id: уникальный, text: действие, used: false }
+    let availableActions = [];
+    let nextId = 0;
+
+    // Инициализация / сброс состояния
+    function initData() {
+        // создаем доступные действия из CORRECT_ORDER (все неиспользованные)
+        availableActions = CORRECT_ORDER.map((text, idx) => ({
+            id: nextId++,
+            text: text,
+            used: false
+        }));
+        // очищаем слоты
+        sequenceSlots = [null, null, null, null, null, null];
+    }
+
+    // Перерисовать интерфейс
+    function render() {
+        renderActionsList();
+        renderSequenceSlots();
+        // скрыть фидбек при изменении порядка (пользователь что-то меняет)
+        const feedbackDiv = document.getElementById('feedbackArea');
+        if (feedbackDiv) feedbackDiv.style.display = 'none';
+    }
+
+    // Отрисовка левой колонки (только неиспользованные действия)
+    function renderActionsList() {
+        const container = document.getElementById('actionsList');
+        if (!container) return;
+        const unused = availableActions.filter(a => !a.used);
+        if (unused.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:#7b95b5;">✨ Все действия перемещены</div>`;
+            return;
+        }
+        container.innerHTML = '';
+        unused.forEach(action => {
+            const dragEl = document.createElement('div');
+            dragEl.className = 'drag-item';
+            dragEl.setAttribute('draggable', 'true');
+            dragEl.setAttribute('data-id', action.id);
+            dragEl.setAttribute('data-text', action.text);
+            dragEl.innerHTML = escapeHtml(action.text);
+            // обработчики drag
+            dragEl.addEventListener('dragstart', handleDragStart);
+            dragEl.addEventListener('dragend', handleDragEnd);
+            container.appendChild(dragEl);
+        });
+    }
+
+    // Отрисовка правой колонки (слоты 1..6)
+    function renderSequenceSlots() {
+        const container = document.getElementById('sequenceContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        for (let i = 0; i < sequenceSlots.length; i++) {
+            const slotValue = sequenceSlots[i]; // index from CORRECT_ORDER or null
+            const slotDiv = document.createElement('div');
+            slotDiv.className = 'slot-item';
+            if (slotValue === null) {
+                slotDiv.classList.add('slot-empty');
+                slotDiv.innerHTML = `<div class="slot-number">${i+1}</div><div class="slot-text">⬅ Перетащите сюда действие</div>`;
+            } else {
+                const actionText = CORRECT_ORDER[slotValue];
+                slotDiv.innerHTML = `<div class="slot-number">${i+1}</div><div class="slot-text">${escapeHtml(actionText)}</div>`;
+                // добавим кнопку удаления (крестик) для удобства
+                const removeBtn = document.createElement('span');
+                removeBtn.innerHTML = '✕';
+                removeBtn.style.cursor = 'pointer';
+                removeBtn.style.marginLeft = '8px';
+                removeBtn.style.fontWeight = 'bold';
+                removeBtn.style.color = '#b13e3e';
+                removeBtn.style.fontSize = '0.8rem';
+                removeBtn.title = 'Вернуть в левую колонку';
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeFromSlot(i);
+                });
+                slotDiv.appendChild(removeBtn);
+            }
+            // обработчики drop
+            slotDiv.setAttribute('data-slot-index', i);
+            slotDiv.addEventListener('dragover', handleDragOver);
+            slotDiv.addEventListener('dragleave', handleDragLeave);
+            slotDiv.addEventListener('drop', handleDrop);
+            container.appendChild(slotDiv);
+        }
+    }
+
+    // удалить действие из слота и вернуть в левую колонку
+    function removeFromSlot(slotIndex) {
+        const actionIdx = sequenceSlots[slotIndex];
+        if (actionIdx === null) return;
+        // находим соответствующее действие в availableActions (то, у которого текст совпадает, но оно помечено used)
+        const textToReturn = CORRECT_ORDER[actionIdx];
+        const actionObj = availableActions.find(a => a.text === textToReturn && a.used === true);
+        if (actionObj) {
+            actionObj.used = false;
+        } else {
+            // fallback: если по каким-то причинам не нашли, создаём новый
+            const newId = nextId++;
+            availableActions.push({ id: newId, text: textToReturn, used: false });
+        }
+        sequenceSlots[slotIndex] = null;
+        render();
+    }
+
+    // Drag & Drop глобальные переменные
+    let draggedItemId = null;
+    let draggedText = null;
+
+    function handleDragStart(e) {
+        const target = e.target.closest('.drag-item');
+        if (!target) {
+            e.preventDefault();
+            return false;
+        }
+        draggedItemId = parseInt(target.getAttribute('data-id'));
+        draggedText = target.getAttribute('data-text');
+        e.dataTransfer.setData('text/plain', JSON.stringify({ id: draggedItemId, text: draggedText }));
+        e.dataTransfer.effectAllowed = 'move';
+        target.classList.add('dragging');
+    }
+
+    function handleDragEnd(e) {
+        const target = e.target.closest('.drag-item');
+        if (target) target.classList.remove('dragging');
+        draggedItemId = null;
+        draggedText = null;
+        // убираем подсветку со всех слотов
+        document.querySelectorAll('.slot-item').forEach(slot => {
+            slot.classList.remove('drag-over');
+        });
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const slot = e.target.closest('.slot-item');
+        if (slot) slot.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        const slot = e.target.closest('.slot-item');
+        if (slot) slot.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const slot = e.target.closest('.slot-item');
+        if (!slot) return;
+        slot.classList.remove('drag-over');
+        
+        const slotIndex = parseInt(slot.getAttribute('data-slot-index'));
+        if (isNaN(slotIndex)) return;
+        
+        // получаем перетаскиваемый объект
+        let dragData;
+        try {
+            dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
+        } catch(err) {
+            return;
+        }
+        if (!dragData) return;
+        const dragId = dragData.id;
+        const dragText = dragData.text;
+        
+        // Находим действие в availableActions (неиспользованное)
+        const actionObj = availableActions.find(a => a.id === dragId && !a.used);
+        if (!actionObj) return; // уже использовано или не найдено
+        
+        // Находим индекс этого действия в CORRECT_ORDER (чтобы сохранить в слот)
+        const correctIndex = CORRECT_ORDER.findIndex(text => text === dragText);
+        if (correctIndex === -1) return;
+        
+        // Если слот уже занят, ничего не делаем (можно расширить: заменять, но по заданию лучше просто запретить)
+        if (sequenceSlots[slotIndex] !== null) {
+            // показываем мини-фидбек что слот занят, но без краша
+            const feedbackDiv = document.getElementById('feedbackArea');
+            if (feedbackDiv) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.className = 'feedback incorrect';
+                feedbackDiv.innerHTML = `⚠️ Слот ${slotIndex+1} уже занят. Сначала верните действие из слота (нажмите ✕), затем переместите новое.`;
+                setTimeout(() => {
+                    if (feedbackDiv && !document.querySelector('.feedback.correct')) feedbackDiv.style.display = 'none';
+                }, 2000);
+            }
+            return;
+        }
+        
+        // Перемещаем: помечаем действие как used, заполняем слот
+        actionObj.used = true;
+        sequenceSlots[slotIndex] = correctIndex;
+        
+        // скрываем любой старый фидбек
+        const feedbackDiv = document.getElementById('feedbackArea');
+        if (feedbackDiv) feedbackDiv.style.display = 'none';
+        
+        render();
+    }
+
+    // Проверка правильности порядка
+    function checkOrder() {
+        // проверяем, все ли слоты заполнены
+        const allFilled = sequenceSlots.every(idx => idx !== null);
+        if (!allFilled) {
+            const feedbackDiv = document.getElementById('feedbackArea');
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.className = 'feedback incorrect';
+            feedbackDiv.innerHTML = '❌ Не все действия расставлены. Перетащите все 6 действий в правую колонку.';
+            return;
+        }
+        // сравниваем последовательность с эталоном [0,1,2,3,4,5]
+        let isCorrect = true;
+        for (let i = 0; i < sequenceSlots.length; i++) {
+            if (sequenceSlots[i] !== i) {
+                isCorrect = false;
+                break;
+            }
+        }
+        const feedbackDiv = document.getElementById('feedbackArea');
+        feedbackDiv.style.display = 'block';
+        if (isCorrect) {
+            feedbackDiv.className = 'feedback correct';
+            feedbackDiv.innerHTML = '✅ Поздравляем! Вы правильно расставили все действия в хронологическом порядке.';
+        } else {
+            feedbackDiv.className = 'feedback incorrect';
+            feedbackDiv.innerHTML = '❌ Порядок нарушен. Вспомните этапы оформления перевозки: сначала формирование Т1, сверка данных, подписание погрузки водителем, затем Т2 от менеджера, после — приемка грузополучателем и завершающий Т4. Попробуйте ещё раз.';
+        }
+    }
+
+    // Сброс всех действий (полностью очистить и вернуть как было)
+    function resetGame() {
+        // заново инициализируем данные
+        nextId = 0;
+        initData();
+        render();
+        const feedbackDiv = document.getElementById('feedbackArea');
+        if (feedbackDiv) {
+            feedbackDiv.style.display = 'none';
+            feedbackDiv.className = 'feedback';
+            feedbackDiv.innerHTML = '';
+        }
+    }
+
+    // вспомогательная функция для экранирования HTML
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Инициализация приложения
+    function init() {
+        initData();
+        render();
+        document.getElementById('resetBtn').addEventListener('click', resetGame);
+        document.getElementById('checkBtn').addEventListener('click', checkOrder);
+    }
+
+    init();
+</script>
+</body>
+</html>
