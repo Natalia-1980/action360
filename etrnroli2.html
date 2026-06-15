@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ЭТрН · Кто выполняет действие?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 650px;
+            max-width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1d3b5e;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-sub {
+            font-size: 0.75rem;
+            color: #5e7290;
+            margin-bottom: 1.2rem;
+            border-left: 3px solid #8da9cc;
+            padding-left: 10px;
+        }
+
+        /* таблица */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 24px;
+            border: 2px solid #e1eaf5;
+            background: #f9fcff;
+            margin-bottom: 1.2rem;
+        }
+
+        .action-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .action-table th {
+            background: #eef3fa;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 700;
+            color: #1d3b5e;
+            border-bottom: 2px solid #d4e0ec;
+        }
+
+        .action-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e2eaf2;
+            vertical-align: middle;
+            color: #1a324a;
+        }
+
+        .action-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .col-number {
+            width: 50px;
+            text-align: center;
+            font-weight: 600;
+            color: #1e6bb8;
+        }
+
+        .col-action {
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .col-select {
+            width: 130px;
+            text-align: center;
+        }
+
+        /* стили для селекта */
+        .participant-select {
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            transition: 0.1s;
+            font-family: inherit;
+            width: 100%;
+            max-width: 100px;
+            text-align: center;
+        }
+
+        .participant-select:hover {
+            border-color: #8da9cc;
+            background: #f5faff;
+        }
+
+        .participant-select.correct-highlight {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+
+        .participant-select.wrong-highlight {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        /* легенда */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: #f0f5fa;
+            border-radius: 20px;
+            padding: 10px 15px;
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-badge {
+            font-weight: 700;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #b0c4dd;
+            transition: 0.07s linear;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 0.8rem 1rem;
+            border: 2px solid #b9d3f0;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            display: none;
+        }
+
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .result-stats {
+            font-weight: 700;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-title">
+        <span>📋</span> Кто выполняет действие?
+    </div>
+    <div class="card-sub">
+        Выберите для каждого действия участника: ГО (грузоотправитель), П (перевозчик) или ГП (грузополучатель)
+    </div>
+
+    <!-- Легенда -->
+    <div class="legend">
+        <div class="legend-item"><span class="legend-badge">ГО</span> — Грузоотправитель</div>
+        <div class="legend-item"><span class="legend-badge">П</span> — Перевозчик</div>
+        <div class="legend-item"><span class="legend-badge">ГП</span> — Грузополучатель</div>
+    </div>
+
+    <!-- Таблица -->
+    <div class="table-wrapper">
+        <table class="action-table" id="actionTable">
+            <thead>
+                <tr>
+                    <th class="col-number">№</th>
+                    <th class="col-action">Действие</th>
+                    <th class="col-select">Участник</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- строки будут заполнены JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="button-row">
+        <button class="btn" id="resetBtn">⟳ Сбросить</button>
+        <button class="btn primary" id="checkBtn">✓ Проверить</button>
+    </div>
+    <div id="feedbackArea" class="feedback"></div>
+</div>
+
+<script>
+    // Данные: действия и правильные ответы (ГО, П, ГП)
+    const actionsData = [
+        { number: 1, action: "Указывает сведения о грузе (наименование, вес, объем, маркировку)", correct: "ГО" },
+        { number: 2, action: "Фиксирует замечания о состоянии груза при погрузке (например, «упаковка повреждена»)", correct: "П" },
+        { number: 3, action: "Подписывает ЭТрН после того, как груз загружен в транспорт (через мобильное приложение водитель)", correct: "П" },
+        { number: 4, action: "Принимает груз, фиксирует расхождения по количеству или качеству", correct: "ГП" },
+        { number: 5, action: "Заполняет информацию о том, кто производит погрузку (силами отправителя или перевозчика)", correct: "ГО" },
+        { number: 6, action: "Получает QR-код в мобильном приложении для предъявления инспекторам ГИБДД", correct: "П" },
+        { number: 7, action: "Подписывает титул 4, завершая обмен ЭТрН", correct: "П" }
+    ];
+
+    // Варианты для выбора
+    const options = ["ГО", "П", "ГП"];
+
+    // Храним выбранные значения (индекс действия -> выбранное значение или null)
+    let userSelections = new Array(actionsData.length).fill(null);
+
+    // Функция рендеринга таблицы
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        actionsData.forEach((item, idx) => {
+            const row = tbody.insertRow();
+            
+            // №
+            const cellNum = row.insertCell(0);
+            cellNum.className = 'col-number';
+            cellNum.textContent = item.number;
+            
+            // Действие
+            const cellAction = row.insertCell(1);
+            cellAction.className = 'col-action';
+            cellAction.textContent = item.action;
+            
+            // Селект
+            const cellSelect = row.insertCell(2);
+            cellSelect.className = 'col-select';
+            
+            const select = document.createElement('select');
+            select.className = 'participant-select';
+            select.setAttribute('data-index', idx);
+            
+            // Пустой дефолтный option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '— выбрать —';
+            defaultOption.disabled = true;
+            defaultOption.selected = (userSelections[idx] === null);
+            select.appendChild(defaultOption);
+            
+            // Добавляем варианты ГО, П, ГП
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt;
+                option.textContent = opt;
+                if (userSelections[idx] === opt) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+            
+            // Обработчик изменения
+            select.addEventListener('change', (e) => {
+                const selectedValue = e.target.value;
+                if (selectedValue === '') {
+                    userSelections[idx] = null;
+                } else {
+                    userSelections[idx] = selectedValue;
+                }
+                // Убираем подсветку при изменении (пользователь что-то меняет)
+                clearHighlight(select);
+                // Скрываем фидбек при редактировании
+                const feedbackDiv = document.getElementById('feedbackArea');
+                if (feedbackDiv) feedbackDiv.style.display = 'none';
+            });
+            
+            cellSelect.appendChild(select);
+        });
+    }
+    
+    // Убираем подсветку с конкретного селекта
+    function clearHighlight(selectEl) {
+        selectEl.classList.remove('correct-highlight', 'wrong-highlight');
+    }
+    
+    // Сброс всех выборов
+    function resetSelections() {
+        userSelections = new Array(actionsData.length).fill(null);
+        renderTable(); // перерисовываем, сбрасывая значения
+        const feedbackDiv = document.getElementById('feedbackArea');
+        if (feedbackDiv) {
+            feedbackDiv.style.display = 'none';
+            feedbackDiv.className = 'feedback';
+            feedbackDiv.innerHTML = '';
+        }
+    }
+    
+    // Проверка ответов и подсветка строк
+    function checkAnswers() {
+        let allSelected = true;
+        let correctCount = 0;
+        
+        // Сначала проверим, все ли выбрали
+        for (let i = 0; i < userSelections.length; i++) {
+            if (userSelections[i] === null) {
+                allSelected = false;
+                break;
+            }
+        }
+        
+        const feedbackDiv = document.getElementById('feedbackArea');
+        if (!allSelected) {
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.className = 'feedback incorrect';
+            feedbackDiv.innerHTML = '❌ Вы выбрали не все действия. Пожалуйста, выберите участника для каждого пункта.';
+            return;
+        }
+        
+        // Подсветка и подсчёт правильных
+        const selects = document.querySelectorAll('.participant-select');
+        for (let i = 0; i < selects.length; i++) {
+            const select = selects[i];
+            const userAnswer = userSelections[i];
+            const correctAnswer = actionsData[i].correct;
+            
+            // Убираем старые классы
+            select.classList.remove('correct-highlight', 'wrong-highlight');
+            
+            if (userAnswer === correctAnswer) {
+                select.classList.add('correct-highlight');
+                correctCount++;
+            } else {
+                select.classList.add('wrong-highlight');
+            }
+        }
+        
+        const total = actionsData.length;
+        let message = '';
+        let verdictClass = '';
+        
+        if (correctCount === total) {
+            message = `🎉 Превосходно! Все ${total} ответов верны. Вы отлично знаете, кто за что отвечает в процессе ЭТрН.`;
+            verdictClass = 'correct';
+        } else if (correctCount >= 5) {
+            message = `✅ Хороший результат: ${correctCount} из ${total} верных. Есть небольшие ошибки — повторите распределение ролей.`;
+            verdictClass = 'incorrect';
+        } else {
+            message = `⚠️ Результат: ${correctCount} из ${total} верных. Рекомендуем внимательно изучить, какие действия выполняет грузоотправитель, перевозчик и грузополучатель.`;
+            verdictClass = 'incorrect';
+        }
+        
+        feedbackDiv.style.display = 'block';
+        feedbackDiv.className = `feedback ${verdictClass}`;
+        feedbackDiv.innerHTML = `
+            <div class="result-stats">${correctCount} / ${total} правильных ответов</div>
+            <div style="margin-top: 6px;">${message}</div>
+            <div style="margin-top: 8px; font-size: 0.75rem; color: #5e7290;">💡 Зелёная подсветка — верно, розовая — ошибка.</div>
+        `;
+    }
+    
+    // Рендерим таблицу при загрузке
+    renderTable();
+    
+    // Обработчики кнопок
+    document.getElementById('resetBtn').addEventListener('click', resetSelections);
+    document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+</script>
+</body>
+</html>
