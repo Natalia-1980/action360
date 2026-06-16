@@ -29,6 +29,8 @@
             box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
             padding: 1.5rem 1.2rem;
             border: 1px solid #dee6f0;
+            display: flex;
+            flex-direction: column;
         }
 
         .card-title {
@@ -39,6 +41,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-shrink: 0;
         }
 
         .card-sub {
@@ -47,24 +50,29 @@
             margin-bottom: 1.2rem;
             border-left: 3px solid #8da9cc;
             padding-left: 10px;
+            flex-shrink: 0;
         }
 
+        /* Фиксированная высота контейнера чата */
         .chat-container {
             background: #f6faff;
             border-radius: 24px;
             border: 2px solid #e1eaf5;
             padding: 1.2rem;
-            min-height: 380px;
             display: flex;
             flex-direction: column;
+            height: 480px;
+            min-height: 480px;
+            max-height: 480px;
+            overflow: hidden;
         }
 
         .chat-messages {
             flex: 1;
-            max-height: 380px;
             overflow-y: auto;
             padding-right: 6px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
+            min-height: 0;
         }
 
         .chat-messages::-webkit-scrollbar {
@@ -141,6 +149,15 @@
             color: #1e6bb8;
         }
 
+        /* Блок с опциями и пояснением — фиксированная высота */
+        .options-wrapper {
+            flex-shrink: 0;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
         .chat-options {
             display: flex;
             flex-wrap: wrap;
@@ -192,12 +209,15 @@
 
         .explanation {
             border-radius: 16px;
-            padding: 10px 14px;
-            margin-top: 10px;
-            font-size: 0.8rem;
+            padding: 8px 12px;
+            margin-top: 8px;
+            font-size: 0.78rem;
             line-height: 1.4;
             border-left: 3px solid #8da9cc;
             background: #f2f8fd;
+            flex-shrink: 0;
+            overflow-y: auto;
+            max-height: 70px;
         }
 
         .explanation.correct {
@@ -208,6 +228,14 @@
         .explanation.incorrect {
             border-left-color: #b13e3e;
             background: #fff2f2;
+        }
+
+        .explanation::-webkit-scrollbar {
+            width: 3px;
+        }
+        .explanation::-webkit-scrollbar-thumb {
+            background: #b9cee8;
+            border-radius: 10px;
         }
 
         .typing-indicator {
@@ -248,8 +276,7 @@
             cursor: pointer;
             transition: 0.1s;
             font-family: inherit;
-            margin-top: 8px;
-            align-self: center;
+            flex-shrink: 0;
         }
 
         .btn-reset:hover {
@@ -268,12 +295,25 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 4px;
+            margin-top: 8px;
+            flex-shrink: 0;
         }
 
         .progress-text {
             font-size: 0.7rem;
             color: #8da0bb;
+        }
+
+        .final-message {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85rem;
+            color: #1d3b5e;
+        }
+
+        /* Скрываем скролл у контейнера, если контент не превышает высоту */
+        .chat-messages:only-child {
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -291,8 +331,10 @@
             <!-- Сообщения будут добавляться сюда -->
         </div>
 
-        <div id="optionsContainer">
-            <!-- Кнопки вариантов ответа -->
+        <div class="options-wrapper" id="optionsWrapper">
+            <div id="optionsContainer">
+                <!-- Кнопки вариантов ответа -->
+            </div>
         </div>
 
         <div class="chat-footer">
@@ -443,7 +485,7 @@
         const scenario = scenarios[currentIndex];
         if (!scenario) {
             optionsContainer.innerHTML = `
-                <div style="text-align:center; padding:10px; font-size:0.85rem; color:#1d3b5e;">
+                <div class="final-message">
                     🎉 Вы прошли все сценарии! Нажмите «Начать заново», чтобы повторить.
                 </div>
             `;
@@ -474,14 +516,14 @@
 
             const explDiv = document.createElement('div');
             explDiv.className = `explanation ${isCorrect ? 'correct' : 'incorrect'}`;
-            explDiv.innerHTML = `${isCorrect ? '✅ ' : '❌ '}${explanation}`;
+            explDiv.textContent = `${isCorrect ? '✅ ' : '❌ '}${explanation}`;
             optionsContainer.appendChild(explDiv);
 
             if (currentIndex < scenarios.length - 1) {
                 const nextBtn = document.createElement('button');
                 nextBtn.className = 'option-btn';
                 nextBtn.textContent = '➡️ Далее';
-                nextBtn.style.marginTop = '8px';
+                nextBtn.style.marginTop = '6px';
                 nextBtn.style.borderColor = '#1e3b5c';
                 nextBtn.style.background = '#1e3b5c';
                 nextBtn.style.color = 'white';
@@ -503,14 +545,13 @@
                 const finishBtn = document.createElement('button');
                 finishBtn.className = 'option-btn';
                 finishBtn.textContent = '🏁 Завершить';
-                finishBtn.style.marginTop = '8px';
+                finishBtn.style.marginTop = '6px';
                 finishBtn.style.borderColor = '#1e3b5c';
                 finishBtn.style.background = '#1e3b5c';
                 finishBtn.style.color = 'white';
                 finishBtn.addEventListener('click', () => {
-                    if (chatMessages.length > 0 && chatMessages[chatMessages.length - 1].text.includes('Поздравляю')) {
-                        // уже есть
-                    } else {
+                    const lastMsg = chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].text : '';
+                    if (!lastMsg.includes('Поздравляю')) {
                         addBotMessage('🎉 Поздравляю! Вы успешно прошли все сценарии. Теперь вы знаете, как действовать водителю при отсутствии интернета. Нажмите «Начать заново», чтобы повторить материал.');
                         render();
                     }
@@ -588,7 +629,6 @@
         isBotTyping = false;
         chatMessages = [];
 
-        // Единое приветственное сообщение
         addBotMessage('👋 Здравствуйте! Я помогу вам разобраться, как действовать водителю при работе с ЭТрН, если нет интернета или получатель не хочет подписывать электронную накладную. Отвечайте на вопросы. Поехали! 🚛');
         
         const firstScenario = scenarios[0];
