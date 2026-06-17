@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ЭТрН · Кейсовые задачи</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 650px;
+            max-width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #dee6f0;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1d3b5e;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-sub {
+            font-size: 0.75rem;
+            color: #5e7290;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #8da9cc;
+            padding-left: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #e9eff6;
+            border: 1px solid #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #1d3b5e;
+            cursor: pointer;
+            transition: 0.15s;
+            flex: 1 0 auto;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: #1d3b5e;
+            border-color: #1d3b5e;
+            color: white;
+            box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #dce4ef;
+            border-color: #8da9cc;
+        }
+
+        .tab-btn .badge {
+            display: inline-block;
+            background: #1d3b5e;
+            color: white;
+            border-radius: 30px;
+            padding: 0 8px;
+            font-size: 0.55rem;
+            margin-left: 4px;
+        }
+
+        .tab-btn.active .badge {
+            background: white;
+            color: #1d3b5e;
+        }
+
+        .case-content {
+            display: none;
+        }
+
+        .case-content.active {
+            display: block;
+        }
+
+        .case-header {
+            background: #f9fcff;
+            border-radius: 20px;
+            padding: 1rem 1rem 0.8rem;
+            border: 2px solid #e1eaf5;
+            margin-bottom: 1.2rem;
+        }
+
+        .case-header h3 {
+            font-size: 0.95rem;
+            color: #1d3b5e;
+            margin-bottom: 0.3rem;
+        }
+
+        .case-header .scenario {
+            font-size: 0.8rem;
+            color: #3d5a7a;
+            line-height: 1.5;
+        }
+
+        .case-header .scenario strong {
+            color: #1d3b5e;
+        }
+
+        .question-block {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1rem 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #dee6f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            display: none;
+        }
+
+        .question-block.active {
+            display: block;
+        }
+
+        .question-block .q-number {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #1e6bb8;
+            background: #e9eff6;
+            display: inline-block;
+            padding: 1px 10px;
+            border-radius: 30px;
+            margin-bottom: 6px;
+        }
+
+        .question-block .q-text {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #1d3b5e;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.78rem;
+            color: #1a324a;
+            border: 1px solid transparent;
+        }
+
+        .option:hover:not(.disabled) {
+            background: #f5faff;
+            border-color: #cbd5e1;
+        }
+
+        .option input[type="radio"] {
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: #1e6bb8;
+            cursor: pointer;
+        }
+
+        .option.disabled input[type="radio"] {
+            cursor: not-allowed;
+        }
+
+        .option .letter {
+            font-weight: 700;
+            color: #1e6bb8;
+            flex-shrink: 0;
+        }
+
+        .option.correct {
+            background: #e6f7e6;
+            border-color: #4caf50;
+        }
+
+        .option.correct .letter {
+            color: #2e7d32;
+        }
+
+        .option.wrong {
+            background: #fde8e8;
+            border-color: #f44336;
+        }
+
+        .option.wrong .letter {
+            color: #c62828;
+        }
+
+        .option.disabled {
+            pointer-events: none;
+        }
+
+        .explanation {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #f0f4fa;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            color: #2c4e6e;
+            display: none;
+            border-left: 3px solid #1e6bb8;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .explanation strong {
+            color: #1d3b5e;
+        }
+
+        .explanation .correct-answer {
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .question-nav {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+            gap: 8px;
+        }
+
+        .next-btn {
+            background: #1d3b5e;
+            border: none;
+            padding: 6px 20px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .next-btn:hover:not(:disabled) {
+            background: #2a4f7a;
+            transform: translateY(-1px);
+        }
+
+        .next-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid #e1eaf5;
+        }
+
+        .progress-text {
+            font-size: 0.7rem;
+            color: #5e7290;
+        }
+
+        .reset-btn {
+            background: #eef2f7;
+            border: 1px solid #cbd5e1;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .reset-btn:hover {
+            background: #dce4ef;
+            border-color: #8da9cc;
+        }
+
+        .result-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 30px;
+            background: #e9eff6;
+            color: #1d3b5e;
+        }
+
+        .result-badge.passed {
+            background: #e6f7e6;
+            color: #2e7d32;
+        }
+
+        .result-badge.failed {
+            background: #fde8e8;
+            color: #c62828;
+        }
+
+        .question-status {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .q-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e9eff6;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #5e7290;
+            transition: 0.2s;
+        }
+
+        .q-dot.active {
+            border-color: #1d3b5e;
+            background: #1d3b5e;
+            color: white;
+        }
+
+        .q-dot.done {
+            border-color: #4caf50;
+            background: #e6f7e6;
+            color: #2e7d32;
+        }
+
+        .q-dot.wrong-dot {
+            border-color: #f44336;
+            background: #fde8e8;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-title">📋 ЭТрН · Кейсовые задачи</div>
+    <div class="card-sub">Решите 4 кейса по 3 вопроса в каждом</div>
+
+    <!-- Вкладки -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="case1">📦 Кейс 1</button>
+        <button class="tab-btn" data-tab="case2">📍 Кейс 2</button>
+        <button class="tab-btn" data-tab="case3">🚛 Кейс 3</button>
+        <button class="tab-btn" data-tab="case4">🚛 Кейс 4</button>
+    </div>
+
+    <!-- Кейс 1 -->
+    <div id="case1" class="case-content active">
+        <div class="case-header">
+            <h3>📦 Кейс 1. Не принимают часть груза</h3>
+            <div class="scenario">
+                <strong>ООО «МеталлСбыт»</strong> отгрузило 100 ящиков с метизами перевозчику <strong>ИП «Грузовик»</strong>.
+                Грузополучатель — <strong>АО «СтанкоЗавод»</strong>.<br>
+                При приемке выяснилось: 5 ящиков повреждены, 2 ящика отсутствуют, 3 ящика имеют следы вскрытия.
+                Грузополучатель хочет принять только 90 целых ящиков. От 10 проблемных ящиков он отказывается.
+            </div>
+        </div>
+
+        <div class="question-status" id="status1"></div>
+
+        <div class="question-block active" data-case="1" data-q="1">
+            <div class="q-number">Вопрос 1</div>
+            <div class="q-text">Как грузополучатель должен оформить титул 3 в этой ситуации?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q1_1">
+                    <span class="letter">А.</span> Подписать титул 3 без замечаний, чтобы не задерживать выгрузку, а потом направить претензию перевозчику отдельным письмом.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q1_1">
+                    <span class="letter">Б.</span> В титуле 3 указать: принято — 90 ящиков, отказано — 10 ящиков с перечислением причин (повреждение, отсутствие, вскрытие). Дополнительно зафиксировать время прибытия/убытия и состояние груза.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q1_1">
+                    <span class="letter">В.</span> Отказаться от всего груза (100 ящиков), чтобы перевозчик разбирался со всеми проблемами сразу, а АО «СтанкоЗавод» получило новый груз позже.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> Титул 3 позволяет грузополучателю указать частичную приемку. Обязательно фиксируются: количество принятого груза (90 ящиков), причина отказа от 10 ящиков (повреждение, недостача, вскрытие), время прибытия и убытия ТС, состояние груза (оговорки). Вариант А — грубая ошибка: подпись без замечаний лишает права на претензию. Вариант В — неоправданно жесткий и невыгодный для получателя вариант.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="1" data-current="1">Далее →</button>
+            </div>
+        </div>
+
+        <div class="question-block" data-case="1" data-q="2">
+            <div class="q-number">Вопрос 2</div>
+            <div class="q-text">Что должен сделать перевозчик после подписания титула 3 грузополучателем?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q1_2">
+                    <span class="letter">А.</span> Подписать титул 4 с отметкой о частичном отказе и сразу утилизировать непринятый груз, так как он уже поврежден.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q1_2">
+                    <span class="letter">Б.</span> Подписать титул 4 без отметок, так как грузополучатель уже подписал свою часть. Остальные 10 ящиков оставить у себя на складе до востребования.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q1_2">
+                    <span class="letter">В.</span> Подписать титул 4 с отметкой о частичном отказе. Затем оформить возврат непринятого груза грузоотправителю через механизм переадресации в ГИС ЭПД или создать новую ЭТрН на возврат.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: В</span><br>
+                <strong>Пояснение:</strong> Перевозчик подтверждает факт частичного отказа в титуле 4. После этого он обязан организовать возврат непринятого груза грузоотправителю. В ГИС ЭПД для этого используется механизм переадресации (титул 9) либо оформляется отдельная ЭТрН на возврат. Вариант А — незаконен: утилизировать чужой груз без согласия нельзя. Вариант Б — ошибка: титул 4 должен отражать реальную ситуацию, а груз нельзя просто «оставить у себя».
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="1" data-current="2">Далее →</button>
+            </div>
+        </div>
+
+        <div class="question-block" data-case="1" data-q="3">
+            <div class="q-number">Вопрос 3</div>
+            <div class="q-text">Куда денутся 10 непринятых ящиков?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q1_3">
+                    <span class="letter">А.</span> 10 ящиков остаются у грузополучателя, он обязан их выкупить, так как заказал 100 ящиков.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q1_3">
+                    <span class="letter">Б.</span> 10 ящиков остаются у перевозчика. Он обязан вернуть их грузоотправителю за свой счет, если повреждения произошли по его вине. Если повреждения были до погрузки — вопрос решается между грузоотправителем и грузополучателем.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q1_3">
+                    <span class="letter">В.</span> 10 ящиков немедленно отправляются обратно перевозчиком, но за счет грузоотправителя независимо от причин повреждения.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> Непринятый груз остается у перевозчика. Дальнейшая судьба зависит от того, кто виноват: если повреждения возникли по вине перевозчика — он возвращает груз за свой счет. Если повреждения были до погрузки — это спор между грузоотправителем и грузополучателем (перевозчик выступает только как хранитель). Вариант А — неверен: получатель не обязан выкупать поврежденный/недостающий груз. Вариант В — не всегда верен: вина определяется в каждом случае отдельно.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="1" data-current="3" disabled>Завершено ✅</button>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <span class="progress-text" id="progress1">Решено: 0 / 3</span>
+            <button class="reset-btn" data-case="1">🔄 Сбросить</button>
+        </div>
+    </div>
+
+    <!-- Кейс 2 -->
+    <div id="case2" class="case-content">
+        <div class="case-header">
+            <h3>📍 Кейс 2. Меняется адрес выгрузки</h3>
+            <div class="scenario">
+                <strong>ООО «СтройПоставка»</strong> отправило партию цемента в <strong>АО «БетонЗавод»</strong> по адресу: г. Москва, ул. Строителей, д. 10.<br>
+                В пути от грузоотправителя поступило распоряжение: изменить адрес выгрузки на г. Москва, ул. Индустриальная, д. 5 (другой склад этого же заказчика), так как основной склад переполнен.
+            </div>
+        </div>
+
+        <div class="question-status" id="status2"></div>
+
+        <div class="question-block active" data-case="2" data-q="1">
+            <div class="q-number">Вопрос 1</div>
+            <div class="q-text">Какой документ и кто заполняет при изменении адреса выгрузки?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q2_1">
+                    <span class="letter">А.</span> Грузополучатель заполняет титул 3 с новым адресом при приемке груза.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q2_1">
+                    <span class="letter">Б.</span> Перевозчик заполняет титул 7, в котором указывает новый адрес, дату и время принятия решения, причину изменения маршрута.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q2_1">
+                    <span class="letter">В.</span> Грузоотправитель заполняет титул 1 заново с новым адресом.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> Для изменения адреса выгрузки предназначен титул 7. Его заполняет перевозчик на основании распоряжения грузоотправителя или заказчика. В титуле указываются: новый адрес, дата и время принятия решения, причина смены маршрута. Титул 3 — это приемка, новый адрес там не указывается. Титул 1 уже подписан и не переделывается.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="2" data-current="1">Далее →</button>
+            </div>
+        </div>
+
+        <div class="question-block" data-case="2" data-q="2">
+            <div class="q-number">Вопрос 2</div>
+            <div class="q-text">Что должно быть указано в титуле 7 помимо нового адреса?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q2_2">
+                    <span class="letter">А.</span> Только новый адрес и подпись водителя.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q2_2">
+                    <span class="letter">Б.</span> Новый адрес, дата и время принятия решения о переадресации, причина изменения маршрута.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q2_2">
+                    <span class="letter">В.</span> Новый адрес, новые данные грузополучателя и новый договор.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> Титул 7 содержит три обязательных блока: новый адрес, дату и время принятия решения, причину. Это позволяет восстановить хронологию событий при проверках. Новые данные грузополучателя (если они меняются) и договор не вносятся в титул 7 — для этого другие механизмы.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="2" data-current="2">Далее →</button>
+            </div>
+        </div>
+
+        <div class="question-block" data-case="2" data-q="3">
+            <div class="q-number">Вопрос 3</div>
+            <div class="q-text">Если груз уже подъехал к старому адресу, а там его не ждут, водитель должен:</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q2_3">
+                    <span class="letter">А.</span> Выгрузить груз у старого адреса и уехать, чтобы не тратить время.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q2_3">
+                    <span class="letter">Б.</span> Связаться с диспетчером, получить подтверждение изменения маршрута, внести данные в титул 7 и следовать по новому адресу.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q2_3">
+                    <span class="letter">В.</span> Вернуть груз грузоотправителю, так как старый адрес уже недействителен.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> При изменении адреса водитель должен получить подтверждение от диспетчера (или заказчика), внести изменения через титул 7 и следовать по новому адресу. Выгрузка по старому адресу — нарушение, возврат груза без указания — неоправданная крайность.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="2" data-current="3" disabled>Завершено ✅</button>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <span class="progress-text" id="progress2">Решено: 0 / 3</span>
+            <button class="reset-btn" data-case="2">🔄 Сбросить</button>
+        </div>
+    </div>
+
+    <!-- Кейс 3 -->
+    <div id="case3" class="case-content">
+        <div class="case-header">
+            <h3>🚛 Кейс 3. Меняется водитель</h3>
+            <div class="scenario">
+                <strong>ИП «Грузовик»</strong> везет товар из Екатеринбурга в Новосибирск. Водитель Петров почувствовал себя плохо на 300-м километре, не может продолжать рейс. Компания-перевозчик принимает решение заменить водителя на водителя Сидорова. Смена происходит на трассе М-5, пост ДПС «Сосновка», в 14:30.
+            </div>
+        </div>
+
+        <div class="question-status" id="status3"></div>
+
+        <div class="question-block active" data-case="3" data-q="1">
+            <div class="q-number">Вопрос 1</div>
+            <div class="q-text">Какой титул заполняется при замене водителя?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q3_1">
+                    <span class="letter">А.</span> Титул 3 (грузополучатель фиксирует факт замены).
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q3_1">
+                    <span class="letter">Б.</span> Титул 8 (вносятся данные нового водителя, причина замены, время и место передачи груза).
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q3_1">
+                    <span class="letter">В.</span> Титул 7 (указывается новый водитель как часть изменения маршрута).
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> Титул 8 предназначен для изменения данных о водителе или транспортном средстве. В нем указываются: данные нового водителя, причина замены, время и место передачи груза. Титул 7 — для смены адреса, титул 3 — для приемки, они не подходят.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="3" data-current="1">Далее →</button>
+            </div>
+        </div>
+
+        <div class="question-block" data-case="3" data-q="2">
+            <div class="q-number">Вопрос 2</div>
+            <div class="q-text">Какие данные обязательно вносятся в титул 8 при смене водителя?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q3_2">
+                    <span class="letter">А.</span> Только ФИО нового водителя и номер его прав.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q3_2">
+                    <span class="letter">Б.</span> ФИО нового водителя, причина замены, время и место передачи груза.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q3_2">
+                    <span class="letter">В.</span> ФИО нового водителя, стаж, номер телефона и адрес прописки.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> Титул 8 содержит обязательный блок: данные нового водителя, причина замены, время и место передачи груза. Стаж, телефон и прописка не являются обязательными для ЭТрН. Номер прав обычно указывается в составе данных о водителе, но это часть блока «данные водителя», а не отдельное поле.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="3" data-current="2">Далее →</button>
+            </div>
+        </div>
+
+        <div class="question-block" data-case="3" data-q="3">
+            <div class="q-number">Вопрос 3</div>
+            <div class="q-text">В какой момент водитель Сидоров начинает считаться ответственным за груз?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q3_3">
+                    <span class="letter">А.</span> С момента подписания приказа о приеме на работу в компании-перевозчике.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q3_3">
+                    <span class="letter">Б.</span> С момента, когда он поставил подпись в титуле 8 при передаче груза (приемке ТС и документов).
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q3_3">
+                    <span class="letter">В.</span> С момента выезда из гаража компании.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> Новый водитель становится ответственным за груз с момента подписания титула 8, в котором фиксируется передача груза и ТС. Подпись подтверждает, что он принял груз в том состоянии, в котором он был передан. Приказ о приеме на работу и выезд из гаража юридического значения для конкретной перевозки не имеют.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="3" data-current="3" disabled>Завершено ✅</button>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <span class="progress-text" id="progress3">Решено: 0 / 3</span>
+            <button class="reset-btn" data-case="3">🔄 Сбросить</button>
+        </div>
+    </div>
+
+    <!-- Кейс 4 -->
+    <div id="case4" class="case-content">
+        <div class="case-header">
+            <h3>🚛 Кейс 4. Меняется автомобиль</h3>
+            <div class="scenario">
+                <strong>ООО «БыстроТранс»</strong> везет 20 тонн щебня. На 150-м км трассы М-4 у грузовика пробито колесо, поврежден баллон, дальнейшее движение невозможно. Перевозчик вызывает резервную машину. Перегрузка происходит на посту весового контроля «Лиски» в 18:45. Старое ТС — КамАЗ госномер А123ВС, новое — MAN госномер Х987УЕ.
+            </div>
+        </div>
+
+        <div class="question-status" id="status4"></div>
+
+        <div class="question-block active" data-case="4" data-q="1">
+            <div class="q-number">Вопрос 1</div>
+            <div class="q-text">Какой титул используется для замены транспортного средства?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q4_1">
+                    <span class="letter">А.</span> Титул 7.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q4_1">
+                    <span class="letter">Б.</span> Титул 8.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q4_1">
+                    <span class="letter">В.</span> Титул 5.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> Титул 8 предназначен для изменения данных о водителе ИЛИ о транспортном средстве. Смена машины — это изменение ТС. Титул 7 — для смены адреса, титул 5 — для стоимости. Поэтому правильный ответ — Б.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="4" data-current="1">Далее →</button>
+            </div>
+        </div>
+
+        <div class="question-block" data-case="4" data-q="2">
+            <div class="q-number">Вопрос 2</div>
+            <div class="q-text">Какие данные обязательно фиксируются в титуле 8 при смене ТС?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q4_2">
+                    <span class="letter">А.</span> Госномер нового ТС, марка, владелец.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q4_2">
+                    <span class="letter">Б.</span> Госномер нового ТС, причина замены (поломка, ДТП), время и место передачи груза.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q4_2">
+                    <span class="letter">В.</span> Госномер нового ТС, данные водителя нового ТС, пробег и расход топлива.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> В титуле 8 при смене ТС указываются: данные нового ТС (госномер и др.), причина замены, время и место передачи груза. Пробег и расход топлива не являются обязательными для ЭТрН (это данные для путевого листа). Данные водителя меняются отдельным пунктом в том же титуле, но вопрос был про ТС.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="4" data-current="2">Далее →</button>
+            </div>
+        </div>
+
+        <div class="question-block" data-case="4" data-q="3">
+            <div class="q-number">Вопрос 3</div>
+            <div class="q-text">Что должен сделать водитель старого ТС перед тем, как передать груз на новую машину?</div>
+            <div class="options">
+                <label class="option" data-value="A">
+                    <input type="radio" name="q4_3">
+                    <span class="letter">А.</span> Просто перегрузить ящики и уехать на эвакуаторе.
+                </label>
+                <label class="option" data-value="B">
+                    <input type="radio" name="q4_3">
+                    <span class="letter">Б.</span> Подписать акт о передаче груза в титуле 8, подтвердив состояние груза на момент перегрузки.
+                </label>
+                <label class="option" data-value="C">
+                    <input type="radio" name="q4_3">
+                    <span class="letter">В.</span> Уведомить грузополучателя по телефону о задержке.
+                </label>
+            </div>
+            <div class="explanation">
+                <span class="correct-answer">✅ Правильный ответ: Б</span><br>
+                <strong>Пояснение:</strong> Водитель старого ТС обязан зафиксировать состояние груза на момент перегрузки в титуле 8. Это его защита: если новый водитель получит груз уже поврежденным, ответственность ляжет на старого, если он не доказал обратное. Просто перегрузить — риск претензий. Уведомление по телефону не имеет юридической силы без подписи в системе.
+            </div>
+            <div class="question-nav">
+                <button class="next-btn" data-case="4" data-current="3" disabled>Завершено ✅</button>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <span class="progress-text" id="progress4">Решено: 0 / 3</span>
+            <button class="reset-btn" data-case="4">🔄 Сбросить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Данные по правильным ответам
+    const correctAnswers = {
+        1: { 1: 'B', 2: 'C', 3: 'B' },
+        2: { 1: 'B', 2: 'B', 3: 'B' },
+        3: { 1: 'B', 2: 'B', 3: 'B' },
+        4: { 1: 'B', 2: 'B', 3: 'B' }
+    };
+
+    // Состояние вопросов по кейсам
+    const state = {
+        1: { current: 1, solved: {}, total: 3 },
+        2: { current: 1, solved: {}, total: 3 },
+        3: { current: 1, solved: {}, total: 3 },
+        4: { current: 1, solved: {}, total: 3 }
+    };
+
+    // Переключение вкладок
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const contents = {
+        case1: document.getElementById('case1'),
+        case2: document.getElementById('case2'),
+        case3: document.getElementById('case3'),
+        case4: document.getElementById('case4')
+    };
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const target = btn.dataset.tab;
+            Object.keys(contents).forEach(key => {
+                contents[key].classList.toggle('active', key === target);
+            });
+            // Обновляем статусы при переключении
+            const caseNum = parseInt(target.replace('case', ''));
+            updateStatus(caseNum);
+        });
+    });
+
+    // Обновление статусных точек
+    function updateStatus(caseNum) {
+        const container = document.getElementById(`case${caseNum}`);
+        const statusContainer = document.getElementById(`status${caseNum}`);
+        const blocks = container.querySelectorAll('.question-block');
+        const solved = state[caseNum].solved;
+
+        let html = '';
+        for (let i = 1; i <= 3; i++) {
+            let cls = 'q-dot';
+            if (i === state[caseNum].current) cls += ' active';
+            if (solved[i] === true) cls += ' done';
+            if (solved[i] === false) cls += ' wrong-dot';
+            html += `<div class="${cls}">${i}</div>`;
+        }
+        statusContainer.innerHTML = html;
+    }
+
+    // Обработка выбора ответа
+    document.querySelectorAll('.option input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const option = this.closest('.option');
+            const block = option.closest('.question-block');
+            const caseNum = parseInt(block.dataset.case);
+            const qNum = parseInt(block.dataset.q);
+            const selected = option.dataset.value;
+            const correct = correctAnswers[caseNum][qNum];
+
+            // Блокируем все опции в этом вопросе
+            const allOptions = block.querySelectorAll('.option');
+            allOptions.forEach(opt => opt.classList.add('disabled'));
+
+            // Подсвечиваем правильный и неправильный ответы
+            let isCorrect = selected === correct;
+            allOptions.forEach(opt => {
+                if (opt.dataset.value === correct) {
+                    opt.classList.add('correct');
+                } else if (opt.dataset.value === selected && !isCorrect) {
+                    opt.classList.add('wrong');
+                }
+            });
+
+            // Сохраняем результат
+            state[caseNum].solved[qNum] = isCorrect;
+
+            // Показываем пояснение
+            const explanation = block.querySelector('.explanation');
+            explanation.classList.add('show');
+
+            // Обновляем статус
+            updateStatus(caseNum);
+
+            // Обновляем прогресс
+            updateProgress(caseNum);
+
+            // Активируем кнопку "Далее"
+            const nextBtn = block.querySelector('.next-btn');
+            if (nextBtn) {
+                nextBtn.disabled = false;
+                if (qNum === 3) {
+                    nextBtn.textContent = 'Завершено ✅';
+                }
+            }
+        });
+    });
+
+    // Кнопки "Далее"
+    document.querySelectorAll('.next-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const caseNum = parseInt(this.dataset.case);
+            const current = parseInt(this.dataset.current);
+
+            if (this.disabled) return;
+
+            // Проверяем, что вопрос решён
+            const block = document.querySelector(`#case${caseNum} .question-block[data-q="${current}"]`);
+            if (!block) return;
+
+            const options = block.querySelectorAll('.option');
+            let isSolved = false;
+            options.forEach(opt => {
+                if (opt.classList.contains('correct') || opt.classList.contains('wrong')) {
+                    isSolved = true;
+                }
+            });
+
+            if (!isSolved) return;
+
+            // Скрываем текущий вопрос
+            block.classList.remove('active');
+
+            // Показываем следующий
+            if (current < 3) {
+                const nextQ = current + 1;
+                const nextBlock = document.querySelector(`#case${caseNum} .question-block[data-q="${nextQ}"]`);
+                if (nextBlock) {
+                    nextBlock.classList.add('active');
+                    state[caseNum].current = nextQ;
+                    updateStatus(caseNum);
+                }
+            }
+        });
+    });
+
+    // Обновление прогресса
+    function updateProgress(caseNum) {
+        const container = document.getElementById(`case${caseNum}`);
+        const blocks = container.querySelectorAll('.question-block');
+        let solved = 0;
+        blocks.forEach(block => {
+            const options = block.querySelectorAll('.option');
+            let isSolved = false;
+            options.forEach(opt => {
+                if (opt.classList.contains('correct') || opt.classList.contains('wrong')) {
+                    isSolved = true;
+                }
+            });
+            if (isSolved) solved++;
+        });
+
+        const progressText = document.getElementById(`progress${caseNum}`);
+        progressText.textContent = `Решено: ${solved} / 3`;
+
+        // Обновляем бейдж
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            if (btn.dataset.tab === `case${caseNum}`) {
+                let badge = btn.querySelector('.badge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'badge';
+                    btn.appendChild(badge);
+                }
+                badge.textContent = `${solved}/3`;
+            }
+        });
+    }
+
+    // Сброс кейса
+    document.querySelectorAll('.reset-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const caseNum = parseInt(this.dataset.case);
+            const container = document.getElementById(`case${caseNum}`);
+            const blocks = container.querySelectorAll('.question-block');
+
+            // Сбрасываем состояние
+            state[caseNum].current = 1;
+            state[caseNum].solved = {};
+
+            blocks.forEach((block, index) => {
+                // Показываем только первый вопрос
+                if (index === 0) {
+                    block.classList.add('active');
+                } else {
+                    block.classList.remove('active');
+                }
+
+                // Сбрасываем радио
+                const radios = block.querySelectorAll('input[type="radio"]');
+                radios.forEach(r => r.checked = false);
+
+                // Убираем классы с опций
+                const options = block.querySelectorAll('.option');
+                options.forEach(opt => {
+                    opt.classList.remove('correct', 'wrong', 'disabled');
+                });
+
+                // Скрываем пояснение
+                const explanation = block.querySelector('.explanation');
+                explanation.classList.remove('show');
+
+                // Сбрасываем кнопку
+                const nextBtn = block.querySelector('.next-btn');
+                if (nextBtn) {
+                    nextBtn.disabled = true;
+                    if (index === 2) {
+                        nextBtn.textContent = 'Завершено ✅';
+                    } else {
+                        nextBtn.textContent = 'Далее →';
+                    }
+                }
+            });
+
+            updateStatus(caseNum);
+            updateProgress(caseNum);
+
+            // Обновляем бейдж
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                if (btn.dataset.tab === `case${caseNum}`) {
+                    const badge = btn.querySelector('.badge');
+                    if (badge) badge.textContent = '0/3';
+                }
+            });
+        });
+    });
+
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', () => {
+        [1, 2, 3, 4].forEach(caseNum => {
+            updateProgress(caseNum);
+            updateStatus(caseNum);
+        });
+    });
+</script>
+</body>
+</html>
