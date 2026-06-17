@@ -375,10 +375,10 @@
 
     <!-- Вкладки -->
     <div class="tabs">
-        <button class="tab-btn active" data-tab="case1">📦 Кейс 1</button>
-        <button class="tab-btn" data-tab="case2">📍 Кейс 2</button>
-        <button class="tab-btn" data-tab="case3">🚛 Кейс 3</button>
-        <button class="tab-btn" data-tab="case4">🚛 Кейс 4</button>
+        <button class="tab-btn active" data-tab="case1">Кейс 1</button>
+        <button class="tab-btn" data-tab="case2">Кейс 2</button>
+        <button class="tab-btn" data-tab="case3">Кейс 3</button>
+        <button class="tab-btn" data-tab="case4">Кейс 4</button>
     </div>
 
     <!-- Кейс 1 -->
@@ -435,12 +435,12 @@
                 </label>
                 <label class="option" data-value="C">
                     <input type="radio" name="q1_2">
-                    <span class="letter">В.</span> Подписать титул 4 с отметкой о частичном отказе. Затем оформить возврат непринятого груза грузоотправителю через механизм переадресации в ГИС ЭПД или создать новую ЭТрН на возврат.
+                    <span class="letter">В.</span> Подписать титул 4 с отметкой о частичном отказе. Затем оформить возврат непринятого груза грузоотправителю через механизм переадресации.
                 </label>
             </div>
             <div class="explanation">
                 <span class="correct-answer">✅ Правильный ответ: В</span><br>
-                <strong>Пояснение:</strong> Перевозчик подтверждает факт частичного отказа в титуле 4. После этого он обязан организовать возврат непринятого груза грузоотправителю. В ГИС ЭПД для этого используется механизм переадресации (титул 9) либо оформляется отдельная ЭТрН на возврат. Вариант А — незаконен: утилизировать чужой груз без согласия нельзя. Вариант Б — ошибка: титул 4 должен отражать реальную ситуацию, а груз нельзя просто «оставить у себя».
+                <strong>Пояснение:</strong> Перевозчик подтверждает факт частичного отказа в титуле 4. После этого он обязан организовать возврат непринятого груза грузоотправителю. В ГИС ЭПД для этого используется механизм переадресации (титул 8). Вариант А — незаконен: утилизировать чужой груз без согласия нельзя. Вариант Б — ошибка: титул 4 должен отражать реальную ситуацию, а груз нельзя просто «оставить у себя».
             </div>
             <div class="question-nav">
                 <button class="next-btn" data-case="1" data-current="2">Далее →</button>
@@ -497,20 +497,20 @@
             <div class="options">
                 <label class="option" data-value="A">
                     <input type="radio" name="q2_1">
-                    <span class="letter">А.</span> Грузополучатель заполняет титул 3 с новым адресом при приемке груза.
+                    <span class="letter">А.</span> Грузополучатель заполняет титул 3.
                 </label>
                 <label class="option" data-value="B">
                     <input type="radio" name="q2_1">
-                    <span class="letter">Б.</span> Перевозчик заполняет титул 7, в котором указывает новый адрес, дату и время принятия решения, причину изменения маршрута.
+                    <span class="letter">Б.</span> Перевозчик заполняет титул 7.
                 </label>
                 <label class="option" data-value="C">
                     <input type="radio" name="q2_1">
-                    <span class="letter">В.</span> Грузоотправитель заполняет титул 1 заново с новым адресом.
+                    <span class="letter">В.</span> Грузоотправитель заполняет титул 1.
                 </label>
             </div>
             <div class="explanation">
                 <span class="correct-answer">✅ Правильный ответ: Б</span><br>
-                <strong>Пояснение:</strong> Для изменения адреса выгрузки предназначен титул 7. Его заполняет перевозчик на основании распоряжения грузоотправителя или заказчика. В титуле указываются: новый адрес, дата и время принятия решения, причина смены маршрута. Титул 3 — это приемка, новый адрес там не указывается. Титул 1 уже подписан и не переделывается.
+                <strong>Пояснение:</strong> Для изменения адреса выгрузки предназначен титул 7. Его заполняет перевозчик на основании распоряжения грузоотправителя или заказчика. Титул 3 — это приемка. Титул 1 уже подписан и не переделывается.
             </div>
             <div class="question-nav">
                 <button class="next-btn" data-case="2" data-current="1">Далее →</button>
@@ -519,24 +519,24 @@
 
         <div class="question-block" data-case="2" data-q="2">
             <div class="q-number">Вопрос 2</div>
-            <div class="q-text">Что должно быть указано в титуле 7 помимо нового адреса?</div>
+            <div class="q-text">Что обязательно указать в титуле 7?</div>
             <div class="options">
                 <label class="option" data-value="A">
                     <input type="radio" name="q2_2">
-                    <span class="letter">А.</span> Только новый адрес и подпись водителя.
+                    <span class="letter">А.</span> Новый адрес и новый получатель.
                 </label>
                 <label class="option" data-value="B">
                     <input type="radio" name="q2_2">
-                    <span class="letter">Б.</span> Новый адрес, дата и время принятия решения о переадресации, причина изменения маршрута.
+                    <span class="letter">Б.</span> Только новый адрес.
                 </label>
                 <label class="option" data-value="C">
                     <input type="radio" name="q2_2">
-                    <span class="letter">В.</span> Новый адрес, новые данные грузополучателя и новый договор.
+                    <span class="letter">В.</span> Новый адрес и договор.
                 </label>
             </div>
             <div class="explanation">
                 <span class="correct-answer">✅ Правильный ответ: Б</span><br>
-                <strong>Пояснение:</strong> Титул 7 содержит три обязательных блока: новый адрес, дату и время принятия решения, причину. Это позволяет восстановить хронологию событий при проверках. Новые данные грузополучателя (если они меняются) и договор не вносятся в титул 7 — для этого другие механизмы.
+                <strong>Пояснение:</strong> Титул 7 содержит новый адрес. Грузополучатель не меняется. Договор не вносится в титул 7.
             </div>
             <div class="question-nav">
                 <button class="next-btn" data-case="2" data-current="2">Далее →</button>
@@ -596,16 +596,16 @@
                 </label>
                 <label class="option" data-value="B">
                     <input type="radio" name="q3_1">
-                    <span class="letter">Б.</span> Титул 8 (вносятся данные нового водителя, причина замены, время и место передачи груза).
+                    <span class="letter">Б.</span> Титул 8 (вносятся данные нового водителя).
                 </label>
                 <label class="option" data-value="C">
                     <input type="radio" name="q3_1">
-                    <span class="letter">В.</span> Титул 7 (указывается новый водитель как часть изменения маршрута).
+                    <span class="letter">В.</span> Титул 7 (указывается новый водитель).
                 </label>
             </div>
             <div class="explanation">
                 <span class="correct-answer">✅ Правильный ответ: Б</span><br>
-                <strong>Пояснение:</strong> Титул 8 предназначен для изменения данных о водителе или транспортном средстве. В нем указываются: данные нового водителя, причина замены, время и место передачи груза. Титул 7 — для смены адреса, титул 3 — для приемки, они не подходят.
+                <strong>Пояснение:</strong> Титул 8 предназначен для изменения данных о водителе или транспортном средстве. Титул 7 — для смены адреса, титул 3 — для приемки, они не подходят.
             </div>
             <div class="question-nav">
                 <button class="next-btn" data-case="3" data-current="1">Далее →</button>
@@ -614,24 +614,24 @@
 
         <div class="question-block" data-case="3" data-q="2">
             <div class="q-number">Вопрос 2</div>
-            <div class="q-text">Какие данные обязательно вносятся в титул 8 при смене водителя?</div>
+            <div class="q-text">Какие данные вносить в титул 8 при смене водителя?</div>
             <div class="options">
                 <label class="option" data-value="A">
                     <input type="radio" name="q3_2">
-                    <span class="letter">А.</span> Только ФИО нового водителя и номер его прав.
+                    <span class="letter">А.</span> ФИО нового водителя и адрес прописки.
                 </label>
                 <label class="option" data-value="B">
                     <input type="radio" name="q3_2">
-                    <span class="letter">Б.</span> ФИО нового водителя, причина замены, время и место передачи груза.
+                    <span class="letter">Б.</span> ФИО нового водителя.
                 </label>
                 <label class="option" data-value="C">
                     <input type="radio" name="q3_2">
-                    <span class="letter">В.</span> ФИО нового водителя, стаж, номер телефона и адрес прописки.
+                    <span class="letter">В.</span> ФИО нового водителя и стаж.
                 </label>
             </div>
             <div class="explanation">
                 <span class="correct-answer">✅ Правильный ответ: Б</span><br>
-                <strong>Пояснение:</strong> Титул 8 содержит обязательный блок: данные нового водителя, причина замены, время и место передачи груза. Стаж, телефон и прописка не являются обязательными для ЭТрН. Номер прав обычно указывается в составе данных о водителе, но это часть блока «данные водителя», а не отдельное поле.
+                <strong>Пояснение:</strong> Титул 8 содержит данные нового водителя. Стаж и прописка не указываются в ЭТрН.
             </div>
             <div class="question-nav">
                 <button class="next-btn" data-case="3" data-current="2">Далее →</button>
@@ -709,24 +709,24 @@
 
         <div class="question-block" data-case="4" data-q="2">
             <div class="q-number">Вопрос 2</div>
-            <div class="q-text">Какие данные обязательно фиксируются в титуле 8 при смене ТС?</div>
+            <div class="q-text">Какие данные фиксируются в титуле 8 при смене ТС?</div>
             <div class="options">
                 <label class="option" data-value="A">
                     <input type="radio" name="q4_2">
-                    <span class="letter">А.</span> Госномер нового ТС, марка, владелец.
+                    <span class="letter">А.</span> Госномер нового ТС, данные водителя нового ТС.
                 </label>
                 <label class="option" data-value="B">
                     <input type="radio" name="q4_2">
-                    <span class="letter">Б.</span> Госномер нового ТС, причина замены (поломка, ДТП), время и место передачи груза.
+                    <span class="letter">Б.</span> Госномер нового ТС.
                 </label>
                 <label class="option" data-value="C">
                     <input type="radio" name="q4_2">
-                    <span class="letter">В.</span> Госномер нового ТС, данные водителя нового ТС, пробег и расход топлива.
+                    <span class="letter">В.</span> Госномер нового ТС, пробег и расход топлива.
                 </label>
             </div>
             <div class="explanation">
                 <span class="correct-answer">✅ Правильный ответ: Б</span><br>
-                <strong>Пояснение:</strong> В титуле 8 при смене ТС указываются: данные нового ТС (госномер и др.), причина замены, время и место передачи груза. Пробег и расход топлива не являются обязательными для ЭТрН (это данные для путевого листа). Данные водителя меняются отдельным пунктом в том же титуле, но вопрос был про ТС.
+                <strong>Пояснение:</strong> В титуле 8 при смене ТС указываются госномер нового ТС. Пробег и расход топлива не указываются в ЭТрН (это данные для путевого листа). Данные водителя меняются отдельным пунктом в том же титуле, но вопрос был про ТС.
             </div>
             <div class="question-nav">
                 <button class="next-btn" data-case="4" data-current="2">Далее →</button>
@@ -752,7 +752,7 @@
             </div>
             <div class="explanation">
                 <span class="correct-answer">✅ Правильный ответ: Б</span><br>
-                <strong>Пояснение:</strong> Водитель старого ТС обязан зафиксировать состояние груза на момент перегрузки в титуле 8. Это его защита: если новый водитель получит груз уже поврежденным, ответственность ляжет на старого, если он не доказал обратное. Просто перегрузить — риск претензий. Уведомление по телефону не имеет юридической силы без подписи в системе.
+                <strong>Пояснение:</strong> Водитель старого ТС обязан зафиксировать состояние груза на момент перегрузки в титуле 8. Просто перегрузить нельзя. Уведомление по телефону не имеет юридической силы без подписи в системе.
             </div>
             <div class="question-nav">
                 <button class="next-btn" data-case="4" data-current="3" disabled>Завершено ✅</button>
