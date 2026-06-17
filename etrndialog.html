@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>ЭТрН · Чат-бот для водителя</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Тренажёр: ЭТрН · Чат с водителем</title>
     <style>
         * {
             margin: 0;
@@ -13,636 +13,519 @@
 
         body {
             background: #eef2f5;
-            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            padding: 12px;
         }
 
-        .card {
-            width: 650px;
-            max-width: 100%;
-            background: white;
-            border-radius: 32px;
-            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
-            padding: 1.5rem 1.2rem;
-            border: 1px solid #dee6f0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #1d3b5e;
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .card-sub {
-            font-size: 0.75rem;
-            color: #5e7290;
-            margin-bottom: 1.2rem;
-            border-left: 3px solid #8da9cc;
-            padding-left: 10px;
-            flex-shrink: 0;
-        }
-
-        /* Фиксированная высота контейнера чата */
-        .chat-container {
-            background: #f6faff;
+        .messenger {
+            max-width: 700px;
+            width: 100%;
+            background: #FFFFFF;
             border-radius: 24px;
-            border: 2px solid #e1eaf5;
-            padding: 1.2rem;
-            display: flex;
-            flex-direction: column;
-            height: 480px;
-            min-height: 480px;
-            max-height: 480px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
             overflow: hidden;
         }
 
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 6px;
-            margin-bottom: 12px;
-            min-height: 0;
+        .chat-header {
+            background: #FFFFFF;
+            padding: 10px 16px 8px 16px;
+            border-bottom: 1px solid rgba(100, 160, 210, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #95CAFA, #7bb5df);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .chat-info h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a2c3e;
+        }
+        .chat-info h2 span {
+            font-weight: 500;
+            background: #ecf7ff;
+            padding: 1px 6px;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            margin-left: 6px;
+        }
+        .chat-info p {
+            font-size: 0.68rem;
+            color: #5e7a93;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .online-dot {
+            width: 6px;
+            height: 6px;
+            background: #2fc96b;
+            border-radius: 6px;
         }
 
-        .chat-messages::-webkit-scrollbar {
-            width: 4px;
-        }
-        .chat-messages::-webkit-scrollbar-track {
-            background: #eef3fa;
-            border-radius: 10px;
-        }
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #b9cee8;
-            border-radius: 10px;
+        .messages-area {
+            background: #FEFEFE;
+            padding: 12px 14px 8px 14px;
+            min-height: 360px;
+            max-height: 420px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .message {
             display: flex;
-            margin-bottom: 12px;
-            animation: fadeInMsg 0.25s ease;
+            max-width: 88%;
+        }
+        .client-message { align-self: flex-start; }
+        .client-message .bubble {
+            background: #F1F5F9;
+            border-radius: 16px 16px 16px 6px;
+            border: 1px solid #e2ecf5;
+        }
+        .user-message { align-self: flex-end; }
+        .user-message .bubble {
+            background: #ECF5FC;
+            border-radius: 16px 16px 6px 16px;
+            border: 1px solid #cde0ef;
+        }
+        .bubble {
+            padding: 7px 12px;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            color: #1e2e3c;
+        }
+        .message-meta {
+            font-size: 0.6rem;
+            margin-top: 3px;
+            margin-left: 8px;
+            margin-right: 8px;
+            color: #8da0b2;
+            display: flex;
+            gap: 6px;
+        }
+        .client-message .message-meta { justify-content: flex-start; }
+        .user-message .message-meta { justify-content: flex-end; }
+
+        .options-panel {
+            background: #FFFFFF;
+            border-top: 1px solid #e9eff5;
+            padding: 10px 14px 10px;
+        }
+        .options-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 600;
+            color: #5e7a93;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .options-title::before { content: "⚡"; font-size: 11px; }
+        .options-grid { display: flex; flex-direction: column; gap: 7px; }
+        .option-btn {
+            width: 100%;
+            background: transparent;
+            border: 1.5px solid #cde2f5;
+            border-radius: 20px;
+            padding: 7px 12px;
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 500;
+            text-align: left;
+            color: #1e2f3e;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #FFFFFF;
+            line-height: 1.3;
+        }
+        .option-btn:hover {
+            background: #F4FAFF;
+            border-color: #9bc6ec;
+        }
+        .options-disabled .option-btn {
+            opacity: 0.55;
+            cursor: default;
+            pointer-events: none;
         }
 
-        @keyframes fadeInMsg {
-            from { opacity: 0; transform: translateY(6px); }
+        .analysis-card {
+            margin: 6px 14px 12px 14px;
+            border-radius: 14px;
+            padding: 8px 12px;
+            font-size: 0.74rem;
+            line-height: 1.4;
+        }
+        .analysis-card.correct {
+            background-color: #e8f5e9;
+            border-left: 4px solid #2c9b5e;
+            color: #155724;
+        }
+        .analysis-card.wrong {
+            background-color: #ffeaea;
+            border-left: 4px solid #dc3545;
+            color: #8b2c2c;
+        }
+        .feedback-footnote {
+            margin-top: 6px;
+            font-size: 0.65rem;
+            text-align: center;
+            color: #9ab3cc;
+            border-top: 1px solid #ecf3f9;
+            padding-top: 7px;
+        }
+        .reset-button-container {
+            padding: 8px 14px 12px 14px;
+            background: #FFFFFF;
+            border-top: 1px solid #ecf3f9;
+            text-align: center;
+        }
+        .reset-chat {
+            background: #f8fafd;
+            border: 1px solid #cde2f5;
+            border-radius: 32px;
+            padding: 5px 14px;
+            font-size: 0.73rem;
+            font-weight: 500;
+            font-family: inherit;
+            color: #22668d;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .reset-chat:hover {
+            background: #eef5fc;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .messages-area::-webkit-scrollbar { width: 4px; }
+        .messages-area::-webkit-scrollbar-track { background: #ECF3F9; border-radius: 6px; }
+        .messages-area::-webkit-scrollbar-thumb { background: #95CAFA; border-radius: 6px; }
 
-        .message.bot {
-            justify-content: flex-start;
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .bubble {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            line-height: 1.45;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .bot .bubble {
-            background: white;
-            border: 1px solid #dce5f0;
-            color: #1a324a;
-            border-bottom-left-radius: 4px;
-        }
-
-        .user .bubble {
-            background: #1e3b5c;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .bot-avatar {
-            width: 32px;
-            height: 32px;
-            background: #1e3b5c;
-            color: white;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            font-weight: 700;
-            flex-shrink: 0;
-            margin-right: 10px;
-        }
-
-        .message.bot .bubble strong {
-            color: #1e6bb8;
-        }
-
-        /* Блок с опциями и пояснением — фиксированная высота */
-        .options-wrapper {
-            flex-shrink: 0;
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-
-        .chat-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 4px;
-        }
-
-        .chat-options .option-btn {
-            background: white;
-            border: 2px solid #cbd5e1;
-            border-radius: 40px;
-            padding: 8px 16px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #1e3b5c;
-            cursor: pointer;
-            transition: 0.15s;
-            font-family: inherit;
-            flex: 1;
-            min-width: 100px;
-            text-align: center;
-        }
-
-        .chat-options .option-btn:hover {
-            background: #f0f7ff;
-            border-color: #8da9cc;
-            transform: translateY(-1px);
-        }
-
-        .chat-options .option-btn:active {
-            transform: translateY(1px);
-        }
-
-        .chat-options .option-btn.correct-answer {
-            border-color: #2b8c4a;
-            background: #eefaee;
-        }
-
-        .chat-options .option-btn.wrong-answer {
-            border-color: #b13e3e;
-            background: #fff2f2;
-        }
-
-        .chat-options .option-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .explanation {
-            border-radius: 16px;
-            padding: 8px 12px;
-            margin-top: 8px;
-            font-size: 0.78rem;
-            line-height: 1.4;
-            border-left: 3px solid #8da9cc;
-            background: #f2f8fd;
-            flex-shrink: 0;
-            overflow-y: auto;
-            max-height: 70px;
-        }
-
-        .explanation.correct {
-            border-left-color: #2b8c4a;
-            background: #eefaee;
-        }
-
-        .explanation.incorrect {
-            border-left-color: #b13e3e;
-            background: #fff2f2;
-        }
-
-        .explanation::-webkit-scrollbar {
-            width: 3px;
-        }
-        .explanation::-webkit-scrollbar-thumb {
-            background: #b9cee8;
-            border-radius: 10px;
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 8px 0;
-            align-items: center;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: #b9cee8;
-            border-radius: 30px;
-            animation: typing 1.2s infinite ease-in-out;
-        }
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-            30% { transform: translateY(-6px); opacity: 1; }
-        }
-
-        .btn-reset {
-            background: white;
-            border: 2px solid #cbd5e1;
-            border-radius: 40px;
-            padding: 6px 14px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: #5e7290;
-            cursor: pointer;
-            transition: 0.1s;
-            font-family: inherit;
-            flex-shrink: 0;
-        }
-
-        .btn-reset:hover {
-            background: #f0f7ff;
-            border-color: #8da9cc;
-            color: #1d3b5e;
-        }
-
-        .btn-reset:active {
-            transform: scale(0.96);
-        }
-
-        .chat-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 8px;
-            flex-shrink: 0;
-        }
-
-        .progress-text {
-            font-size: 0.7rem;
-            color: #8da0bb;
-        }
-
-        .final-message {
-            text-align: center;
-            padding: 10px;
-            font-size: 0.85rem;
-            color: #1d3b5e;
-        }
-
-        /* Скрываем скролл у контейнера, если контент не превышает высоту */
-        .chat-messages:only-child {
-            overflow-y: auto;
+        @media (max-width: 500px) {
+            .message { max-width: 94%; }
+            .option-btn { padding: 5px 10px; font-size: 0.73rem; }
+            .bubble { font-size: 0.76rem; padding: 6px 10px; }
+            .messages-area { padding: 10px 12px; }
         }
     </style>
 </head>
 <body>
-<div class="card">
-    <div class="card-title">
-        <span>💬</span> Что делать при отсутствии интернета
+<div class="messenger" id="messengerApp">
+    <div class="chat-header">
+        <div class="avatar">🚛</div>
+        <div class="chat-info">
+            <h2>Сергей <span>водитель</span></h2>
+            <p><span class="online-dot"></span> в рейсе</p>
+        </div>
     </div>
-    <div class="card-sub">
-        Симулируем ситуации, в которых может оказаться водитель. Выберите правильное действие.
+
+    <div class="messages-area" id="messagesArea"></div>
+
+    <div class="options-panel" id="optionsPanel">
+        <div class="options-title">Ваш ответ</div>
+        <div class="options-grid" id="optionsContainer"></div>
+        <div class="feedback-footnote" id="footnoteMsg">Выберите вариант ответа</div>
     </div>
 
-    <div class="chat-container">
-        <div class="chat-messages" id="chatMessages">
-            <!-- Сообщения будут добавляться сюда -->
-        </div>
+    <div id="analysisContainer"></div>
 
-        <div class="options-wrapper" id="optionsWrapper">
-            <div id="optionsContainer">
-                <!-- Кнопки вариантов ответа -->
-            </div>
-        </div>
-
-        <div class="chat-footer">
-            <button class="btn-reset" id="resetBtn">⟳ Начать заново</button>
-            <span class="progress-text" id="progressText">Вопрос 1 из 4</span>
-        </div>
+    <div class="reset-button-container">
+        <button class="reset-chat" id="resetChatBtn">⟳ Начать диалог заново</button>
     </div>
 </div>
 
 <script>
     // --------------------------------------------------------------
-    // ДАННЫЕ СЦЕНАРИЕВ
+    // ПОШАГОВЫЙ СЦЕНАРИЙ: ЭТрН — ЧАТ С ВОДИТЕЛЕМ
     // --------------------------------------------------------------
-    const scenarios = [
-        {
-            id: 1,
-            question: "🚛 Вы на погрузке, нужно подписать ЭТрН, но интернет пропал. Ваши действия?",
-            options: [
-                "Остановить погрузку и ждать интернет",
-                "Нажать «Подписать» — система подпишет при появлении сети, выезжать можно",
-                "Оформить бумажную накладную"
-            ],
-            correct: 1,
-            explanation: "Верно! При отсутствии интернета на погрузке нажмите «Подписать» или «Принять груз». Система покажет сообщение «Будет подписано при появлении сети». Выезжайте в рейс — данные синхронизируются автоматически, как только появится связь. QR-код кэшируется и будет доступен даже без интернета.",
-            wrongExplanations: [
-                "Останавливать погрузку не нужно — вы потеряете время. Система поддерживает офлайн-подписание с последующей синхронизацией.",
-                "С 1 сентября 2026 года бумажная накладная — нарушение. Используйте электронный документооборот даже при отсутствии интернета: нажмите «Подписать» в приложении."
-            ]
-        },
-        {
-            id: 2,
-            question: "🛑 Вас остановил инспектор ГИБДД в пути, интернета нет. Что делать?",
-            options: [
-                "Сказать, что интернета нет, и попросить подождать",
-                "Открыть приложение, найти ЭТрН и показать QR-код",
-                "Позвонить диспетчеру, чтобы тот продиктовал номер накладной"
-            ],
-            correct: 1,
-            explanation: "Верно! QR-код кэшируется в приложении и доступен даже без интернета, если вы открыли его до выезда. Откройте приложение → «Мои ЭТрН» → покажите QR-код инспектору. Инспектор может отсканировать его планшетом и увидеть всю информацию о перевозке.",
-            wrongExplanations: [
-                "Инспектор не будет ждать, пока появится интернет. QR-код уже должен быть в приложении — он кэшируется.",
-                "У диспетчера может не быть доступа к вашему QR-коду, и это займёт время. QR-код хранится в вашем приложении."
-            ]
-        },
-        {
-            id: 3,
-            question: "🏭 Вы приехали к получателю, но у него сбой системы, а выгружать нужно срочно (ночь). Ваши действия?",
-            options: [
-                "Позвонить диспетчеру получателя, попросить подписать через мобильное приложение",
-                "Уехать и вернуться утром",
-                "Выгрузить груз и уехать без подписи"
-            ],
-            correct: 0,
-            explanation: "Верно! Позвоните диспетчеру получателя, сообщите время прибытия и состояние груза. Попросите сотрудника склада подписать ЭТрН через мобильное приложение — оно часто работает даже при сбое основной системы. Если мобильного приложения нет — составьте акт о невозможности подписания, сфотографируйте груз. Утром получатель должен подписать ЭТрН с пометкой о времени выгрузки.",
-            wrongExplanations: [
-                "Уезжать без решения проблемы — риск возврата груза и претензий. Свяжитесь с диспетчером получателя.",
-                "Без подписи или акта вы не сможете подтвердить факт выгрузки. Это приведёт к спорам и штрафам."
-            ]
-        },
-        {
-            id: 4,
-            question: "📄 Получатель отказывается подписывать электронно и требует бумажную ТН. Ваши действия?",
-            options: [
-                "Распечатать бумажную накладную, чтобы не спорить",
-                "Объяснить, что бумажная ТН — нарушение, зафиксировать отказ в приложении, не уезжать без указания диспетчера",
-                "Позвонить в ГИБДД и пожаловаться на получателя"
-            ],
-            correct: 1,
-            explanation: "Верно! Спокойно объясните, что с 1 сентября 2026 года бумажные документы — нарушение закона. Если настаивает — позвоните диспетчеру. Зафиксируйте отказ в приложении через кнопку «Отказ от приёмки» или «Оговорки». Не уезжайте без указания диспетчера — это может привести к возврату груза.",
-            wrongExplanations: [
-                "Бумажная ТН с 1 сентября 2026 года — нарушение. Вы можете получить штраф.",
-                "ГИБДД не занимается спорами по документообороту. Решайте вопрос через диспетчера и фиксацию отказа в приложении."
-            ]
-        }
-    ];
+    const messagesContainer = document.getElementById('messagesArea');
+    const optionsContainerDiv = document.getElementById('optionsContainer');
+    const optionsPanel = document.getElementById('optionsPanel');
+    const footnoteEl = document.getElementById('footnoteMsg');
+    const analysisDiv = document.getElementById('analysisContainer');
 
-    // --------------------------------------------------------------
-    // СОСТОЯНИЕ ЧАТА
-    // --------------------------------------------------------------
-    let currentIndex = 0;
-    let isAnswered = false;
-    let selectedIndex = null;
-    let chatMessages = [];
-    let isBotTyping = false;
+    let currentState = {
+        locked: false
+    };
 
-    const chatMessagesEl = document.getElementById('chatMessages');
-    const optionsContainer = document.getElementById('optionsContainer');
-    const progressText = document.getElementById('progressText');
-
-    // --------------------------------------------------------------
-    // ФУНКЦИИ ОТРИСОВКИ
-    // --------------------------------------------------------------
-
-    function render() {
-        renderMessages();
-        renderOptions();
-        updateProgress();
-        if (chatMessagesEl) {
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-        }
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    function renderMessages() {
-        if (!chatMessagesEl) return;
-        chatMessagesEl.innerHTML = '';
+    function addMessage(text, sender = 'user') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender === 'client' ? 'client-message' : 'user-message'}`;
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerText = text;
+        const metaSpan = document.createElement('div');
+        metaSpan.className = 'message-meta';
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (sender === 'client') metaSpan.innerText = `Сергей · ${timeStr}`;
+        else metaSpan.innerText = `Вы · ${timeStr}`;
+        messageDiv.appendChild(bubble);
+        messageDiv.appendChild(metaSpan);
+        messagesContainer.appendChild(messageDiv);
+        scrollToBottom();
+        return messageDiv;
+    }
 
-        chatMessages.forEach(msg => {
-            const div = document.createElement('div');
-            div.className = `message ${msg.type}`;
-            if (msg.type === 'bot') {
-                div.innerHTML = `
-                    <div class="bot-avatar">🤖</div>
-                    <div class="bubble">${msg.text}</div>
-                `;
-            } else {
-                div.innerHTML = `
-                    <div class="bubble">${msg.text}</div>
-                `;
-            }
-            chatMessagesEl.appendChild(div);
+    function clearOptions() { optionsContainerDiv.innerHTML = ''; }
+    function disableOptions(disabled = true) {
+        if (disabled) optionsPanel.classList.add('options-disabled');
+        else optionsPanel.classList.remove('options-disabled');
+    }
+
+    function showAnalysis(text, type = 'wrong') {
+        analysisDiv.innerHTML = '';
+        const card = document.createElement('div');
+        card.className = `analysis-card ${type === 'correct' ? 'correct' : 'wrong'}`;
+        card.innerHTML = `<strong>${type === 'correct' ? '✅ Верное решение' : '❌ Разбор ошибки'}</strong><br>${text}`;
+        analysisDiv.appendChild(card);
+        scrollToBottom();
+    }
+
+    function clearAnalysis() { analysisDiv.innerHTML = ''; }
+
+    function finishWithAnalysis(analysisText, isCorrect = false) {
+        currentState.locked = true;
+        disableOptions(true);
+        clearOptions();
+        showAnalysis(analysisText, isCorrect ? 'correct' : 'wrong');
+        footnoteEl.innerHTML = '✅ Диалог завершён. Нажмите «Начать заново», чтобы пройти сценарий ещё раз.';
+    }
+
+    function createButton(text, onClick) {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = text;
+        btn.addEventListener('click', () => {
+            if (currentState.locked) return;
+            onClick();
         });
-
-        if (isBotTyping) {
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message bot';
-            typingDiv.id = 'typingIndicator';
-            typingDiv.innerHTML = `
-                <div class="bot-avatar">🤖</div>
-                <div class="bubble">
-                    <div class="typing-indicator">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
-            `;
-            chatMessagesEl.appendChild(typingDiv);
-        }
+        optionsContainerDiv.appendChild(btn);
     }
 
-    function renderOptions() {
-        if (!optionsContainer) return;
-        optionsContainer.innerHTML = '';
+    // --------------------------------------------------------------
+    // СТАРТ: водитель на погрузке
+    function startDialog() {
+        addMessage('Привет! Я на погрузке, ЭТрН нужно подписать, а интернет пропал. Что делать?', 'client');
+        showFirstChoice();
+    }
 
-        if (isBotTyping) {
-            optionsContainer.innerHTML = '';
-            return;
-        }
-
-        const scenario = scenarios[currentIndex];
-        if (!scenario) {
-            optionsContainer.innerHTML = `
-                <div class="final-message">
-                    🎉 Вы прошли все сценарии! Нажмите «Начать заново», чтобы повторить.
-                </div>
-            `;
-            return;
-        }
-
-        if (isAnswered) {
-            const explanation = getExplanation(scenario, selectedIndex);
-            const isCorrect = selectedIndex === scenario.correct;
-            
-            const optionsDiv = document.createElement('div');
-            optionsDiv.className = 'chat-options';
-
-            scenario.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt;
-                btn.disabled = true;
-                if (idx === scenario.correct) {
-                    btn.classList.add('correct-answer');
-                } else if (idx === selectedIndex && idx !== scenario.correct) {
-                    btn.classList.add('wrong-answer');
-                }
-                optionsDiv.appendChild(btn);
-            });
-
-            optionsContainer.appendChild(optionsDiv);
-
-            const explDiv = document.createElement('div');
-            explDiv.className = `explanation ${isCorrect ? 'correct' : 'incorrect'}`;
-            explDiv.textContent = `${isCorrect ? '✅ ' : '❌ '}${explanation}`;
-            optionsContainer.appendChild(explDiv);
-
-            if (currentIndex < scenarios.length - 1) {
-                const nextBtn = document.createElement('button');
-                nextBtn.className = 'option-btn';
-                nextBtn.textContent = '➡️ Далее';
-                nextBtn.style.marginTop = '6px';
-                nextBtn.style.borderColor = '#1e3b5c';
-                nextBtn.style.background = '#1e3b5c';
-                nextBtn.style.color = 'white';
-                nextBtn.addEventListener('click', () => {
-                    if (isBotTyping) return;
-                    currentIndex++;
-                    isAnswered = false;
-                    selectedIndex = null;
-                    const nextScenario = scenarios[currentIndex];
-                    if (nextScenario) {
-                        addBotMessage(nextScenario.question);
-                    } else {
-                        addBotMessage('🎉 Поздравляю! Вы успешно прошли все сценарии. Теперь вы знаете, как действовать водителю при отсутствии интернета. Выберите «Начать заново», чтобы повторить материал.');
-                    }
-                    render();
-                });
-                optionsContainer.appendChild(nextBtn);
-            } else {
-                const finishBtn = document.createElement('button');
-                finishBtn.className = 'option-btn';
-                finishBtn.textContent = '🏁 Завершить';
-                finishBtn.style.marginTop = '6px';
-                finishBtn.style.borderColor = '#1e3b5c';
-                finishBtn.style.background = '#1e3b5c';
-                finishBtn.style.color = 'white';
-                finishBtn.addEventListener('click', () => {
-                    const lastMsg = chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].text : '';
-                    if (!lastMsg.includes('Поздравляю')) {
-                        addBotMessage('🎉 Поздравляю! Вы успешно прошли все сценарии. Теперь вы знаете, как действовать водителю при отсутствии интернета. Нажмите «Начать заново», чтобы повторить материал.');
-                        render();
-                    }
-                });
-                optionsContainer.appendChild(finishBtn);
-            }
-            return;
-        }
-
-        const optionsDiv = document.createElement('div');
-        optionsDiv.className = 'chat-options';
-
-        scenario.options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.textContent = opt;
-            btn.addEventListener('click', () => {
-                if (isAnswered || isBotTyping) return;
-                handleAnswer(idx);
-            });
-            optionsDiv.appendChild(btn);
+    // --------------------------------------------------------------
+    // ПЕРВЫЙ ВЫБОР (Сценарий 1)
+    function showFirstChoice() {
+        clearOptions();
+        createButton('Остановить погрузку и ждать интернет', () => {
+            addMessage('Остановить погрузку и ждать интернет', 'user');
+            // Неправильный ответ
+            setTimeout(() => {
+                addMessage('Так, но у нас график, не могу ждать долго.', 'client');
+                setTimeout(() => {
+                    finishWithAnalysis(
+                        'Останавливать погрузку не нужно — вы потеряете время. Система поддерживает офлайн-подписание с последующей синхронизацией. Нажмите «Подписать» в приложении, и подпись будет отправлена при появлении сети.',
+                        false
+                    );
+                }, 500);
+            }, 500);
         });
-
-        optionsContainer.appendChild(optionsDiv);
+        createButton('Нажать «Подписать» — система подпишет при появлении сети, выезжать можно', () => {
+            addMessage('Нажать «Подписать» — система подпишет при появлении сети, выезжать можно', 'user');
+            // Правильный ответ
+            setTimeout(() => {
+                addMessage('Понял! Нажал. Поехали! Спасибо!', 'client');
+                setTimeout(() => {
+                    // Переход к следующему сценарию
+                    addMessage('🚛 В пути. Еду по трассе, тут ГИБДД. Остановили, просят ЭТрН. Интернета нет. Что делать?', 'client');
+                    showSecondChoice();
+                }, 600);
+            }, 500);
+        });
+        createButton('Оформить бумажную накладную', () => {
+            addMessage('Оформить бумажную накладную', 'user');
+            // Неправильный ответ
+            setTimeout(() => {
+                addMessage('Я слышал, что с 1 сентября бумажные уже нельзя...', 'client');
+                setTimeout(() => {
+                    finishWithAnalysis(
+                        'С 1 сентября 2026 года бумажная накладная — нарушение. Используйте электронный документооборот даже при отсутствии интернета: нажмите «Подписать» в приложении. Подпись синхронизируется автоматически.',
+                        false
+                    );
+                }, 500);
+            }, 500);
+        });
+        footnoteEl.innerHTML = 'Водитель на погрузке, интернет пропал. Ваш ответ';
     }
 
-    function updateProgress() {
-        if (progressText) {
-            const total = scenarios.length;
-            const current = Math.min(currentIndex + 1, total);
-            progressText.textContent = `Вопрос ${current} из ${total}`;
-        }
+    // --------------------------------------------------------------
+    // ВТОРОЙ ВЫБОР (Сценарий 2 — ГИБДД)
+    function showSecondChoice() {
+        clearOptions();
+        createButton('Сказать, что интернета нет, и попросить подождать', () => {
+            addMessage('Сказать, что интернета нет, и попросить подождать', 'user');
+            setTimeout(() => {
+                addMessage('Инспектор сказал, что ждать не будет. Говорит, что должен быть QR-код.', 'client');
+                setTimeout(() => {
+                    finishWithAnalysis(
+                        'Инспектор не будет ждать, пока появится интернет. QR-код кэшируется в приложении и доступен даже без сети, если вы открыли его до выезда. Откройте приложение → «Мои ЭТрН» → покажите QR-код.',
+                        false
+                    );
+                }, 500);
+            }, 500);
+        });
+        createButton('Открыть приложение, найти ЭТрН и показать QR-код', () => {
+            addMessage('Открыть приложение, найти ЭТрН и показать QR-код', 'user');
+            setTimeout(() => {
+                addMessage('Да, QR-код есть! Инспектор отсканировал планшетом. Отпустили! Спасибо!', 'client');
+                setTimeout(() => {
+                    // Переход к следующему сценарию
+                    addMessage('🏭 Приехал к получателю, а у них сбой системы, груз срочно нужно выгружать (ночь). Что делать?', 'client');
+                    showThirdChoice();
+                }, 600);
+            }, 500);
+        });
+        createButton('Позвонить диспетчеру, чтобы тот продиктовал номер накладной', () => {
+            addMessage('Позвонить диспетчеру, чтобы тот продиктовал номер накладной', 'user');
+            setTimeout(() => {
+                addMessage('Диспетчер сказал, что у него нет QR-кода. Инспектор недоволен.', 'client');
+                setTimeout(() => {
+                    finishWithAnalysis(
+                        'У диспетчера может не быть доступа к вашему QR-коду, и это займёт время. QR-код хранится в вашем приложении и кэшируется. Откройте приложение и покажите его инспектору.',
+                        false
+                    );
+                }, 500);
+            }, 500);
+        });
+        footnoteEl.innerHTML = 'Остановка ГИБДД, интернета нет. Ваш ответ';
     }
 
-    function getExplanation(scenario, selectedIdx) {
-        if (selectedIdx === scenario.correct) {
-            return scenario.explanation;
-        } else {
-            return scenario.wrongExplanations[selectedIdx] || 'Неправильный ответ. Попробуйте запомнить правильное действие.';
-        }
+    // --------------------------------------------------------------
+    // ТРЕТИЙ ВЫБОР (Сценарий 3 — сбой у получателя)
+    function showThirdChoice() {
+        clearOptions();
+        createButton('Позвонить диспетчеру получателя, попросить подписать через мобильное приложение', () => {
+            addMessage('Позвонить диспетчеру получателя, попросить подписать через мобильное приложение', 'user');
+            setTimeout(() => {
+                addMessage('Диспетчер сказал, что мобильное приложение работает, он подписал через него. Спасибо!', 'client');
+                // Переход к финальному сценарию
+                setTimeout(() => {
+                    addMessage('📄 Получатель, к которому я приехал, отказывается подписывать электронно. Говорит, нужна бумажная ТН. Что делать?', 'client');
+                    showFourthChoice();
+                }, 600);
+            }, 500);
+        });
+        createButton('Уехать и вернуться утром', () => {
+            addMessage('Уехать и вернуться утром', 'user');
+            setTimeout(() => {
+                addMessage('Утром получатель сказал, что груз уже не нужен — они купили у другого. Машина пустая, рейс сорван.', 'client');
+                setTimeout(() => {
+                    finishWithAnalysis(
+                        'Уезжать без решения проблемы — риск возврата груза и претензий. Свяжитесь с диспетчером получателя и попросите подписать через мобильное приложение — оно часто работает даже при сбое основной системы.',
+                        false
+                    );
+                }, 500);
+            }, 500);
+        });
+        createButton('Выгрузить груз и уехать без подписи', () => {
+            addMessage('Выгрузить груз и уехать без подписи', 'user');
+            setTimeout(() => {
+                addMessage('Получатель принял груз, но подписывать отказался. Теперь говорят, что мы не подтвердили доставку.', 'client');
+                setTimeout(() => {
+                    finishWithAnalysis(
+                        'Без подписи или акта вы не сможете подтвердить факт выгрузки. Это приведёт к спорам и штрафам. Позвоните диспетчеру получателя, сообщите время прибытия и состояние груза. Если мобильного приложения нет — составьте акт о невозможности подписания и сфотографируйте груз.',
+                        false
+                    );
+                }, 500);
+            }, 500);
+        });
+        footnoteEl.innerHTML = 'Сбой системы у получателя, нужно срочно выгружать. Ваш ответ';
     }
 
-    function handleAnswer(idx) {
-        if (isAnswered || isBotTyping) return;
-        const scenario = scenarios[currentIndex];
-        if (!scenario) return;
-
-        isAnswered = true;
-        selectedIndex = idx;
-
-        addUserMessage(scenario.options[idx]);
-
-        const isCorrect = idx === scenario.correct;
-        const explanation = getExplanation(scenario, idx);
-        const icon = isCorrect ? '✅ ' : '❌ ';
-        const extraText = isCorrect ? 'Верно!' : 'Неверно.';
-        const botResponse = `${icon}${extraText}\n\n${explanation}`;
-        addBotMessage(botResponse);
-
-        render();
+    // --------------------------------------------------------------
+    // ЧЕТВЁРТЫЙ ВЫБОР (Сценарий 4 — отказ от ЭТрН)
+    function showFourthChoice() {
+        clearOptions();
+        createButton('Распечатать бумажную накладную, чтобы не спорить', () => {
+            addMessage('Распечатать бумажную накладную, чтобы не спорить', 'user');
+            setTimeout(() => {
+                addMessage('Я распечатал, но наш диспетчер сказал, что это нарушение, могут быть штрафы.', 'client');
+                setTimeout(() => {
+                    finishWithAnalysis(
+                        'Бумажная ТН с 1 сентября 2026 года — нарушение. Вы можете получить штраф. Объясните получателю, что электронный документооборот обязателен, и зафиксируйте отказ в приложении через кнопку «Отказ от приёмки» или «Оговорки».',
+                        false
+                    );
+                }, 500);
+            }, 500);
+        });
+        createButton('Объяснить, что бумажная ТН — нарушение, зафиксировать отказ в приложении, не уезжать без указания диспетчера', () => {
+            addMessage('Объяснить, что бумажная ТН — нарушение, зафиксировать отказ в приложении, не уезжать без указания диспетчера', 'user');
+            setTimeout(() => {
+                addMessage('Ок, я объяснил, зафиксировал отказ в приложении. Диспетчер сказал ждать, сейчас решим. Спасибо за помощь!', 'client');
+                setTimeout(() => {
+                    // ФИНАЛ — правильный ответ
+                    finishWithAnalysis(
+                        'Верно! Спокойно объясните, что с 1 сентября 2026 года бумажные документы — нарушение закона. Зафиксируйте отказ в приложении через кнопку «Отказ от приёмки» или «Оговорки». Не уезжайте без указания диспетчера.',
+                        true
+                    );
+                }, 500);
+            }, 500);
+        });
+        createButton('Позвонить в ГИБДД и пожаловаться на получателя', () => {
+            addMessage('Позвонить в ГИБДД и пожаловаться на получателя', 'user');
+            setTimeout(() => {
+                addMessage('В ГИБДД сказали, что это не их компетенция. Получатель смеётся и ждёт.', 'client');
+                setTimeout(() => {
+                    finishWithAnalysis(
+                        'ГИБДД не занимается спорами по документообороту. Решайте вопрос через диспетчера и фиксацию отказа в приложении. Объясните получателю, что электронная подпись обязательна с 1 сентября 2026 года.',
+                        false
+                    );
+                }, 500);
+            }, 500);
+        });
+        footnoteEl.innerHTML = 'Получатель отказывается от электронной подписи. Ваш ответ';
     }
 
-    function addBotMessage(text) {
-        chatMessages.push({ type: 'bot', text: text });
+    // --------------------------------------------------------------
+    // СБРОС
+    function fullReset() {
+        currentState = { locked: false };
+        messagesContainer.innerHTML = '';
+        clearAnalysis();
+        disableOptions(false);
+        startDialog();
     }
 
-    function addUserMessage(text) {
-        chatMessages.push({ type: 'user', text: text });
+    // ИНИЦИАЛИЗАЦИЯ
+    function init() {
+        startDialog();
+        const resetBtn = document.getElementById('resetChatBtn');
+        if (resetBtn) resetBtn.addEventListener('click', fullReset);
     }
 
-    function resetChat() {
-        currentIndex = 0;
-        isAnswered = false;
-        selectedIndex = null;
-        isBotTyping = false;
-        chatMessages = [];
-
-        addBotMessage('👋 Здравствуйте! Я помогу вам разобраться, как действовать водителю при работе с ЭТрН, если нет интернета или получатель не хочет подписывать электронную накладную. Отвечайте на вопросы. Поехали! 🚛');
-        
-        const firstScenario = scenarios[0];
-        if (firstScenario) {
-            addBotMessage(firstScenario.question);
-        }
-
-        render();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        resetChat();
-        document.getElementById('resetBtn').addEventListener('click', resetChat);
-    });
+    init();
 </script>
 </body>
 </html>
