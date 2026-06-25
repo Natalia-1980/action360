@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Анализ баланса · ИАС КБ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #eef2f5;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 820px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            padding: 16px 20px 8px;
+            border-bottom: 1px solid #e2e6ea;
+            background: #fafbfd;
+        }
+        .header h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2a4058;
+            letter-spacing: -0.2px;
+        }
+        .header p {
+            font-size: 0.8rem;
+            color: #6c7a8a;
+            margin-top: 2px;
+        }
+        .two-columns {
+            display: flex;
+        }
+        .sidebar {
+            width: 210px;
+            background: #fafbfd;
+            border-right: 1px solid #e8ecef;
+            padding: 12px 0;
+            flex-shrink: 0;
+        }
+        .cat-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .cat-item {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #5a6e7e;
+            background: transparent;
+            border: none;
+            text-align: left;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .cat-item:hover {
+            background: #edf0f4;
+        }
+        .cat-item.active {
+            background: #e8edf2;
+            color: #4a5b6e;
+            font-weight: 600;
+            border-left: 3px solid #7a8c9e;
+        }
+        .cat-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #dce2e8;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #5a6e7e;
+            flex-shrink: 0;
+        }
+        .cat-item.active .cat-number {
+            background: #7a8c9e;
+            color: white;
+        }
+        .content-area {
+            flex: 1;
+            padding: 14px;
+            background: white;
+            min-width: 0;
+        }
+        .info-card {
+            background: #fafbfc;
+            border-radius: 14px;
+            padding: 14px;
+            border: 1px solid #e2e6ea;
+        }
+        .desc-text {
+            font-size: 0.83rem;
+            line-height: 1.5;
+            color: #4a5b6e;
+        }
+        .desc-text .main-point {
+            margin-bottom: 6px;
+            padding-left: 4px;
+        }
+        .desc-text .main-point strong {
+            color: #3a4b5e;
+            font-weight: 700;
+        }
+        .desc-text .sub-list {
+            list-style: none;
+            padding-left: 20px;
+            margin-top: 2px;
+            margin-bottom: 6px;
+        }
+        .desc-text .sub-list li {
+            padding-left: 14px;
+            position: relative;
+            margin-bottom: 2px;
+        }
+        .desc-text .sub-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #7a8c9e;
+            font-weight: 700;
+        }
+        .risk-block {
+            margin-top: 8px;
+            padding: 10px 14px;
+            background: #f5f0ec;
+            border-radius: 8px;
+            border-left: 3px solid #b38b6b;
+        }
+        .risk-block .risk-label {
+            font-weight: 700;
+            color: #7a5a3e;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+        }
+        .risk-block .action-label {
+            font-weight: 700;
+            color: #4a6a5e;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+            margin-top: 4px;
+        }
+        .risk-block strong {
+            color: #3a4b5e;
+        }
+        .sub-tabs {
+            display: flex;
+            gap: 4px;
+            background: #f5f7fa;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .sub-tab {
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #6c7a8a;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .sub-tab.active {
+            background: white;
+            color: #4a5b6e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .sub-tab:hover {
+            background: #e8edf2;
+        }
+        .recommendation {
+            background: #e8f0ed;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 6px;
+            border-left: 3px solid #5a8a7a;
+        }
+        .recommendation strong {
+            color: #3a5a4e;
+        }
+        .divider {
+            height: 1px;
+            background: #e2e6ea;
+            margin: 8px 0;
+        }
+        @media (max-width: 600px) {
+            .sidebar { width: 140px; }
+            .cat-item { font-size: 0.7rem; padding: 6px 8px; }
+            .content-area { padding: 10px; }
+        }
+        @media (max-width: 480px) {
+            .two-columns { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e2e6ea; }
+            .cat-list { flex-direction: row; flex-wrap: wrap; }
+            .cat-item { width: auto; padding: 6px 12px; }
+            .cat-item.active { border-left: none; border-bottom: 3px solid #7a8c9e; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Что система анализирует в балансе</h1>
+        <p>Разбор рисков по разделам бухгалтерского баланса</p>
+    </div>
+
+    <div class="two-columns">
+        <div class="sidebar" id="sectionsSidebar"></div>
+        <div class="content-area">
+            <div id="sectionsSubTabs" class="sub-tabs"></div>
+            <div id="sectionsContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sectionsData = {
+        fixedAssets: {
+            name: "Основные средства (1150, 1160)",
+            number: "1",
+            group: "Внеоборотные активы",
+            description: `
+                <div class="main-point"><strong>Что проверяет ФНС:</strong> использует ли компания имущество в деятельности, обоснованна ли переоценка.</div>
+                <div class="risk-block">
+                    <div class="risk-label">Риск:</div>
+                    Здание есть, выручки нет. Налоговая доначислит налог на имущество, так как объект не эксплуатируется, но амортизация идет.
+                </div>
+                <div class="recommendation">
+                    <strong>Что делать:</strong> представить акты ввода в эксплуатацию, инвентаризационные описи, договоры инвестирования. Докажите факт использования имущества.
+                </div>
+            `
+        },
+        longTermAssets: {
+            name: "Активы к продаже (1190)",
+            number: "2",
+            group: "Внеоборотные активы",
+            description: `
+                <div class="main-point"><strong>Что проверяет ФНС:</strong> резкое появление строки сигнализирует о подготовке к продаже завода или станка.</div>
+                <div class="risk-block">
+                    <div class="risk-label">Риск:</div>
+                    Инспекторы проверят переоценку перед продажей — не занизили ли вы налог.
+                </div>
+                <div class="recommendation">
+                    <strong>Что делать:</strong> объяснить причины переоценки объективными факторами (рыночная ситуация, износ, техническое состояние).
+                </div>
+            `
+        },
+        inventory: {
+            name: "Запасы (1210)",
+            number: "1",
+            group: "Оборотные активы",
+            description: `
+                <div class="main-point"><strong>Что проверяет ФНС:</strong> динамику запасов, отклонения могут указывать на фиктивные операции.</div>
+                <div class="risk-block">
+                    <div class="risk-label">Риск 1:</div>
+                    Рост запасов на фоне падения выручки — признак «затоваривания» и фиктивных закупок у ненадежных контрагентов.
+                </div>
+                <div class="risk-block" style="margin-top:6px;">
+                    <div class="risk-label">Риск 2:</div>
+                    Резкое списание запасов при стабильной выручке — признак неучтенных доходов. Падение выручки без списания запасов говорит о занижении налоговой базы.
+                </div>
+                <div class="recommendation">
+                    <strong>Что делать:</strong> падение рентабельности объясните сезонностью, выходом на новый рынок или инвестициями в маркетинг.
+                </div>
+            `
+        },
+        nds: {
+            name: "НДС по приобретенным ценностям (1220)",
+            number: "2",
+            group: "Оборотные активы",
+            description: `
+                <div class="main-point"><strong>Что проверяет ФНС:</strong> рост остатка НДС без вычета.</div>
+                <div class="risk-block">
+                    <div class="risk-label">Риск:</div>
+                    Компания не может подтвердить оплату или сделку с поставщиком. Контрагент, вероятно, проблемный.
+                </div>
+                <div class="recommendation">
+                    <strong>Что делать:</strong> используйте сервисы для проверки партнеров. Забракуйте сомнительных контрагентов на этапе согласования договора. Собирайте к каждому договору исчерпывающий пакет подтверждающих документов. Взаимодействуйте с другими отделами компании.
+                </div>
+            `
+        },
+        receivables: {
+            name: "Дебиторская задолженность (1230)",
+            number: "3",
+            group: "Оборотные активы",
+            description: `
+                <div class="main-point"><strong>Что проверяет ФНС:</strong> динамику дебиторской задолженности.</div>
+                <div class="risk-block">
+                    <div class="risk-label">Риск:</div>
+                    Критический сценарий — рост ДЗ при снижении выручки. Это прямой индикатор высокого налогового риска и возможной подмены реальной отгрузки «бумажным» долгом.
+                </div>
+                <div class="recommendation">
+                    <strong>Что делать:</strong> приложить реестр контрагентов с разбивкой по срокам. Подтвердить, что долги не просрочены. Объяснить рост ДЗ объективными причинами (например, коммерческий кредит). Приложите график погашения.
+                </div>
+            `
+        },
+        uncoveredLoss: {
+            name: "Непокрытый убыток (1370)",
+            number: "1",
+            group: "Капитал и обязательства",
+            description: `
+                <div class="main-point"><strong>Что проверяет ФНС:</strong> соотношение убытка и уставного капитала.</div>
+                <div class="risk-block">
+                    <div class="risk-label">Риск:</div>
+                    Убыток превышает 50% уставного капитала. Это прямая угроза принудительной ликвидации компании через суд (ст. 9 Закона № 14-ФЗ).
+                </div>
+                <div class="recommendation">
+                    <strong>Что делать:</strong> принять меры по финансовому оздоровлению, уменьшить убыток за счет прибыли или увеличить уставный капитал.
+                </div>
+            `
+        },
+        payables: {
+            name: "Кредиторская задолженность (1520)",
+            number: "2",
+            group: "Капитал и обязательства",
+            description: `
+                <div class="main-point"><strong>Что проверяет ФНС:</strong> неснижаемый остаток кредиторки.</div>
+                <div class="risk-block">
+                    <div class="risk-label">Риск:</div>
+                    Долг висит 3 года подряд и растет, а выручка падает. Для алгоритмов ФНС это сигнал о выводе средств.
+                </div>
+                <div class="recommendation">
+                    <strong>Что делать:</strong> если долг не безнадежный — предоставить соглашение о реструктуризации или отсрочке платежа. Если просрочка более 3 лет — включить сумму во внереализационные доходы, иначе ИАС автоматически посчитает ущерб бюджету.
+                </div>
+            `
+        },
+        borrowings: {
+            name: "Долгосрочные заемные средства (1410)",
+            number: "3",
+            group: "Капитал и обязательства",
+            description: `
+                <div class="main-point"><strong>Что проверяет ФНС:</strong> использование заемных средств.</div>
+                <div class="risk-block">
+                    <div class="risk-label">Риск:</div>
+                    Кредиты под высокие проценты лежат на счете. Инспектор увидит транзит или вывод капитала.
+                </div>
+                <div class="recommendation">
+                    <strong>Что делать:</strong> объяснить увеличение валюты баланса приобретением нового оборудования за счет кредита. Приложите акт ввода в эксплуатацию и договор кредита.
+                </div>
+            `
+        }
+    };
+
+    let activeGroup = 'Внеоборотные активы';
+    let activeSection = 'fixedAssets';
+
+    function buildSectionsSidebar() {
+        const sidebar = document.getElementById('sectionsSidebar');
+        const groups = [...new Set(Object.values(sectionsData).map(item => item.group))];
+        sidebar.innerHTML = groups.map((g, idx) => {
+            const activeClass = (g === activeGroup) ? 'active' : '';
+            return `<button class="cat-item ${activeClass}" data-group="${g}">
+                        <span class="cat-number">${idx + 1}</span>
+                        <span>${g}</span>
+                    </button>`;
+        }).join('');
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeGroup = btn.dataset.group;
+                const keys = getKeysForGroup(activeGroup);
+                activeSection = keys.length > 0 ? keys[0] : null;
+                buildSectionsSidebar();
+                renderSectionsSubTabsAndContent();
+            });
+        });
+    }
+
+    function getKeysForGroup(group) {
+        return Object.keys(sectionsData).filter(key => sectionsData[key].group === group);
+    }
+
+    function getSubTabsForGroup(group) {
+        const keys = getKeysForGroup(group);
+        return keys.map(key => ({ key, name: sectionsData[key].name, number: sectionsData[key].number }));
+    }
+
+    function renderSectionsSubTabsAndContent() {
+        const subTabsContainer = document.getElementById('sectionsSubTabs');
+        const contentDiv = document.getElementById('sectionsContent');
+        const subTabs = getSubTabsForGroup(activeGroup);
+        if (subTabs.length === 0) {
+            subTabsContainer.innerHTML = '';
+            contentDiv.innerHTML = `<div class="info-card"><div class="desc-text">Нет подразделов</div></div>`;
+            return;
+        }
+        if (!subTabs.some(t => t.key === activeSection)) activeSection = subTabs[0].key;
+
+        subTabsContainer.innerHTML = subTabs.map(t => 
+            `<button class="sub-tab ${t.key === activeSection ? 'active' : ''}" data-key="${t.key}">${t.name}</button>`
+        ).join('');
+        subTabsContainer.querySelectorAll('.sub-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeSection = btn.dataset.key;
+                renderSectionsSubTabsAndContent();
+            });
+        });
+
+        const data = sectionsData[activeSection];
+        contentDiv.innerHTML = `<div class="info-card"><div class="desc-text">${data.description}</div></div>`;
+    }
+
+    function init() {
+        buildSectionsSidebar();
+        renderSectionsSubTabsAndContent();
+    }
+
+    init();
+</script>
+</body>
+</html>
