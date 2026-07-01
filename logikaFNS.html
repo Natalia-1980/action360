@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Логика доначислений ФНС по оценочным значениям</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #eef2f5;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 820px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            padding: 16px 20px 8px;
+            border-bottom: 1px solid #e2e6ea;
+            background: #fafbfd;
+        }
+        .header h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2a4058;
+            letter-spacing: -0.2px;
+        }
+        .header p {
+            font-size: 0.8rem;
+            color: #6c7a8a;
+            margin-top: 2px;
+        }
+        .two-columns {
+            display: flex;
+        }
+        .sidebar {
+            width: 210px;
+            background: #fafbfd;
+            border-right: 1px solid #e8ecef;
+            padding: 12px 0;
+            flex-shrink: 0;
+        }
+        .cat-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .cat-item {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #5a6e7e;
+            background: transparent;
+            border: none;
+            text-align: left;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .cat-item:hover {
+            background: #edf0f4;
+        }
+        .cat-item.active {
+            background: #e8edf2;
+            color: #4a5b6e;
+            font-weight: 600;
+            border-left: 3px solid #7a8c9e;
+        }
+        .cat-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #dce2e8;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #5a6e7e;
+            flex-shrink: 0;
+        }
+        .cat-item.active .cat-number {
+            background: #7a8c9e;
+            color: white;
+        }
+        .content-area {
+            flex: 1;
+            padding: 14px;
+            background: white;
+            min-width: 0;
+        }
+        .info-card {
+            background: #fafbfc;
+            border-radius: 14px;
+            padding: 14px 16px;
+            border: 1px solid #e2e6ea;
+        }
+        .desc-text {
+            font-size: 0.83rem;
+            line-height: 1.5;
+            color: #4a5b6e;
+        }
+        .desc-text .sub-list {
+            list-style: none;
+            padding-left: 20px;
+            margin-top: 2px;
+            margin-bottom: 0;
+        }
+        .desc-text .sub-list li {
+            padding-left: 14px;
+            position: relative;
+            margin-bottom: 2px;
+        }
+        .desc-text .sub-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #7a8c9e;
+            font-weight: 700;
+        }
+        .sub-tabs {
+            display: flex;
+            gap: 4px;
+            background: #f5f7fa;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .sub-tab {
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #6c7a8a;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .sub-tab.active {
+            background: white;
+            color: #4a5b6e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .sub-tab:hover {
+            background: #e8edf2;
+        }
+        @media (max-width: 600px) {
+            .sidebar { width: 140px; }
+            .cat-item { font-size: 0.7rem; padding: 6px 8px; }
+            .content-area { padding: 10px; }
+        }
+        @media (max-width: 480px) {
+            .two-columns { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e2e6ea; }
+            .cat-list { flex-direction: row; flex-wrap: wrap; }
+            .cat-item { width: auto; padding: 6px 12px; }
+            .cat-item.active { border-left: none; border-bottom: 3px solid #7a8c9e; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Логика доначислений ФНС по оценочным значениям</h1>
+        <p>Инспекция оспаривает не само оценочное значение, а отсутствие его обоснования</p>
+    </div>
+
+    <div class="two-columns">
+        <div class="sidebar" id="sectionsSidebar"></div>
+        <div class="content-area">
+            <div id="sectionsSubTabs" class="sub-tabs"></div>
+            <div id="sectionsContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sectionsData = {
+        // ========== ПРЕТЕНЗИИ ФНС ==========
+        fncTypical: {
+            name: "Типичные претензии ФНС",
+            number: "1",
+            group: "Претензии ФНС",
+            description: `
+                <ul class="sub-list">
+                    <li>Резерв создается, чтобы искусственно завысить расходы.</li>
+                    <li>Оценочное обязательство не соответствует реальной вероятности.</li>
+                    <li>Нет документального расчета.</li>
+                </ul>
+            `
+        },
+        fncArguments: {
+            name: "Аргументы ФНС в ходе проверки",
+            number: "2",
+            group: "Претензии ФНС",
+            description: `
+                <ul class="sub-list">
+                    <li>Резерв создается избирательно — только в выгодные для компании периоды.</li>
+                    <li>Компания не закрепила методологию расчета резерва.</li>
+                    <li>Комиссия не проводилась, протокол отсутствует.</li>
+                    <li>Изменение оценочного значения произошло в последний квартал – подозрительно по срокам.</li>
+                </ul>
+            `
+        },
+        fncCourt: {
+            name: "Что смотрит суд",
+            number: "3",
+            group: "Претензии ФНС",
+            description: `
+                <ul class="sub-list">
+                    <li>Методологию в учетной политике.</li>
+                    <li>Документы по процедуре расчета и утверждения оценочного обязательства.</li>
+                    <li>Экономическую основу расчета, связь с реальными событиями в компании.</li>
+                </ul>
+            `
+        },
+
+        // ========== ЗАЩИТА ПРОФСУЖДЕНИЯ ==========
+        protectDocs: {
+            name: "Соберите минимальный пакет документов",
+            number: "1",
+            group: "Защита профсуждения",
+            description: `
+                <ul class="sub-list">
+                    <li>Учетная политика с методом расчета, периодичностью пересмотра, ответственными лицами.</li>
+                    <li>Приказ руководителя: о принятии, пересмотре оценочного значения с датой и подписью.</li>
+                    <li>Расчет или аналитическая справка с цифрами, формулами, допущениями.</li>
+                    <li>Протокол инвентаризационной, оценочной комиссии с составом, датами, результатом.</li>
+                    <li>Заключение независимого эксперта: оценщика, юриста.</li>
+                </ul>
+            `
+        },
+        protectPolicy: {
+            name: "Установите в учетной политике 3 уровня защиты",
+            number: "2",
+            group: "Защита профсуждения",
+            description: `
+                <ul class="sub-list">
+                    <li><strong>Алгоритм</strong> расчета с ссылками на нормы ПБУ, ФСБУ, НК.</li>
+                    <li><strong>Процедура</strong> — пропишите: кто считает, когда утверждают, когда пересматривают.</li>
+                    <li><strong>Источник</strong> информации: рынок, внутренние отчеты, технические документы. Установите, кто занимается актуализацией данных в компании.</li>
+                </ul>
+            `
+        },
+        protectRemember: {
+            name: "Помните",
+            number: "3",
+            group: "Защита профсуждения",
+            description: `
+                <ul class="sub-list">
+                    <li>Изменение оценочного обязательства — не исправление ошибки.</li>
+                    <li>Изменение оценочного значения компания отражает перспективно.</li>
+                    <li>В учетной политике нужно указать, изменение СПИ, ликвидационной стоимости, резерва – это плановый пересмотр оценочного значения.</li>
+                </ul>
+            `
+        }
+    };
+
+    let activeGroup = 'Претензии ФНС';
+    let activeSection = 'fncTypical';
+
+    function buildSectionsSidebar() {
+        const sidebar = document.getElementById('sectionsSidebar');
+        const groups = [...new Set(Object.values(sectionsData).map(item => item.group))];
+        sidebar.innerHTML = groups.map((g, idx) => {
+            const activeClass = (g === activeGroup) ? 'active' : '';
+            return `<button class="cat-item ${activeClass}" data-group="${g}">
+                        <span class="cat-number">${idx + 1}</span>
+                        <span>${g}</span>
+                    </button>`;
+        }).join('');
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeGroup = btn.dataset.group;
+                const keys = getKeysForGroup(activeGroup);
+                activeSection = keys.length > 0 ? keys[0] : null;
+                buildSectionsSidebar();
+                renderSectionsSubTabsAndContent();
+            });
+        });
+    }
+
+    function getKeysForGroup(group) {
+        return Object.keys(sectionsData).filter(key => sectionsData[key].group === group);
+    }
+
+    function getSubTabsForGroup(group) {
+        const keys = getKeysForGroup(group);
+        return keys.map(key => ({ key, name: sectionsData[key].name, number: sectionsData[key].number }));
+    }
+
+    function renderSectionsSubTabsAndContent() {
+        const subTabsContainer = document.getElementById('sectionsSubTabs');
+        const contentDiv = document.getElementById('sectionsContent');
+        const subTabs = getSubTabsForGroup(activeGroup);
+        if (subTabs.length === 0) {
+            subTabsContainer.innerHTML = '';
+            contentDiv.innerHTML = `<div class="info-card"><div class="desc-text">Нет подразделов</div></div>`;
+            return;
+        }
+        if (!subTabs.some(t => t.key === activeSection)) activeSection = subTabs[0].key;
+
+        subTabsContainer.innerHTML = subTabs.map(t => 
+            `<button class="sub-tab ${t.key === activeSection ? 'active' : ''}" data-key="${t.key}">${t.name}</button>`
+        ).join('');
+        subTabsContainer.querySelectorAll('.sub-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeSection = btn.dataset.key;
+                renderSectionsSubTabsAndContent();
+            });
+        });
+
+        const data = sectionsData[activeSection];
+        contentDiv.innerHTML = `<div class="info-card"><div class="desc-text">${data.description}</div></div>`;
+    }
+
+    function init() {
+        buildSectionsSidebar();
+        renderSectionsSubTabsAndContent();
+    }
+
+    init();
+</script>
+</body>
+</html>
