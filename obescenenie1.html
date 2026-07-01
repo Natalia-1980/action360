@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Инфографика: обесценение и позиция ФНС</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #eef2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      padding: 20px;
+    }
+    .frame {
+      width: 720px;
+      max-width: 100%;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      padding: 24px 28px 18px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e2e6ea;
+    }
+    .nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      margin-bottom: 4px;
+    }
+    .badge {
+      background: #7a8c9e;
+      color: white;
+      font-weight: 600;
+      font-size: 0.7rem;
+      letter-spacing: 0.3px;
+      padding: 4px 18px;
+      border-radius: 30px;
+    }
+    .slide-counter {
+      font-weight: 500;
+      color: #4a5b6e;
+      background: #eef2f5;
+      padding: 2px 18px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      border: 1px solid #dce2e8;
+    }
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      background: #e2e6ea;
+      border-radius: 20px;
+      margin: 10px 0 14px;
+      flex-shrink: 0;
+    }
+    .progress-fill {
+      height: 4px;
+      background: #7a8c9e;
+      border-radius: 20px;
+      width: 20%;
+      transition: width 0.3s ease;
+    }
+    .slide-scroll {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-bottom: 10px;
+      scrollbar-width: thin;
+    }
+    .slide-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .slide-scroll::-webkit-scrollbar-thumb {
+      background: #c8d0d8;
+      border-radius: 20px;
+    }
+    .slide-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2a4058;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+    .slide-sub {
+      color: #4a5b6e;
+      font-size: 0.9rem;
+      font-weight: 400;
+      border-left: 3px solid #7a8c9e;
+      padding-left: 16px;
+      background: #f5f7fa;
+      border-radius: 0 8px 8px 0;
+      line-height: 1.3;
+      margin-bottom: 14px;
+      padding: 6px 16px;
+      border: 1px solid #e2e6ea;
+      border-left-width: 3px;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 6px 0 10px;
+    }
+    .card {
+      background: #fafbfc;
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid #e2e6ea;
+    }
+    .card h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2a4058;
+      margin-bottom: 8px;
+      border-bottom: 1px dashed #dce2e8;
+      padding-bottom: 5px;
+    }
+    .card ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .card li {
+      padding-left: 18px;
+      position: relative;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #4a5b6e;
+    }
+    .card li::before {
+      content: "•";
+      color: #7a8c9e;
+      font-weight: 700;
+      position: absolute;
+      left: 2px;
+    }
+    .highlight-badge {
+      background: #eef2f5;
+      padding: 1px 12px;
+      border-radius: 20px;
+      color: #4a5b6e;
+      font-weight: 500;
+      font-size: 0.7rem;
+      display: inline-block;
+      margin-right: 4px;
+      border: 1px solid #dce2e8;
+    }
+    .chip-icon {
+      display: inline-block;
+      background: #7a8c9e;
+      color: white;
+      border-radius: 30px;
+      padding: 0 12px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      line-height: 22px;
+    }
+    .info-block {
+      background: #f5f7fa;
+      border-radius: 14px;
+      padding: 8px 18px;
+      border: 1px solid #e2e6ea;
+      font-size: 0.85rem;
+      color: #4a5b6e;
+      margin: 6px 0 8px;
+      font-weight: 450;
+      line-height: 1.5;
+      border-left: 3px solid #7a8c9e;
+    }
+    .footer-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      gap: 16px;
+      padding: 6px 0 2px;
+      border-top: 1px solid #e2e6ea;
+      padding-top: 10px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      background: #f5f7fa;
+      border: 1px solid #dce2e8;
+      padding: 8px 34px;
+      border-radius: 40px;
+      font-weight: 500;
+      color: #4a5b6e;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-primary {
+      background: #7a8c9e;
+      border: 1px solid #7a8c9e;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .btn-primary:hover {
+      background: #6a7a8a;
+      border-color: #6a7a8a;
+    }
+    .btn-outline:hover {
+      background: #e8edf2;
+      border-color: #b8c4d0;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .btn:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .fade-enter {
+      animation: fadeSlide 0.4s ease;
+    }
+    @keyframes fadeSlide {
+      0% { opacity: 0.5; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 680px) {
+      .frame { padding: 16px; }
+      .grid-2col { grid-template-columns: 1fr; gap: 12px; }
+      .slide-title { font-size: 1.3rem; }
+    }
+    .risk-tag {
+      display: inline-block;
+      background: #f0ece8;
+      color: #7a5a4a;
+      border-radius: 30px;
+      padding: 1px 12px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      margin-right: 4px;
+      border: 1px solid #dcc8c0;
+    }
+    .case-block {
+      background: #f5f7fa;
+      border-radius: 14px;
+      padding: 12px 16px;
+      border-left: 4px solid #7a8c9e;
+      margin: 4px 0 8px;
+      border: 1px solid #e2e6ea;
+      border-left-width: 4px;
+    }
+    .case-block .title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #2a4058;
+    }
+    .case-block .detail {
+      font-size: 0.85rem;
+      color: #4a5b6e;
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+    .single-card {
+      background: #fafbfc;
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid #e2e6ea;
+      margin-bottom: 8px;
+    }
+    .single-card h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2a4058;
+      margin-bottom: 8px;
+      border-bottom: 1px dashed #dce2e8;
+      padding-bottom: 5px;
+    }
+    .single-card ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .single-card li {
+      padding-left: 18px;
+      position: relative;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #4a5b6e;
+    }
+    .single-card li::before {
+      content: "•";
+      color: #7a8c9e;
+      font-weight: 700;
+      position: absolute;
+      left: 2px;
+    }
+    .info-block ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 4px 0 0 0;
+    }
+    .info-block ul li {
+      padding-left: 18px;
+      position: relative;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #4a5b6e;
+      margin-bottom: 2px;
+    }
+    .info-block ul li::before {
+      content: "•";
+      color: #7a8c9e;
+      font-weight: 700;
+      position: absolute;
+      left: 2px;
+    }
+    .single-card.border-warning {
+      border-left: 4px solid #b38b6b;
+    }
+    .single-card.border-info {
+      border-left: 4px solid #7a8c9e;
+    }
+  </style>
+</head>
+<body>
+<div class="frame">
+  <div class="nav-header">
+    <span class="badge">Обесценение · позиция ФНС</span>
+    <span class="slide-counter" id="slideCounter">1 / 3</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width: 33%;"></div>
+  </div>
+
+  <div class="slide-scroll" id="slideScroll">
+    <div id="slideContent" class="fade-enter"></div>
+  </div>
+
+  <div class="footer-actions">
+    <div class="btn-group">
+      <button class="btn btn-outline" id="prevBtn">Назад</button>
+      <button class="btn btn-primary" id="nextBtn">Вперед</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const slides = [
+      {
+        title: 'Позиция ФНС: обесценение как инструмент занижения',
+        subtitle: 'Главная уязвимость — субъективность оценки',
+        content: `
+          <div class="grid-2col">
+            <div class="card">
+              <h4>Аргумент ФНС</h4>
+              <ul>
+                <li>Обесценение может использоваться для искусственного занижения налоговой базы.</li>
+                <li>Наличие или отсутствие признаков обесценения — крайне субъективная оценка.</li>
+                <li>Инспекциям несложно найти эксперта с противоположным мнением.</li>
+                <li><span class="highlight-badge">риск</span> этого достаточно для доначисления налога.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>Инструмент ФНС</h4>
+              <ul>
+                <li>После камеральной проверки — назначение независимых экспертиз стоимости активов.</li>
+                <li>На основании экспертиз — отказ в признании обесценения.</li>
+                <li>Спор переходит в плоскость противоречивых экспертных заключений.</li>
+                <li><span class="chip-icon">ключ</span> суд назначает экспертизу при противоречиях.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-block">Обесценение — всегда спор экспертиз. Без собственной методики и заключения независимого оценщика шансов на защиту нет.</div>
+        `
+      },
+      {
+        title: 'Риски и триггеры для ФНС',
+        subtitle: 'На что обращает внимание инспекция',
+        content: `
+          <div class="single-card border-warning">
+            <h4>Три налоговых риска</h4>
+            <ul>
+              <li><strong>Доначисление налога:</strong> необоснованная методика лишает права на снижение базы.</li>
+              <li><strong>Штрафные санкции:</strong> по ст. 122 НК РФ — 20% от неуплаченной суммы, при умысле — 40%.</li>
+              <li><strong>Противоречивые экспертизы:</strong> без собственной методики суд встает на сторону ФНС.</li>
+            </ul>
+          </div>
+          <div class="single-card border-info">
+            <h4>Факторы, которые привлекают внимание ФНС</h4>
+            <ul>
+              <li>Отсутствие утвержденной методики теста на обесценение в учетной политике.</li>
+              <li>Нарушение регулярности тестирования — пропуски отчетных дат.</li>
+              <li>Обесценение дорогостоящих объектов без привлечения независимых оценщиков.</li>
+            </ul>
+          </div>
+          <div class="info-block" style="background:#f5f0ec; border-left-color:#b38b6b;">
+            <strong>Памятка:</strong> отсутствие документов = отсутствие защиты. ФНС использует любую возможность оспорить обесценение, если методика не утверждена или тестирование проведено формально.
+          </div>
+        `
+      },
+      {
+        title: 'Дело ПАО «Россети Юг»',
+        subtitle: 'Прецедент — постановление АС Поволжского округа от 20.05.2025 № Ф06-2353/2025',
+        content: `
+          <div class="case-block">
+            <div class="title">Суть спора</div>
+            <div class="detail">ИФНС доначислила налог на имущество за 2022 год, посчитав, что компания необоснованно учла обесценение активов при расчете налоговой базы.</div>
+          </div>
+          <div class="grid-2col" style="margin-top:4px;">
+            <div class="card">
+              <h4>Позиция налогоплательщика</h4>
+              <ul>
+                <li>Экспертные заключения ФНС противоречивы и вызывают сомнения.</li>
+                <li>Компания ходатайствовала о назначении судебной экспертизы.</li>
+                <li>Суд первой инстанции удовлетворил ходатайство.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>Итог в судах</h4>
+              <ul>
+                <li>Апелляция подтвердила: при противоречиях экспертиз их устраняет суд.</li>
+                <li>Кассация (АС Поволжского округа) не нашла оснований для отмены.</li>
+                <li>Спор перешел в стадию судебной экспертизы.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-block">
+            <strong>Ключевые выводы:</strong>
+            <ul>
+              <li>Собственная методика и заключение независимого оценщика позволяют создать «противоречие экспертных мнений» и перенести разбирательство в суд.</li>
+              <li>Без документов это сделать невозможно.</li>
+            </ul>
+          </div>
+        `
+      }
+    ];
+
+    let current = 0;
+    const contentEl = document.getElementById('slideContent');
+    const counterEl = document.getElementById('slideCounter');
+    const progressEl = document.getElementById('progressFill');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function render(index) {
+      const data = slides[index];
+      contentEl.classList.remove('fade-enter');
+      void contentEl.offsetWidth;
+      contentEl.innerHTML = `
+        <div class="slide-title">${data.title}</div>
+        <div class="slide-sub">${data.subtitle}</div>
+        ${data.content}
+      `;
+      contentEl.classList.add('fade-enter');
+
+      counterEl.textContent = `${index+1} / ${slides.length}`;
+      progressEl.style.width = `${((index+1)/slides.length)*100}%`;
+      prevBtn.disabled = (index === 0);
+      prevBtn.style.opacity = (index === 0) ? '0.4' : '1';
+      nextBtn.textContent = 'Вперед';
+    }
+
+    function next() {
+      if (current < slides.length - 1) {
+        current++;
+      } else {
+        current = 0;
+      }
+      render(current);
+    }
+
+    function prev() {
+      if (current > 0) {
+        current--;
+        render(current);
+      }
+    }
+
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        next();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prev();
+      }
+    });
+    render(0);
+  })();
+</script>
+</body>
+</html>
