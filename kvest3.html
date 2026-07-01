@@ -12,7 +12,7 @@
             box-sizing: border-box;
         }
         body {
-            background: #d0d0d0;
+            background: #eef2f5;
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
@@ -23,16 +23,16 @@
         .game-board {
             width: 650px;
             height: 650px;
-            background: #f5f5f5;
-            border-radius: 40px;
-            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.3);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
         }
         .game-header {
-            background: #4a4a4a;
+            background: #2a4058;
             padding: 12px 18px;
             display: flex;
             justify-content: space-between;
@@ -58,7 +58,7 @@
             opacity: 0.8;
         }
         .score-box {
-            background: #888888;
+            background: #7a8c9e;
             padding: 4px 16px;
             border-radius: 60px;
             font-weight: 700;
@@ -66,16 +66,17 @@
             color: white;
         }
         .step-indicator {
-            background: #666666;
+            background: #4a5b6e;
             padding: 4px 14px;
             border-radius: 40px;
             font-weight: 600;
             font-size: 0.8rem;
+            color: white;
         }
         .path-track {
-            background: #e8e8e8;
+            background: #f5f7fa;
             padding: 10px 14px 6px 14px;
-            border-bottom: 2px solid #cccccc;
+            border-bottom: 2px solid #e2e6ea;
             flex-shrink: 0;
         }
         .steps-container {
@@ -89,35 +90,40 @@
             flex: 1;
             min-width: 32px;
             text-align: center;
-            background: #d4d4d4;
+            background: #eef2f5;
             border-radius: 30px;
             padding: 5px 0;
             font-weight: 700;
             font-size: 0.7rem;
-            color: #555555;
+            color: #6c7a8a;
             transition: all 0.2s;
             cursor: pointer;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
             position: relative;
+            border: 1px solid #dce2e8;
         }
         .step-node.active {
-            background: #777777;
+            background: #7a8c9e;
             color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             transform: scale(1.05);
+            border-color: #7a8c9e;
         }
         .step-node.completed {
-            background: #9a9a9a;
+            background: #5a7a6a;
             color: white;
+            border-color: #4a6a5a;
         }
         .step-node.skipped {
-            background: #c4c4c4;
-            color: #555555;
+            background: #e8e0d8;
+            color: #6c7a8a;
+            border-color: #d0c8c0;
         }
         .step-node.locked {
-            background: #c0c0c0;
-            color: #888888;
+            background: #f0f2f4;
+            color: #aab0b8;
             cursor: default;
+            border-color: #e2e6ea;
         }
         .step-node .diff-badge {
             font-size: 0.5rem;
@@ -134,7 +140,7 @@
         }
         .connector {
             font-size: 0.7rem;
-            color: #aaaaaa;
+            color: #b8c4d0;
         }
         .question-area {
             padding: 16px 20px 14px 20px;
@@ -145,11 +151,10 @@
             min-height: 0;
         }
         .question-card {
-            background: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 8px 20px -10px rgba(0,0,0,0.1);
+            background: #fafbfc;
+            border-radius: 16px;
             padding: 20px 22px 16px 22px;
-            border: 1px solid #d0d0d0;
+            border: 1px solid #e2e6ea;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -157,7 +162,7 @@
         }
         .question-meta {
             font-size: 0.8rem;
-            color: #777777;
+            color: #6c7a8a;
             margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
@@ -167,7 +172,7 @@
         .question-text {
             font-size: 1.05rem;
             font-weight: 700;
-            color: #333333;
+            color: #2a4058;
             line-height: 1.5;
             margin-bottom: 16px;
             flex-shrink: 0;
@@ -181,51 +186,53 @@
             min-height: 0;
         }
         .answer-option {
-            background: #f0f0f0;
+            background: white;
             border-radius: 30px;
             padding: 12px 18px;
             font-weight: 500;
             font-size: 0.9rem;
-            border: 1px solid #d0d0d0;
+            border: 1px solid #dce2e8;
             cursor: pointer;
             transition: all 0.15s;
-            color: #333333;
+            color: #4a5b6e;
             flex-shrink: 0;
         }
         .answer-option:hover {
-            background: #e0e0e0;
+            background: #f0f4f8;
             transform: translateX(4px);
+            border-color: #b8c4d0;
         }
         .answer-option.selected {
-            background: #777777;
-            border-color: #555555;
+            background: #7a8c9e;
+            border-color: #6a7a8a;
             color: white;
         }
         .answer-option.correct {
-            background: #6a9a6a;
-            border-color: #4a7a4a;
+            background: #5a8a7a;
+            border-color: #4a7a6a;
             color: white;
         }
         .answer-option.wrong {
-            background: #9a6a6a;
-            border-color: #7a4a4a;
+            background: #b38b6b;
+            border-color: #9a7a5a;
             color: white;
         }
         .answer-feedback {
-            background: #ececec;
-            border-radius: 18px;
+            background: #f5f7fa;
+            border-radius: 14px;
             padding: 12px 18px;
             margin-top: 4px;
             font-size: 0.85rem;
-            border-left: 5px solid #999999;
+            border-left: 4px solid #7a8c9e;
             flex-shrink: 0;
             line-height: 1.5;
-            color: #333333;
+            color: #4a5b6e;
             max-height: 110px;
             overflow-y: auto;
         }
         .answer-feedback strong {
             font-weight: 700;
+            color: #2a4058;
         }
         .action-row {
             display: flex;
@@ -246,37 +253,38 @@
             text-align: center;
         }
         .btn-next {
-            background: #555555;
+            background: #7a8c9e;
             color: white;
         }
         .btn-next:disabled {
-            background: #b0b0b0;
+            background: #b8c4d0;
             cursor: not-allowed;
             opacity: 0.6;
         }
         .btn-next:hover:not(:disabled) {
-            background: #3a3a3a;
+            background: #6a7a8a;
         }
         .btn-skip {
-            background: #d0d0d0;
-            color: #444444;
+            background: #eef2f5;
+            color: #4a5b6e;
+            border: 1px solid #dce2e8;
             flex: 1;
         }
         .btn-skip:hover {
-            background: #c0c0c0;
+            background: #e2e8ee;
         }
         .btn-skip:disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
         .btn-reset {
-            background: #aa5555;
+            background: #b38b6b;
             color: white;
             flex: 0.7;
             font-size: 0.85rem;
         }
         .btn-reset:hover {
-            background: #883333;
+            background: #9a7a5a;
         }
         .final-box {
             text-align: center;
@@ -290,15 +298,15 @@
         .final-box h2 {
             font-size: 1.4rem;
             margin: 8px 0;
-            color: #333333;
+            color: #2a4058;
         }
         .final-box .big-score {
             font-size: 2.6rem;
             font-weight: 800;
-            color: #555555;
+            color: #4a5b6e;
         }
         .restart-btn {
-            background: #666666;
+            background: #7a8c9e;
             border: none;
             padding: 12px 28px;
             border-radius: 40px;
@@ -307,16 +315,17 @@
             color: white;
             margin-top: 14px;
             cursor: pointer;
+            font-family: 'Inter', sans-serif;
         }
         .restart-btn:hover {
-            background: #4a4a4a;
+            background: #6a7a8a;
         }
         .norm-hint {
             font-size: 0.65rem;
-            color: #777777;
+            color: #6c7a8a;
             margin-top: 12px;
             text-align: center;
-            border-top: 1px dashed #cccccc;
+            border-top: 1px dashed #dce2e8;
             padding-top: 12px;
         }
         .champion-badge {
@@ -327,10 +336,10 @@
             width: 4px;
         }
         .question-area::-webkit-scrollbar-track {
-            background: #e8e8e8;
+            background: #f5f7fa;
         }
         .question-area::-webkit-scrollbar-thumb {
-            background: #aaaaaa;
+            background: #b8c4d0;
             border-radius: 8px;
         }
 
@@ -348,7 +357,7 @@
         }
         .score-input-area p {
             font-size: 1rem;
-            color: #444;
+            color: #4a5b6e;
             text-align: center;
             max-width: 400px;
             line-height: 1.6;
@@ -362,7 +371,7 @@
         .score-input-area input {
             padding: 14px 22px;
             border-radius: 30px;
-            border: 2px solid #ccc;
+            border: 2px solid #dce2e8;
             font-size: 1.2rem;
             font-weight: 600;
             width: 200px;
@@ -371,12 +380,13 @@
             background: white;
             outline: none;
             transition: border-color 0.2s;
+            color: #2a4058;
         }
         .score-input-area input:focus {
-            border-color: #777777;
+            border-color: #7a8c9e;
         }
         .score-input-area .btn-start {
-            background: #555555;
+            background: #7a8c9e;
             color: white;
             border: none;
             padding: 14px 40px;
@@ -388,24 +398,24 @@
             transition: 0.2s;
         }
         .score-input-area .btn-start:hover {
-            background: #3a3a3a;
+            background: #6a7a8a;
         }
         .score-input-area .error-msg {
-            color: #8a4a4a;
+            color: #7a5a4a;
             font-weight: 600;
-            background: #f0e0e0;
+            background: #f5ece8;
             padding: 12px 24px;
             border-radius: 30px;
             font-size: 0.95rem;
             max-width: 450px;
             text-align: center;
             line-height: 1.5;
-            border: 1px solid #d0a0a0;
+            border: 1px solid #dcc8c0;
         }
         .score-input-area .success-msg {
-            color: #4a7a4a;
+            color: #4a7a5a;
             font-weight: 600;
-            background: #e0f0e0;
+            background: #e8f0ec;
             padding: 8px 20px;
             border-radius: 30px;
             font-size: 0.9rem;
@@ -650,8 +660,8 @@
                     <div class="champion-badge">${isChampion ? '🏆' : '📖'}</div>
                     <h2>Квест завершен!</h2>
                     <div class="big-score">🪙 ${score}</div>
-                    <p style="font-size:1rem; font-weight:600; margin:6px 0; color:#333;">${champText}</p>
-                    <p style="font-size:0.85rem; color:#777;">Всего доступно: ${maxPossible} монет</p>
+                    <p style="font-size:1rem; font-weight:600; margin:6px 0; color:#2a4058;">${champText}</p>
+                    <p style="font-size:0.85rem; color:#6c7a8a;">Всего доступно: ${maxPossible} монет</p>
                     <button class="restart-btn" id="restartGameBtn">🔄 Пройти заново</button>
                     <div class="norm-hint">💡 Учетная политика, приказ руководителя, расчет, протокол комиссии — главная защита при проверке ФНС.</div>
                 </div>
@@ -678,7 +688,7 @@
             `;
         } else if (isSkipped) {
             feedbackHtml = `
-                <div class="answer-feedback" style="border-left-color: #bbbbbb;">
+                <div class="answer-feedback" style="border-left-color: #b8c4d0;">
                     ⏭ <strong>Вопрос пропущен.</strong> Вы можете вернуться к нему позже и ответить.
                 </div>
             `;
@@ -718,7 +728,6 @@
             </div>
         `;
 
-        // Обработка кликов по ответам
         if (!isAnswered) {
             const answerDivs = document.querySelectorAll('.answer-option');
             answerDivs.forEach(div => {
@@ -743,7 +752,6 @@
             });
         }
 
-        // Кнопка "Пропустить"
         const skipBtn = document.getElementById('skipBtn');
         if (skipBtn) {
             skipBtn.addEventListener('click', function() {
@@ -757,7 +765,6 @@
             });
         }
 
-        // Кнопка "Сброс"
         const resetBtn = document.getElementById('resetBtn');
         if (resetBtn) {
             resetBtn.addEventListener('click', function() {
@@ -767,7 +774,6 @@
             });
         }
 
-        // Кнопка "Далее"
         const nextBtn = document.getElementById('nextBtn');
         if (nextBtn) {
             nextBtn.addEventListener('click', function() {
@@ -797,7 +803,7 @@
                     <button class="btn-start" id="startBtn">Начать квест</button>
                 </div>
                 <div id="scoreMessage"></div>
-                <div style="font-size:0.75rem; color:#999; margin-top:10px;">10 практических кейсов по оценочным значениям, резервам, ликвидационной стоимости и защите от ФНС</div>
+                <div style="font-size:0.75rem; color:#6c7a8a; margin-top:10px;">10 практических кейсов по оценочным значениям, резервам, ликвидационной стоимости и защите от ФНС</div>
             </div>
         `;
 

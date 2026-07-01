@@ -12,7 +12,7 @@
             box-sizing: border-box;
         }
         body {
-            background: #d0d0d0;
+            background: #eef2f5;
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
@@ -23,16 +23,16 @@
         .game-board {
             width: 650px;
             height: 650px;
-            background: #f5f5f5;
-            border-radius: 40px;
-            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.3);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
         }
         .game-header {
-            background: #4a4a4a;
+            background: #2a4058;
             padding: 12px 18px;
             display: flex;
             justify-content: space-between;
@@ -58,7 +58,7 @@
             opacity: 0.8;
         }
         .score-box {
-            background: #888888;
+            background: #7a8c9e;
             padding: 4px 16px;
             border-radius: 60px;
             font-weight: 700;
@@ -66,16 +66,17 @@
             color: white;
         }
         .step-indicator {
-            background: #666666;
+            background: #4a5b6e;
             padding: 4px 14px;
             border-radius: 40px;
             font-weight: 600;
             font-size: 0.8rem;
+            color: white;
         }
         .path-track {
-            background: #e8e8e8;
+            background: #f5f7fa;
             padding: 10px 14px 6px 14px;
-            border-bottom: 2px solid #cccccc;
+            border-bottom: 2px solid #e2e6ea;
             flex-shrink: 0;
         }
         .steps-container {
@@ -89,35 +90,40 @@
             flex: 1;
             min-width: 32px;
             text-align: center;
-            background: #d4d4d4;
+            background: #eef2f5;
             border-radius: 30px;
             padding: 5px 0;
             font-weight: 700;
             font-size: 0.7rem;
-            color: #555555;
+            color: #6c7a8a;
             transition: all 0.2s;
             cursor: pointer;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
             position: relative;
+            border: 1px solid #dce2e8;
         }
         .step-node.active {
-            background: #777777;
+            background: #7a8c9e;
             color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             transform: scale(1.05);
+            border-color: #7a8c9e;
         }
         .step-node.completed {
-            background: #9a9a9a;
+            background: #5a7a6a;
             color: white;
+            border-color: #4a6a5a;
         }
         .step-node.skipped {
-            background: #c4c4c4;
-            color: #555555;
+            background: #e8e0d8;
+            color: #6c7a8a;
+            border-color: #d0c8c0;
         }
         .step-node.locked {
-            background: #c0c0c0;
-            color: #888888;
+            background: #f0f2f4;
+            color: #aab0b8;
             cursor: default;
+            border-color: #e2e6ea;
         }
         .step-node .diff-badge {
             font-size: 0.5rem;
@@ -134,7 +140,7 @@
         }
         .connector {
             font-size: 0.7rem;
-            color: #aaaaaa;
+            color: #b8c4d0;
         }
         .question-area {
             padding: 16px 20px 14px 20px;
@@ -145,11 +151,10 @@
             min-height: 0;
         }
         .question-card {
-            background: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 8px 20px -10px rgba(0,0,0,0.1);
+            background: #fafbfc;
+            border-radius: 16px;
             padding: 20px 22px 16px 22px;
-            border: 1px solid #d0d0d0;
+            border: 1px solid #e2e6ea;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -157,23 +162,17 @@
         }
         .question-meta {
             font-size: 0.8rem;
-            color: #777777;
+            color: #6c7a8a;
             margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             font-weight: 600;
             flex-shrink: 0;
         }
-        .question-meta .diff-easy {
-            color: #666666;
-        }
-        .question-meta .diff-hard {
-            color: #666666;
-        }
         .question-text {
             font-size: 1.05rem;
             font-weight: 700;
-            color: #333333;
+            color: #2a4058;
             line-height: 1.5;
             margin-bottom: 16px;
             flex-shrink: 0;
@@ -187,41 +186,53 @@
             min-height: 0;
         }
         .answer-option {
-            background: #f0f0f0;
+            background: white;
             border-radius: 30px;
             padding: 12px 18px;
             font-weight: 500;
             font-size: 0.9rem;
-            border: 1px solid #d0d0d0;
+            border: 1px solid #dce2e8;
             cursor: pointer;
             transition: all 0.15s;
-            color: #333333;
+            color: #4a5b6e;
             flex-shrink: 0;
         }
         .answer-option:hover {
-            background: #e0e0e0;
+            background: #f0f4f8;
             transform: translateX(4px);
+            border-color: #b8c4d0;
         }
         .answer-option.selected {
-            background: #777777;
-            border-color: #555555;
+            background: #7a8c9e;
+            border-color: #6a7a8a;
+            color: white;
+        }
+        .answer-option.correct {
+            background: #5a8a7a;
+            border-color: #4a7a6a;
+            color: white;
+        }
+        .answer-option.wrong {
+            background: #b38b6b;
+            border-color: #9a7a5a;
             color: white;
         }
         .answer-feedback {
-            background: #ececec;
-            border-radius: 18px;
+            background: #f5f7fa;
+            border-radius: 14px;
             padding: 12px 18px;
             margin-top: 4px;
             font-size: 0.85rem;
-            border-left: 5px solid #999999;
+            border-left: 4px solid #7a8c9e;
             flex-shrink: 0;
             line-height: 1.5;
-            color: #333333;
+            color: #4a5b6e;
             max-height: 110px;
             overflow-y: auto;
         }
         .answer-feedback strong {
             font-weight: 700;
+            color: #2a4058;
         }
         .action-row {
             display: flex;
@@ -242,24 +253,25 @@
             text-align: center;
         }
         .btn-next {
-            background: #555555;
+            background: #7a8c9e;
             color: white;
         }
         .btn-next:disabled {
-            background: #b0b0b0;
+            background: #b8c4d0;
             cursor: not-allowed;
             opacity: 0.6;
         }
         .btn-next:hover:not(:disabled) {
-            background: #3a3a3a;
+            background: #6a7a8a;
         }
         .btn-skip {
-            background: #d0d0d0;
-            color: #444444;
+            background: #eef2f5;
+            color: #4a5b6e;
+            border: 1px solid #dce2e8;
             flex: 1;
         }
         .btn-skip:hover {
-            background: #c0c0c0;
+            background: #e2e8ee;
         }
         .btn-skip:disabled {
             opacity: 0.4;
@@ -277,15 +289,15 @@
         .final-box h2 {
             font-size: 1.4rem;
             margin: 8px 0;
-            color: #333333;
+            color: #2a4058;
         }
         .final-box .big-score {
             font-size: 2.6rem;
             font-weight: 800;
-            color: #555555;
+            color: #4a5b6e;
         }
         .restart-btn {
-            background: #666666;
+            background: #7a8c9e;
             border: none;
             padding: 12px 28px;
             border-radius: 40px;
@@ -294,16 +306,17 @@
             color: white;
             margin-top: 14px;
             cursor: pointer;
+            font-family: 'Inter', sans-serif;
         }
         .restart-btn:hover {
-            background: #4a4a4a;
+            background: #6a7a8a;
         }
         .norm-hint {
             font-size: 0.65rem;
-            color: #777777;
+            color: #6c7a8a;
             margin-top: 12px;
             text-align: center;
-            border-top: 1px dashed #cccccc;
+            border-top: 1px dashed #dce2e8;
             padding-top: 12px;
         }
         .champion-badge {
@@ -314,18 +327,18 @@
             width: 4px;
         }
         .question-area::-webkit-scrollbar-track {
-            background: #e8e8e8;
+            background: #f5f7fa;
         }
         .question-area::-webkit-scrollbar-thumb {
-            background: #aaaaaa;
+            background: #b8c4d0;
             border-radius: 8px;
         }
         .task-data {
-            background: #f8f8f8;
-            border-radius: 16px;
+            background: #f5f7fa;
+            border-radius: 14px;
             padding: 12px 16px;
             margin-bottom: 12px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #e2e6ea;
             font-size: 0.85rem;
             line-height: 1.7;
             flex-shrink: 0;
@@ -336,31 +349,31 @@
             display: flex;
             justify-content: space-between;
             padding: 2px 0;
-            border-bottom: 1px dashed #e8e8e8;
+            border-bottom: 1px dashed #e8ecef;
         }
         .task-data .row:last-child {
             border-bottom: none;
         }
         .task-data .label {
             font-weight: 500;
-            color: #555;
+            color: #6c7a8a;
         }
         .task-data .value {
             font-weight: 600;
-            color: #333;
+            color: #2a4058;
         }
         .task-data .header {
             font-weight: 700;
-            color: #444;
+            color: #2a4058;
             font-size: 0.9rem;
             margin-bottom: 6px;
             display: block;
-            border-bottom: 2px solid #ddd;
+            border-bottom: 2px solid #e2e6ea;
             padding-bottom: 4px;
         }
         .task-data .sub-header {
             font-weight: 600;
-            color: #555;
+            color: #4a5b6e;
             font-size: 0.8rem;
             margin-top: 2px;
             display: block;
@@ -370,7 +383,7 @@
                 width: 100%;
                 height: 100vh;
                 max-height: 650px;
-                border-radius: 28px;
+                border-radius: 20px;
             }
         }
     </style>
@@ -396,16 +409,16 @@
 <script>
     const questions = [
         {
-            text: `Контрагент ООО «Склад» просрочил оплату на 79 дней. Долг — 150 000 рублей. Компания создала резерв в БУ и НУ. Возникнет ли разница?`,
+            text: `Контрагент ООО «Склад» просрочил оплату на 79 дней. Долг — 150 000 рублей. Компания создала резерв в БУ и НУ. Возникнет ли разница, что предоставить инспекции?`,
             options: [
-                "Разница не возникнет",
-                "Возникнет разница",
-                "Возникнет разница, при запросе инспекции следует дать пояснения, приложить регистр расчета резерва и отклонений"
+                "Разниц нет, не потребует пояснений",
+                "Возникнет разница, но инспекция пояснений не потребует — правила учета разные",
+                "Возникнет постоянная разница, при запросе инспекции следует дать пояснения, приложить регистр расчета резерва и отклонений"
             ],
             correct: 2,
             points: 50,
             difficulty: 'easy',
-            explanation: "В БУ резерв создан на 150 000 руб., в НУ — на 75 000 руб. (лимит 50% при просрочке 79 дней). Разница 75 000 руб. Инспекция может запросить пояснения. Приложите к ним регистр с расчетом резерва и отклонений, накладную или другой документ с отражением срока долга."
+            explanation: "В БУ резерв создан на 150 000 руб., в НУ — на 75 000 руб. (лимит 50% при просрочке 79 дней). Постоянная разница 75 000 руб. Инспекция может запросить пояснения. Приложите к ним регистр с расчетом резерва и отклонений, накладную или другой документ с отражением срока долга."
         },
         {
             text: `ООО «Альфа» применило к оборудованию амортизационную премию 30% в налоговом учете. В бухучете амортизация за I квартал — 25 000 руб., в налоговом — 17 500 руб. Запросит ли инспекция пояснения?`,
@@ -417,22 +430,22 @@
             correct: 0,
             points: 50,
             difficulty: 'easy',
-            explanation: "Разница = 25 000 – 17 500 = 7 500 руб. Инспекция может запросить пояснения, приложите регистр, учетную политику по НУ. В регистре покажите расхождение."
+            explanation: "Временная разница = 25 000 – 17 500 = 7 500 руб. Инспекция может запросить пояснения, приложите регистр, учетную политику по НУ. В регистре покажите расхождение."
         },
         {
-            text: `Резерв на отпуска в БУ — 107 561 руб. за I квартал. В НУ резерв не формируется, расходы по факту — 75 000 руб. Что ответить инспекции о разницах при запросе?`,
+            text: `Резерв на отпуска в БУ — 107 561 руб. за I квартал. В НУ резерв не формируется, расходы по факту — 75 000 руб. Будет ли разница? Что ответить инспекции при запросе?`,
             options: [
-                "Ничего, это не ошибка, пояснения не нужны",
-                "Инспекции надо дать пояснения о разнице из–за отсутствия резерва в НУ, приложить расчет резерва и разниц",
-                "Разниц нет, инспекции пояснения давать не надо"
+                "Будет разница, инспекции надо дать только пояснения",
+                "Будет разница, инспекции надо дать пояснения, приложить расчет резерва и разниц",
+                "Не будет разниц, инспекции пояснения давать не надо"
             ],
             correct: 1,
             points: 50,
             difficulty: 'easy',
-            explanation: "Разница = 107 561 – 75 000 = 32 561 руб. Инспекции поясните, что в НУ компания решила резерв не формировать, приложите регистр с отклонениями в учете, учетную политику по НУ."
+            explanation: "Постоянная разница = 107 561 – 75 000 = 32 561 руб. Инспекция может запросить пояснения, приложите регистр с пояснением отклонений, учетную политику по НУ."
         },
         {
-            text: `ООО «Береза» заключило договор строительного подряда на срок 21 месяц. Поэтапной сдачи работ нет. Компания признает выручку в БУ по степени готовности работ, пропорционально расходам, в НУ — равномерно по периодам. В I квартале компания выполнила 20% работ на 200 000 руб. Запросит ли ФНС пояснения?`,
+            text: `ООО «Береза» заключило договор строительного подряда на срок 21 месяц. Поэтапной сдачи работ нет. Компания признает выручку в БУ по степени готовности работ, пропорционально расходам, в НУ — равномерно по периодам. В I квартале компания выполнила 20% работ на 200 000 руб. Запросит ли ФНС пояснения? Какие документы стоит приложить?`,
             options: [
                 "Да, запросит, так как возникнет разница. Приложить следует договор, акты, регистры расчета выручки, учетку",
                 "Да, запросит, так как возникнет разница. Приложить следует выписку по счету",
@@ -441,22 +454,22 @@
             correct: 0,
             points: 50,
             difficulty: 'easy',
-            explanation: "Возникает разница и инспекция запросит пояснения. Приложите к ним договор, акты КС-2, КС-3, регистры расчета выручки по степени завершенности, выдержки из учетной политики с определением методов учета выручки."
+            explanation: "Возникает временная разница. ФНС запросит пояснения. Приложите к ним договор, акты КС-2, КС-3, регистры расчета выручки по степени завершенности, выдержки из учетной политики с определением методов учета выручки."
         },
         {
-            text: `ООО «Торг» отразило в БУ представительские расходы в сумме 200 000 руб., а в НУ — в размере 4% от ФОТ 120 000 руб. Что ответить налоговой про разницу?`,
+            text: `ООО «Торг» отразило в БУ представительские расходы в сумме 200 000 руб., а в НУ — в размере 4% от ФОТ 120 000 руб. Возникнет разница и что ответить налоговой?`,
             options: [
-                "Лучше проигнорировать запрос, инспекция сама разберется",
-                "Нужно дать пояснения, что в НУ действует ограничение на расходы, приложить расчет лимита представительских расходов, регистр с перечнем затрат и пояснением отклонений",
-                "Следует пояснить, что расходы будут приняты в следующем периоде"
+                "Не возникнет разница, не надо ничего отвечать",
+                "Возникнет разница, надо дать пояснения и приложить расчет лимита представительских расходов, регистр с перечнем затрат и пояснением отклонений",
+                "Расходы будут приняты в следующем периоде и пояснять ничего не надо"
             ],
             correct: 1,
             points: 50,
             difficulty: 'easy',
-            explanation: "Сверхнормативные 80 000 руб. не принимаются в НУ, разницу нужно пояснить. К пояснениям следует приложить расчет лимита, регистр с перечнем затрат, расчетом отклонений."
+            explanation: "Сверхнормативные 80 000 руб. не принимаются в НУ → будет разница. К пояснениям следует приложить расчет лимита, регистр с перечнем затрат, расчетом отклонений."
         },
         {
-            text: `ООО «Альфа» закрепила в учетке амортизационную премию 15%. В I квартале по ОС возникла разница 21 250 руб. Какой документ нужно представить в ФНС по требованию?`,
+            text: `ООО «Альфа» закрепила в учетке амортизационную премию 15%. В I квартале по ОС возникла временная разница 21 250 руб. Какой документ нужно представить в ФНС по требованию?`,
             options: [
                 "Регистр налогового учета по амортизации с детализацией разниц",
                 "Акт инвентаризации ОС",
@@ -614,8 +627,8 @@
                     <div class="champion-badge">${isChampion ? '🏆' : '📖'}</div>
                     <h2>Квест завершён!</h2>
                     <div class="big-score">🪙 ${score}</div>
-                    <p style="font-size:1rem; font-weight:600; margin:6px 0; color:#333;">${champText}</p>
-                    <p style="font-size:0.85rem; color:#777;">Цель: 350 монет. Всего доступно: ${maxPossible}</p>
+                    <p style="font-size:1rem; font-weight:600; margin:6px 0; color:#2a4058;">${champText}</p>
+                    <p style="font-size:0.85rem; color:#6c7a8a;">Цель: 350 монет. Всего доступно: ${maxPossible}</p>
                     <button class="restart-btn" id="restartGameBtn">🔄 Пройти заново</button>
                     <div class="norm-hint">💡 Регистры, учётная политика и знание ПБУ 18/02 — главная защита при камеральной проверке.</div>
                 </div>
@@ -642,7 +655,7 @@
             `;
         } else if (isSkipped) {
             feedbackHtml = `
-                <div class="answer-feedback" style="border-left-color: #bbbbbb;">
+                <div class="answer-feedback" style="border-left-color: #b8c4d0;">
                     ⏭ <strong>Вопрос пропущен.</strong> Вы можете вернуться к нему позже и ответить.
                 </div>
             `;
@@ -651,7 +664,7 @@
         const optionsHtml = q.options.map((opt, idx) => {
             let additionalClass = '';
             if (selectedIdx === idx && isAnswered) {
-                additionalClass = 'selected';
+                additionalClass = saved.isCorrect ? 'correct' : 'wrong';
             }
             return `<div class="answer-option ${additionalClass}" data-opt-index="${idx}">${String.fromCharCode(65+idx)}. ${opt}</div>`;
         }).join('');
