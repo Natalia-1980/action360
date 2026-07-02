@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Отраслевые и территориальные льготы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .frame-wrapper {
+            width: 650px;
+            margin: 0 auto;
+            background: transparent;
+        }
+
+        body {
+            background: #eef2f6;
+            font-family: 'Inter', system-ui, 'Segoe UI', 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 650px;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2edf2;
+            flex-wrap: wrap;
+        }
+
+        .main-tab {
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #4f6f8f;
+            transition: 0.2s;
+            border-radius: 24px 24px 0 0;
+            position: relative;
+        }
+
+        .main-tab.active {
+            color: #1d8f7a;
+            background: #f6fbf9;
+        }
+
+        .main-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #1d8f7a;
+            border-radius: 2px;
+        }
+
+        .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+            height: auto;
+            min-height: 0;
+        }
+
+        .sidebar {
+            width: 190px;
+            background: #fafcff;
+            border-right: 1px solid #e9edf2;
+            padding: 16px 8px 16px 12px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: #5f7f9e;
+            margin-bottom: 14px;
+            padding-left: 4px;
+        }
+
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .cat-item {
+            padding: 8px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #1f3b4f;
+            background: transparent;
+            border: none;
+            text-align: left;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.3;
+        }
+
+        .cat-item i {
+            font-style: normal;
+            font-size: 0.95rem;
+        }
+
+        .cat-item:hover {
+            background: #eef3fa;
+        }
+
+        .cat-item.active {
+            background: #e3f5f0;
+            color: #107a66;
+            font-weight: 600;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 16px 18px 18px 18px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .tax-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #eef2f8;
+            padding-bottom: 12px;
+        }
+
+        .tax-chip {
+            background: #f0f4f9;
+            padding: 6px 14px;
+            border-radius: 32px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #2a577b;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tax-chip.active {
+            background: #1d8f7a;
+            color: white;
+            box-shadow: 0 2px 6px rgba(29,143,122,0.2);
+        }
+
+        .info-card {
+            background: #f9fdfb;
+            border-radius: 20px;
+            padding: 18px;
+            border: 1px solid #e2efe9;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            margin-bottom: 14px;
+        }
+
+        .rate-big {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #115b4e;
+            margin-bottom: 10px;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .rate-big small {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #54809b;
+        }
+
+        .conditions {
+            background: white;
+            padding: 12px 14px;
+            border-radius: 16px;
+            margin: 12px 0;
+            font-size: 0.75rem;
+            line-height: 1.45;
+            color: #1f3b4f;
+            border: 1px solid #e2f0ea;
+        }
+
+        .norm-link {
+            font-size: 0.7rem;
+            font-family: 'SF Mono', monospace;
+            background: #eef3fc;
+            padding: 4px 12px;
+            border-radius: 30px;
+            color: #1d6f8b;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 28px 16px;
+            background: #fafeff;
+            border-radius: 20px;
+            color: #6f94b0;
+            font-size: 0.75rem;
+        }
+
+        .reset-btn {
+            margin-top: 12px;
+            margin-bottom: 4px;
+            display: inline-flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #cbdde9;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #2c5a77;
+            width: fit-content;
+        }
+
+        .reset-btn:hover {
+            background: #f0f6fc;
+            border-color: #9bb6cc;
+        }
+
+        /* две подкарточки внутри одной карточки */
+        .sub-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .sub-card {
+            background: white;
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid #e2efe9;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .sub-card .sub-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #115b4e;
+            margin-bottom: 6px;
+        }
+
+        .sub-card .sub-conditions {
+            font-size: 0.75rem;
+            line-height: 1.45;
+            color: #1f3b4f;
+            margin-bottom: 8px;
+        }
+
+        .sub-card .sub-norm {
+            font-size: 0.7rem;
+            font-family: 'SF Mono', monospace;
+            background: #eef3fc;
+            padding: 3px 12px;
+            border-radius: 30px;
+            color: #1d6f8b;
+            display: inline-block;
+        }
+
+        @media (max-width: 650px) {
+            .frame-wrapper {
+                width: 100%;
+            }
+            .sidebar {
+                width: 170px;
+            }
+            .cat-item {
+                font-size: 0.75rem;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="frame-wrapper">
+    <div class="dashboard">
+        <div class="tabs-header">
+            <button class="main-tab active" data-main-tab="industry">🏭 Отраслевые льготы</button>
+            <button class="main-tab" data-main-tab="territory">🗺️ Территориальные льготы</button>
+        </div>
+
+        <!-- Отраслевые -->
+        <div id="industryTabPanel" class="two-columns">
+            <div class="sidebar">
+                <div class="sidebar-title">ОТРАСЛИ</div>
+                <div class="category-list" id="industrySidebar"></div>
+            </div>
+            <div class="content-area">
+                <div class="tax-chips" id="industryTaxChips"></div>
+                <div id="industryInfoArea"></div>
+                <button class="reset-btn" id="resetIndustryBtn">⟳ Сбросить отрасль</button>
+            </div>
+        </div>
+
+        <!-- Территориальные -->
+        <div id="territoryTabPanel" class="two-columns" style="display: none;">
+            <div class="sidebar">
+                <div class="sidebar-title">ТЕРРИТОРИАЛЬНЫЕ РЕЖИМЫ</div>
+                <div class="category-list" id="territorySidebar"></div>
+            </div>
+            <div class="content-area">
+                <div class="tax-chips" id="territoryTaxChips"></div>
+                <div id="territoryInfoArea"></div>
+                <button class="reset-btn" id="resetTerritoryBtn">⟳ Сбросить территорию</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // ОТРАСЛЕВЫЕ ДАННЫЕ
+    // --------------------------------------------------------------
+    const industryData = {
+        it: {
+            name: "💻 ИТ-компании",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "фед. — 5% / рег. — 0%", conditions: "Аккредитация Минцифры + доля ИТ-доходов ≥70% (до 2030 года)", norm: "п. 16 ст. 284 НК" },
+                nds: { label: "НДС", rate: "Освобождение", conditions: "Передача прав на ПО и БД, услуги по разработке и поддержке. Аккредитация не требуется.", norm: "пп. 26 п. 2 ст. 149 НК" },
+                insurance: { label: "Страховые взносы", rate: "15% в пределах базы / 7,6% сверх", conditions: "Аккредитация Минцифры + доля доходов ≥70%", norm: "п. 5 ст. 427 НК" },
+                property: { label: "Налог на имущество", rate: "—", conditions: "Могут устанавливать региональные власти", norm: "—" },
+                land: { label: "Земельный налог", rate: "—", conditions: "Могут устанавливать местные власти", norm: "гл. 31 НК" }
+            }
+        },
+        radio: {
+            name: "📡 Радиоэлектроника",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "фед. — 8% / рег. — 0%", conditions: "Реестр Минпромторга + доля доходов ≥70%", norm: "п. 1.16 ст. 284 НК" },
+                nds: { label: "НДС", rate: "Освобождение", conditions: "Не облагается передача исключительных прав на изобретения, полезные модели, промышленные образцы, топологии интегральных микросхем, секреты производства (ноу-хау) и прав на их использование по лицензионным договорам", norm: "подп. 26.1 п. 2 ст. 149 НК" },
+                insurance: { label: "Страховые взносы", rate: "15% в пределах базы / 7,6% сверх", conditions: "Реестр Минпромторга + доля доходов ≥70%", norm: "п. 14 ст. 427 НК" },
+                property: { label: "Налог на имущество", rate: "—", conditions: "Могут устанавливать региональные власти", norm: "—" },
+                land: { label: "Земельный налог", rate: "—", conditions: "Могут устанавливать местные власти", norm: "гл. 31 НК" }
+            }
+        },
+        med: {
+            name: "🏥 Медицина",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "0%", conditions: "Лицензия + вид деятельности в перечне, утв. постановлением Правительства от 10.11.2011 № 917 + доля медицинских доходов ≥90% + штат ≥15", norm: "ст. 284.1 НК" },
+                nds: { label: "НДС", rate: "Освобождение", conditions: "Медицинские услуги по перечню, утв. постановлением Правительства от 20.02.2001 № 132. Требуется лицензия.", norm: "пп. 2 п. 2 ст. 149 НК" },
+                insurance: { label: "Страховые взносы", rate: "30% с выплат ниже 1,5 МРОТ / 15% свыше", conditions: "Для медицинской деятельности льготы нет. Пониженный тариф действует для производителей лекарств и материалов для медицинских целей и ветеринарии. По аналогии с МСП: доля доходов ≥70% + есть в реестре МСП.", norm: "ст. 427 НК (МСП)" },
+                property: { label: "Налог на имущество", rate: "Освобождение", conditions: "Недвижимость для производства ветеринарных иммунобиологических препаратов. Лицензия + основной вид деятельности — производство + раздельный учет", norm: "п. 4 ст. 381 НК" },
+                transport: { label: "Транспортный налог", rate: "Освобождение", conditions: "Самолеты и вертолеты санитарной авиации и медицинской службы", norm: "подп. 8 п. 2 ст. 358 НК" },
+                land: { label: "Земельный налог", rate: "—", conditions: "Могут устанавливать местные власти", norm: "гл. 31 НК" }
+            }
+        },
+        edu: {
+            name: "📚 Образование",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "0%", conditions: "Лицензия + доля образовательных доходов ≥90% + штат ≥15", norm: "ст. 284.1 НК" },
+                nds: { label: "НДС", rate: "Освобождение", conditions: "Только образовательные услуги НКО по перечню в лицензии", norm: "пп. 14 п. 2 ст. 149 НК" },
+                insurance: { label: "Страховые взносы", rate: "30% с выплат ниже 1,5 МРОТ / 15% свыше", conditions: "По аналогии с МСП: доля доходов ≥70% + реестр МСП", norm: "ст. 427 НК (МСП)" },
+                property: { label: "Налог на имущество", rate: "Освобождение", conditions: "Недвижимость >15 000 кв. м, введена с 01.01.2022, ОКВЭД 93.11 «Деятельность спортивных объектов»", norm: "подп. 4 п. 4 ст. 372.1 НК" },
+                land: { label: "Земельный налог", rate: "—", conditions: "Могут устанавливать местные власти", norm: "гл. 31 НК" }
+            }
+        },
+        catering: {
+            name: "🍽️ Общепит",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "—", conditions: "Специальных пониженных ставок нет", norm: "—" },
+                nds: { label: "НДС", rate: "Освобождение", conditions: "<strong>Освобождение по ст. 145 НК:</strong> выручка без НДС за 3 месяца ≤ 2 млн руб.<br><br><strong>Специальная льгота по подп. 38 п. 3 ст. 149 НК:</strong> ОКВЭД класс 56 + доходы ≤3 млрд руб. + доля доходов от услуг общепита ≥70% + среднемесячные выплаты ≥ среднеотраслевой зарплаты по региону. Для вновь созданных — без ограничений.", norm: "п. 1 ст. 145, подп. 38 п. 3 ст. 149 НК" },
+                insurance: { label: "Страховые взносы", rate: "30% с выплат ниже 1,5 МРОТ / 15% свыше", conditions: "<strong>Для численности персонала до 250 человек</strong> — стандартные условия: доля доходов ≥70% + реестр МСП.<br><br><strong>Для численности персонала 250-1500 человек:</strong> ОКВЭД 56 + доходы ≤3 млрд руб. + доля доходов от услуг общепита ≥70% + зарплата ≥ среднеотраслевой.", norm: "ст. 427 НК" },
+                property: { label: "Налог на имущество", rate: "—", conditions: "Могут устанавливать региональные власти", norm: "—" },
+                land: { label: "Земельный налог", rate: "—", conditions: "Могут устанавливать местные власти", norm: "гл. 31 НК" }
+            }
+        },
+        tourism: {
+            name: "🏖️ Туризм",
+            taxes: {
+                nds: {
+                    label: "НДС",
+                    _sub: [
+                        {
+                            title: "Освобождение / Туроператор",
+                            conditions: "Туры с перевозкой и размещением по России и из других стран в Россию. Для тура только с проживанием льготы нет. Действует до 31 декабря 2030.",
+                            norm: "подп. 39 п. 3 ст. 149 НК"
+                        },
+                        {
+                            title: "0% / Гостиница",
+                            conditions: "Услуги проживания и услуги в цене номера по перечню, утв. Постановлением Правительства от 27.12.2024 № 1951. Действует до 31 декабря 2030.",
+                            norm: "подп. 19 п. 1 ст. 164 НК"
+                        }
+                    ]
+                },
+                tourist_tax: {
+                    label: "Туристический налог",
+                    _sub: [
+                        {
+                            title: "Освобождение",
+                            conditions: "Санаторно–курортное проживание, если есть медпоказания и оплата из бюджета, либо по путевке отдыхает физик–льготник.",
+                            norm: "п. 1 ст. 418.5-1 НК"
+                        },
+                        {
+                            title: "Минимальный налог",
+                            conditions: "Санатории платят только минимальный налог 100 руб. по каждой путевке.",
+                            norm: "п. 1 ст. 418.7 НК"
+                        }
+                    ]
+                }
+            }
+        }
+    };
+
+    // --------------------------------------------------------------
+    // ТЕРРИТОРИАЛЬНЫЕ ДАННЫЕ (добавлен ИНТЦ)
+    // --------------------------------------------------------------
+    const territoryData = {
+        tor: {
+            name: "🏢 ТОР",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "0% фед. / ≤5% рег. (первые 5 периодов) → затем не ниже 10% рег.", conditions: "Резидент, раздельный учет, доля льготной выручки ≥90%, запрет филиалов вне ТОР, отказ от спецрежимов", norm: "п. 1.8 ст. 284, ст. 284.4 НК" },
+                nds: { label: "НДС", rate: "Специальных льгот нет", conditions: "НДС в общем порядке. Для СТЗ — условия из подп.1 п.1 ст.164, 165 НК", norm: "ст. 164 НК" },
+                insurance: { label: "Страховые взносы", rate: "7,6% в пределах базы / 0% сверх", conditions: "Только новые рабочие места по соглашению. 10 лет для ДФО, 12 лет для остальных ТОР.", norm: "п. 10.1 ст. 427 НК" },
+                property: { label: "Налог на имущество", rate: "Регион может установить 0%", conditions: "Федеральной льготы нет, регион может ввести льготу", norm: "региональные законы" },
+                land: { label: "Земельный налог", rate: "Местные власти могут установить льготу", conditions: "Местные власти могут установить льготу для резидентов ТОР", norm: "региональные акты" }
+            }
+        },
+        spv: {
+            name: "⚓ Свободный порт Владивосток",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "0% фед. / ≤5% рег. (первые 5) → затем не ниже 10% рег.", conditions: "Резидент, доля выручки ≥90%, раздельный учет, запрет филиалов", norm: "ст. 284.4 НК, Закон №82-КЗ" },
+                nds: { label: "НДС", rate: "Специальных льгот нет", conditions: "НДС в общем порядке. Для СТЗ — условия из подп.1 п.1 ст.164, 165 НК", norm: "ст. 164 НК" },
+                insurance: { label: "Страховые взносы", rate: "7,6% в пределах базы / 0% сверх", conditions: "Новые рабочие места по соглашению. Если резидент до 31.12.2022 — 10 лет с месяца статуса; с 01.01.2023 — 10 лет с уведомления ИФНС.", norm: "п. 10.1 ст. 427 НК" },
+                property: { label: "Налог на имущество", rate: "0% первые 5 лет / 0,5% следующие 5", conditions: "Имущество вновь создано/приобретено для деятельности на территории СПВ/ТОСЭР, не входило в базу до регистрации, расположено в СПВ, используется по соглашению.", norm: "п. 4,4(1) ст.2 Закона №82-КЗ" },
+                land: { label: "Земельный налог", rate: "Регион может установить 0%", conditions: "По региональному закону для резидентов СПВ", norm: "Закон Приморского края №82-КЗ" }
+            }
+        },
+        oez: {
+            name: "🏭 ОЭЗ (общий режим)",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "фед. 2% / рег. 0–13,5%", conditions: "Резидент, инвестиции, раздельный учет доходов/расходов по бизнесу в ОЭЗ", norm: "ст. 284 НК" },
+                nds: { label: "НДС", rate: "Освобождение при ввозе (СТЗ)", conditions: "Освобождение при ввозе в процедуре СТЗ. В портовой ОЭЗ — освобождение работ/услуг.", norm: "пп.1 п.1 ст.164, пп.27 п.3 ст.149 НК" },
+                insurance: { label: "Страховые взносы", rate: "Специальных льгот нет", conditions: "Могут применять другие пониженные тарифы. Например, как МСП: 30% в пределах 1,5 МРОТ, 15% сверх при доле доходов ≥70% + реестр МСП", norm: "ст. 427 НК" },
+                property: { label: "Налог на имущество", rate: "0% на 10 лет", conditions: "Имущество для деятельности в ОЭЗ по соглашению с управляющей компанией ОЭЗ", norm: "п. 17 ст. 381 НК" },
+                land: { label: "Земельный налог", rate: "0% на 5–10 лет", conditions: "Для резидентов ОЭЗ", norm: "ст. 395 НК" }
+            }
+        },
+        koez: {
+            name: "🌊 ОЭЗ Калининградская обл.",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "первые 6 лет: 0% / затем 6 лет: фед. 4% + рег. 8,5%", conditions: "Только прибыль от инвестпроекта, раздельный учет. Если прибыль не получена 3 года — льгота с 4-го года", norm: "ст. 288.1 НК" },
+                nds: { label: "НДС", rate: "Не уплачивается при ввозе", conditions: "Должен быть резидент ОЭЗ или зарегистрироваться до 01.04.2006, состоять на учете в регионе, не применять спецрежимы (кроме УСН с уплатой НДС по общим ставкам), не использовать освобождение по ст.145, нет необлагаемых операций по ст.149, кроме благотворительности.", norm: "подп.1 п.1 ст.164 НК" },
+                insurance: { label: "Страховые взносы", rate: "7,6% в пределах базы / 0% сверх", conditions: "Резидент с 01.01.2018, только новые рабочие места, перечень согласован с администрацией ОЭЗ и ИФНС. С 2027 — требование соразмерности инвестиций (ст.56.1 НК)", norm: "ст. 427 НК, Закон №18-ФЗ" },
+                property: { label: "Налог на имущество", rate: "0% на 10 лет", conditions: "Имущество для деятельности в ОЭЗ по соглашению с управляющей компанией ОЭЗ", norm: "п. 17 ст. 381 НК" },
+                land: { label: "Земельный налог", rate: "0% на 5–10 лет", conditions: "Для резидентов ОЭЗ", norm: "ст. 395 НК" }
+            }
+        },
+        skolkovo: {
+            name: "🚀 Сколково",
+            taxes: {
+                profit: { label: "Налог на прибыль", rate: "0%", conditions: "Первые 10 лет, пока выручка <1 млрд руб.", norm: "ст. 246.1, 284 НК" },
+                nds: { label: "НДС", rate: "Освобождение (ст.145.1)", conditions: "Уведомительный порядок. 10 лет с момента статуса, выручка <1 млрд руб. Нет вычета входного НДС.", norm: "ст. 145.1 НК" },
+                insurance: { label: "Страховые взносы", rate: "30% в пределах 1,5 МРОТ / 15% свыше", conditions: "Первые 10 лет, выручка <1 млрд руб.", norm: "ст. 427 НК" },
+                property: { label: "Налог на имущество", rate: "0% на 10 лет", conditions: "Подтверждение статуса + данные учета доходов/расходов. Утрата права по п.2 ст.145.1 НК", norm: "п. 19,20 ст. 381 НК" },
+                land: { label: "Земельный налог", rate: "0% на 10 лет", conditions: "Для участников проекта", norm: "ст. 395 НК" }
+            }
+        },
+        // ---- ИНТЦ ----
+        intc: {
+            name: "🔬 ИНТЦ",
+            taxes: {
+                profit: {
+                    label: "Налог на прибыль",
+                    rate: "Освобождение",
+                    conditions: "Уведомительный порядок. Действует 10 лет со дня получения статуса, прекращается при выручке >1 млрд руб. и последующей прибыли >300 млн руб.",
+                    norm: "Ст. 246.1 НК"
+                },
+                nds: {
+                    label: "НДС",
+                    rate: "Освобождение",
+                    conditions: "Уведомительный порядок. Действует 10 лет со дня получения статуса, прекращается при выручке >1 млрд руб. и последующей прибыли >300 млн руб. Компании не принимают входной НДС к вычету.",
+                    norm: "Ст. 145.1 НК"
+                },
+                insurance: {
+                    label: "Страховые взносы",
+                    rate: "30% с выплат ниже 1,5 МРОТ / 15% свыше",
+                    conditions: "Нет уведомительного порядка. Действует 10 лет со дня получения статуса, прекращается при выручке >1 млрд руб. и последующей прибыли >300 млн руб. Льгота не действует по взносам на травматизм.",
+                    norm: "пп. 10 п. 1 ст. 427 НК"
+                },
+                property: {
+                    label: "Налог на имущество",
+                    rate: "0%",
+                    conditions: "Действует 10 лет со дня получения статуса, прекращается при выручке >1 млрд руб. и последующей прибыли >300 млн руб. Касается только имущества компании на территории ИНТЦ.",
+                    norm: "п. 28 ст. 381 НК"
+                },
+                land: {
+                    label: "Земельный налог",
+                    rate: "Освобождение",
+                    conditions: "Действует 10 лет со дня получения статуса, прекращается при выручке >1 млрд руб. и последующей прибыли >300 млн руб. Освобождение действует только для участков, которые входят в состав территории ИНТЦ.",
+                    norm: "п. 13 ч. 1 ст. 395 НК"
+                }
+            }
+        }
+    };
+
+    let activeMainTab = 'industry';
+    let activeIndustryCat = 'it';
+    let activeIndustryTax = 'profit';
+    let activeTerritoryCat = 'tor';
+    let activeTerritoryTax = 'profit';
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Рендер чипов
+    function renderTaxChips(containerId, dataObj, catKey, activeTaxKey, onSelect) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const category = dataObj[catKey];
+        if (!category?.taxes) {
+            container.innerHTML = '';
+            return;
+        }
+        let html = '';
+        for (const [key, tax] of Object.entries(category.taxes)) {
+            const label = tax._sub ? tax.label : tax.label;
+            const activeClass = (key === activeTaxKey) ? 'active' : '';
+            html += `<div class="tax-chip ${activeClass}" data-taxkey="${key}">${escapeHtml(label)}</div>`;
+        }
+        container.innerHTML = html;
+        container.querySelectorAll('.tax-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const taxKey = chip.getAttribute('data-taxkey');
+                if (taxKey) onSelect(taxKey);
+            });
+        });
+    }
+
+    // Рендер информации (с поддержкой подкарточек)
+    function renderInfo(containerId, dataObj, catKey, taxKey) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const category = dataObj[catKey];
+        if (!category?.taxes?.[taxKey]) {
+            container.innerHTML = `<div class="empty-msg">🔍 Выберите налог из списка</div>`;
+            return;
+        }
+        const tax = category.taxes[taxKey];
+
+        // Если есть _sub — рисуем подкарточки
+        if (tax._sub && Array.isArray(tax._sub)) {
+            let subHtml = `<div class="sub-cards">`;
+            for (const sub of tax._sub) {
+                subHtml += `
+                    <div class="sub-card">
+                        <div class="sub-title">${escapeHtml(sub.title)}</div>
+                        <div class="sub-conditions">${sub.conditions}</div>
+                        ${sub.norm ? `<span class="sub-norm">📖 ${escapeHtml(sub.norm)}</span>` : ''}
+                    </div>
+                `;
+            }
+            subHtml += `</div>`;
+            container.innerHTML = subHtml;
+            return;
+        }
+
+        // Обычная карточка (без подкарточек)
+        const html = `
+            <div class="info-card">
+                <div class="rate-big">${escapeHtml(tax.rate)}</div>
+                <div class="conditions">${tax.conditions}</div>
+                ${tax.norm && tax.norm !== '—' ? `<a href="#" class="norm-link">📖 ${escapeHtml(tax.norm)}</a>` : `<span class="norm-link" style="background:#f0f0f0;">—</span>`}
+            </div>
+        `;
+        container.innerHTML = html;
+    }
+
+    function buildIndustrySidebar() {
+        const sidebar = document.getElementById('industrySidebar');
+        if (!sidebar) return;
+        let html = '';
+        for (const [key, val] of Object.entries(industryData)) {
+            const activeClass = (key === activeIndustryCat) ? 'active' : '';
+            html += `<button class="cat-item ${activeClass}" data-cat="${key}">${val.name}</button>`;
+        }
+        sidebar.innerHTML = html;
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cat = btn.getAttribute('data-cat');
+                if (cat && cat !== activeIndustryCat) {
+                    activeIndustryCat = cat;
+                    const firstKey = Object.keys(industryData[cat].taxes)[0] || 'profit';
+                    activeIndustryTax = firstKey;
+                    refreshIndustryFull();
+                }
+            });
+        });
+    }
+
+    function buildTerritorySidebar() {
+        const sidebar = document.getElementById('territorySidebar');
+        if (!sidebar) return;
+        let html = '';
+        for (const [key, val] of Object.entries(territoryData)) {
+            const activeClass = (key === activeTerritoryCat) ? 'active' : '';
+            html += `<button class="cat-item ${activeClass}" data-cat="${key}">${val.name}</button>`;
+        }
+        sidebar.innerHTML = html;
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cat = btn.getAttribute('data-cat');
+                if (cat && cat !== activeTerritoryCat) {
+                    activeTerritoryCat = cat;
+                    const firstKey = Object.keys(territoryData[cat].taxes)[0] || 'profit';
+                    activeTerritoryTax = firstKey;
+                    refreshTerritoryFull();
+                }
+            });
+        });
+    }
+
+    function refreshIndustryFull() {
+        renderTaxChips('industryTaxChips', industryData, activeIndustryCat, activeIndustryTax, (newTax) => {
+            activeIndustryTax = newTax;
+            refreshIndustryFull();
+        });
+        renderInfo('industryInfoArea', industryData, activeIndustryCat, activeIndustryTax);
+        document.querySelectorAll('#industrySidebar .cat-item').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-cat') === activeIndustryCat);
+        });
+    }
+
+    function refreshTerritoryFull() {
+        renderTaxChips('territoryTaxChips', territoryData, activeTerritoryCat, activeTerritoryTax, (newTax) => {
+            activeTerritoryTax = newTax;
+            refreshTerritoryFull();
+        });
+        renderInfo('territoryInfoArea', territoryData, activeTerritoryCat, activeTerritoryTax);
+        document.querySelectorAll('#territorySidebar .cat-item').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-cat') === activeTerritoryCat);
+        });
+    }
+
+    function switchTab(tabId) {
+        activeMainTab = tabId;
+        const industryPanel = document.getElementById('industryTabPanel');
+        const territoryPanel = document.getElementById('territoryTabPanel');
+        document.querySelectorAll('.main-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-main-tab') === tabId);
+        });
+        if (tabId === 'industry') {
+            industryPanel.style.display = 'flex';
+            territoryPanel.style.display = 'none';
+            refreshIndustryFull();
+        } else {
+            industryPanel.style.display = 'none';
+            territoryPanel.style.display = 'flex';
+            refreshTerritoryFull();
+        }
+    }
+
+    document.getElementById('resetIndustryBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        activeIndustryCat = 'it';
+        activeIndustryTax = 'profit';
+        refreshIndustryFull();
+    });
+    document.getElementById('resetTerritoryBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        activeTerritoryCat = 'tor';
+        activeTerritoryTax = 'profit';
+        refreshTerritoryFull();
+    });
+
+    buildIndustrySidebar();
+    buildTerritorySidebar();
+    refreshIndustryFull();
+    refreshTerritoryFull();
+    document.querySelectorAll('.main-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.getAttribute('data-main-tab');
+            if (tab) switchTab(tab);
+        });
+    });
+    switchTab('industry');
+</script>
+</body>
+</html>

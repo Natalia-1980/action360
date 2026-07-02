@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Чек-листы: льготы, лицензии и статус резидента</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #eef2f6;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-tabs {
+            display: flex;
+            gap: 0;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 16px;
+        }
+        .main-tab {
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #5a6e7c;
+            transition: 0.2s;
+        }
+        .main-tab.active {
+            color: #1d8f7a;
+            border-bottom: 2px solid #1d8f7a;
+        }
+        .two-columns {
+            display: flex;
+            flex-direction: row;
+        }
+        .sidebar {
+            width: 200px;
+            background: #fafcff;
+            border-right: 1px solid #e9edf2;
+            padding: 12px 0;
+            flex-shrink: 0;
+        }
+        .sidebar-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: #8ba0b0;
+            padding: 0 12px 8px 12px;
+        }
+        .cat-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .cat-item {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #2c5a77;
+            background: transparent;
+            border: none;
+            text-align: left;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .cat-item:hover {
+            background: #eef3fa;
+        }
+        .cat-item.active {
+            background: #e3f5f0;
+            color: #107a66;
+            font-weight: 600;
+            border-left: 3px solid #1d8f7a;
+        }
+        .content-area {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            min-width: 0;
+        }
+        .sub-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eef2f8;
+            padding-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .sub-tab {
+            background: #f0f4f9;
+            padding: 4px 10px;
+            border-radius: 32px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #2a577b;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .sub-tab.active {
+            background: #1d8f7a;
+            color: white;
+        }
+        .info-card {
+            background: #f9fdfb;
+            border-radius: 14px;
+            padding: 12px;
+            border: 1px solid #e2efe9;
+        }
+        .checklist-items {
+            list-style: none;
+        }
+        .checklist-items li {
+            margin-bottom: 6px;
+            font-size: 0.7rem;
+            line-height: 1.4;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .checklist-items li:last-child {
+            margin-bottom: 0;
+        }
+        .checklist-items li::before {
+            content: "✓";
+            background: #2b7a4b;
+            color: white;
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            font-size: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .checklist-items li a {
+            color: #1d6f8b;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        .checklist-items li a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="main-tabs">
+        <button class="main-tab active" data-main-tab="industry">🏭 Отраслевые льготы</button>
+        <button class="main-tab" data-main-tab="territory">🗺️ Территориальные льготы</button>
+    </div>
+
+    <!-- Панель Отраслевые льготы -->
+    <div id="industryPanel" class="two-columns">
+        <div class="sidebar">
+            <div class="sidebar-title">ОТРАСЛИ</div>
+            <div class="cat-list" id="industrySidebar"></div>
+        </div>
+        <div class="content-area">
+            <div class="sub-tabs" id="industrySubTabs">
+                <div class="sub-tab active" data-sub="benefit">📋 Условия для льгот</div>
+                <div class="sub-tab" data-sub="license">📜 Что проверить</div>
+            </div>
+            <div id="industryContent"></div>
+        </div>
+    </div>
+
+    <!-- Панель Территориальные льготы -->
+    <div id="territoryPanel" class="two-columns" style="display: none;">
+        <div class="sidebar">
+            <div class="sidebar-title">ТЕРРИТОРИАЛЬНЫЕ РЕЖИМЫ</div>
+            <div class="cat-list" id="territorySidebar"></div>
+        </div>
+        <div class="content-area">
+            <div class="sub-tabs" id="territorySubTabs">
+                <div class="sub-tab active" data-sub="status">📌 Условия для статуса</div>
+                <div class="sub-tab" data-sub="report">📊 Отчетность</div>
+            </div>
+            <div id="territoryContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ======================= ОТРАСЛЕВЫЕ ДАННЫЕ =======================
+    const industriesData = {
+        it: {
+            name: "💻 ИТ-компании",
+            benefitChecks: [
+                "Аккредитация в реестре Минцифры (актуальный статус).",
+                "Доля профильных доходов ≥ 70% от общей суммы доходов (расчет по данным бухучета и деклараций).",
+                "Среднемесячная зарплата сотрудников за последние 3 месяца ≥ средней по РФ или региону (данные Росстата, РСВ).",
+                "Ежегодное подтверждение аккредитации не позднее 1 июня.",
+                "При доходе ≥ 1 млрд руб. и численности >100 чел. — соглашение с вузами (содействие образовательным программам)."
+            ],
+            licenseChecks: [
+                "Деятельность строго соответствует перечню (приложение 1 к постановлению № 1729).",
+                "На официальном сайте размещены актуальные данные об ИТ-деятельности по требованиям Минцифры.",
+                "Наличие согласия на раскрытие налоговой тайны (льготы, доходы, численность, зарплата).",
+                "Ежегодно до 1 июня — подтверждение аккредитации (выписка из реестра).",
+                "Минцифры проводит проверки: нарушение требований → исключение из реестра, потеря льгот.",
+                "Контроль за долей доходов и зарплатой на протяжении всего налогового периода."
+            ]
+        },
+        radio: {
+            name: "📡 Радиоэлектронная промышленность",
+            benefitChecks: [
+                "Компания включена в реестр организаций РЭП Минпромторга (выписка из ГИПС).",
+                "Доля профильных доходов ≥ 70% (подтверждается договорами, актами, счетами-фактурами, УПД, регистрами налогового учета).",
+                "Подтверждение основного вида деятельности — проектирование, разработка, производство ЭКБ, модулей или электроники.",
+                "Производит продукцию на основе собственных разработок."
+            ],
+            licenseChecks: [
+                "Вид деятельности точно соответствует: ЭКБ, электронные модули, продукция, материалы для производства компонентной базы.",
+                "Регистрация в ГИПС с использованием усиленной квалифицированной электронной подписи (УКЭП).",
+                "Наличие экспертного заключения ФГБУ «ВНИИР» о соответствии организации.",
+                "Подача заявления и полного пакета в Минпромторг (учредительные документы, штатное расписание, сведения об оборудовании, топологии ИС, лицензионные соглашения).",
+                "Подтверждение соответствия требованиям ежегодно; изменение сведений — риск исключения из реестра."
+            ]
+        },
+        med: {
+            name: "🏥 Медицина",
+            benefitChecks: [
+                "НДС (медуслуги): медлицензия, услуги из перечня ПП №132, раздельный учет.",
+                "НДС (медизделия): регистрационное удостоверение, код товара из ПП №1042, раздельный учет.",
+                "Налог на прибыль 0%: деятельность по ПП №917, лицензия, штат ≥15 чел., из них ≥50% — аккредитованные/сертифицированные медики, доля доходов от медицины+образования+НИОКР ≥90%.",
+                "Ежегодное подтверждение в ИФНС (форма № ММВ-7-3/892) до 25 марта следующего года."
+            ],
+            licenseChecks: [
+                "Недвижимость в собственности/аренде — санэпидзаключение, оборудование зарегистрировано (ПП №1416).",
+                "Договор с лицензированной организацией / обученный сотрудник для обслуживания медтехники.",
+                "Руководители имеют высшее медобразование и стаж, все сотрудники-медики — сертификаты/аккредитацию.",
+                "Организация в ЕГИСЗ, сотрудники в Федеральном регистре медработников.",
+                "Доп. требования для донорства, трансплантации, МСЭ (спецзаконы №125-ФЗ, №4180-1, №181-ФЗ).",
+                "Лицензия бессрочная, но Росздравнадзор проводит плановые/внеплановые проверки. Нарушение — основание для приостановления или аннулирования лицензии."
+            ]
+        },
+        edu: {
+            name: "🎓 Образование",
+            benefitChecks: [
+                "Действующая лицензия на образовательную деятельность.",
+                "Доход от льготной деятельности (образование + медицина + соцобслуживание) ≥90% от всех доходов по налоговому учету.",
+                "Штат не менее 15 сотрудников непрерывно в течение всего налогового периода.",
+                "Отсутствие операций с векселями и производными финансовыми инструментами.",
+                "Для новых организаций — льгота только со следующего года. При утрате права — повторное применение не ранее чем через 5 лет (кроме добровольного отказа или перехода с УСН)."
+            ],
+            licenseChecks: [
+                "Недвижимость на законном основании + санитарно-эпидемиологическое заключение Роспотребнадзора.",
+                "Материально-техническая база по ФГОС, утвержденные образовательные программы.",
+                "Трудовые договоры с педагогами, наличие образования, квалификации, стажа.",
+                "Лицензия бессрочная, но при нарушении лицензионных требований — приостановление/аннулирование."
+            ]
+        },
+        catering: {
+            name: "🍽️ Общепит",
+            benefitChecks: [
+                "НДС-льгота (подп.38 п.3 ст.149 НК): ОКВЭД 56 в ЕГРЮЛ/ЕГРИП, доход за предыдущий год ≤3 млрд руб., доля дохода от общепита ≥70%, среднемесячные выплаты за предыдущий период ≥ региональной среднемесячной зарплаты. В год создания применяют льготу без ограничений.",
+                "Пониженные взносы (численность до 250 чел.): в реестре МСП, ОКВЭД 56 на 1 января текущего года, доля дохода от ОКВЭД 56 ≥70%.",
+                "Пониженные взносы (численность 251–1500 чел.): МСП, ОКВЭД 56, доход за предыдущий год ≤2 млрд руб., среднемесячная зарплата ≥ среднеотраслевой по региону, доля дохода от общепита ≥70%."
+            ],
+            licenseChecks: [
+                "Санитарные нормы: внедрена система ХАССП (HACCP), помещения по СанПиН 2.3/2.4.3590-20, отдельная вентиляция, цеховое деление (сырье / полуфабрикаты).",
+                "У всех сотрудников, работающих с продуктами, действующие медицинские книжки.",
+                "Пожарная безопасность (123-ФЗ, ПП №1479): огнетушители, оповещение, эвакуационные выходы.",
+                "Уведомление Роспотребнадзора о начале деятельности, при продаже алкоголя — лицензия (171-ФЗ).",
+                "ККТ зарегистрирована, уголок потребителя с установленным перечнем документов.",
+                "Ежегодный контроль доли дохода ≥70%, лимитов 3 млрд (НДС-льгота) / 2 млрд (МСП), статус МСП, среднеотраслевая зарплата."
+            ]
+        }
+    };
+
+    // ======================= ТЕРРИТОРИАЛЬНЫЕ ДАННЫЕ =======================
+    const territoriesData = {
+        tor: {
+            name: "🏢 ТОР",
+            statusChecks: [
+                "Регистрация юрлица или ИП на территории ТОР/МТОР (кроме гос/мун унитарных предприятий).",
+                "Инвестиции: от 500 тыс. руб. (стандарт) до 500 млн руб. (для моногородов/МТОР за 3 года).",
+                "Запрещены: добыча нефти/газа, подакцизные товары (кроме авто), трейдинг.",
+                "Подача заявки онлайн через КРДВ (или УК). Решение за 15 рабочих дней.",
+                "Статус резидента — с даты внесения записи в реестр (п.12 ст.13 №473-ФЗ)."
+            ],
+            reportChecks: [
+                "Ежеквартально: отчет УК о выполнении соглашения (инвестиции, рабочие места).",
+                "Ежегодно: расчет капвложений и НИОКР.",
+                "Расчет ТВмакс (налоговой экономии) — не позднее 25 марта года, следующего за отчетным.",
+                "В ФНС: декларации по налогу на прибыль, НДС, зарплатная отчетность, персведения в общем порядке.",
+                "В СФР: раздел 2 ЕФС-1."
+            ]
+        },
+        oez: {
+            name: "🏭 ОЭЗ",
+            statusChecks: [
+                "Типы: ППТ (инвестиции от 150 млн руб.), ТВТ (от 1 млн), ТРТ (от 5 млн), портовая (от 5 млн).",
+                "Подача заявки в Минэкономразвития / региональную УК.",
+                "Бизнес-план с оценкой ≥150 баллов (экспертный совет).",
+                "Заключение соглашения на срок до 49 лет (ОЭЗ создается на 49 лет).",
+                "Запрещена добыча полезных ископаемых (кроме минеральных вод и лечебных ресурсов)."
+            ],
+            reportChecks: [
+                "Стандартные налоговые отчеты + раздельный учет доходов/расходов в ОЭЗ.",
+                "Ежегодно: подтверждение пропорции доходов (≥90% от основного вида).",
+                "Отчет в УК до 1 апреля.",
+                "Резиденты ОЭЗ обязаны сдавать расчет ТВмакс (налоговой экономии) — не позднее 25 марта года, следующего за отчетным."
+            ]
+        },
+        spv: {
+            name: "⚓ СПВ",
+            statusChecks: [
+                "Регистрация в одном из 22 муниципалитетов (Приморье, Камчатка, Хабаровский край, Сахалин, Чукотка).",
+                "Инвестиции: от 500 тыс. руб. за 3 года.",
+                "Запрещены: добыча нефти/газа, подакцизные товары (кроме авто/топливо).",
+                "Онлайн-заявка через КРДВ. Решение за 15 рабочих дней. Статус — с даты внесения в реестр (п.12 ст.11 №212-ФЗ).",
+                "Новые резиденты (после 1.04.2026) должны соблюдать соотношение капвложений и налоговой экономии (ТВмакс). Переходный период — 3 года."
+            ],
+            reportChecks: [
+                "Ежеквартальный отчет УК (КРДВ) — до 20 числа следующего месяца.",
+                "Годовой отчет до 1 апреля.",
+                "Расчет ТВмакс (налоговой экономии) — не позднее 25 марта года, следующего за отчетным.",
+                "Для резидентов СПВ после 1.04.2026 — контроль соотношения капвложений и налоговой экономии (ТВмакс).",
+                "В ФНС: декларации по налогу на прибыль, НДС, зарплатная отчетность, персведения в общем порядке.",
+                "В СФР: раздел 2 ЕФС-1."
+            ]
+        },
+        skolkovo: {
+            name: "🚀 Сколково",
+            statusChecks: [
+                "Подача заявки на сайте Фонда «Сколково» (sk.ru). Требования: юрлицо с ОКВЭД 72.",
+                "Экспертиза инновационности, научно-техническая экспертиза.",
+                "Решение в течение 10 дней (для МТК — 6 дней). Включение в реестр участников.",
+                "Статус дается на 10 лет. Обязательство соблюдать лимит выручки: не более 1 млрд руб. в год.",
+                "Деятельность по Правилам Сколково. Правила есть на сайте проекта."
+            ],
+            reportChecks: [
+                "Ежегодная отчетность в Фонд (НИОКР, результаты, финсостояние).",
+                "Квартальные/полугодовые отчеты.",
+                "В ФНС: нет деклараций по НДС и налогу на прибыль, зарплатная отчетность в общем порядке.",
+                "Участники Сколково также обязаны сдавать расчет ТВмакс в ИФНС."
+            ]
+        }
+    };
+
+    // Состояние
+    let activeMainTab = 'industry';
+    let activeIndustryCat = 'it';
+    let activeIndustrySub = 'benefit';
+    let activeTerritoryCat = 'tor';
+    let activeTerritorySub = 'status';
+
+    // Построение левого меню для отраслей
+    function buildIndustrySidebar() {
+        const sidebar = document.getElementById('industrySidebar');
+        sidebar.innerHTML = Object.entries(industriesData).map(([key, val]) => 
+            `<button class="cat-item ${key === activeIndustryCat ? 'active' : ''}" data-cat="${key}">${val.name}</button>`
+        ).join('');
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeIndustryCat = btn.dataset.cat;
+                refreshIndustry();
+            });
+        });
+    }
+
+    // Построение левого меню для территорий
+    function buildTerritorySidebar() {
+        const sidebar = document.getElementById('territorySidebar');
+        sidebar.innerHTML = Object.entries(territoriesData).map(([key, val]) => 
+            `<button class="cat-item ${key === activeTerritoryCat ? 'active' : ''}" data-cat="${key}">${val.name}</button>`
+        ).join('');
+        sidebar.querySelectorAll('.cat-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeTerritoryCat = btn.dataset.cat;
+                refreshTerritory();
+            });
+        });
+    }
+
+    // Обновление правой панели для отраслей
+    function refreshIndustry() {
+        const ind = industriesData[activeIndustryCat];
+        const contentDiv = document.getElementById('industryContent');
+        
+        if (activeIndustrySub === 'benefit') {
+            contentDiv.innerHTML = `
+                <div class="info-card">
+                    <ul class="checklist-items">${ind.benefitChecks.map(item => `<li>${item}</li>`).join('')}</ul>
+                </div>
+            `;
+        } else {
+            contentDiv.innerHTML = `
+                <div class="info-card">
+                    <ul class="checklist-items">${ind.licenseChecks.map(item => `<li>${item}</li>`).join('')}</ul>
+                </div>
+            `;
+        }
+        
+        document.querySelectorAll('#industrySidebar .cat-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.cat === activeIndustryCat);
+        });
+    }
+
+    // Обновление правой панели для территорий
+    function refreshTerritory() {
+        const terr = territoriesData[activeTerritoryCat];
+        const contentDiv = document.getElementById('territoryContent');
+        
+        if (activeTerritorySub === 'status') {
+            contentDiv.innerHTML = `
+                <div class="info-card">
+                    <ul class="checklist-items">${terr.statusChecks.map(item => `<li>${item}</li>`).join('')}</ul>
+                </div>
+            `;
+        } else {
+            contentDiv.innerHTML = `
+                <div class="info-card">
+                    <ul class="checklist-items">${terr.reportChecks.map(item => `<li>${item}</li>`).join('')}</ul>
+                </div>
+            `;
+        }
+        
+        document.querySelectorAll('#territorySidebar .cat-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.cat === activeTerritoryCat);
+        });
+    }
+
+    // Переключение между основными вкладками
+    function switchMainTab(tabId) {
+        activeMainTab = tabId;
+        document.querySelectorAll('.main-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mainTab === tabId);
+        });
+        
+        const industryPanel = document.getElementById('industryPanel');
+        const territoryPanel = document.getElementById('territoryPanel');
+        
+        if (tabId === 'industry') {
+            industryPanel.style.display = 'flex';
+            territoryPanel.style.display = 'none';
+            refreshIndustry();
+        } else {
+            industryPanel.style.display = 'none';
+            territoryPanel.style.display = 'flex';
+            refreshTerritory();
+        }
+    }
+
+    // Инициализация
+    function init() {
+        buildIndustrySidebar();
+        buildTerritorySidebar();
+        
+        // Подвкладки для отраслей
+        document.querySelectorAll('#industrySubTabs .sub-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeIndustrySub = btn.dataset.sub;
+                document.querySelectorAll('#industrySubTabs .sub-tab').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                refreshIndustry();
+            });
+        });
+        
+        // Подвкладки для территорий
+        document.querySelectorAll('#territorySubTabs .sub-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeTerritorySub = btn.dataset.sub;
+                document.querySelectorAll('#territorySubTabs .sub-tab').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                refreshTerritory();
+            });
+        });
+        
+        // Верхние вкладки
+        document.querySelectorAll('.main-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchMainTab(btn.dataset.mainTab);
+            });
+        });
+        
+        refreshIndustry();
+    }
+    
+    init();
+</script>
+</body>
+</html>
