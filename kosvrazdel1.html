@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Заполнение Раздела 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 650px;
+            height: 650px;
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 24px 28px;
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+            border: 1px solid #d0d7de;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 16px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .left-panel {
+            flex: 0 0 180px;
+            background: #f0f4fa;
+            border-radius: 24px;
+            padding: 14px 12px;
+            border: 1px solid #cbd5e1;
+            overflow-y: auto;
+        }
+
+        .left-panel h3 {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #2b4050;
+            border-bottom: 2px dashed #b0c0d0;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .drag-items {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .drag-item {
+            background: #e3eaf2;
+            border-radius: 30px;
+            padding: 6px 10px;
+            border: 2px solid #a6b6c8;
+            color: #1f2c38;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-align: center;
+            cursor: grab;
+            box-shadow: 0 2px 6px -2px rgba(0,0,0,0.08);
+            transition: all 0.1s;
+            user-select: none;
+        }
+
+        .drag-item:hover {
+            background: #d5dfea;
+            transform: translateY(-1px);
+        }
+
+        .drag-item:active {
+            cursor: grabbing;
+            opacity: 0.7;
+        }
+
+        .drag-item.empty-item {
+            background: #d1d8e0;
+            border-color: #8f9eae;
+            opacity: 0.7;
+            cursor: grab;
+        }
+
+        .drag-item.empty-item:hover {
+            background: #d5dfea;
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+
+        .right-panel {
+            flex: 1;
+            background: #f9fbfd;
+            border-radius: 24px;
+            padding: 14px 16px;
+            border: 1px solid #cbd5e1;
+            overflow-y: auto;
+        }
+
+        .right-panel h3 {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #1e2b39;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #dce3ec;
+        }
+
+        .fields-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 14px;
+        }
+
+        .field-full {
+            grid-column: span 2;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .field label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #2f465a;
+            letter-spacing: 0.2px;
+            line-height: 1.2;
+        }
+
+        .field label .code {
+            color: #6b7f92;
+            font-weight: 600;
+        }
+
+        .dropzone {
+            background: #ffffff;
+            border: 2px dashed #aebecf;
+            border-radius: 30px;
+            padding: 5px 10px;
+            min-height: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            word-break: break-word;
+            transition: all 0.15s;
+            color: #1f2c38;
+        }
+
+        .dropzone.dropped {
+            border: 2px solid #6b7b8c;
+            background: #edf2f7;
+            font-weight: 600;
+        }
+
+        .dropzone.correct {
+            border: 3px solid #1f8b5a;
+            background: #d4f0e3;
+            font-weight: 700;
+        }
+
+        .dropzone.incorrect {
+            border: 3px solid #c0392b;
+            background: #fde8e5;
+            font-weight: 700;
+        }
+
+        .dropzone.drag-over {
+            border-color: #1a5a7a;
+            background: #dce8f2;
+        }
+
+        .dropzone .hint-placeholder {
+            color: #8f9eae;
+            font-weight: 400;
+            font-size: 0.65rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 10px 0 8px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            background: #e2e8f0;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 24px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #1f2c38;
+            border: 1px solid #bcc8d6;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn:hover {
+            background: #d0dbe8;
+        }
+
+        .btn-primary {
+            background: #2b4f6e;
+            color: white;
+            border-color: #1f3a5f;
+        }
+
+        .btn-primary:hover {
+            background: #1f3a5f;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .feedback {
+            background: #f0f4fa;
+            border-radius: 16px;
+            padding: 10px 14px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid #c8d4e2;
+            color: #1f2c38;
+            margin-top: 8px;
+            line-height: 1.6;
+            min-height: 50px;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .feedback .error-list {
+            margin-top: 4px;
+            padding-left: 16px;
+            color: #a93226;
+        }
+
+        .feedback .error-list li {
+            list-style-type: disc;
+        }
+
+        .feedback .success {
+            color: #1a7a4a;
+        }
+
+        .hint-text {
+            font-size: 0.55rem;
+            color: #6b7f92;
+            margin-top: 8px;
+            text-align: center;
+            border-top: 1px dashed #bcc8d6;
+            padding-top: 8px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                padding: 16px;
+            }
+            .fields-grid { grid-template-columns: 1fr; }
+            .field-full { grid-column: span 1; }
+            .main-layout { flex-direction: column; }
+            .left-panel { flex: 0 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="main-layout">
+        <div class="left-panel">
+            <h3>Перетащите</h3>
+            <div class="drag-items" id="dragContainer">
+                <div class="drag-item" draggable="true" data-value="45377000">45377000</div>
+                <div class="drag-item" draggable="true" data-value="182 1 04 01000 01 1000 110">182 1 04 01000 01 1000 110</div>
+                <div class="drag-item" draggable="true" data-value="880000">880 000</div>
+                <div class="drag-item" draggable="true" data-value="880000">880 000</div>
+                <div class="drag-item empty-item" draggable="true" data-value="—">— (прочерк)</div>
+                <div class="drag-item" draggable="true" data-value="1000000">1 000 000</div>
+                <div class="drag-item" draggable="true" data-value="120000">120 000</div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <h3>Заполните Раздел 1</h3>
+            <div class="fields-grid">
+                <div class="field">
+                    <label><span class="code">010</span> Код по ОКТМО</label>
+                    <div class="dropzone" id="drop-oktmo" data-expected="45377000">
+                        <span class="hint-placeholder">перетащите сюда</span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label><span class="code">020</span> КБК</label>
+                    <div class="dropzone" id="drop-kbk" data-expected="182 1 04 01000 01 1000 110">
+                        <span class="hint-placeholder">перетащите сюда</span>
+                    </div>
+                </div>
+
+                <div class="field field-full">
+                    <label><span class="code">030</span> Сумма налога, исчисленная к уплате в бюджет</label>
+                    <div class="dropzone" id="drop-total" data-expected="880000">
+                        <span class="hint-placeholder">перетащите сюда</span>
+                    </div>
+                </div>
+
+                <div class="field field-full">
+                    <label><span class="code">031</span> в т.ч. по приобретенным товарам</label>
+                    <div class="dropzone" id="drop-acquired" data-expected="880000">
+                        <span class="hint-placeholder">перетащите сюда</span>
+                    </div>
+                </div>
+
+                <div class="field field-full">
+                    <label><span class="code">040</span> Стоимость товаров, не подлежащих налогообложению</label>
+                    <div class="dropzone" id="drop-exempt" data-expected="—">
+                        <span class="hint-placeholder">перетащите сюда</span>
+                    </div>
+                </div>
+
+                <div class="field field-full">
+                    <label><span class="code">050</span> Сумма налога резидентом СЭЗ</label>
+                    <div class="dropzone" id="drop-sez" data-expected="—">
+                        <span class="hint-placeholder">перетащите сюда</span>
+                    </div>
+                </div>
+
+                <div class="field field-full">
+                    <label><span class="code">060</span> Сумма обеспечительного платежа (из ДОПП)</label>
+                    <div class="dropzone" id="drop-security" data-expected="1000000">
+                        <span class="hint-placeholder">перетащите сюда</span>
+                    </div>
+                </div>
+
+                <div class="field field-full">
+                    <label><span class="code">070</span> Сумма налога к доплате</label>
+                    <div class="dropzone" id="drop-payable" data-expected="—">
+                        <span class="hint-placeholder">перетащите сюда</span>
+                    </div>
+                </div>
+
+                <div class="field field-full">
+                    <label><span class="code">080</span> Превышение обеспечительного платежа</label>
+                    <div class="dropzone" id="drop-overpay" data-expected="120000">
+                        <span class="hint-placeholder">перетащите сюда</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn" id="resetBtn">Сброс</button>
+        <button class="btn btn-primary" id="checkBtn">Проверить</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    <div class="hint-text">Двойной клик по полю — очистить</div>
+</div>
+
+<script>
+    (function() {
+        var dragItems = document.querySelectorAll('.drag-item');
+        var dropZones = document.querySelectorAll('.dropzone');
+        var resetBtn = document.getElementById('resetBtn');
+        var checkBtn = document.getElementById('checkBtn');
+        var feedback = document.getElementById('feedback');
+
+        var expectedValues = {
+            'drop-oktmo': '45377000',
+            'drop-kbk': '182 1 04 01000 01 1000 110',
+            'drop-total': '880000',
+            'drop-acquired': '880000',
+            'drop-exempt': '—',
+            'drop-sez': '—',
+            'drop-security': '1000000',
+            'drop-payable': '—',
+            'drop-overpay': '120000'
+        };
+
+        var fieldLabels = {
+            'drop-oktmo': '010 ОКТМО',
+            'drop-kbk': '020 КБК',
+            'drop-total': '030 Исчисленный налог',
+            'drop-acquired': '031 По приобретенным',
+            'drop-exempt': '040 Необлагаемые',
+            'drop-sez': '050 СЭЗ',
+            'drop-security': '060 Обеспечительный платеж',
+            'drop-payable': '070 К доплате',
+            'drop-overpay': '080 Превышение'
+        };
+
+        var expectedDisplay = {
+            'drop-oktmo': '45377000',
+            'drop-kbk': '182 1 04 01000 01 1000 110',
+            'drop-total': '880 000',
+            'drop-acquired': '880 000',
+            'drop-exempt': 'прочерк (—)',
+            'drop-sez': 'прочерк (—)',
+            'drop-security': '1 000 000',
+            'drop-payable': 'прочерк (—)',
+            'drop-overpay': '120 000'
+        };
+
+        dragItems.forEach(function(item) {
+            item.addEventListener('dragstart', function(e) {
+                var value = this.getAttribute('data-value') || '';
+                e.dataTransfer.setData('text/plain', value);
+                this.style.opacity = '0.6';
+            });
+            item.addEventListener('dragend', function() {
+                this.style.opacity = '1';
+            });
+        });
+
+        dropZones.forEach(function(zone) {
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+            zone.addEventListener('dragenter', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+            zone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+
+                var data = e.dataTransfer.getData('text/plain');
+                if (data === '—') {
+                    this.innerHTML = '—';
+                } else if (data === '') {
+                    this.innerHTML = '';
+                } else {
+                    // Проверяем, является ли значение КБК (содержит пробелы и цифры)
+                    var isKbk = /^\d{3}\s\d\s\d{2}\s\d{5}\s\d{2}\s\d{4}\s\d{3}$/.test(data);
+                    if (isKbk) {
+                        this.innerHTML = data;
+                    } else {
+                        var displayValue = data;
+                        if (!isNaN(data) && data.length > 3) {
+                            displayValue = Number(data).toLocaleString('ru-RU');
+                        }
+                        this.innerHTML = displayValue;
+                    }
+                }
+                this.classList.add('dropped');
+                this.classList.remove('correct', 'incorrect');
+            });
+
+            zone.addEventListener('dblclick', function() {
+                this.innerHTML = '';
+                this.classList.remove('dropped', 'correct', 'incorrect');
+            });
+        });
+
+        resetBtn.addEventListener('click', function() {
+            dropZones.forEach(function(zone) {
+                zone.innerHTML = '<span class="hint-placeholder">перетащите сюда</span>';
+                zone.classList.remove('dropped', 'correct', 'incorrect', 'drag-over');
+            });
+            feedback.innerHTML = '';
+        });
+
+        checkBtn.addEventListener('click', function() {
+            var correctCount = 0;
+            var totalFields = dropZones.length;
+            var errors = [];
+
+            dropZones.forEach(function(zone) {
+                var id = zone.id;
+                var expected = expectedValues[id];
+                var actual = zone.innerText.trim();
+                if (actual === 'перетащите сюда') {
+                    actual = '';
+                }
+
+                var normalize = function(s) {
+                    if (s === '') return '';
+                    return String(s).replace(/\s+/g, '').toLowerCase();
+                };
+
+                var normActual = normalize(actual);
+                var normExpected = normalize(expected);
+
+                var isDash = function(s) {
+                    return s === '—' || s === '-' || s === '–';
+                };
+
+                var isExpectedDash = isDash(expected);
+                var isActualDash = isDash(actual);
+
+                var isCorrect = false;
+
+                if (isExpectedDash && isActualDash) {
+                    isCorrect = true;
+                } else if ((expected === '' || expected === null || expected === undefined) && actual === '') {
+                    isCorrect = true;
+                } else if (!isExpectedDash && !isActualDash && expected !== '' && actual !== '') {
+                    isCorrect = (normActual === normExpected);
+                } else {
+                    isCorrect = false;
+                }
+
+                zone.classList.remove('correct', 'incorrect');
+                if (isCorrect) {
+                    correctCount++;
+                    zone.classList.add('correct');
+                } else {
+                    zone.classList.add('incorrect');
+                    var label = fieldLabels[id] || id;
+                    var display = expectedDisplay[id] || expected;
+                    errors.push(label + ' — правильно: ' + display);
+                }
+            });
+
+            if (correctCount === totalFields) {
+                feedback.innerHTML = '<div class="success"><strong>Отлично!</strong> Все поля Раздела 1 заполнены верно.</div>';
+            } else {
+                var errorHtml = errors.map(function(e) { return '<li>' + e + '</li>'; }).join('');
+                feedback.innerHTML = '<div style="font-weight:600;">Верно: <strong>' + correctCount + '</strong> из <strong>' + totalFields + '</strong></div><div style="margin-top:6px;">Исправьте ошибки:</div><ul class="error-list">' + errorHtml + '</ul>';
+            }
+        });
+
+        dropZones.forEach(function(zone) {
+            zone.setAttribute('draggable', 'true');
+            zone.addEventListener('dragstart', function(e) {
+                var text = this.innerText.trim();
+                if (text && text !== 'перетащите сюда') {
+                    e.dataTransfer.setData('text/plain', text);
+                    this.style.opacity = '0.5';
+                } else {
+                    e.preventDefault();
+                }
+            });
+            zone.addEventListener('dragend', function() {
+                this.style.opacity = '1';
+            });
+        });
+
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+        });
+
+    })();
+</script>
+
+</body>
+</html>
