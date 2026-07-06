@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Тренажёр: ошибки в ОДДС</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .step {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.correct {
+            background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
+            color: white;
+        }
+
+        .task-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #0a2942;
+            margin-bottom: 0.8rem;
+            white-space: pre-line;
+        }
+
+        .task-text strong {
+            color: #0f3857;
+        }
+
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 0.8rem 0 1rem 0;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1rem;
+            background: white;
+            border: 2px solid #dde6f0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.9rem;
+        }
+        .option-item:hover {
+            border-color: #8da9cc;
+            background: #f5faff;
+        }
+        .option-item.selected {
+            border-color: #1e6bb8;
+            background: #e8f1fe;
+        }
+        .option-item.correct-answer {
+            border-color: #2b8c4a;
+            background: #e6f4e9;
+        }
+        .option-item.wrong-answer {
+            border-color: #b13e3e;
+            background: #fef0ee;
+        }
+        .option-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            accent-color: #1e6bb8;
+        }
+        .option-item .letter {
+            font-weight: 600;
+            color: #1e3b5c;
+            min-width: 20px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 3px 0 #b0c4dd;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin: 1rem 0 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+        .feedback .error-title {
+            font-weight: 600;
+            color: #b13e3e;
+        }
+        .feedback .ok-title {
+            font-weight: 600;
+            color: #2b8c4a;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #1a344c;
+            margin: 1.5rem 0 0.5rem 0;
+            text-align: center;
+        }
+        .summary-table {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #c7daf5;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #d8e2f2;
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        .summary-row.header {
+            background: #e2ecfe;
+            font-weight: 600;
+            color: #0d2f4e;
+        }
+        .summary-value {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .congrats {
+            text-align: center;
+            margin: 1.5rem 0 0.5rem;
+            font-size: 1.2rem;
+            color: #1e3b5c;
+        }
+
+        .restart-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .progress { gap: 0.5rem; }
+            .step { width: 30px; height: 30px; font-size: 0.8rem; }
+            .task-container { padding: 1rem; }
+            .option-item { padding: 0.5rem 0.8rem; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="progress" id="progressContainer"></div>
+
+        <div id="taskContainer" class="task-container"></div>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="btn primary" id="nextBtn" disabled>Далее →</button>
+        </div>
+
+        <div id="summaryContainer" class="hidden">
+            <div class="congrats">✅ Все задачи решены!</div>
+            <div class="summary-title">Результаты</div>
+            <div class="summary-table" id="summaryTable"></div>
+            <div class="restart-btn">
+                <button class="btn" id="restartBtn">🔄 Пройти заново</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const tasks = [
+                {
+                    text: `📌 <strong>Задача 1. НДС в выручке</strong>
+
+        Компания отразила в строке 4111 «от продажи продукции, товаров, работ и услуг» поступление от покупателя в размере 122 000 руб. (включая НДС 22%).
+
+        ❓ Какая ошибка допущена?`,
+                    options: [
+                        'Строка 4111 должна быть уменьшена на сумму НДС — 22 000 руб.',
+                        'Всё верно, НДС включается в строку 4111',
+                        'НДС нужно показать отдельной строкой в финансовой деятельности'
+                    ],
+                    correct: 0,
+                    explanation: `В строке 4111 надо показывать выручку без НДС.
+
+        Сумма НДС (22 000 руб.) должна быть отражена в прочих поступлениях (строка 4119) или прочих платежах сальдированно.
+
+        📎 Типовая ошибка: не исключают НДС из поступлений от покупателей.`
+                },
+                {
+                    text: `📌 <strong>Задача 2. Возврат аванса прошлого года</strong>
+
+        Компания вернула покупателю аванс, полученный в прошлом году — 50 000 руб. Бухгалтер уменьшил строку 4111 «от продажи продукции» на эту сумму.
+
+        ❓ Правильно ли это?`,
+                    options: [
+                        'Да, верно, аванс уменьшает выручку текущего года',
+                        'Нет, возврат аванса прошлого года надо отразить в строке 4129 «Прочие платежи»',
+                        'Нет, возврат аванса надо отразить в строке 4322 «Выплата дивидендов»'
+                    ],
+                    correct: 1,
+                    explanation: `Если аванс был получен в прошлом году, его возврат не уменьшает выручку текущего года.
+
+        Возврат аванса, полученного в предыдущем периоде, отражается по строке 4129 «Прочие платежи» текущего отчёта.
+
+        📎 Типовая ошибка: путают возврат авансов текущего и прошлого периода.`
+                },
+                {
+                    text: `📌 <strong>Задача 3. Проценты по неснижаемому остатку</strong>
+
+        Банк начислил проценты на неснижаемый остаток на расчётном счёте — 15 000 руб. Бухгалтер отразил их в строке 4213 «от возврата предоставленных займов».
+
+        ❓ Правильно ли это?`,
+                    options: [
+                        'Да, верно, это поступления от финансовых операций',
+                        'Нет, проценты надо отразить в строке 4119 «Прочие поступления»',
+                        'Нет, проценты надо отразить в строке 4322 «Выплата дивидендов»'
+                    ],
+                    correct: 1,
+                    explanation: `Проценты по банковскому счёту — это текущая операция.
+
+        Они должны отражаться в строке 4119 «Прочие поступления» раздела «Денежные потоки от текущих операций».
+
+        📎 Типовая ошибка: проценты ошибочно относят к финансовой деятельности.`
+                },
+                {
+                    text: `📌 <strong>Задача 4. Внутренние перемещения денег</strong>
+
+        Компания сняла с расчётного счёта 100 000 руб. и оприходовала в кассу. Бухгалтер отразил это как движение по строке 4111 «от продажи продукции».
+
+        ❓ Правильно ли это?`,
+                    options: [
+                        'Да, верно, это поступление от продаж',
+                        'Нет, внутренние перемещения не показывают в ОДДС',
+                        'Да, но только если снятие было для выплаты зарплаты'
+                    ],
+                    correct: 1,
+                    explanation: `В ОДДС не показывают движение денег внутри компании.
+
+        Перевод со счёта на счёт, внесение наличной выручки в банк, снятие денег со счёта в кассу — всё это внутренние перемещения и в ОДДС не отражается.
+
+        📎 Типовая ошибка: включают внутренние обороты между своими счетами.`
+                },
+                {
+                    text: `📌 <strong>Задача 5. Зарплатные налоги в ОДДС</strong>
+
+        Компания перечислила на карты сотрудников зарплату 300 000 руб. НДФЛ с зарплаты составил 39 000 руб., страховые взносы — 90 600 руб.
+
+        ❓ Какая сумма должна быть отражена в строке 4122 «в связи с оплатой труда»?`,
+                    options: [
+                        '300 000 руб. — только сама зарплата',
+                        '339 000 руб. — зарплата + НДФЛ',
+                        '429 600 руб. — зарплата + НДФЛ + страховые взносы'
+                    ],
+                    correct: 2,
+                    explanation: `В строку 4122 включают всю сумму, связанную с оплатой труда.
+
+        300 000 (зарплата) + 39 000 (НДФЛ) + 90 600 (взносы) = 429 600 руб.
+
+        📎 Типовая ошибка: показывают только перечисленную зарплату без налогов.`
+                },
+                {
+                    text: `📌 <strong>Задача 6. Краткосрочный депозит</strong>
+
+        Компания разместила 200 000 руб. на краткосрочном депозите на 1 месяц. Бухгалтер отразил эту операцию в строке 4223 «в связи с приобретением долговых ценных бумаг».
+
+        ❓ Правильно ли это?`,
+                    options: [
+                        'Да, верно, депозит — это финансовое вложение',
+                        'Нет, краткосрочные депозиты — это денежные эквиваленты, их не отражают в ОДДС',
+                        'Да, но только если депозит был открыт в другом банке'
+                    ],
+                    correct: 1,
+                    explanation: `Краткосрочные депозиты являются денежными эквивалентами.
+
+        Их размещение и возврат не отражаются в ОДДС, так как это не меняет общий остаток денежных средств.
+
+        📎 Типовая ошибка: показывают обороты по депозитам как инвестиционные операции.`
+                },
+                {
+                    text: `📌 <strong>Задача 7. Беспроцентный заём</strong>
+
+        Компания выдала другой организации беспроцентный заём на 300 000 руб.
+
+        ❓ В каком разделе ОДДС нужно отразить эту операцию?`,
+                    options: [
+                        'В инвестиционной деятельности (строка 4223)',
+                        'В текущей деятельности (строка 4129 «Прочие платежи»)',
+                        'Не нужно отражать, беспроцентные займы не показывают в ОДДС'
+                    ],
+                    correct: 1,
+                    explanation: `Беспроцентные займы не являются финансовыми вложениями.
+
+        Они отражаются в денежных потоках от текущих операций (строка 4129 при выдаче, 4119 при возврате).
+
+        📎 Типовая ошибка: показывают беспроцентные займы как инвестиционную деятельность.`
+                },
+                {
+                    text: `📌 <strong>Задача 8. Авансы за ОС</strong>
+
+        Компания перечислила аванс поставщику за оборудование — 244 000 руб. (включая НДС 22%). Бухгалтер отразил эту сумму в строке 4121 «поставщикам за сырьё, материалы, работы, услуги».
+
+        ❓ Правильно ли это?`,
+                    options: [
+                        'Да, верно, авансы поставщикам всегда отражают в строке 4121',
+                        'Нет, авансы за внеоборотные активы надо отражать в строке 4221 (без НДС — 200 000 руб.)',
+                        'Нет, авансы за ОС не отражают в ОДДС до момента поставки'
+                    ],
+                    correct: 1,
+                    explanation: `Авансы, уплаченные за внеоборотные активы, надо показывать в инвестиционной деятельности.
+
+        Строка 4221 «в связи с приобретением внеоборотных активов» — 200 000 руб. (без НДС).
+
+        📎 Типовая ошибка: ошибочно отражают в строке 4121 «поставщикам».`
+                },
+                {
+                    text: `📌 <strong>Задача 9. Выплата дивидендов с НДФЛ</strong>
+
+        Компания выплатила дивиденды учредителю — 100 000 руб. НДФЛ удержан и перечислен — 13 000 руб.
+
+        ❓ Какая сумма должна быть отражена в строке 4322 «на уплату дивидендов»?`,
+                    options: [
+                        '100 000 руб. — только сумма дивидендов',
+                        '113 000 руб. — дивиденды + НДФЛ',
+                        '87 000 руб. — дивиденды за минусом НДФЛ'
+                    ],
+                    correct: 1,
+                    explanation: `Дивиденды отражаются вместе с удержанным налогом.
+
+        100 000 (дивиденды) + 13 000 (НДФЛ) = 113 000 руб.
+
+        📎 Типовая ошибка: показывают дивиденды без учёта удержанного налога.`
+                },
+                {
+                    text: `📌 <strong>Задача 10. Сверка с балансом</strong>
+
+        Остаток денежных средств по строке 4500 ОДДС составил 500 000 руб. А по строке 1250 баланса — 480 000 руб.
+
+        ❓ Что это означает?`,
+                    options: [
+                        'Это нормально, расхождения допустимы до 5%',
+                        'Расхождения свидетельствуют об ошибках в заполнении форм отчетности',
+                        'Это связано с курсовыми разницами, которые не влияют на ОДДС'
+                    ],
+                    correct: 1,
+                    explanation: `Остатки должны совпадать.
+
+        Расхождения между строкой 4500 ОДДС и строкой 1250 баланса свидетельствуют об ошибках в заполнении форм отчётности.
+
+        📎 Типовая ошибка: не сверяют ОДДС с балансом на конец периода.`
+                }
+            ];
+
+            let currentTask = 0;
+            let answered = false;
+            let selectedOption = null;
+            let results = new Array(tasks.length).fill(null);
+
+            const taskContainer = document.getElementById('taskContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const summaryContainer = document.getElementById('summaryContainer');
+            const progressContainer = document.getElementById('progressContainer');
+            const summaryTable = document.getElementById('summaryTable');
+            const restartBtn = document.getElementById('restartBtn');
+
+            function updateProgress() {
+                let html = '';
+                for (let i = 0; i < tasks.length; i++) {
+                    let statusClass = '';
+                    if (i === currentTask && results[i] === null) statusClass = 'active';
+                    else if (results[i] === true) statusClass = 'correct';
+                    else if (results[i] === false) statusClass = 'incorrect';
+                    html += `<div class="step ${statusClass}">${i+1}</div>`;
+                }
+                progressContainer.innerHTML = html;
+            }
+
+            function renderTask() {
+                const task = tasks[currentTask];
+                answered = false;
+                selectedOption = null;
+
+                let optionsHtml = '';
+                const letters = ['А', 'Б', 'В', 'Г'];
+                task.options.forEach((opt, idx) => {
+                    optionsHtml += `
+                        <div class="option-item" data-index="${idx}">
+                            <input type="radio" name="taskOption" id="opt_${idx}" value="${idx}">
+                            <span class="letter">${letters[idx]}.</span>
+                            <label for="opt_${idx}" style="cursor:pointer; flex:1;">${opt}</label>
+                        </div>
+                    `;
+                });
+
+                let html = `
+                    <div class="task-text">${task.text}</div>
+                    <div class="options-group" id="optionsGroup">
+                        ${optionsHtml}
+                    </div>
+                    <div class="button-row">
+                        <button class="btn primary" id="checkBtn">Проверить</button>
+                    </div>
+                    <div id="feedback" class="feedback hidden"></div>
+                `;
+
+                taskContainer.innerHTML = html;
+
+                document.querySelectorAll('.option-item').forEach(item => {
+                    const radio = item.querySelector('input[type="radio"]');
+                    item.addEventListener('click', () => {
+                        if (answered) return;
+                        radio.checked = true;
+                        document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+                        item.classList.add('selected');
+                        selectedOption = parseInt(radio.value);
+                    });
+                    radio.addEventListener('change', () => {
+                        if (answered) return;
+                        document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+                        item.classList.add('selected');
+                        selectedOption = parseInt(radio.value);
+                    });
+                });
+
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (answered) return;
+                    checkAnswer();
+                });
+
+                updateProgress();
+            }
+
+            function checkAnswer() {
+                if (selectedOption === null) {
+                    alert('Выберите вариант ответа');
+                    return;
+                }
+
+                const task = tasks[currentTask];
+                const isCorrect = selectedOption === task.correct;
+                results[currentTask] = isCorrect;
+
+                document.querySelectorAll('.option-item').forEach((item, idx) => {
+                    const radio = item.querySelector('input[type="radio"]');
+                    if (idx === task.correct) {
+                        item.classList.add('correct-answer');
+                    } else if (idx === selectedOption && !isCorrect) {
+                        item.classList.add('wrong-answer');
+                    }
+                    radio.disabled = true;
+                });
+
+                const feedbackDiv = document.getElementById('feedback');
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+
+                if (isCorrect) {
+                    feedbackDiv.innerHTML = `<span class="ok-title">✅ Верно!</span><br><br>${task.explanation}`;
+                } else {
+                    const letters = ['А', 'Б', 'В', 'Г'];
+                    feedbackDiv.innerHTML = `
+                        <span class="error-title">❌ Неверно.</span><br><br>
+                        Вы выбрали вариант <strong>${letters[selectedOption]}</strong>.<br><br>
+                        ${task.explanation}
+                    `;
+                }
+
+                answered = true;
+                updateProgress();
+
+                if (currentTask < tasks.length - 1) {
+                    nextBtn.disabled = false;
+                } else {
+                    nextBtn.textContent = 'Завершить';
+                    nextBtn.disabled = false;
+                }
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentTask < tasks.length - 1) {
+                    currentTask++;
+                    renderTask();
+                    nextBtn.disabled = true;
+                } else {
+                    taskContainer.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+
+                    let summaryHtml = '<div class="summary-row header"><span>Задача</span><span>Результат</span></div>';
+                    for (let i = 0; i < tasks.length; i++) {
+                        const status = results[i] === true ? '✅ Верно' : (results[i] === false ? '❌ Неверно' : '⚪ Не решена');
+                        summaryHtml += `<div class="summary-row"><span>Задача ${i+1}</span><span class="summary-value">${status}</span></div>`;
+                    }
+                    summaryTable.innerHTML = summaryHtml;
+                    summaryContainer.classList.remove('hidden');
+                }
+            });
+
+            function restart() {
+                currentTask = 0;
+                results = new Array(tasks.length).fill(null);
+                answered = false;
+                selectedOption = null;
+
+                taskContainer.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+                summaryContainer.classList.add('hidden');
+                nextBtn.textContent = 'Далее →';
+                nextBtn.disabled = true;
+
+                renderTask();
+            }
+
+            restartBtn.addEventListener('click', restart);
+
+            renderTask();
+        })();
+    </script>
+</body>
+</html>
