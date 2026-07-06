@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Заполнение Раздела 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 650px;
+            height: 700px;
+            min-width: 650px;
+            max-width: 650px;
+            min-height: 700px;
+            max-height: 700px;
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 20px 24px;
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+            border: 1px solid #d0d7de;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            flex-grow: 0;
+        }
+
+        .header {
+            margin-bottom: 12px;
+        }
+
+        .header h3 {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1e2b39;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #dce3ec;
+        }
+
+        .table-wrap {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.72rem;
+        }
+
+        thead th {
+            background: #f0f4fa;
+            color: #1e2b39;
+            font-weight: 700;
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 2px solid #cbd5e1;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        thead th:first-child {
+            width: 55%;
+        }
+        thead th:nth-child(2) {
+            width: 18%;
+        }
+        thead th:nth-child(3) {
+            width: 27%;
+        }
+
+        tbody td {
+            padding: 5px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .row-label {
+            font-weight: 600;
+            color: #2f465a;
+            font-size: 0.68rem;
+            line-height: 1.3;
+        }
+
+        .row-code {
+            font-weight: 700;
+            color: #6b7f92;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        .row-input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 2px solid #cbd5e1;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #1f2c38;
+            outline: none;
+            transition: all 0.15s;
+            font-family: inherit;
+            background: #ffffff;
+            min-height: 32px;
+        }
+
+        .row-input:focus {
+            border-color: #2b4f6e;
+            box-shadow: 0 0 0 3px rgba(43, 79, 110, 0.12);
+        }
+
+        .row-input.correct {
+            border: 3px solid #1f8b5a;
+            background: #d4f0e3;
+            font-weight: 700;
+        }
+
+        .row-input.incorrect {
+            border: 3px solid #c0392b;
+            background: #fde8e5;
+            font-weight: 700;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 12px 0 6px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            background: #e2e8f0;
+            border: none;
+            border-radius: 40px;
+            padding: 7px 26px;
+            font-weight: 600;
+            font-size: 0.78rem;
+            color: #1f2c38;
+            border: 1px solid #bcc8d6;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .btn:hover {
+            background: #d0dbe8;
+        }
+
+        .btn-primary {
+            background: #2b4f6e;
+            color: white;
+            border-color: #1f3a5f;
+        }
+
+        .btn-primary:hover {
+            background: #1f3a5f;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .feedback {
+            background: #f0f4fa;
+            border-radius: 16px;
+            padding: 8px 14px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            border: 1px solid #c8d4e2;
+            color: #1f2c38;
+            margin-top: 6px;
+            line-height: 1.6;
+            min-height: 44px;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .feedback .error-list {
+            margin-top: 3px;
+            padding-left: 16px;
+            color: #a93226;
+        }
+
+        .feedback .error-list li {
+            list-style-type: disc;
+        }
+
+        .feedback .success {
+            color: #1a7a4a;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                width: 100%;
+                height: 100vh;
+                min-width: unset;
+                max-width: unset;
+                min-height: unset;
+                max-height: unset;
+                border-radius: 0;
+                padding: 12px;
+            }
+            thead th:first-child { width: 40%; }
+            thead th:nth-child(2) { width: 15%; }
+            thead th:nth-child(3) { width: 45%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h3>Раздел 1. Сумма налога на добавленную стоимость, подлежащая уплате в бюджет</h3>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Показатель</th>
+                    <th>Код строки</th>
+                    <th>Значение показателей</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="row-label">Код по ОКТМО</td>
+                    <td class="row-code">010</td>
+                    <td><input type="text" class="row-input" id="input-oktmo" data-expected="45377000"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Код бюджетной классификации</td>
+                    <td class="row-code">020</td>
+                    <td><input type="text" class="row-input" id="input-kbk" data-expected="182 1 04 01000 01 1000 110"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Сумма налога, исчисленная к уплате в бюджет</td>
+                    <td class="row-code">030</td>
+                    <td><input type="text" class="row-input" id="input-total" data-expected="880000"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Сумма налога, исчисленная к уплате в бюджет в отношении приобретенных товаров, в рублях</td>
+                    <td class="row-code">031</td>
+                    <td><input type="text" class="row-input" id="input-acquired" data-expected="880000"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Стоимость импортируемых товаров, не подлежащих налогообложению налогом, в рублях</td>
+                    <td class="row-code">040</td>
+                    <td><input type="text" class="row-input" id="input-exempt" data-expected="—"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Сумма налога, исчисленная к уплате в бюджет резидентом СЭЗ в отношении товаров, импортированных на территорию СЭЗ Российской Федерации, в рублях</td>
+                    <td class="row-code">050</td>
+                    <td><input type="text" class="row-input" id="input-sez" data-expected="—"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Сумма обеспечительного платежа в части исполнения обязанности по уплате налога, в рублях</td>
+                    <td class="row-code">060</td>
+                    <td><input type="text" class="row-input" id="input-security" data-expected="1000000"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Сумма налога, подлежащая уплате (доплате) в бюджет, в рублях</td>
+                    <td class="row-code">070</td>
+                    <td><input type="text" class="row-input" id="input-payable" data-expected="—"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Сумма превышения обеспечительного платежа в части исполнения обязанности по уплате налога над суммой налога, исчисленной к уплате в бюджет, в рублях</td>
+                    <td class="row-code">080</td>
+                    <td><input type="text" class="row-input" id="input-overpay" data-expected="120000"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <button class="btn" id="resetBtn">Сброс</button>
+        <button class="btn btn-primary" id="checkBtn">Проверить</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+    (function() {
+        var inputs = document.querySelectorAll('.row-input');
+        var resetBtn = document.getElementById('resetBtn');
+        var checkBtn = document.getElementById('checkBtn');
+        var feedback = document.getElementById('feedback');
+
+        var fieldLabels = {
+            'input-oktmo': '010 ОКТМО',
+            'input-kbk': '020 КБК',
+            'input-total': '030 Исчисленный налог',
+            'input-acquired': '031 По приобретенным',
+            'input-exempt': '040 Необлагаемые',
+            'input-sez': '050 СЭЗ',
+            'input-security': '060 Обеспечительный платеж',
+            'input-payable': '070 К доплате',
+            'input-overpay': '080 Превышение'
+        };
+
+        var expectedDisplay = {
+            'input-oktmo': '45377000',
+            'input-kbk': '182 1 04 01000 01 1000 110',
+            'input-total': '880 000',
+            'input-acquired': '880 000',
+            'input-exempt': 'прочерк (—)',
+            'input-sez': 'прочерк (—)',
+            'input-security': '1 000 000',
+            'input-payable': 'прочерк (—)',
+            'input-overpay': '120 000'
+        };
+
+        resetBtn.addEventListener('click', function() {
+            inputs.forEach(function(input) {
+                input.value = '';
+                input.classList.remove('correct', 'incorrect');
+            });
+            feedback.innerHTML = '';
+        });
+
+        checkBtn.addEventListener('click', function() {
+            var correctCount = 0;
+            var totalFields = inputs.length;
+            var errors = [];
+
+            inputs.forEach(function(input) {
+                var expected = input.getAttribute('data-expected');
+                var actual = input.value.trim();
+
+                var normalize = function(s) {
+                    if (s === '') return '';
+                    return String(s).replace(/\s+/g, '').toLowerCase();
+                };
+
+                var normActual = normalize(actual);
+                var normExpected = normalize(expected);
+
+                var isDash = function(s) {
+                    return s === '—' || s === '-' || s === '–';
+                };
+
+                var isExpectedDash = isDash(expected);
+                var isActualDash = isDash(actual);
+
+                var isCorrect = false;
+
+                if (isExpectedDash && isActualDash) {
+                    isCorrect = true;
+                } else if ((expected === '' || expected === null || expected === undefined) && actual === '') {
+                    isCorrect = true;
+                } else if (!isExpectedDash && !isActualDash && expected !== '' && actual !== '') {
+                    isCorrect = (normActual === normExpected);
+                } else {
+                    isCorrect = false;
+                }
+
+                input.classList.remove('correct', 'incorrect');
+                if (isCorrect) {
+                    correctCount++;
+                    input.classList.add('correct');
+                } else {
+                    input.classList.add('incorrect');
+                    var label = fieldLabels[input.id] || input.id;
+                    var display = expectedDisplay[input.id] || expected;
+                    errors.push(label + ' — правильно: ' + display);
+                }
+            });
+
+            if (correctCount === totalFields) {
+                feedback.innerHTML = '<div class="success"><strong>Отлично!</strong> Все поля Раздела 1 заполнены верно.</div>';
+            } else {
+                var errorHtml = errors.map(function(e) { return '<li>' + e + '</li>'; }).join('');
+                feedback.innerHTML = '<div style="font-weight:600;">Верно: <strong>' + correctCount + '</strong> из <strong>' + totalFields + '</strong></div><div style="margin-top:6px;">Исправьте ошибки:</div><ul class="error-list">' + errorHtml + '</ul>';
+            }
+        });
+
+        inputs.forEach(function(input) {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    this.classList.remove('correct', 'incorrect');
+                }
+            });
+        });
+
+    })();
+</script>
+
+</body>
+</html>
