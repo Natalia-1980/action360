@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>РБП · задачник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 1.8rem;
+            border: 1px solid #dee6f0;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .step {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #e9f0fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1e3b5c;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .step.active {
+            background: #1e3b5c;
+            color: white;
+        }
+        .step.correct {
+            background: #2b8c4a;
+            color: white;
+        }
+        .step.incorrect {
+            background: #b13e3e;
+            color: white;
+        }
+
+        .task-container {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #0a2942;
+            margin-bottom: 1.2rem;
+            white-space: pre-line;
+        }
+
+        .task-text strong {
+            color: #0f3857;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.6rem 0 0.8rem 0;
+            flex-wrap: wrap;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            min-width: 150px;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e6bb8;
+        }
+        .input-group span {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b0c4dd;
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 3px 0 #b0c4dd;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin: 1rem 0 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #1a344c;
+            margin: 1.5rem 0 0.5rem 0;
+            text-align: center;
+        }
+        .summary-table {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #c7daf5;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #d8e2f2;
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        .summary-row.header {
+            background: #e2ecfe;
+            font-weight: 600;
+            color: #0d2f4e;
+        }
+        .summary-value {
+            font-weight: 500;
+            color: #1e3b5c;
+        }
+
+        .congrats {
+            text-align: center;
+            margin: 1.5rem 0 0.5rem;
+            font-size: 1.2rem;
+            color: #1e3b5c;
+        }
+
+        .restart-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1.2rem; }
+            .progress { gap: 0.5rem; }
+            .step { width: 30px; height: 30px; font-size: 0.8rem; }
+            .task-container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="progress" id="progressContainer"></div>
+
+        <div id="taskContainer" class="task-container"></div>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="btn primary" id="nextBtn" disabled>Далее →</button>
+        </div>
+
+        <div id="summaryContainer" class="hidden">
+            <div class="congrats">✅ Все кейсы решены!</div>
+            <div class="summary-title">Результаты</div>
+            <div class="summary-table" id="summaryTable"></div>
+            <div class="restart-btn">
+                <button class="btn" id="restartBtn">🔄 Пройти заново</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const tasks = [
+                {
+                    text: `📌 <strong>Кейс 1. Оплата облачного 1С на год (120 т.р.)</strong>
+        Акт подписан 1 декабря, доступ открыт, пользоваться будем весь следующий год.
+
+        ❓ Какой счёт используется для учёта этой операции? Напишите номер счёта.`,
+                    correct: '97',
+                    explanation: `✅ <strong>Правильно!</strong> Счёт 97 «Расходы будущих периодов».
+
+        Мы уже получили услугу (доступ открыт), но пользоваться ею будем в будущем. Это классический РБП.
+
+        📎 Проводка: Дт 97 Кт 51 — 120 000 руб.
+        Ежемесячное списание: Дт 26 (44) Кт 97 — 10 000 руб.`
+                },
+                {
+                    text: `📌 <strong>Кейс 2. Покупка исключительного права на программу (500 т.р., срок 3 года)</strong>
+        Акт подписан. Программа будет использоваться 3 года.
+
+        ❓ Можно ли использовать счёт 97 для учёта этой покупки? Напишите «Да» или «Нет».`,
+                    correct: 'нет',
+                    explanation: `✅ <strong>Правильно!</strong> Нет, счёт 97 не используется.
+
+        Это НМА (нематериальный актив), а не РБП. Сначала собираем на 08, затем вводим на 04.
+
+        📎 Проводки:
+        Дт 08 Кт 51 — 500 000 руб.
+        Дт 04 Кт 08 — 500 000 руб.
+        Амортизация: Дт 20/26/44 Кт 05 — 13 889 руб. ежемесячно.`
+                },
+                {
+                    text: `📌 <strong>Кейс 3. Замена разбитого стекла в окне арендованного офиса (5 т.р.)</strong>
+        Работы выполнены, акт подписан.
+
+        ❓ Нужно ли использовать счёт 97 для учёта этих расходов? Напишите «Да» или «Нет».`,
+                    correct: 'нет',
+                    explanation: `✅ <strong>Правильно!</strong> Нет, счёт 97 не нужен.
+
+        Это текущий ремонт. Расходы списываются сразу в момент производства работ.
+
+        📎 Проводка: Дт 26 (44) Кт 60 (10) — 5 000 руб.`
+                },
+                {
+                    text: `📌 <strong>Кейс 4. Капитальная перепланировка арендуемого офиса (500 т.р.)</strong>
+        Установка новых перегородок, замена проводки. Аренда на 3 года. Работы приняты по акту.
+
+        ❓ На какой счёт собираются затраты? Напишите номер счёта.`,
+                    correct: '08',
+                    explanation: `✅ <strong>Правильно!</strong> Счёт 08 «Вложения во внеоборотные активы».
+
+        Это неотделимые улучшения арендованного имущества. Собираем на 08, вводим как отдельный объект ОС.
+
+        📎 Проводки:
+        Дт 08 Кт 60, 10 — 500 000 руб.
+        Дт 01 (субсчет «Улучшения аренды») Кт 08 — 500 000 руб.
+        Амортизация 36 месяцев: Дт 26/44 Кт 02 — 13 889 руб.
+
+        Счёт 97 здесь не участвует!`
+                },
+                {
+                    text: `📌 <strong>Кейс 5. Оплата страховки КАСКО на год (60 т.р.)</strong>
+        Оплата 25 декабря, полис действует с 1 января.
+
+        ❓ Какой счёт используется для учёта оплаты? Напишите номер счёта.`,
+                    correct: '76.01',
+                    explanation: `✅ <strong>Правильно!</strong> Счёт 76.01 «Расчёты по имущественному и личному страхованию».
+
+        Это аванс, услуга ещё не оказывается. Счёт 97 НЕ используем согласно Рекомендации БМЦ Р-13/2011.
+
+        📎 Проводка в декабре: Дт 76.01 Кт 51 — 60 000 руб.
+        Ежемесячное списание с января: Дт 26 (44) Кт 76.01 — 5 000 руб.`
+                },
+                {
+                    text: `📌 <strong>Кейс 6. Пусконаладочные работы нового станка (200 т.р.)</strong>
+        Станок уже есть, наладка сделана, серийный выпуск начнётся через квартал.
+
+        ❓ Какой счёт используется для учёта этих расходов? Напишите номер счёта.`,
+                    correct: '97',
+                    explanation: `✅ <strong>Правильно!</strong> Счёт 97 «Расходы будущих периодов».
+
+        Это подготовка производства. Станок есть, наладка сделана, но серийный выпуск начнётся позже.
+
+        📎 Проводка: Дт 97 Кт 60 — 200 000 руб.
+        Списание в течение периода получения выгоды (4 месяца): Дт 20 Кт 97 — 50 000 руб. ежемесячно.`
+                },
+                {
+                    text: `📌 <strong>Кейс 7. Штраф ГИБДД за превышение скорости (500 руб.)</strong>
+        Нарушение на служебной машине.
+
+        ❓ Можно ли использовать счёт 97 для учёта штрафа? Напишите «Да» или «Нет».`,
+                    correct: 'нет',
+                    explanation: `✅ <strong>Правильно!</strong> Нет, счёт 97 не используется.
+
+        Это прочий расход, не связанный с производством. Списывается сразу.
+
+        📎 Проводка: Дт 91.02 Кт 76 — 500 руб.`
+                },
+                {
+                    text: `📌 <strong>Кейс 8. Предоплата за аренду помещения на 3 месяца (900 т.р.)</strong>
+        Счёт получен, арендодатель ждёт деньги.
+
+        ❓ Какой счёт используется для учёта предоплаты? Напишите номер счёта.`,
+                    correct: '76.АВ, 76',
+                    explanation: `✅ <strong>Правильно!</strong> Счёт 76.АВ «Авансы выданные» (или 76).
+
+        Это аванс. Мы ещё не пользовались помещением. Счёт 97 не нужен.
+
+        📎 Проводка: Дт 76.АВ Кт 51 — 900 000 руб.
+        Ежемесячное списание по мере пользования: Дт 26 (44) Кт 76.АВ — 300 000 руб.`
+                },
+                {
+                    text: `📌 <strong>Кейс 9. Расходы на регистрацию ООО (4 000 руб.)</strong>
+        Оплачена государственная пошлина.
+
+        ❓ Можно ли использовать счёт 97 для учёта этих расходов? Напишите «Да» или «Нет».`,
+                    correct: 'нет',
+                    explanation: `✅ <strong>Правильно!</strong> Нет, счёт 97 не используется.
+
+        Будущей экономической выгоды нет. Это организационные расходы, списываются сразу.
+
+        📎 Проводка: Дт 91.02 Кт 51 — 4 000 руб.`
+                },
+                {
+                    text: `📌 <strong>Кейс 10. Приобретение лицензии на ПО на 2 года (240 т.р.)</strong>
+        Лицензия получена, срок действия — 2 года.
+
+        ❓ Какой счёт используется для учёта лицензии? Напишите номер счёта.`,
+                    correct: '97',
+                    explanation: `✅ <strong>Правильно!</strong> Счёт 97 «Расходы будущих периодов».
+
+        Лицензия — это право использования, которое действует в течение определённого срока. Это РБП.
+
+        📎 Проводка: Дт 97 Кт 51 — 240 000 руб.
+        Ежемесячное списание в течение 24 месяцев: Дт 26 (44) Кт 97 — 10 000 руб.`
+                }
+            ];
+
+            let currentTask = 0;
+            let answered = false;
+            let results = new Array(tasks.length).fill(null);
+
+            const taskContainer = document.getElementById('taskContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const summaryContainer = document.getElementById('summaryContainer');
+            const progressContainer = document.getElementById('progressContainer');
+            const summaryTable = document.getElementById('summaryTable');
+            const restartBtn = document.getElementById('restartBtn');
+
+            function updateProgress() {
+                let html = '';
+                for (let i = 0; i < tasks.length; i++) {
+                    let statusClass = '';
+                    if (i === currentTask && results[i] === null) statusClass = 'active';
+                    else if (results[i] === true) statusClass = 'correct';
+                    else if (results[i] === false) statusClass = 'incorrect';
+                    html += `<div class="step ${statusClass}">${i+1}</div>`;
+                }
+                progressContainer.innerHTML = html;
+            }
+
+            function renderTask() {
+                const task = tasks[currentTask];
+                answered = false;
+
+                let html = `
+                    <div class="task-text">${task.text}</div>
+                    <div class="input-group">
+                        <input type="text" id="valueInput" placeholder="Введите ответ">
+                    </div>
+                    <div class="button-row">
+                        <button class="btn" id="checkBtn">Проверить</button>
+                    </div>
+                    <div id="feedback" class="feedback hidden"></div>
+                `;
+
+                taskContainer.innerHTML = html;
+
+                document.getElementById('checkBtn').addEventListener('click', () => {
+                    if (answered) return;
+                    checkAnswer();
+                });
+
+                const input = document.getElementById('valueInput');
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (!answered) checkAnswer();
+                    }
+                });
+
+                updateProgress();
+            }
+
+            function normalize(str) {
+                return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/\./g, '');
+            }
+
+            function checkAnswer() {
+                const task = tasks[currentTask];
+                const input = document.getElementById('valueInput');
+                const rawValue = input.value.trim();
+
+                if (rawValue === '') {
+                    alert('Введите ответ');
+                    return;
+                }
+
+                const userAnswer = normalize(rawValue);
+
+                // Специальная обработка для кейса 8: принимаем и "76", и "76.АВ"
+                let isCorrect = false;
+                if (currentTask === 7) { // кейс 8 (индекс 7)
+                    const validAnswers = ['76', '76ав', '76.ав', '76.ав', '76', '76ав'];
+                    isCorrect = validAnswers.some(a => userAnswer === normalize(a));
+                } else {
+                    isCorrect = userAnswer === normalize(task.correct);
+                }
+
+                results[currentTask] = isCorrect;
+
+                const feedbackDiv = document.getElementById('feedback');
+                feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+                feedbackDiv.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+
+                if (isCorrect) {
+                    feedbackDiv.innerHTML = task.explanation;
+                } else {
+                    feedbackDiv.innerHTML = `❌ <strong>Неверно.</strong><br><br>Ваш ответ: «${rawValue}»<br><br>${task.explanation}`;
+                }
+
+                answered = true;
+                updateProgress();
+
+                if (currentTask < tasks.length - 1) {
+                    nextBtn.disabled = false;
+                } else {
+                    nextBtn.textContent = 'Завершить';
+                    nextBtn.disabled = false;
+                }
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentTask < tasks.length - 1) {
+                    currentTask++;
+                    renderTask();
+                    nextBtn.disabled = true;
+                } else {
+                    taskContainer.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+
+                    let summaryHtml = '<div class="summary-row header"><span>Кейс</span><span>Результат</span></div>';
+                    for (let i = 0; i < tasks.length; i++) {
+                        const status = results[i] === true ? '✅ Верно' : (results[i] === false ? '❌ Неверно' : '⚪ Не решена');
+                        summaryHtml += `<div class="summary-row"><span>Кейс ${i+1}</span><span class="summary-value">${status}</span></div>`;
+                    }
+                    summaryTable.innerHTML = summaryHtml;
+                    summaryContainer.classList.remove('hidden');
+                }
+            });
+
+            function restart() {
+                currentTask = 0;
+                results = new Array(tasks.length).fill(null);
+                answered = false;
+
+                taskContainer.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+                summaryContainer.classList.add('hidden');
+                nextBtn.textContent = 'Далее →';
+                nextBtn.disabled = true;
+
+                renderTask();
+            }
+
+            restartBtn.addEventListener('click', restart);
+
+            renderTask();
+        })();
+    </script>
+</body>
+</html>
