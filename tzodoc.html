@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Документация по контролируемым сделкам</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.8rem 1.5rem 2rem;
+            border: 1px solid #dee6f0;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .card::-webkit-scrollbar {
+            width: 4px;
+        }
+        .card::-webkit-scrollbar-thumb {
+            background: #b8ccdf;
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0a2942;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .subhead {
+            font-size: 0.75rem;
+            color: #4e6f8a;
+            border-left: 3px solid #2e7ab3;
+            padding-left: 12px;
+            margin-bottom: 1.2rem;
+        }
+
+        /* Вкладки справа вверху */
+        .tab-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+        .tab-btn {
+            background: #f0f5fc;
+            border: none;
+            border-radius: 40px;
+            padding: 0.3rem 1.2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1a3f5a;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 1.5px solid transparent;
+        }
+        .tab-btn:hover {
+            background: #e3ebf5;
+            border-color: #b8ccdf;
+        }
+        .tab-btn.active {
+            background: #1e3b5c;
+            color: white;
+            border-color: #1e3b5c;
+            box-shadow: 0 4px 10px rgba(25, 55, 85, 0.15);
+        }
+
+        .main-area {
+            display: flex;
+            gap: 1.2rem;
+            align-items: flex-start;
+        }
+
+        /* Левая колонка: кнопки (скрыты по умолчанию) */
+        .col-left {
+            flex: 0 0 140px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            position: sticky;
+            top: 0;
+            transition: 0.15s;
+        }
+        .col-left.hidden {
+            display: none;
+        }
+
+        .stage-btn {
+            background: #f0f5fc;
+            border: none;
+            border-radius: 40px;
+            padding: 0.35rem 0.8rem;
+            font-size: 0.68rem;
+            font-weight: 500;
+            color: #1a3f5a;
+            cursor: pointer;
+            transition: 0.1s;
+            text-align: left;
+            border: 1.5px solid transparent;
+            width: 100%;
+        }
+        .stage-btn:hover {
+            background: #e3ebf5;
+            border-color: #b8ccdf;
+        }
+        .stage-btn.active {
+            background: #1e3b5c;
+            color: white;
+            border-color: #1e3b5c;
+            box-shadow: 0 4px 10px rgba(25, 55, 85, 0.15);
+        }
+        .stage-btn .num {
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        /* Правая колонка: контент */
+        .col-right {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .content-block {
+            background: #f9fcff;
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 0.8rem;
+            display: none;
+        }
+        .content-block.active {
+            display: block;
+        }
+
+        .content-block h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #0a2942;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .content-block h3 .badge {
+            background: #dce8f5;
+            color: #1a4b6e;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 0 8px;
+            border-radius: 30px;
+            letter-spacing: 0.2px;
+        }
+
+        .content-block ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .content-block ul li {
+            font-size: 0.78rem;
+            line-height: 1.5;
+            color: #1a3f5a;
+            padding: 0.2rem 0 0.2rem 1.2rem;
+            position: relative;
+            border-bottom: 1px dashed #e5edf6;
+        }
+        .content-block ul li:last-child {
+            border-bottom: none;
+        }
+        .content-block ul li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #2e7ab3;
+            font-weight: 500;
+        }
+
+        .content-block .note {
+            font-size: 0.7rem;
+            color: #5e7290;
+            margin-top: 0.4rem;
+            padding-top: 0.4rem;
+            border-top: 1px solid #dce6f2;
+        }
+
+        .content-block .highlight {
+            background: #eef3fa;
+            border-radius: 12px;
+            padding: 0.4rem 0.8rem;
+            margin: 0.4rem 0;
+            border-left: 3px solid #2e7ab3;
+            font-size: 0.75rem;
+        }
+
+        .footer-note {
+            font-size: 0.65rem;
+            color: #6c86a3;
+            margin-top: 0.8rem;
+            text-align: center;
+            border-top: 1px solid #d8e2f2;
+            padding-top: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            .main-area {
+                flex-direction: column;
+            }
+            .col-left {
+                flex: none;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 0.2rem;
+                position: static;
+                margin-bottom: 0.5rem;
+            }
+            .col-left.hidden {
+                display: none;
+            }
+            .stage-btn {
+                flex: 0 0 auto;
+                white-space: nowrap;
+                font-size: 0.6rem;
+                padding: 0.2rem 0.6rem;
+            }
+            .tab-bar {
+                justify-content: center;
+            }
+            .card { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>📋 Документация по контролируемым сделкам</h1>
+    <div class="subhead">ст. 105.15 НК РФ · подготовка и представление</div>
+
+    <!-- Вкладки справа вверху -->
+    <div class="tab-bar" id="tabBar">
+        <button class="tab-btn active" data-tab="tab_composition">📄 Состав</button>
+        <button class="tab-btn" data-tab="tab_stages">📌 Этапы</button>
+    </div>
+
+    <div class="main-area">
+        <!-- Левая колонка: кнопки (изначально показаны для "Состав") -->
+        <div class="col-left" id="leftPanel">
+            <!-- Кнопки для состава (всегда 3) -->
+            <div id="compositionBtns">
+                <button class="stage-btn active" data-stage="stage0_1"><span class="num">1</span> Сведения</button>
+                <button class="stage-btn" data-stage="stage0_2"><span class="num">2</span> Методы</button>
+                <button class="stage-btn" data-stage="stage0_3"><span class="num">3</span> МГК</button>
+            </div>
+            <!-- Кнопки для этапов (9 шт, скрыты по умолчанию) -->
+            <div id="stagesBtns" style="display:none;">
+                <button class="stage-btn" data-stage="stage1"><span class="num">1</span> Идентификация</button>
+                <button class="stage-btn" data-stage="stage2"><span class="num">2</span> Планирование</button>
+                <button class="stage-btn" data-stage="stage3"><span class="num">3</span> Сфера деятельности</button>
+                <button class="stage-btn" data-stage="stage4"><span class="num">4</span> Сопоставимость</button>
+                <button class="stage-btn" data-stage="stage5"><span class="num">5</span> Тестируемая сторона</button>
+                <button class="stage-btn" data-stage="stage6"><span class="num">6</span> Выбор метода</button>
+                <button class="stage-btn" data-stage="stage7"><span class="num">7</span> Эконанализ</button>
+                <button class="stage-btn" data-stage="stage8"><span class="num">8</span> Документирование</button>
+                <button class="stage-btn" data-stage="stage9"><span class="num">9</span> Мониторинг</button>
+            </div>
+        </div>
+
+        <!-- Правая колонка: контент -->
+        <div class="col-right">
+
+            <!-- Состав: блок 1 — Сведения -->
+            <div id="stage0_1" class="content-block active">
+                <h3>📄 1️⃣ Сведения о деятельности и сделке <span class="badge">пп. 1</span></h3>
+                <ul>
+                    <li>Перечень лиц (с указанием государств и территорий) — контрагентов по сделке</li>
+                    <li>Описание сделки: коммерческие и финансовые условия</li>
+                    <li>Функциональный анализ: функции, активы, риски сторон (с подтверждающими документами)</li>
+                    <li>Сведения о доходах, расходах, численности, прибыли (убытке), ОС и НМА иностранного лица-стороны сделки (с приложением фин. отчётности)</li>
+                    <li>Регистрационные данные иностранного лица и сведения о лицах, выступающих от его имени</li>
+                </ul>
+                <div class="note">📎 Для сделок с независимыми лицами (подп. 2 п. 1 ст. 105.14) — требования к фин. отчётности и пп. 3 не применяются.</div>
+            </div>
+
+            <!-- Состав: блок 2 — Методы -->
+            <div id="stage0_2" class="content-block">
+                <h3>📄 2️⃣ Обоснование методов ценообразования <span class="badge">пп. 2</span></h3>
+                <ul>
+                    <li>Анализ коммерческих и финансовых условий (ст. 105.5 НК РФ)</li>
+                    <li>Обоснование выбора и способа применения метода (комбинации методов) по ст. 105.7</li>
+                    <li>Описание корректировок для обеспечения сопоставимости</li>
+                    <li>Указание источников информации (ст. 105.6)</li>
+                    <li>Расчёт интервала рыночных цен (рентабельности) с описанием подхода к выбору сопоставимых сделок (организаций)</li>
+                    <li>Сумма доходов (прибыли) и расходов (убытков), рентабельность</li>
+                    <li>Сведения об экономической выгоде от НМА, прав на РИД и т.п.</li>
+                    <li>Иные факторы, влияющие на цену (рыночная стратегия и др.)</li>
+                    <li>Сведения о корректировках налоговой базы по п. 6 ст. 105.3 (при наличии)</li>
+                </ul>
+            </div>
+
+            <!-- Состав: блок 3 — МГК -->
+            <div id="stage0_3" class="content-block">
+                <h3>📄 3️⃣ Дополнительные сведения для МГК <span class="badge">пп. 3</span></h3>
+                <ul>
+                    <li>Структура органов управления налогоплательщика, идентификационные сведения о лицах, которым представляется управленческая отчётность</li>
+                    <li>Сведения о деятельности, рыночной стратегии, реструктуризации, передаче НМА</li>
+                    <li>Сведения об основных конкурентах</li>
+                    <li>Описание причин, по которым цена соответствует рыночной</li>
+                    <li>Описание корректировок для сопоставимости</li>
+                    <li>Копии существенных соглашений между участниками МГК, влияющих на ценообразование</li>
+                    <li>Копии соглашений о ценообразовании, налоговых разъяснений компетентных органов</li>
+                    <li>Аудиторское заключение (если обязательно или проведён добровольно)</li>
+                </ul>
+                <div class="note">📎 Применяется, если общая сумма дохода (выручки) МГК <em>не удовлетворяет</em> условию подп. 3 п. 6 ст. 105.16-3 НК РФ.</div>
+                <div class="highlight" style="margin-top:0.6rem;">
+                    📌 Документация представляется <strong>по требованию</strong> ФНС (не ранее 1 июня года, следующего за отчётным). Детальность — <strong>соразмерна сложности сделки</strong> (п. 6 ст. 105.15).
+                </div>
+            </div>
+
+            <!-- Этап 1 -->
+            <div id="stage1" class="content-block">
+                <h3>1️⃣ Идентификация и анализ контролируемых сделок</h3>
+                <p style="font-size:0.78rem; color:#1a3f5a; margin-bottom:0.3rem;">Выявляем сделки, подпадающие под критерии ст. 105.14 НК РФ.</p>
+                <ul>
+                    <li>Сделка = каждая отдельная операция (транзакция), а не обязательно договор в целом.</li>
+                    <li>Сумма доходов определяется нарастающим итогом за календарный год.</li>
+                    <li>Мониторинг в течение года — чтобы не пропустить момент превышения критерия.</li>
+                </ul>
+                <div class="highlight">📎 Если сделка с несколькими взаимозависимыми лицами — доходы суммируются по правилам п. 9, 10 ст. 105.14.</div>
+            </div>
+
+            <!-- Этап 2 -->
+            <div id="stage2" class="content-block">
+                <h3>2️⃣ Планирование и определение объёма документации</h3>
+                <p style="font-size:0.78rem; color:#1a3f5a; margin-bottom:0.3rem;">Оцениваем размер будущих налоговых обязательств, затраты на подготовку.</p>
+                <ul>
+                    <li>Детальность и основательность — соразмерны сложности сделки (п. 6 ст. 105.15).</li>
+                    <li>Учитываем количество и сложность контролируемых сделок.</li>
+                    <li>Определяем, какие разделы документации будут наиболее объёмными.</li>
+                </ul>
+                <div class="highlight">📎 Помним: стороны контролируемой сделки должны определять налоговые обязательства исходя из рыночных условий (ст. 105.3).</div>
+            </div>
+
+            <!-- Этап 3 -->
+            <div id="stage3" class="content-block">
+                <h3>3️⃣ Описание сферы (вида) деятельности</h3>
+                <p style="font-size:0.78rem; color:#1a3f5a; margin-bottom:0.3rem;">Анализируем характеристику товаров (работ, услуг), конкуренцию, поставщиков, потребителей.</p>
+                <ul>
+                    <li>Оцениваем возможные заменители и их влияние на ценообразование.</li>
+                    <li>Изучаем обычную для отрасли практику (аутсорсинг, каналы сбыта).</li>
+                    <li>Анализируем статистические данные, рыночные индикаторы.</li>
+                </ul>
+                <div class="highlight">📎 Цель — выявить основные факторы, которые учитываются при определении сопоставимости и функциональном анализе (п. 8, 9 ст. 105.5).</div>
+            </div>
+
+            <!-- Этап 4 -->
+            <div id="stage4" class="content-block">
+                <h3>4️⃣ Сопоставимость условий и функциональный анализ</h3>
+                <p style="font-size:0.78rem; color:#1a3f5a; margin-bottom:0.3rem;">Анализируем права и обязанности сторон, функции, активы, риски (ст. 105.5).</p>
+                <ul>
+                    <li>Определяем тестируемую сторону и метод ценообразования.</li>
+                    <li>Выявляем существенные факторы сопоставимости.</li>
+                    <li>Анализируем: характеристика товаров, функции, условия договоров, экономические условия, рыночные стратегии.</li>
+                    <li>Проводим функциональный анализ: функции, активы (включая НМА), риски, распределение ответственности.</li>
+                </ul>
+                <div class="highlight">📎 Вывод — классификация сторон (дистрибьютор с широкими/ограниченными функциями, комиссионер и т.п.) и обоснование выбора метода.</div>
+            </div>
+
+            <!-- Этап 5 -->
+            <div id="stage5" class="content-block">
+                <h3>5️⃣ Описание взаимозависимых лиц и выбор тестируемой стороны</h3>
+                <p style="font-size:0.78rem; color:#1a3f5a; margin-bottom:0.3rem;">Классификация сторон на основе функционального анализа.</p>
+                <ul>
+                    <li>Производство, реализация, вспомогательные функции, НИОКР, владение существенными НМА.</li>
+                    <li>Выделяем «рутинные» и «нерутинные» функции.</li>
+                    <li>Определяем тестируемую сторону для экономического анализа.</li>
+                </ul>
+                <div class="highlight">📎 Организации с «рутинными» функциями имеют стабильные невысокие доходы, поиск сопоставимых организаций для них проще.</div>
+            </div>
+
+            <!-- Этап 6 -->
+            <div id="stage6" class="content-block">
+                <h3>6️⃣ Выбор метода ценообразования</h3>
+                <p style="font-size:0.78rem; color:#1a3f5a; margin-bottom:0.3rem;">Выбираем метод (или комбинацию) согласно ст. 105.7 НК РФ.</p>
+                <ul>
+                    <li>Метод сопоставимых рыночных цен — приоритетный (если есть информация).</li>
+                    <li>Метод цены последующей реализации — приоритетный для перепродажи без переработки.</li>
+                    <li>Если приоритетные методы невозможны — обосновываем выбор иного метода.</li>
+                    <li>Для длительных сделок — определяем порядок использования источников информации.</li>
+                </ul>
+                <div class="highlight">📎 При применении метода сопоставимой рентабельности обосновываем выбор показателя рентабельности.</div>
+            </div>
+
+            <!-- Этап 7 -->
+            <div id="stage7" class="content-block">
+                <h3>7️⃣ Экономический анализ</h3>
+                <p style="font-size:0.78rem; color:#1a3f5a; margin-bottom:0.3rem;">Поиск сопоставимых сделок/организаций и расчёт интервала рыночных цен (рентабельности).</p>
+                <ul>
+                    <li>Используем информацию на момент совершения сделки (не позднее 31 декабря отчётного года) или за 3 предшествующих года.</li>
+                    <li>Документируем результаты поиска, источники, критерии сопоставимости.</li>
+                    <li>Осуществляем корректировки для обеспечения сопоставимости (дебиторская задолженность, ТМЦ и др.).</li>
+                    <li>Рассчитываем интервал рыночных цен (рентабельности) по ст. 105.9 (105.8).</li>
+                    <li>Определяем соответствие/несоответствие цены (рентабельности) в контролируемой сделке.</li>
+                </ul>
+                <div class="highlight">📎 Сохраняем первичные выгрузки из источников — они могут обновляться, и в момент проверки данные могут отличаться.</div>
+            </div>
+
+            <!-- Этап 8 -->
+            <div id="stage8" class="content-block">
+                <h3>8️⃣ Документирование</h3>
+                <p style="font-size:0.78rem; color:#1a3f5a; margin-bottom:0.3rem;">Фиксация результатов всех этапов в едином документе (или совокупности документов).</p>
+                <ul>
+                    <li>Централизованный или децентрализованный подход — по выбору налогоплательщика.</li>
+                    <li>Общая часть (разделы 1–2) может не обновляться при отсутствии существенных изменений.</li>
+                    <li>Ежегодно пересматриваем экономический анализ и обновляем выборки.</li>
+                    <li>По долгосрочным договорам (более 1 года) — возможно подготовить одну документацию без ежегодного обновления, если условия неизменны.</li>
+                </ul>
+                <div class="highlight">📎 Важно: документация составляется в произвольной форме, если законодательством не установлена обязательная форма.</div>
+            </div>
+
+            <!-- Этап 9 -->
+            <div id="stage9" class="content-block">
+                <h3>9️⃣ Внедрение и мониторинг</h3>
+                <p style="font-size:0.78rem; color:#1a3f5a; margin-bottom:0.3rem;">Организация процесса ежегодного пересмотра документации и хранения.</p>
+                <ul>
+                    <li>Документация пересматривается ежегодно для обеспечения актуальности.</li>
+                    <li>Хранение — не менее 4 лет (подп. 8 п. 1 ст. 23 НК РФ).</li>
+                    <li>Представление — по требованию ФНС, но не ранее 1 июня года, следующего за отчётным.</li>
+                </ul>
+                <div class="highlight">📎 Для сделок с товарными группами из п. 5 ст. 105.14 — документация представляется <strong>вместе с уведомлением</strong> о контролируемых сделках (п. 8 ст. 105.15).</div>
+            </div>
+
+            <div class="footer-note">
+                ст. 105.15 НК РФ · рекомендации ФНС · для налогового контроля
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Вкладки
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const leftPanel = document.getElementById('leftPanel');
+        const compositionBtns = document.getElementById('compositionBtns');
+        const stagesBtns = document.getElementById('stagesBtns');
+
+        // Все кнопки этапов (для переключения активного состояния)
+        const allStageBtns = document.querySelectorAll('.stage-btn');
+        const contentBlocks = document.querySelectorAll('.content-block');
+
+        // Функция переключения вкладок
+        function switchTab(tabId) {
+            // Обновляем активные кнопки вкладок
+            tabBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+            });
+
+            // Показываем/скрываем левую панель и соответствующие кнопки
+            if (tabId === 'tab_composition') {
+                leftPanel.classList.remove('hidden');
+                compositionBtns.style.display = 'block';
+                stagesBtns.style.display = 'none';
+                // Активируем первую кнопку состава, если ещё не активна
+                const firstCompBtn = compositionBtns.querySelector('.stage-btn');
+                if (firstCompBtn && !firstCompBtn.classList.contains('active')) {
+                    // Снимаем активность со всех
+                    allStageBtns.forEach(b => b.classList.remove('active'));
+                    firstCompBtn.classList.add('active');
+                    // Показываем соответствующий блок
+                    const targetId = firstCompBtn.getAttribute('data-stage');
+                    contentBlocks.forEach(block => block.classList.remove('active'));
+                    const targetBlock = document.getElementById(targetId);
+                    if (targetBlock) targetBlock.classList.add('active');
+                }
+            } else { // tab_stages
+                leftPanel.classList.remove('hidden');
+                compositionBtns.style.display = 'none';
+                stagesBtns.style.display = 'block';
+                // Активируем первую кнопку этапов, если ещё не активна
+                const firstStageBtn = stagesBtns.querySelector('.stage-btn');
+                if (firstStageBtn && !firstStageBtn.classList.contains('active')) {
+                    allStageBtns.forEach(b => b.classList.remove('active'));
+                    firstStageBtn.classList.add('active');
+                    const targetId = firstStageBtn.getAttribute('data-stage');
+                    contentBlocks.forEach(block => block.classList.remove('active'));
+                    const targetBlock = document.getElementById(targetId);
+                    if (targetBlock) targetBlock.classList.add('active');
+                }
+            }
+        }
+
+        // Обработчики для вкладок
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+
+        // Обработчики для всех кнопок этапов (и состава, и этапов)
+        allStageBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-stage');
+
+                // Снимаем активность со всех кнопок
+                allStageBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Показываем соответствующий блок контента
+                contentBlocks.forEach(block => block.classList.remove('active'));
+                const targetBlock = document.getElementById(targetId);
+                if (targetBlock) targetBlock.classList.add('active');
+            });
+        });
+
+        // Инициализация: активна вкладка "Состав", левая панель видна, кнопки состава активны
+        // Убедимся, что первая кнопка состава активна и соответствующий блок показан
+        const activeCompBtn = compositionBtns.querySelector('.stage-btn.active');
+        if (activeCompBtn) {
+            const targetId = activeCompBtn.getAttribute('data-stage');
+            contentBlocks.forEach(block => block.classList.remove('active'));
+            const targetBlock = document.getElementById(targetId);
+            if (targetBlock) targetBlock.classList.add('active');
+        } else {
+            // Если по какой-то причине нет активной, активируем первую
+            const first = compositionBtns.querySelector('.stage-btn');
+            if (first) {
+                allStageBtns.forEach(b => b.classList.remove('active'));
+                first.classList.add('active');
+                const targetId = first.getAttribute('data-stage');
+                contentBlocks.forEach(block => block.classList.remove('active'));
+                const targetBlock = document.getElementById(targetId);
+                if (targetBlock) targetBlock.classList.add('active');
+            }
+        }
+
+        // Скрываем этапы по умолчанию, показываем состав
+        compositionBtns.style.display = 'block';
+        stagesBtns.style.display = 'none';
+        leftPanel.classList.remove('hidden');
+
+        // На случай, если на мобильном экране левая панель может быть скрыта — убираем класс hidden
+        leftPanel.classList.remove('hidden');
+    })();
+</script>
+</body>
+</html>
