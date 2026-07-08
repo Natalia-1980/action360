@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Тренажёр: разложи остатки по строкам баланса</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 1.8rem 1.5rem 2rem;
+            border: 1px solid #dee6f0;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .card::-webkit-scrollbar {
+            width: 4px;
+        }
+        .card::-webkit-scrollbar-thumb {
+            background: #b8ccdf;
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0a2942;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .subhead {
+            font-size: 0.75rem;
+            color: #4e6f8a;
+            border-left: 3px solid #2e7ab3;
+            padding-left: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .task-desc {
+            background: #f9fcff;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1.2rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #0a2942;
+        }
+        .task-desc strong {
+            color: #0f3857;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            margin-bottom: 1.2rem;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #d2e0f0;
+        }
+        .data-table th {
+            background: #e8eff8;
+            color: #0a2942;
+            font-weight: 600;
+            padding: 0.5rem 0.6rem;
+            text-align: left;
+            border-bottom: 1px solid #c7daf5;
+        }
+        .data-table td {
+            padding: 0.5rem 0.6rem;
+            border-bottom: 1px solid #e5edf6;
+            color: #1a3f5a;
+        }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-sub {
+            display: inline-block;
+            background: #dce8f5;
+            color: #1a4b6e;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 0 8px;
+            border-radius: 30px;
+            letter-spacing: 0.2px;
+        }
+
+        .answer-section {
+            background: #f9fcff;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            border: 1px solid #d2e0f0;
+            margin-bottom: 1rem;
+        }
+        .answer-section h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0a2942;
+            margin-bottom: 0.6rem;
+        }
+
+        .answer-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem 0.8rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed #e5edf6;
+        }
+        .answer-row:last-child {
+            border-bottom: none;
+        }
+        .answer-row .label {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #1a3f5a;
+            min-width: 180px;
+        }
+        .answer-row input {
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 40px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            transition: 0.1s;
+            width: 140px;
+        }
+        .answer-row input:focus {
+            border-color: #1e6bb8;
+            box-shadow: 0 0 0 3px rgba(30, 107, 184, 0.1);
+        }
+        .answer-row input.correct {
+            border-color: #2b8c4a;
+            background: #e6f4e9;
+        }
+        .answer-row input.wrong {
+            border-color: #b13e3e;
+            background: #fef0ee;
+        }
+        .answer-row .hint {
+            font-size: 0.7rem;
+            color: #6c86a3;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: white;
+            border: 2px solid #1e3b5c;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 3px 0 #b0c4dd;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b0c4dd;
+        }
+        .btn.primary {
+            background: #1e3b5c;
+            color: white;
+            border-color: #0e2b44;
+        }
+        .btn.primary:hover {
+            background: #16324d;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 3px 0 #b0c4dd;
+        }
+
+        .feedback {
+            background: #f2f8fd;
+            border-radius: 18px;
+            padding: 1rem;
+            border: 2px solid #b9d3f0;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            display: none;
+        }
+        .feedback.show {
+            display: block;
+        }
+        .feedback.correct {
+            border-color: #2b8c4a;
+            background: #eefaee;
+        }
+        .feedback.incorrect {
+            border-color: #b13e3e;
+            background: #fff2f2;
+        }
+        .feedback .ok-title {
+            color: #2b8c4a;
+            font-weight: 600;
+        }
+        .feedback .error-title {
+            color: #b13e3e;
+            font-weight: 600;
+        }
+
+        .footer-note {
+            font-size: 0.65rem;
+            color: #6c86a3;
+            margin-top: 1rem;
+            text-align: center;
+            border-top: 1px solid #d8e2f2;
+            padding-top: 0.8rem;
+        }
+
+        .solution-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            margin-top: 0.6rem;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #d2e0f0;
+        }
+        .solution-table th {
+            background: #e8eff8;
+            color: #0a2942;
+            font-weight: 600;
+            padding: 0.4rem 0.6rem;
+            text-align: left;
+            border-bottom: 1px solid #c7daf5;
+        }
+        .solution-table td {
+            padding: 0.4rem 0.6rem;
+            border-bottom: 1px solid #e5edf6;
+            color: #1a3f5a;
+        }
+        .solution-table tr:last-child td {
+            border-bottom: none;
+        }
+        .solution-table .total-row {
+            border-top: 2px solid #c7daf5;
+            font-weight: 600;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 1rem; }
+            .answer-row .label { min-width: 130px; font-size: 0.72rem; }
+            .answer-row input { width: 100px; font-size: 0.78rem; }
+            .data-table { font-size: 0.7rem; }
+            .data-table th, .data-table td { padding: 0.3rem 0.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>🧩 Разложи остатки по строкам баланса</h1>
+    <div class="subhead">Счёт 97 «Расходы будущих периодов» · 31 декабря 2026 г.</div>
+
+    <div class="task-desc">
+        <strong>Задание:</strong> На 31 декабря 2026 года по счёту 97 числятся остатки. Распределите их по строкам баланса.
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Субсчёт</th>
+                <th>Наименование расхода</th>
+                <th>Сумма остатка</th>
+                <th>Оставшийся срок</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="badge-sub">97.01</span></td>
+                <td>Лицензия на 1С (3 года)</td>
+                <td>150 000 руб.</td>
+                <td>20 месяцев</td>
+            </tr>
+            <tr>
+                <td><span class="badge-sub">97.02</span></td>
+                <td>Доступ к системе «Контур» (годовой)</td>
+                <td>18 000 руб.</td>
+                <td>9 месяцев</td>
+            </tr>
+            <tr>
+                <td><span class="badge-sub">97.03</span></td>
+                <td>Пусконаладка оборудования</td>
+                <td>40 000 руб.</td>
+                <td>4 месяца</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="answer-section">
+        <h3>✏️ Введите суммы по строкам баланса</h3>
+
+        <div class="answer-row">
+            <span class="label">1190 «Прочие внеоборотные активы»</span>
+            <input type="number" id="input1190" placeholder="0" step="1">
+            <span class="hint">руб.</span>
+        </div>
+        <div class="answer-row">
+            <span class="label">1260 «Прочие оборотные активы»</span>
+            <input type="number" id="input1260" placeholder="0" step="1">
+            <span class="hint">руб.</span>
+        </div>
+        <div class="answer-row" style="border-top: 2px solid #c7daf5; margin-top:0.2rem; padding-top:0.5rem;">
+            <span class="label" style="font-weight:600;">Итого по счёту 97</span>
+            <span style="font-size:0.9rem; font-weight:600; color:#0a2942;">208 000 руб.</span>
+        </div>
+    </div>
+
+    <div class="btn-row">
+        <button class="btn primary" id="checkBtn">Проверить</button>
+        <button class="btn" id="resetBtn">🔄 Сбросить</button>
+        <button class="btn" id="showSolutionBtn">📋 Решение</button>
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+
+    <div id="solutionBlock" style="display:none; margin-top:1rem;">
+        <div style="font-weight:600; font-size:0.85rem; color:#0a2942; margin-bottom:0.4rem;">✅ Правильное решение</div>
+        <table class="solution-table">
+            <thead>
+                <tr>
+                    <th>Строка баланса</th>
+                    <th>Какие расходы входят</th>
+                    <th>Сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1190 «Прочие внеоборотные активы»</td>
+                    <td>97.01 (20 мес. &gt; 12 мес.)</td>
+                    <td>150 000 руб.</td>
+                </tr>
+                <tr>
+                    <td>1260 «Прочие оборотные активы»</td>
+                    <td>97.02 + 97.03 (оба &lt; 12 мес.)</td>
+                    <td>18 000 + 40 000 = 58 000 руб.</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="2">Итого по счёту 97</td>
+                    <td>208 000 руб.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-note">
+        Счёт 97 · распределение между внеоборотными и оборотными активами
+    </div>
+</div>
+
+<script>
+    (function() {
+        const input1190 = document.getElementById('input1190');
+        const input1260 = document.getElementById('input1260');
+        const checkBtn = document.getElementById('checkBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const showSolutionBtn = document.getElementById('showSolutionBtn');
+        const feedback = document.getElementById('feedback');
+        const solutionBlock = document.getElementById('solutionBlock');
+
+        const CORRECT_1190 = 150000;
+        const CORRECT_1260 = 58000;
+
+        function validateInputs() {
+            const val1190 = parseFloat(input1190.value.replace(/\s/g, ''));
+            const val1260 = parseFloat(input1260.value.replace(/\s/g, ''));
+            return { val1190, val1260, valid: !isNaN(val1190) && !isNaN(val1260) };
+        }
+
+        function checkAnswer() {
+            const { val1190, val1260, valid } = validateInputs();
+
+            if (!valid) {
+                feedback.className = 'feedback show incorrect';
+                feedback.innerHTML = `<span class="error-title">❌ Ошибка</span><br>Введите корректные числовые значения в оба поля.`;
+                return;
+            }
+
+            const is1190Correct = Math.abs(val1190 - CORRECT_1190) < 0.5;
+            const is1260Correct = Math.abs(val1260 - CORRECT_1260) < 0.5;
+            const allCorrect = is1190Correct && is1260Correct;
+
+            input1190.classList.remove('correct', 'wrong');
+            input1260.classList.remove('correct', 'wrong');
+            if (is1190Correct) input1190.classList.add('correct');
+            else input1190.classList.add('wrong');
+            if (is1260Correct) input1260.classList.add('correct');
+            else input1260.classList.add('wrong');
+
+            feedback.className = 'feedback show';
+            if (allCorrect) {
+                feedback.classList.add('correct');
+                feedback.innerHTML = `
+                    <span class="ok-title">✅ Отлично! Всё верно.</span><br>
+                    <br>
+                    1190 — 150 000 руб.<br>
+                    1260 — 58 000 руб.
+                `;
+            } else {
+                feedback.classList.add('incorrect');
+                let errors = [];
+                if (!is1190Correct) errors.push(`строка 1190: ваша сумма ${val1190.toFixed(0)} руб., правильно — ${CORRECT_1190} руб.`);
+                if (!is1260Correct) errors.push(`строка 1260: ваша сумма ${val1260.toFixed(0)} руб., правильно — ${CORRECT_1260} руб.`);
+                feedback.innerHTML = `
+                    <span class="error-title">❌ Есть ошибки</span><br>
+                    ${errors.join('<br>')}
+                `;
+            }
+        }
+
+        function resetAll() {
+            input1190.value = '';
+            input1260.value = '';
+            input1190.classList.remove('correct', 'wrong');
+            input1260.classList.remove('correct', 'wrong');
+            feedback.className = 'feedback';
+            feedback.innerHTML = '';
+        }
+
+        function toggleSolution() {
+            if (solutionBlock.style.display === 'none') {
+                solutionBlock.style.display = 'block';
+                showSolutionBtn.textContent = '🙈 Скрыть решение';
+            } else {
+                solutionBlock.style.display = 'none';
+                showSolutionBtn.textContent = '📋 Решение';
+            }
+        }
+
+        checkBtn.addEventListener('click', checkAnswer);
+        resetBtn.addEventListener('click', resetAll);
+        showSolutionBtn.addEventListener('click', toggleSolution);
+
+        input1190.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkAnswer(); });
+        input1260.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkAnswer(); });
+
+        solutionBlock.style.display = 'none';
+    })();
+</script>
+</body>
+</html>
