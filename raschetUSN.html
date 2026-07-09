@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: расчёт налога УСН</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 760px;
+            max-width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 22px 28px 28px;
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.10);
+            border: 1px solid #d0d7de;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin: 8px 0 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            min-width: 460px;
+        }
+
+        thead th {
+            background: #f0f4fa;
+            color: #1e2b39;
+            font-weight: 700;
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        thead th:first-child { width: 45%; }
+        thead th:nth-child(2) { width: 20%; }
+        thead th:nth-child(3) { width: 35%; }
+
+        tbody td {
+            padding: 6px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .row-label {
+            font-weight: 600;
+            color: #1f3a5f;
+            font-size: 0.74rem;
+        }
+
+        .row-code {
+            font-weight: 700;
+            color: #6b7f92;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        .row-input {
+            width: 100%;
+            padding: 7px 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 24px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #1f2c38;
+            outline: none;
+            transition: 0.15s;
+            background: white;
+            font-family: inherit;
+        }
+
+        .row-input:focus {
+            border-color: #2b4f6e;
+            box-shadow: 0 0 0 3px rgba(43, 79, 110, 0.12);
+        }
+
+        .row-input.correct {
+            border: 3px solid #1f8b5a;
+            background: #d4f0e3;
+            font-weight: 700;
+        }
+
+        .row-input.incorrect {
+            border: 3px solid #c0392b;
+            background: #fde8e5;
+            font-weight: 700;
+        }
+
+        .actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            margin: 16px 0 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #e2e8f0;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 32px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #1f2c38;
+            border: 1px solid #bcc8d6;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .btn:hover {
+            background: #d0dbe8;
+        }
+
+        .btn-primary {
+            background: #2b4f6e;
+            color: white;
+            border-color: #1f3a5f;
+        }
+
+        .btn-primary:hover {
+            background: #1f3a5f;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .feedback {
+            background: #f0f4fa;
+            border-radius: 18px;
+            padding: 12px 18px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid #c8d4e2;
+            color: #1f2c38;
+            line-height: 1.6;
+            min-height: 52px;
+        }
+
+        .feedback .error-list {
+            margin-top: 4px;
+            padding-left: 20px;
+            color: #a93226;
+        }
+
+        .feedback .error-list li {
+            list-style-type: disc;
+        }
+
+        .feedback .success {
+            color: #1a7a4a;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 16px; }
+            thead th:first-child { width: 35%; }
+            thead th:nth-child(2) { width: 18%; }
+            thead th:nth-child(3) { width: 47%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Показатель</th>
+                    <th>Код строки</th>
+                    <th>Значение (руб.)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="row-label">Налоговая база</td>
+                    <td class="row-code">—</td>
+                    <td><input type="text" class="row-input" id="base" data-expected="2600000" placeholder="впишите"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Исчисленный налог по ставке 15%</td>
+                    <td class="row-code">—</td>
+                    <td><input type="text" class="row-input" id="taxUsual" data-expected="390000" placeholder="впишите"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Минимальный налог</td>
+                    <td class="row-code">—</td>
+                    <td><input type="text" class="row-input" id="minTax" data-expected="124000" placeholder="впишите"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Налог к уплате за год</td>
+                    <td class="row-code">—</td>
+                    <td><input type="text" class="row-input" id="taxToPay" data-expected="390000" placeholder="впишите"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Уплачено авансов за год</td>
+                    <td class="row-code">—</td>
+                    <td><input type="text" class="row-input" id="advancePaid" data-expected="245000" placeholder="впишите"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Сумма к доплате</td>
+                    <td class="row-code">—</td>
+                    <td><input type="text" class="row-input" id="finalPay" data-expected="145000" placeholder="впишите"></td>
+                </tr>
+                <tr>
+                    <td class="row-label">Переплата</td>
+                    <td class="row-code">—</td>
+                    <td><input type="text" class="row-input" id="overpay" data-expected="0" placeholder="впишите"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <button class="btn" id="resetBtn">↺ Сбросить</button>
+        <button class="btn btn-primary" id="checkBtn">✅ Проверить</button>
+    </div>
+
+    <div class="feedback" id="feedback">
+        Введите значения в поля и нажмите «Проверить».
+    </div>
+</div>
+
+<script>
+    (function() {
+        const inputs = document.querySelectorAll('.row-input');
+        const resetBtn = document.getElementById('resetBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const feedback = document.getElementById('feedback');
+
+        const fieldNames = {
+            'base': 'Налоговая база',
+            'taxUsual': 'Налог 15%',
+            'minTax': 'Минимальный налог',
+            'taxToPay': 'Налог к уплате за год',
+            'advancePaid': 'Уплачено авансов',
+            'finalPay': 'Сумма к доплате',
+            'overpay': 'Переплата'
+        };
+
+        const expectedDisplay = {
+            'base': '2 600 000',
+            'taxUsual': '390 000',
+            'minTax': '124 000',
+            'taxToPay': '390 000',
+            'advancePaid': '245 000',
+            'finalPay': '145 000',
+            'overpay': '0 (ноль) или прочерк (—)'
+        };
+
+        // Нормализация: убираем пробелы, запятые, приводим к числу
+        function normalizeNumber(str) {
+            if (str === undefined || str === null) return '';
+            let s = String(str).trim();
+            // убираем пробелы и запятые (разделители)
+            s = s.replace(/\s+/g, '').replace(/,/g, '');
+            // если прочерк или пусто — возвращаем ''
+            if (s === '' || s === '—' || s === '-' || s === '–') return '';
+            // если число с минусом
+            if (/^-?\d+$/.test(s)) {
+                return s;
+            }
+            return s;
+        }
+
+        function isCorrectValue(actual, expected, inputId) {
+            // Специальная обработка для поля "Переплата"
+            if (inputId === 'overpay') {
+                const normActual = normalizeNumber(actual);
+                // Если введен прочерк (—) или 0 — считаем верным
+                if (normActual === '' || Number(normActual) === 0) {
+                    return true;
+                }
+                // Иначе сравниваем с ожидаемым значением
+                const normExpected = normalizeNumber(expected);
+                if (normActual === '' || normExpected === '') return false;
+                return Number(normActual) === Number(normExpected);
+            }
+
+            // Стандартная проверка для остальных полей
+            const normActual = normalizeNumber(actual);
+            const normExpected = normalizeNumber(expected);
+            if (normActual === '' && normExpected === '') return true;
+            if (normActual === '' || normExpected === '') return false;
+            return Number(normActual) === Number(normExpected);
+        }
+
+        function checkAll() {
+            let correctCount = 0;
+            const totalFields = inputs.length;
+            const errors = [];
+
+            inputs.forEach(input => {
+                const expected = input.getAttribute('data-expected');
+                const actual = input.value.trim();
+                const inputId = input.id;
+                const isCorrect = isCorrectValue(actual, expected, inputId);
+
+                input.classList.remove('correct', 'incorrect');
+                if (isCorrect) {
+                    correctCount++;
+                    input.classList.add('correct');
+                } else {
+                    input.classList.add('incorrect');
+                    const label = fieldNames[inputId] || inputId;
+                    const display = expectedDisplay[inputId] || expected;
+                    errors.push(`${label} — должно быть ${display}`);
+                }
+            });
+
+            if (correctCount === totalFields) {
+                feedback.innerHTML = `<div class="success">✅ Отлично! Все расчёты верны.</div>`;
+            } else {
+                let errorHtml = errors.map(e => `<li>${e}</li>`).join('');
+                feedback.innerHTML = `
+                    <div style="font-weight:600;">Верно: <strong>${correctCount}</strong> из <strong>${totalFields}</strong></div>
+                    <div style="margin-top:4px;">Исправьте ошибки:</div>
+                    <ul class="error-list">${errorHtml}</ul>
+                `;
+            }
+        }
+
+        // сброс
+        resetBtn.addEventListener('click', function() {
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('correct', 'incorrect');
+            });
+            feedback.innerHTML = 'Поля очищены. Введите ответы и нажмите «Проверить».';
+        });
+
+        checkBtn.addEventListener('click', checkAll);
+
+        // нажатие Escape — очистка поля
+        inputs.forEach(input => {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    this.classList.remove('correct', 'incorrect');
+                }
+            });
+        });
+    })();
+</script>
+
+</body>
+</html>
