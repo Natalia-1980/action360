@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Признаки контрагентов, которые триггерят ФНС</title>
+  <style>
+    :root{
+      --ink:#132a2b;--muted:#4e6565;--line:#d7ddd5;--paper:#fffef9;--bg:#f4f2eb;
+      --teal:#0b6b61;--teal-dark:#064a44;--mint:#dcefe7;--green-bg:#e8f4ee;
+      --amber:#705a18;--amber-bg:#f5e6b0;--red:#9a3c2e;--red-bg:#f9e3dc;
+      --violet:#536b66;--violet-bg:#e5ece9;--acid:#d8ef66;
+      --shadow:0 18px 44px rgba(19,42,43,.12)
+    }
+    *{box-sizing:border-box}
+    html{width:100%;max-width:650px;margin:0 auto;background:var(--bg)}
+    body{width:100%;max-width:650px;margin:0 auto;min-width:320px;background:radial-gradient(circle at 8% 7%,rgba(216,239,102,.18),transparent 27rem),var(--bg);color:var(--ink);font:15px/1.42 Inter,"Segoe UI",Arial,sans-serif}
+    button{font:inherit;color:inherit;cursor:pointer}
+    button:focus-visible{outline:3px solid rgba(11,107,97,.28);outline-offset:3px}
+    .shell{width:100%;max-width:650px;margin:0 auto;padding:14px 10px 38px}
+    .brand{margin:0 3px 10px;color:var(--teal);font-size:12px;font-weight:850;letter-spacing:.055em;text-transform:uppercase}
+    .panel{position:relative;overflow:hidden;background:var(--paper);border:1px solid rgba(19,42,43,.13);border-top:9px solid var(--teal);border-radius:22px;box-shadow:var(--shadow)}
+    .screen-pad{padding:22px}
+    h1,h2{font-family:Georgia,serif;font-weight:600;letter-spacing:-.02em}
+    h1{font-size:30px;line-height:1.08;margin:0 0 10px}
+    h2{font-size:23px;line-height:1.15;margin:0 0 9px}
+    h3{font-size:17px;line-height:1.25;margin:0 0 6px}
+    p{margin:0 0 11px}
+    .lead{font-size:16px;color:var(--muted)}
+    .meta{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:17px 0}
+    .meta div{background:#f1f2ed;border-radius:11px;padding:11px}
+    .meta b{display:block;margin-bottom:4px}
+    .meta span{color:var(--muted);font-size:13px}
+    .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .btn{min-height:40px;border:1px solid var(--line);background:#fff;border-radius:11px;padding:8px 14px;font-weight:780;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+    .btn:hover{border-color:#8bb8ad;background:#f8faf7}
+    .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+    .btn.primary:hover{background:var(--teal-dark)}
+    .btn.danger{color:var(--red)}
+    .btn:disabled{opacity:.42;cursor:not-allowed}
+    .progress-wrap{padding:13px 18px 12px;border-bottom:1px solid var(--line)}
+    .progress{height:7px;background:#dfe3dc;border-radius:99px;overflow:hidden;margin:0 0 5px}
+    .progress span{display:block;height:100%;background:var(--teal);transition:width .25s}
+    .progressline{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:12px}
+    .workspace{display:grid;grid-template-columns:176px minmax(0,1fr);min-height:570px}
+    .stage-nav{background:#f1f2ed;border-right:1px solid var(--line);padding:14px 0}
+    .stage-tab{width:100%;display:grid;grid-template-columns:32px minmax(0,1fr);gap:9px;align-items:start;border:0;border-left:3px solid transparent;background:transparent;padding:11px 11px 11px 9px;text-align:left}
+    .stage-tab:hover{background:rgba(255,255,255,.7)}
+    .stage-tab.active{border-left-color:var(--teal);background:#fff}
+    .stage-num{width:30px;height:30px;border-radius:9px;background:#dfe7e5;color:var(--teal-dark);display:grid;place-items:center;font-size:12px;font-weight:850}
+    .stage-tab.done .stage-num{background:var(--teal);color:#fff}
+    .stage-copy b{display:block;font-size:13px;line-height:1.25}
+    .stage-copy small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.2}
+    .work{min-width:0;padding:16px 16px 18px}
+    .section-tabs{display:flex;gap:6px;padding:5px;background:#f1f2ed;border-radius:13px;margin-bottom:14px}
+    .section-tab{flex:1 1 0;min-width:0;border:0;border-radius:9px;background:transparent;padding:8px 7px;color:var(--muted);font-size:12px;font-weight:800;line-height:1.15}
+    .section-tab:hover{background:rgba(255,255,255,.65)}
+    .section-tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(19,42,43,.08)}
+    .section-head{margin-bottom:11px}
+    .section-head h2{font-size:21px;margin-bottom:5px}
+    .section-head p{color:var(--muted);font-size:13px;margin:0}
+    .criterion{border:1px solid var(--line);border-radius:16px;padding:15px;background:#fff;animation:reveal .24s ease-out}
+    @keyframes reveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .criterion-head{display:flex;align-items:flex-start;gap:10px}
+    .number{width:28px;height:28px;flex:0 0 auto;border-radius:50%;background:var(--mint);color:var(--teal);display:grid;place-items:center;font-size:12px;font-weight:850}
+    .criterion h3{font-size:17px}
+    .impact{margin:11px 0 0;padding:11px 12px;border-left:4px solid #c98773;border-radius:0 10px 10px 0;background:#f7eee9;color:#654139;font-size:13px;line-height:1.45}
+    .when{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.4}
+    .when b{color:var(--ink)}
+    .hint-link{margin:10px 0 0;border:0;background:transparent;color:var(--teal);padding:0;font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+    .options{display:grid;gap:7px;margin-top:14px}
+    .option{min-height:43px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;text-align:left;font-size:13px;font-weight:760}
+    .option:hover{border-color:#8bb8ad;background:#f8faf7}
+    .option.selected{border:2px solid var(--teal);background:var(--mint);padding:8px 10px;color:var(--teal-dark)}
+    .card-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px}
+    .card-nav span{color:var(--muted);font-size:12px;text-align:center}
+    .work-footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+    .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}
+    .metric{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+    .metric strong{font-size:25px;display:block;line-height:1.1}
+    .metric span{font-size:12px;color:var(--muted)}
+    .metric.good{border-color:#a9d4c4;background:var(--green-bg)}
+    .metric.gap{border-color:#e0b3a8;background:var(--red-bg)}
+    .metric.unknown{border-color:#bcc9c5;background:var(--violet-bg)}
+    .result-section{margin-top:15px}
+    .result-section>h2{font-size:21px;margin-bottom:9px}
+    .gap-list{display:grid;gap:8px}
+    .gap-card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+    .gap-card summary{list-style:none;padding:12px 13px;cursor:pointer;font-weight:820}
+    .gap-card summary::-webkit-details-marker{display:none}
+    .gap-card summary::after{content:"＋";float:right;color:var(--teal)}
+    .gap-card[open] summary::after{content:"−"}
+    .gap-body{border-top:1px solid var(--line);padding:10px 13px 12px}
+    .gap-body ul{margin:0;padding-left:20px}
+    .gap-body li{margin:5px 0}
+    .status-word{font-weight:800}
+    .status-word.gap{color:var(--red)}
+    .status-word.unknown{color:var(--violet)}
+    .consequences{display:grid;gap:8px}
+    .consequence-card{border-radius:12px;padding:13px;border-left:5px solid var(--red);background:var(--red-bg)}
+    .consequence-card h3{font-size:15px;margin-bottom:5px}
+    .consequence-card p{margin:0;color:#6d3a32;font-size:13px}
+    .empty{padding:17px;border:1px dashed #9caea8;border-radius:12px;text-align:center;color:var(--muted)}
+    .toast{position:fixed;right:20px;bottom:20px;background:var(--ink);color:#fff;padding:10px 13px;border-radius:10px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s;z-index:30}
+    .toast.show{opacity:1;transform:none}
+    .modal{position:fixed;inset:0;background:rgba(19,42,43,.56);display:grid;place-items:center;padding:20px;z-index:40}
+    .modal.hidden{display:none}
+    .modal-card{background:var(--paper);border-radius:18px;max-width:520px;width:100%;padding:21px;box-shadow:var(--shadow)}
+    .modal-card h2{font-size:21px}
+    .modal-card p{color:var(--muted)}
+    .print-report{display:none}
+    @media(max-width:590px){
+      .shell{padding:8px 6px 30px}.screen-pad{padding:17px 13px}h1{font-size:26px}
+      .meta,.result-grid{grid-template-columns:1fr}
+      .workspace{grid-template-columns:1fr;min-height:0}
+      .stage-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:0;border-right:0;border-bottom:1px solid var(--line)}
+      .stage-tab{grid-template-columns:1fr;border-left:0;border-bottom:3px solid transparent;padding:9px 7px;text-align:center}
+      .stage-tab.active{border-bottom-color:var(--teal)}
+      .stage-num{margin:0 auto 4px;width:27px;height:27px}
+      .stage-copy small{display:none}
+      .work{padding:13px 11px 16px}
+      .section-tabs{overflow-x:auto;justify-content:flex-start}
+      .section-tab{flex:0 0 auto;min-width:88px}
+      .card-nav{align-items:stretch}.card-nav .btn{flex:1;padding-inline:8px}
+    }
+    @media print{
+      @page{size:A4;margin:13mm}
+      body{background:#fff;color:#132a2b;font:10.5pt/1.35 Arial,sans-serif}
+      body>*:not(.print-report){display:none!important}
+      .print-report{display:block!important}
+      .print-report h1{font:700 21pt/1.15 Arial,sans-serif;margin:0 0 4mm}
+      .print-meta{margin:0 0 6mm;color:#344f50}
+      .print-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin:0 0 7mm}
+      .print-summary div{border:1px solid #d7ddd5;border-radius:3mm;padding:3mm}
+      .print-summary b{display:block;font-size:16pt}
+      .print-section{font:700 14pt/1.25 Arial,sans-serif;color:#0b6b61;margin:7mm 0 3mm;border-bottom:2px solid #0b6b61;padding-bottom:2mm}
+      .print-group{break-inside:avoid;margin:0 0 4mm}
+      .print-group h3{font:700 11.5pt/1.3 Arial,sans-serif;margin:0 0 2mm}
+      .print-group ul{margin:0;padding-left:5mm}
+      .print-consequence{break-inside:avoid;border-left:3px solid #9a3c2e;background:#f9e3dc;padding:3mm;margin:0 0 3mm}
+      .print-consequence b{display:block;margin-bottom:1mm}
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">Признаки контрагентов, которые триггерят ФНС</div>
+    <section class="panel" id="app" aria-live="polite"></section>
+  </main>
+  <section class="print-report" id="printReport" aria-hidden="true"></section>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal hidden" id="hintModal" role="dialog" aria-modal="true" aria-labelledby="hintTitle">
+    <div class="modal-card"><h2 id="hintTitle">Что входит в проверку</h2><p id="hintText"></p><div class="btnrow"><button class="btn primary" data-action="close-hint">Понятно</button></div></div>
+  </div>
+  <div class="modal hidden" id="resetModal" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+    <div class="modal-card"><h2 id="resetTitle">Начать заново?</h2><p>Тренажер удалит ответы. Отменить это действие не получится.</p><div class="btnrow"><button class="btn" data-action="cancel-reset">Отмена</button><button class="btn danger" data-action="confirm-reset">Удалить ответы</button></div></div>
+  </div>
+  <script>
+  (() => {
+    "use strict";
+    const STORAGE_KEY="counterparty_signals_check_v2";
+    const LEGACY_KEY="counterparty_signals_check_v1";
+    const statuses={checked:{label:"Проверяем",short:"Проверяем",kind:"good"},not_checked:{label:"Не проверяем",short:"Не проверяем",kind:"gap"},unknown:{label:"Не знаю, проверяем ли",short:"Не знаем",kind:"unknown"}};
+    const stages=[
+      {id:"counterparty",title:"Проверяем контрагента",desc:"С кем компания работает и способен ли контрагент вести заявленную деятельность?",sections:["status","tax","resources","chain"]},
+      {id:"transaction",title:"Проверяем сделку",desc:"Может ли контрагент исполнить конкретный договор и чем компания подтвердит исполнение?",sections:["capability","evidence"]},
+      {id:"review",title:"Обновляем проверку",desc:"Когда обновлять сведения планово и после существенных изменений?",sections:["planned","event"]}
+    ];
+    const sections=[
+      {id:"status",stage:"counterparty",tab:"Статус",title:"Статус и полномочия",desc:"Статус компании, адрес, руководитель, участники и полномочия представителей"},
+      {id:"tax",stage:"counterparty",tab:"Налоги",title:"Налоги и финансы",desc:"Отчетность, долги, ограничения и соответствие масштаба бизнеса будущей сделке"},
+      {id:"resources",stage:"counterparty",tab:"Ресурсы",title:"Ресурсы и деловая история",desc:"Люди, площадки, оборудование, опыт, причина выбора и обязательные разрешения"},
+      {id:"chain",stage:"counterparty",tab:"Цепочка",title:"Цепочка и расчеты",desc:"Посредники, другие участники и платежи третьим лицам"},
+      {id:"capability",stage:"transaction",tab:"Условия",title:"Условия и исполнители",desc:"Особые условия, объем, срок и фактические исполнители"},
+      {id:"evidence",stage:"transaction",tab:"Доказательства",title:"Товар и доказательства",desc:"Источник товара, хранение, перевозка, документы и результат"},
+      {id:"planned",stage:"review",tab:"Плановая",title:"Плановая проверка",desc:"Как часто компания обновляет сведения о действующих контрагентах"},
+      {id:"event",stage:"review",tab:"Внеплановая",title:"Внеплановая проверка",desc:"Какие изменения запускают повторную проверку"}
+    ];
+    const questions = [
+      {
+        id:"lifecycle",section:"status",label:"Статус, ликвидация и банкротство",
+        question:"Компания проверяет, действует ли контрагент, не находится ли в стадии ликвидации или банкротства?",
+        hint:"Проверьте ЕГРЮЛ, Федресурс и картотеку арбитражных дел: действующий статус, ликвидацию, заявление о банкротстве и стадию процедуры.",
+        consequence:"Контрагент не исполнит договор, не вернет аванс, выдаст недостоверные документы. Если компания не проверит статус контрагента, ей будет сложно доказать ФНС, что в период сделки контрагент работал и мог исполнить обязательства.",
+        when:"до сделки, при продлении договора и после сообщения о ликвидации или банкротстве"
+      },
+      {
+        id:"reliable_address",section:"status",label:"Достоверность сведений и адрес",
+        question:"Компания проверяет достоверность сведений в ЕГРЮЛ и фактическое присутствие контрагента по адресу?",
+        hint:"Проверьте запись о недостоверности, массовый адрес, расхождение юридического и фактического адресов, документы на помещение и фактическое присутствие.",
+        consequence:"Компания не установит, где контрагент работает и кто им управляет. ФНС учтет недостоверный адрес вместе с другими противоречиями, обвинит контрагента в недобросовестности, а компанию — в недостаточной осмотрительности. Налоговая снимет вычеты НДС и расходы по налогу на прибыль.",
+        when:"до первой сделки, при изменении адреса и при обновлении сведений"
+      },
+      {
+        id:"representatives",section:"status",label:"Полномочия представителей",
+        question:"Компания проверяет полномочия тех, кто ведет переговоры и подписывает документы от имени контрагента?",
+        hint:"Сверьте руководителя с ЕГРЮЛ. Проверьте доверенность, приказ, решение, срок и объем полномочий переговорщика и подписанта.",
+        consequence:"Если контрагент не подтвердит полномочия, переписка и первичка не докажут, что условия сделки согласовывал и документы подписывал представитель контрагента. ФНС решит, что сделки не было, и снимет вычеты НДС и расходы по налогу на прибыль.",
+        when:"до согласования существенных условий и подписания документов"
+      },
+      {
+        id:"director_limits",section:"status",label:"Ограничения руководителя",
+        question:"Компания проверяет руководителя контрагента в реестре дисквалифицированных лиц и наличие ограничений на управление компанией?",
+        hint:"Проверьте реестр дисквалифицированных лиц и ограничения на управление юридическими лицами.",
+        consequence:"Если документы подписал дисквалифицированный руководитель, ФНС в совокупности с другими фактами решит, что контрагент недобросовестный. Снимет вычеты НДС и расходы по налогу на прибыль.",
+        when:"до сделки и при смене руководителя"
+      },
+      {
+        id:"participant_limits",section:"status",label:"Ограничения участников",
+        question:"Компания проверяет ограничения участников на участие в юридических лицах?",
+        hint:"Проверьте ограничения участников на создание юридических лиц и участие в них.",
+        consequence:"Компания пропустит признак номинального владения или формального управления. ФНС в совокупности с иными обстоятельствами усомнится, что контрагент ведет самостоятельный бизнес. Обвинит компанию в том, что она получила необоснованную налоговую выгоду.",
+        when:"до сделки и при смене участников"
+      },
+      {
+        id:"reporting_debt",section:"tax",label:"Отчетность и налоговые долги",
+        question:"Компания проверяет, сдает ли контрагент налоговую и бухгалтерскую отчетность и есть ли у него налоговые долги?",
+        hint:"Установите, сдана ли налоговая и бухгалтерская отчетность, какие периоды пропущены, есть ли недоимка, пени и штрафы.",
+        consequence:"Финансово нестабильный контрагент сорвет сделку. Если отчетность не подтверждает масштаб деятельности, компания не сможет доказать, что именно этот контрагент исполнил договор. Налоговый долг может привести к взысканиям и блокировке счетов. Контрагенту не хватит денег на исполнение договора, и он сорвет сделку.",
+        when:"до сделки и при плановом обновлении сведений"
+      },
+      {
+        id:"breaches_blocks",section:"tax",label:"Нарушения и блокировки счетов",
+        question:"Компания проверяет налоговые нарушения и блокировки счетов контрагента?",
+        hint:"Проверьте сведения о налоговых правонарушениях, их повторяемость и решения о приостановлении операций по счетам.",
+        consequence:"Повторные существенные нарушения могут привести к взысканию денег и блокировке счетов. Из-за блокировки деньги застрянут на счете контрагента, он не рассчитается с поставщиками и исполнителями и сорвет сделку. Компания потеряет аванс, нарушит свои обязательства перед заказчиками и заплатит неустойку. Вдобавок получит претензии от ФНС.",
+        when:"до аванса или существенной оплаты и при обновлении сведений"
+      },
+      {
+        id:"enforcement",section:"tax",label:"Исполнительные производства",
+        question:"Компания проверяет исполнительные производства и сопоставляет долги с масштабом бизнеса и суммой сделки?",
+        hint:"Сопоставьте сумму, предмет, остаток и динамику исполнительных производств с выручкой и ценой договора.",
+        consequence:"Приставы могут взыскать деньги или имущество, которые нужны контрагенту для исполнения договора. Компания рискует не получить товар, работу, услугу или возврат аванса. Для ФНС это один из сигналов недобросовестности контрагента.",
+        when:"до сделки и при плановом обновлении сведений"
+      },
+      {
+        id:"tax_assessment",section:"tax",label:"Оценка ФНС",
+        question:"Компания получает выписку ФНС с результатами оценки контрагента, если сделка существенная?",
+        hint:"Используйте выписку ФНС с официальной оценкой финансовой устойчивости, ресурсов и опыта. Разберите критерии, которым контрагент не соответствует.",
+        consequence:"Компания пропустит налоговые, финансовые и ресурсные проблемы, которые уже видит ФНС. Контрагент может сорвать сделку, а компании будет сложнее объяснить, почему она не учла доступные сведения.",
+        when:"до существенной сделки и при обновлении сведений"
+      },
+      {
+        id:"tax_burden",section:"tax",label:"Налоговая нагрузка",
+        question:"Компания сопоставляет налоговую нагрузку контрагента с масштабом его деятельности?",
+        hint:"Сопоставьте уплаченные налоги, доходы, расходы и активы с отраслью и обычным масштабом деятельности.",
+        consequence:"Низкая налоговая нагрузка при большом обороте может вызвать вопросы к реальности деятельности и цепочке сделки.",
+        when:"до существенной сделки и при обновлении сведений"
+      },
+      {
+        id:"financial_scale",section:"tax",label:"Финансовые показатели и сделка",
+        question:"Компания сопоставляет выручку, активы и другие финансовые показатели контрагента с суммой и сроком будущего договора?",
+        hint:"Сопоставьте выручку, активы, штат и источники финансирования с суммой, объемом и сроком договора.",
+        consequence:"Контрагенту может не хватить денег и активов, чтобы закупить товар, материалы или оплатить исполнителей. Он сорвет срок либо передаст исполнение лицам, которых компания не проверяла. Это риски претензий ФНС к вашей компании.",
+        when:"до каждой существенной сделки"
+      },
+      {
+        id:"employees",section:"resources",label:"Сотрудники и квалификация",
+        question:"Компания проверяет, есть ли у контрагента сотрудники нужной квалификации для исполнения договора?",
+        hint:"Проверьте число сотрудников, их роли и квалификацию. При нехватке ресурсов установите подтвержденных субподрядчиков или соисполнителей.",
+        consequence:"Контрагент может не выполнить работу сам или передать ее неизвестным лицам.",
+        when:"до договора и при изменении объема, срока или состава исполнителей"
+      },
+      {
+        id:"physical_resources",section:"resources",label:"Площадка, оборудование, сырье и мощности",
+        question:"Компания проверяет, есть ли у контрагента ресурсы для исполнения договора: площадка, оборудование, сырье и производственные мощности?",
+        hint:"Проверьте производственную площадку, оборудование, сырье, производственную мощность и право пользоваться этими ресурсами.",
+        consequence:"Без необходимых ресурсов контрагент не произведет нужный объем и не выполнит заказ в срок. Если компания не установит, где и как контрагент создал результат, ФНС может решить, что документы оформил не фактический исполнитель.",
+        when:"до производственного договора и при изменении объема или срока"
+      },
+      {
+        id:"ordinary_expenses",section:"resources",label:"Обычные расходы",
+        question:"Компания проверяет, несет ли контрагент расходы, без которых невозможно исполнить договор?",
+        hint:"Проверьте расходы на зарплату, аренду, сырье, транспорт, связь, коммунальные услуги и другие затраты, без которых исполнение невозможно.",
+        consequence:"Если у контрагента нет расходов на работников, помещение, сырье или перевозку, ФНС может предположить, что договор исполняло другое лицо или сделки не было в реальности вообще. Одни закрывающие документы не объяснят, как контрагент выполнил обязательства.",
+        when:"до крупной, сложной или нетипичной сделки"
+      },
+      {
+        id:"experience_market",section:"resources",label:"Опыт и присутствие на рынке",
+        question:"Компания проверяет опыт, деловую историю и присутствие контрагента на рынке?",
+        hint:"Изучите сопоставимые договоры, завершенные проекты, отзывы, сайт, каталог, прайс-лист, участие в закупках и реестр недобросовестных поставщиков, если он применим.",
+        consequence:"Компания не сможет обосновать, почему считала контрагента способным исполнить договор.",
+        when:"до первой существенной сделки"
+      },
+      {
+        id:"choice",section:"resources",label:"Причина выбора",
+        question:"Компания фиксирует, как нашла контрагента и почему выбрала именно его?",
+        hint:"Сохраните источник контакта, сравнение предложений, цену, сроки, качество, гарантии и деловую причину выбора.",
+        consequence:"Компания не докажет деловую причину выбора и рыночность условий.",
+        when:"до согласования существенной сделки"
+      },
+      {
+        id:"permits",section:"resources",label:"Спецразрешения",
+        question:"Компания проверяет обязательные разрешения на деятельность и товар?",
+        hint:"Сюда входят лицензии, членство в СРО, допуски, разрешения, сертификаты, декларации соответствия и другие обязательные документы на товар или деятельность.",
+        consequence:"Работу может выполнить лицо без обязательного разрешения. Сделку могут признать незаконной, а документы — не подтверждающими реальное исполнение.",
+        when:"до договора, приемки товара и перед истечением срока разрешения"
+      },
+      {
+        id:"chain_participants",section:"chain",label:"Посредники и другие участники",
+        question:"Компания устанавливает роль посредников и других участников сделки в движении денег и товара, выполнении работ или оказании услуг?",
+        hint:"Установите, кто производит и поставляет товар, кто перевозит, кто выполняет работы или услуги, кому перечисляют деньги и какую полезную функцию выполняет каждый участник.",
+        consequence:"Компания заплатит формальному звену. ФНС обвинит компанию в недобросовестности, снимет вычет НДС и расходы по налогу на прибыль, начислит недоимку, пени и штраф.",
+        when:"до сделки с посредниками или сложной цепочкой и при ее изменении"
+      },
+      {
+        id:"third_party_payment",section:"chain",label:"Платеж третьему лицу",
+        question:"Компания проверяет основание платежа третьему лицу вместо контрагента?",
+        hint:"Получите письмо контрагента и правовое основание платежа: уступку, агентский договор, поручение или трехстороннее соглашение.",
+        consequence:"Платеж может не погасить долг перед контрагентом и уйти ненадлежащему лицу.",
+        when:"до каждого платежа третьему лицу"
+      },
+      {
+        id:"unusual_terms",section:"capability",label:"Особые условия сделки",
+        question:"У компании есть пояснения, если контрагент просит крупный аванс, цена выше рыночной или в сделке используют нестандартный способ расчетов — бартер или зачет?",
+        hint:"Проверьте крупный аванс, особую цену, нестандартный способ оплаты, платеж третьему лицу и другие условия, которые отличаются от обычной практики.",
+        consequence:"Компания может потерять аванс или согласиться на невыгодные условия без защиты. При налоговой проверке ей будет сложно объяснить, почему условия отличаются от обычной деловой практики.",
+        when:"до согласования необычного условия"
+      },
+      {
+        id:"volume_deadline",section:"capability",label:"Объем и срок",
+        question:"Компания проверяет, сможет ли контрагент исполнить нужный объем работ или поставки в установленный срок?",
+        hint:"Получите график, расчет мощности и потребности в людях, технике, материалах и деньгах.",
+        consequence:"Контрагент сорвет объем или срок либо передаст исполнение неизвестным лицам. Если компания не подтвердит ресурсы и фактического исполнителя, ФНС снимет вычеты НДС и расходы по налогу на прибыль.",
+        when:"до каждой существенной сделки и при изменении объема или срока"
+      },
+      {
+        id:"actual_performer_access",section:"capability",label:"Фактические исполнители и доступ",
+        question:"Компания устанавливает, кто фактически выполнит работы или окажет услуги и есть ли у исполнителя доступ на объект?",
+        hint:"Проверьте фактических сотрудников и организации, договоры субподряда, квалификацию, допуски, пропуска и журналы доступа.",
+        consequence:"Работу может выполнить неизвестное лицо, а отсутствие пропусков не подтвердит исполнение на объекте.",
+        when:"до допуска исполнителей и при изменении их состава"
+      },
+      {
+        id:"origin_right",section:"evidence",label:"Источник и право на товар",
+        question:"Компания устанавливает источник происхождения товара и право поставщика им распоряжаться?",
+        hint:"Установите производителя, импортера или предыдущего поставщика, договорную цепочку, момент перехода права на товар и полномочия посредника.",
+        consequence:"Компания не подтвердит источник происхождения товара и непрерывную цепочку поставки. ФНС может признать поставку недоказанной, снять вычет НДС и расходы по налогу на прибыль.",
+        when:"до оплаты или первой отгрузки и при смене источника товара"
+      },
+      {
+        id:"storage_trace",section:"evidence",label:"Хранение и складской след",
+        question:"Компания проверяет место хранения или схему прямой отгрузки и фиксирует поступление и выбытие товара на своем складе, если товар проходит через него?",
+        hint:"Проверьте место хранения или схему прямой отгрузки. Зафиксируйте приход, перемещение, отпуск, продажу или списание товара на складе покупателя, если товар проходит через него.",
+        consequence:"Компания не подтвердит, где находился товар и что получила именно заявленную партию.",
+        when:"до первой отгрузки и по каждой партии"
+      },
+      {
+        id:"transport_route",section:"evidence",label:"Перевозчик и маршрут",
+        question:"Компания устанавливает перевозчика и сохраняет документы, по которым можно восстановить маршрут товара?",
+        hint:"Проверьте перевозчика, договор или заявку на перевозку, машину, водителя, маршрут, места погрузки и разгрузки.",
+        consequence:"Компания не докажет перемещение товара и участие указанного перевозчика.",
+        when:"до отгрузки и по каждой поставке"
+      },
+      {
+        id:"evidence_facts",section:"evidence",label:"Документы и фактическое исполнение",
+        question:"Компания заранее определяет доказательства исполнения и сверяет документы, даты и участников с фактическими событиями?",
+        hint:"Определите обязательные следы исполнения, проверьте хронологию и совпадение участников, дат, объемов и адресов. Если компания готовит первичку по своему шаблону, сохраните исходные сведения и подтверждение контрагента.",
+        consequence:"Расхождения между документами и событиями могут привести к отказу в расходах и вычетах НДС.",
+        when:"до начала исполнения, при приемке и до отражения операции в учете"
+      },
+      {
+        id:"service_result",section:"evidence",label:"Результат работ или услуг",
+        question:"Компания определяет результат работ или услуг и сохраняет подтверждение его получения и использования?",
+        hint:"Сохраните задание, отчет, расчеты, файлы, переписку, акт приемки и подтверждение использования результата.",
+        consequence:"Акт без конкретного результата не докажет, что работа или услуга получена и использована.",
+        when:"до начала работ, при приемке и после использования результата"
+      },
+      {
+        id:"breach_reaction",section:"evidence",label:"Реакция на нарушение",
+        question:"Компания письменно фиксирует реакцию на срыв срока, недопоставку или другое нарушение договора?",
+        hint:"Оформите претензию, дополнительное соглашение, изменение цены или срока либо письменное решение не применять меры.",
+        consequence:"Отсутствие реакции может показать, что стороны не исполняли договор как независимые компании.",
+        when:"после каждого нарушения"
+      },
+      {
+        id:"planned_review",section:"planned",label:"Плановое обновление",
+        question:"Компания планово обновляет сведения о действующих контрагентах?",
+        hint:"Периодичность зависит от уровня проверки, суммы договора, срока сотрудничества и критичности сделки.",
+        consequence:"Компания будет принимать решения по устаревшим сведениям и пропустит новые риски.",
+        when:"в сроки, установленные для уровня проверки и срока сотрудничества"
+      },
+      {
+        id:"event_review",section:"event",label:"Внеплановое обновление",
+        question:"Компания повторно проверяет контрагента после смены руководителя, адреса, владельца, лицензии или других существенных изменений?",
+        hint:"К таким событиям относятся смена руководителя, адреса или участника, недостоверность в ЕГРЮЛ, ликвидация, банкротство, блокировка счета, потеря лицензии, новый посредник или изменение источника товара.",
+        consequence:"Компания может продолжить работу после смены руководителя, потери лицензии или начала банкротства.",
+        when:"сразу после существенного изменения"
+      }
+    ];
+    const consequences = [
+      {
+        id:"execution",
+        title:"Контрагент не сможет исполнить договор",
+        text:"Компания может перечислить аванс и не получить товар, работу или услугу в срок.",
+        questionIds:["lifecycle","reporting_debt","breaches_blocks","enforcement","tax_assessment","tax_burden","financial_scale","employees","physical_resources","ordinary_expenses","experience_market","permits","unusual_terms","volume_deadline"]
+      },
+      {
+        id:"performer",
+        title:"Компания не установит фактического исполнителя",
+        text:"Компания не сможет объяснить, кто произвел товар, выполнил работу, оказал услугу или получил деньги.",
+        questionIds:["chain_participants","third_party_payment","actual_performer_access","origin_right","transport_route"]
+      },
+      {
+        id:"evidence",
+        title:"Документы не подтвердят реальность сделки",
+        text:"ФНС может запросить дополнительные доказательства. Если компания их не представит, инспекция может снять расходы и вычеты НДС.",
+        questionIds:["reliable_address","representatives","director_limits","participant_limits","choice","origin_right","storage_trace","transport_route","evidence_facts","service_result","breach_reaction"]
+      },
+      {
+        id:"changes",
+        title:"Компания пропустит изменения",
+        text:"Компания может продолжить работу после смены руководителя, потери лицензии, начала ликвидации или других существенных изменений.",
+        questionIds:["planned_review","event_review"]
+      }
+    ];
+    const blankState=()=>({screen:"start",stage:"",section:"",index:0,answers:{},updated:null});
+    let state=loadState();let toastTimer;
+    function loadState(){
+      try{
+        const current=JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if(current&&current.answers)return {...blankState(),...current,answers:current.answers||{}};
+        const legacy=JSON.parse(localStorage.getItem(LEGACY_KEY));
+        if(legacy&&legacy.answers)return {...blankState(),screen:"work",answers:legacy.answers||{}};
+      }catch(error){}
+      return blankState();
+    }
+    function saveState(){state.updated=new Date().toISOString();try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(error){}}
+    function clearState(){try{localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(LEGACY_KEY)}catch(error){}}
+    function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+    function sectionById(id){return sections.find(s=>s.id===id)}
+    function stageById(id){return stages.find(s=>s.id===id)}
+    function sectionQuestions(id){return questions.filter(q=>q.section===id)}
+    function answeredCount(){return questions.filter(q=>state.answers[q.id]).length}
+    function answeredSection(id){return sectionQuestions(id).filter(q=>state.answers[q.id]).length}
+    function sectionDone(id){const list=sectionQuestions(id);return list.length>0&&list.every(q=>state.answers[q.id])}
+    function stageQuestions(id){const stage=stageById(id);return questions.filter(q=>stage.sections.includes(q.section))}
+    function stageDone(id){const list=stageQuestions(id);return list.length>0&&list.every(q=>state.answers[q.id])}
+    function answeredStage(id){return stageQuestions(id).filter(q=>state.answers[q.id]).length}
+    function stats(){const out={checked:0,not_checked:0,unknown:0};questions.forEach(q=>{if(state.answers[q.id])out[state.answers[q.id]]++});return out}
+    function progressMarkup(){const n=answeredCount(),total=questions.length;return `<div class="progress"><span style="width:${n/total*100}%"></span></div><div class="progressline"><span>${n} из ${total} вопросов</span><span>${Math.round(n/total*100)}%</span></div>`}
+    function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),1800)}
+    function reportHeight(){const height=Math.ceil(Math.max(document.body.scrollHeight,document.documentElement.scrollHeight));if(window.parent!==window)window.parent.postMessage({type:"counterparty-signals-height",height},"*")}
+    function render(preserve=false){const y=window.scrollY;document.getElementById("app").innerHTML=state.screen==="start"?startScreen():state.screen==="results"?resultScreen():workScreen();requestAnimationFrame(()=>{if(preserve)window.scrollTo(0,y);reportHeight()})}
+    function startScreen(){const has=answeredCount()>0;return `<div class="screen-pad"><h1>Проверьте, какие признаки учитывает компания</h1><p class="lead">Отметьте, что компания проверяет до сделки, при исполнении договора и во время дальнейшей работы с контрагентом.</p><div class="meta"><div><b>Можно сделать паузу</b><span>Ответы сохранятся в этом браузере</span></div><div><b>Краткий результат</b><span>Пробелы по разделам и риски для сделки и налогов</span></div></div>${has?progressMarkup():""}<div class="btnrow"><button class="btn primary" data-action="${has?"continue":"begin"}">${has?"Продолжить":"Начать проверку"}</button>${has?`<button class="btn" data-action="results">Посмотреть результат</button><button class="btn danger" data-action="reset">Начать заново</button>`:""}</div></div>`}
+    function firstIncompleteSection(stageId){const stage=stageById(stageId);return stage.sections.find(id=>!sectionDone(id))||stage.sections[0]}
+    function firstIncompleteIndex(sectionId){const list=sectionQuestions(sectionId);const i=list.findIndex(q=>!state.answers[q.id]);return i<0?0:i}
+    function workScreen(){
+      const stage=stageById(state.stage);
+      const stageNav=`<nav class="stage-nav" aria-label="Этапы проверки">${stages.map((s,i)=>`<button class="stage-tab ${state.stage===s.id?"active":""} ${stageDone(s.id)?"done":""}" data-action="stage" data-id="${s.id}"><span class="stage-num">${i+1}</span><span class="stage-copy"><b>${esc(s.title)}</b><small>${answeredStage(s.id)} из ${stageQuestions(s.id).length}</small></span></button>`).join("")}</nav>`;
+      if(!stage){
+        return `<div class="progress-wrap">${progressMarkup()}</div><div class="workspace">${stageNav}<section class="work"><div class="section-head chooser"><h2>Выберите этап</h2><p>Сначала выберите, что хотите проверить: контрагента, сделку или обновление проверки.</p></div><div class="work-footer"><button class="btn" data-action="results">Посмотреть результат</button><button class="btn danger" data-action="reset">Начать заново</button></div></section></div>`;
+      }
+      const sectionSelected = stage.sections.includes(state.section) ? state.section : '';
+      const tabs=`<div class="section-tabs">${stage.sections.map(id=>{const s=sectionById(id);return `<button class="section-tab ${sectionSelected===id?"active":""}" data-action="section" data-id="${id}">${esc(s.tab)}</button>`}).join("")}</div>`;
+      if(!sectionSelected){
+        return `<div class="progress-wrap">${progressMarkup()}</div><div class="workspace">${stageNav}<section class="work">${tabs}<div class="section-head chooser"><h2>${esc(stage.title)}</h2><p>${esc(stage.desc || 'Выберите группу, чтобы открыть вопросы этого этапа.')}</p><div class="chooser-note">Выберите группу: после этого откроется первый вопрос раздела.</div></div><div class="work-footer"><button class="btn" data-action="results">Посмотреть результат</button><button class="btn danger" data-action="reset">Начать заново</button></div></section></div>`;
+      }
+      const section=sectionById(sectionSelected)||sections[0];
+      const list=sectionQuestions(section.id);state.index=Math.max(0,Math.min(state.index,list.length-1));const q=list[state.index];
+      return `<div class="progress-wrap">${progressMarkup()}</div><div class="workspace">${stageNav}<section class="work">${tabs}<div class="section-head"><h2>${esc(section.title)}</h2><p>${esc(section.desc)}</p></div><article class="criterion"><div class="criterion-head"><span class="number">${state.index+1}</span><h3>${esc(q.question)}</h3></div><p class="impact">${esc(q.consequence)}</p><p class="when"><b>Когда проверять:</b> ${esc(q.when)}.</p><button class="hint-link" data-action="hint" data-id="${q.id}">Что входит?</button><div class="options">${Object.entries(statuses).map(([id,s])=>`<button class="option ${state.answers[q.id]===id?"selected":""}" data-action="answer" data-id="${q.id}" data-status="${id}">${esc(s.label)}</button>`).join("")}</div></article><div class="card-nav"><button class="btn" data-action="previous" ${state.index===0?"disabled":""}>← Предыдущий</button><span>${state.index+1} из ${list.length}</span><button class="btn" data-action="next" ${state.index===list.length-1?"disabled":""}>Следующий →</button></div><div class="work-footer"><button class="btn" data-action="results">Посмотреть результат</button><button class="btn danger" data-action="reset">Начать заново</button></div></section></div>`;
+    }
+    function gapsBySection(){return sections.map(s=>({...s,items:sectionQuestions(s.id).filter(q=>state.answers[q.id]==="not_checked"||state.answers[q.id]==="unknown")})).filter(s=>s.items.length)}
+    function activeConsequences(){const ids=new Set(questions.filter(q=>state.answers[q.id]==="not_checked"||state.answers[q.id]==="unknown").map(q=>q.id));return consequences.filter(c=>c.questionIds.some(id=>ids.has(id)))}
+    function resultScreen(){const total=stats(),gaps=gapsBySection(),risks=activeConsequences(),complete=answeredCount()===questions.length;return `<div class="screen-pad">${progressMarkup()}<h1 style="font-size:32px;margin-top:23px">Краткая карта проверки</h1><p class="lead">${complete?"Проверка завершена.":"Это промежуточный результат. Ответьте на остальные вопросы, чтобы увидеть полную картину."}</p><div class="result-grid"><div class="metric good"><strong>${total.checked}</strong><span>проверяем</span></div><div class="metric gap"><strong>${total.not_checked}</strong><span>не проверяем</span></div><div class="metric unknown"><strong>${total.unknown}</strong><span>не знаем</span></div></div><section class="result-section"><h2>Где есть пробелы</h2>${gaps.length?`<div class="gap-list">${gaps.map(s=>`<details class="gap-card"><summary>${esc(s.title)} — ${s.items.length}</summary><div class="gap-body"><ul>${s.items.map(q=>`<li><span class="status-word ${state.answers[q.id]==="unknown"?"unknown":"gap"}">${state.answers[q.id]==="unknown"?"Не знаем":"Не проверяем"}:</span> ${esc(q.label)}</li>`).join("")}</ul></div></details>`).join("")}</div>`:`<div class="empty">По текущим ответам пробелов нет.</div>`}</section><section class="result-section"><h2>К чему могут привести пробелы</h2>${risks.length?`<div class="consequences">${risks.map(r=>`<article class="consequence-card"><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p></article>`).join("")}</div>`:`<div class="empty">Риски появятся, если компания не проверяет признак или не знает, проверяет ли его.</div>`}</section><div class="btnrow"><button class="btn primary" data-action="print">Скачать краткую карту в PDF</button><button class="btn" data-action="back-work">Вернуться к вопросам</button></div></div>`}
+    function buildPrintReport(){const total=stats(),gaps=gapsBySection(),risks=activeConsequences();document.getElementById("printReport").innerHTML=`<h1>Краткая карта проверки признаков контрагентов</h1><div class="print-meta">Дата: ${esc(new Date().toLocaleDateString("ru-RU"))}</div><div class="print-summary"><div><b>${total.checked}</b>Проверяем</div><div><b>${total.not_checked}</b>Не проверяем</div><div><b>${total.unknown}</b>Не знаем</div></div><h2 class="print-section">Где есть пробелы</h2>${gaps.length?gaps.map(s=>`<div class="print-group"><h3>${esc(s.title)}</h3><ul>${s.items.map(q=>`<li>${state.answers[q.id]==="unknown"?"Не знаем, проверяем ли":"Не проверяем"}: ${esc(q.label)}</li>`).join("")}</ul></div>`).join(""):`<p>По текущим ответам пробелов нет.</p>`}<h2 class="print-section">К чему могут привести пробелы</h2>${risks.length?risks.map(r=>`<div class="print-consequence"><b>${esc(r.title)}</b>${esc(r.text)}</div>`).join(""):`<p>По текущим ответам риски не выявлены.</p>`}`}
+    function continueFromProgress(){const stage=stages.find(s=>!stageDone(s.id))||stages[0];state.stage=stage.id;state.section="";state.index=0;state.screen="work"}
+    document.addEventListener("click",e=>{const b=e.target.closest("[data-action]");if(!b)return;const a=b.dataset.action;
+      if(a==="begin"){state.screen="work";state.stage="";state.section="";state.index=0}
+      else if(a==="continue"){continueFromProgress()}
+      else if(a==="stage"){state.stage=b.dataset.id;state.section="";state.index=0;state.screen="work"}
+      else if(a==="section"){state.section=b.dataset.id;state.stage=sectionById(state.section).stage;state.index=firstIncompleteIndex(state.section)}
+      else if(a==="answer"){state.answers[b.dataset.id]=b.dataset.status;const list=sectionQuestions(state.section);const i=list.findIndex(q=>q.id===b.dataset.id);if(i<list.length-1)state.index=i+1;saveState();render(true);return}
+      else if(a==="previous"){state.index=Math.max(0,state.index-1)}
+      else if(a==="next"){state.index=Math.min(sectionQuestions(state.section).length-1,state.index+1)}
+      else if(a==="results"){state.screen="results"}
+      else if(a==="back-work"){state.screen="work"}
+      else if(a==="hint"){const q=questions.find(q=>q.id===b.dataset.id);document.getElementById("hintText").textContent=q.hint;document.getElementById("hintModal").classList.remove("hidden");return}
+      else if(a==="close-hint"){document.getElementById("hintModal").classList.add("hidden");return}
+      else if(a==="print"){buildPrintReport();toast("В окне печати выберите «Сохранить как PDF»");setTimeout(()=>window.print(),160);return}
+      else if(a==="reset"){document.getElementById("resetModal").classList.remove("hidden");return}
+      else if(a==="cancel-reset"){document.getElementById("resetModal").classList.add("hidden");return}
+      else if(a==="confirm-reset"){clearState();state=blankState();document.getElementById("resetModal").classList.add("hidden");render();toast("Ответы удалены");return}
+      saveState();render();
+    });
+    document.addEventListener("keydown",e=>{if(e.key==="Escape"){document.getElementById("hintModal").classList.add("hidden");document.getElementById("resetModal").classList.add("hidden")}});
+    document.getElementById("hintModal").addEventListener("click",e=>{if(e.target.id==="hintModal")e.currentTarget.classList.add("hidden")});
+    document.getElementById("resetModal").addEventListener("click",e=>{if(e.target.id==="resetModal")e.currentTarget.classList.add("hidden")});
+    if("ResizeObserver" in window){const ro=new ResizeObserver(()=>requestAnimationFrame(reportHeight));ro.observe(document.documentElement)}
+    window.addEventListener("load",reportHeight);render();
+  })();
+  </script>
+</body>
+</html>
