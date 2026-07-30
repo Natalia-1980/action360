@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Как ФНС связывает признаки недобросовестности контрагента со сделкой</title>
+  <style>
+    :root {
+      --ink:#132a2b; --soft:#4e6565; --paper:#f4f2eb; --surface:#fffef9;
+      --line:#d7ddd5; --teal:#0b6b61; --teal-dark:#064a44; --mint:#dcefe7;
+      --acid:#d8ef66; --amber:#f5e6b0; --coral:#f4c8bd; --red:#9a3c2e;
+      --shadow:0 22px 60px rgba(19,42,43,.14);
+    }
+    *{box-sizing:border-box}
+    html{background:var(--paper)}
+    body{margin:0;min-width:320px;color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;background:
+      radial-gradient(circle at 8% 7%,rgba(216,239,102,.18),transparent 27rem),var(--paper)}
+    button{font:inherit;color:inherit}
+    button:focus-visible,a:focus-visible,input:focus-visible+span{outline:3px solid rgba(11,107,97,.3);outline-offset:3px}
+    .topbar{display:grid;grid-template-columns:auto 1fr minmax(150px,220px);align-items:center;gap:12px;min-height:70px;padding:10px clamp(14px,3vw,24px);border-bottom:1px solid rgba(19,42,43,.11);background:rgba(244,242,235,.92)}
+    .mark{display:grid;width:46px;height:46px;place-items:center;border-radius:14px 14px 14px 4px;background:var(--ink);color:var(--acid);font-size:22px;font-weight:850}
+    .course{display:flex;flex-direction:column;gap:3px}.course span{color:var(--soft);font-size:12px}.course strong{font-size:14px}
+    .progress{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px;color:var(--soft);font-size:12px;font-weight:800}
+    .track{height:7px;border-radius:99px;background:#dfe3dc;overflow:hidden}.fill{height:100%;background:var(--teal);transition:width .3s ease}
+    main{min-height:calc(100vh - 112px);padding:24px 0 36px;overflow:hidden}
+    .intro{width:min(650px,calc(100% - 28px));margin:0 auto 18px;display:grid;grid-template-columns:1fr 1.15fr;align-items:end;gap:20px}
+    .intro h1{margin:3px 0 0;font-family:Georgia,serif;font-size:clamp(18px,3vw,22px);font-weight:600;letter-spacing:-.02em;line-height:1.1}
+    .kicker{margin:0;color:var(--teal);font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+    .intro-note{margin:0;color:var(--soft);font-size:14px;line-height:1.42}
+    .stage{position:relative;height:580px;display:grid;place-items:center}
+    .carousel{position:relative;width:min(650px,calc(100% - 64px));height:550px;perspective:1700px}
+    .slide{position:absolute;left:50%;top:0;width:min(650px,calc(100vw - 64px));height:540px;transform:translateX(-50%) scale(.83);opacity:0;pointer-events:none;transition:transform .42s ease,opacity .35s ease,filter .35s ease;filter:saturate(.78)}
+    .slide.active{z-index:3;transform:translateX(-50%) scale(1);opacity:1;pointer-events:auto;filter:none}
+    .slide.prev{z-index:1;transform:translateX(-100%) scale(.78) rotateY(5deg);opacity:.72}
+    .slide.next{z-index:1;transform:translateX(0%) scale(.78) rotateY(-5deg);opacity:.72}
+    .card-inner{position:relative;width:100%;height:100%;transition:transform .62s cubic-bezier(.2,.75,.25,1);transform-style:preserve-3d}
+    .slide.flipped .card-inner{transform:rotateY(180deg)}
+    .face{position:absolute;inset:0;display:flex;flex-direction:column;border:1px solid rgba(19,42,43,.13);border-radius:28px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden;backface-visibility:hidden}
+    .back{transform:rotateY(180deg)}
+    .band{height:18px;background:linear-gradient(90deg,var(--teal),#3a9688 72%,var(--acid))}
+    .back .band{background:linear-gradient(90deg,var(--ink),var(--teal))}
+    .card-body{display:flex;flex:1;min-height:0;flex-direction:column;padding:17px 22px 16px}
+    .front .card-body{overflow:hidden}
+    .front-content{min-height:0;overflow:visible}
+    .case-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:6px;color:var(--soft);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+    .case-meta b{color:var(--teal)}
+    h2{margin:0;font-family:Georgia,serif;font-size:clamp(16px,2vw,18px);font-weight:600;line-height:1.15}
+    .story{margin:8px 0 9px;color:var(--soft);font-size:14px;line-height:1.4}
+    .question{margin-top:7px}.question h3{margin:0 0 5px;font-size:10px;line-height:1.3}.question h3 span{color:var(--teal)}
+    .options{display:grid;gap:5px}
+    .option{position:relative;display:block;cursor:pointer}
+    .option input{position:absolute;opacity:0}
+    .option span{display:block;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:white;font-size:12px;line-height:1.3;transition:.16s}
+    .option:hover span{border-color:#8bb8ad}.option input:checked+span{border-color:var(--teal);background:var(--mint);color:var(--teal-dark)}
+    .option.correct span{border-color:#78aa99;background:#eef9f3}.option.wrong span{border-color:#d59a89;background:#fff2ed}
+    .feedback{min-height:16px;margin:7px 0 0;color:var(--red);font-size:11px;font-weight:700}
+    .actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:9px}
+    .front .feedback{flex:0 0 auto}
+    .front .actions{flex:0 0 auto;border-top:1px solid var(--line);background:var(--surface)}
+    .primary,.secondary,.flip-back{min-height:44px;border-radius:13px;cursor:pointer;font-weight:780}
+    .primary{padding:0 19px;border:0;background:var(--teal);color:white;box-shadow:0 10px 22px rgba(11,107,97,.18)}
+    .check{min-height:40px;padding:0 16px;flex:0 0 auto;font-size:13px;white-space:nowrap;box-shadow:0 8px 20px rgba(11,107,97,.28)}
+    .primary:hover{background:var(--teal-dark)}.primary:disabled{background:#d8ddda;color:#6f7c77;box-shadow:none;cursor:not-allowed}
+    .primary.ready{animation:readyPulse .42s ease}
+    @keyframes readyPulse{50%{transform:translateY(-2px);box-shadow:0 13px 26px rgba(11,107,97,.28)}}
+    .secondary,.flip-back{padding:0 15px;border:1px solid var(--teal);background:transparent;color:var(--teal)}
+    .hint{color:var(--soft);font-size:11px;line-height:1.35}
+    .analysis-accordion{display:grid;gap:6px;margin-top:10px}
+    .position{border-radius:12px;background:#f1f2ed;overflow:hidden}
+    .position.taxpayer{background:var(--mint)}.position.tax{background:var(--coral)}.position.court{background:var(--amber)}.position.lesson{background:var(--ink);color:white}
+    .position-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:8px 11px;border:0;background:transparent;cursor:pointer;text-align:left;color:var(--teal);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.055em}
+    .position-toggle::after{content:"+";flex:0 0 auto;font-size:17px;line-height:1;transition:transform .18s ease}
+    .position.open .position-toggle::after{content:"−"}
+    .position.tax .position-toggle{color:var(--red)}.position.court .position-toggle{color:#705a18}.position.lesson .position-toggle{color:var(--acid)}
+    .position-panel{display:none;padding:0 11px 10px}
+    .position.open .position-panel{display:block}
+    .position p{margin:0;font-size:14px;line-height:1.4}.position.lesson p{color:#e4ece9}
+    .answer-review{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+    .review-item{padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:#f7f7f2}
+    .review-item.correct{border-color:#91c3b3;background:#eef9f3}.review-item.wrong{border-color:#e0aa9d;background:#fff4ef}
+    .review-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.045em}
+    .review-result{color:var(--teal)}.review-item.wrong .review-result{color:var(--red)}
+    .review-choice{margin:0 0 3px;font-size:11px;font-weight:800;line-height:1.25}
+    .review-note{margin:0;color:var(--soft);font-size:11px;line-height:1.3}
+    .source{margin:8px 0 0;color:var(--soft);font-size:9px;line-height:1.25}.source a{color:var(--teal);font-weight:750}
+    .nav{position:absolute;z-index:7;top:50%;display:grid;width:48px;height:48px;place-items:center;border:1px solid var(--line);border-radius:50%;background:var(--surface);box-shadow:0 8px 22px rgba(19,42,43,.13);cursor:pointer;font-size:24px}
+    .nav:hover{background:var(--mint)}.nav:disabled{opacity:.3;cursor:default}.nav.prev-btn{left:4px}.nav.next-btn{right:4px}
+    .dots{display:flex;justify-content:center;gap:8px;margin-top:-3px}
+    .dot{width:9px;height:9px;padding:0;border:0;border-radius:50%;background:#c8cec8;cursor:pointer}.dot.active{width:24px;border-radius:99px;background:var(--teal)}.dot.done{background:#7fb7a9}
+    .final-face{background:var(--ink);color:white}.final-face .band{background:var(--acid)}
+    .final-content{display:grid;flex:1;align-content:center;padding:42px}
+    .final-content .kicker{color:var(--acid)}.final-content h2{max-width:590px;margin-top:10px;font-size:clamp(25px,3.6vw,38px);line-height:1.08}
+    .final-content>p{max-width:620px;color:#cbd9d5;font-size:16px;line-height:1.55}
+    .formula{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 22px}
+    .formula div{padding:15px;border:1px solid rgba(255,255,255,.16);border-radius:15px;color:#d8e3e0;font-size:12px;line-height:1.4}.formula b{display:block;margin-bottom:5px;color:var(--acid);font-size:19px}
+    .final-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:min(100%,520px)}
+    .final-action{min-height:46px;border-radius:13px;padding:0 14px;font-weight:850;cursor:pointer;line-height:1.15}
+    .final-action.restart{border:1px solid var(--acid);background:transparent;color:var(--acid)}
+    .final-action.restart:hover{background:rgba(216,239,102,.1)}
+    .final-action.finish{border:0;background:var(--acid);color:var(--ink)}
+    .final-action.finish:hover{background:#e4f58b}
+    .final-action:disabled{opacity:.72;cursor:default}
+    @media(max-width:800px){
+      .intro{display:block}.intro-note{margin-top:14px}.stage{height:650px}.carousel{width:calc(100% - 28px);height:600px}.slide{width:min(680px,86vw);height:590px}.slide.prev{transform:translateX(-106%) scale(.72)}.slide.next{transform:translateX(6%) scale(.72)}
+      .nav{top:auto;bottom:-5px}.nav.prev-btn{left:calc(50% - 64px)}.nav.next-btn{right:calc(50% - 64px)}.dots{margin-top:10px}
+    }
+    @media(max-width:600px){
+      .topbar{grid-template-columns:auto 1fr}.progress{grid-column:1/-1}.intro{width:calc(100% - 28px);margin-bottom:18px}
+      main{padding-top:28px}.stage{height:735px}.carousel{height:680px}.slide{width:94vw;height:670px}.slide.prev,.slide.next{opacity:0}
+      .card-body{padding:16px 16px 14px}.story{font-size:14px;margin-bottom:7px}.question{margin-top:7px}.option span{padding:7px 9px;font-size:12px}
+      .answer-review{grid-template-columns:1fr}.review-item{padding:7px 9px}.review-note{font-size:10.5px}
+      .actions{align-items:stretch;flex-direction:column}.primary,.secondary,.flip-back{width:100%}.hint{text-align:center}
+      .formula{grid-template-columns:1fr}.final-content{padding:26px 22px}.final-content h2{font-size:27px}.final-actions{gap:7px}.final-action{padding:0 8px;font-size:12px}
+    }
+    @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="mark">П</div>
+    <div class="course"><strong>Как ФНС связывает признаки недобросовестности контрагента со сделкой</strong></div>
+    <div class="progress"><span id="progressText">1 из 7</span><div class="track"><div class="fill" id="progressFill"></div></div></div>
+  </header>
+  <main>
+    <section class="stage" aria-label="Карусель судебных кейсов">
+      <button class="nav prev-btn" id="prev" aria-label="Предыдущая карточка">‹</button>
+      <div class="carousel" id="carousel"></div>
+      <button class="nav next-btn" id="next" aria-label="Следующая карточка">›</button>
+    </section>
+    <div class="dots" id="dots" aria-label="Навигация по карточкам"></div>
+  </main>
+  <script>
+    "use strict";
+    const cases = [
+      {
+        title:"Ресурсы подтвердили реальную работу",
+        story:"ИТ-компания привлекает четырех поставщиков и подрядчиков. Инспекция видит общие связи и высокую долю вычетов, но у трех контрагентов есть сотрудники, расчеты, налоги, деловая переписка и результаты работ. По четвертому доказательств меньше.",
+        facts:["Высокая доля вычетов.","Короткий срок работы.","Ресурсы и результат каждого."], fact:2,
+        factNotes:["Высокая доля вычетов может привлечь внимание ФНС, но не показывает, кто реально выполнил работы.","Срок работы сам по себе не доказывает невозможность исполнить договор.","Именно ресурсы и результат связывают конкретного исполнителя с реальной работой."],
+        actions:["Собрать досье по каждому.","Сохранить выписки из ЕГРЮЛ.","Получить письма о надежности."], action:0,
+        actionNotes:["Досье по каждому позволяет отдельно подтвердить выбор, ресурсы и фактическое исполнение.","Выписка подтверждает регистрацию, но не возможность выполнить конкретные работы.","Письмо самого контрагента не заменяет проверку его ресурсов и документов об исполнении."],
+        taxpayer:"Компания представила договоры, переписку, результаты работ, данные о движении денег, выплате зарплаты и налогов. Эти доказательства подтверждали реальную деятельность трех из четырех контрагентов.",
+        tax:"Инспекция считала четырех контрагентов сомнительными и связывала их с формальным документооборотом и неправомерными вычетами и расходами.",
+        court:"По трем контрагентам суд признал операции реальными: у них были сотрудники, расчеты, налоги, переписка и результаты работ. По четвертому контрагенту отказ сохранился, потому что компания не представила такую же совокупность доказательств.",
+        lesson:"Одинаковый красный флаг не дает одинакового вывода. Досье на контрагента, фиксация переговоров и доказательство рыночности цены помогут отстоять и расходы, и вычеты по НДС.",
+        courtName:"Постановление АС Московского округа от 25.03.2025 по делу № А40‑10965/2024", source:"https://kad.arbitr.ru/"
+      },
+      {
+        title:"Подрядчики без ресурсов",
+        story:"Компания передает дополнительные работы и техобслуживание двум подрядчикам. Почти вся их выручка поступает от заказчика, работников и имущества нет, позднее компании исключают из ЕГРЮЛ. Документов о выборе и фактических исполнителях не сохранили.",
+        facts:["Неясно, кто выполнил работы.","Выручка от одного заказчика.","Позднее исключены из ЕГРЮЛ."], fact:0,
+        factNotes:["Если нельзя установить исполнителей и ресурсы, первичка не подтверждает реальность работ.","Выручка от одного заказчика может быть обычной бизнес-моделью и сама по себе не решает спор.","Позднее исключение из ЕГРЮЛ не показывает, мог ли подрядчик исполнить договор в момент сделки."],
+        actions:["Проверить опыт и исполнителей.","Запросить устав и выписку.","Проверить после завершения работ."], action:0,
+        actionNotes:["До договора нужно понять, кто выполнит работы, какой у подрядчика опыт и ресурсы.","Устав и выписка подтверждают юридический статус, но не способность выполнить работы.","Проверка после выполнения работ не подтверждает осмотрительность при выборе подрядчика."],
+        taxpayer:"Компания ссылалась на договоры, акты и хозяйственную необходимость работ. Она считала, что эти документы подтверждают привлечение подрядчиков и право на вычеты и расходы.",
+        tax:"У спорных организаций не было работников, транспорта и имущества; они не вели самостоятельную деятельность. Компания не показала поиск, выбор, контакты и реальное исполнение.",
+        court:"Апелляция отказала компании, кассация поддержала этот вывод. Формальные документы не доказали ни осмотрительность, ни выполнение работ заявленными подрядчиками.",
+        lesson:"Ошибки учета и общие ссылки на осмотрительность не помогут, если нет доказательств, что товар, работу или услугу получили и использовали.",
+        courtName:"Постановление АС Московского округа от 09.04.2026 по делу № А40‑47306/2025", source:"https://kad.arbitr.ru/"
+      },
+      {
+        title:"Цепочка без инфраструктуры",
+        story:"Ювелирная компания оформляет закупку золота у 16 организаций. У поставщиков совпадают IP-адреса, телефоны, почта и представители; нет лицензий, хранилищ и инкассации. Учет запасов не позволяет подтвердить весь заявленный объем.",
+        facts:["Товар дорого стоит.","Нет лицензий и инфраструктуры.","Поставщиков было шестнадцать."], fact:1,
+        factNotes:["Высокая стоимость усиливает цену ошибки, но не доказывает фиктивность поставщика.","Без лицензий, хранения и перевозки поставщик не может законно и фактически работать с золотом.","Количество поставщиков само по себе не говорит, что операции формальные."],
+        actions:["Запросить обычную первичку.","Проверить лицензии и логистику.","Проверить записи в ЕГРЮЛ."], action:1,
+        actionNotes:["Обычная первичка фиксирует сделку на бумаге, но не подтверждает возможность работать с регулируемым товаром.","Лицензии, хранение и перевозка показывают, может ли поставщик реально исполнить договор.","ЕГРЮЛ подтверждает регистрацию, но не наличие обязательных разрешений и инфраструктуры."],
+        taxpayer:"Компания настаивала, что металл реально поступил, первичные документы оформлены, а при выборе поставщиков она проявила должную осмотрительность.",
+        tax:"Инспекция доказала управляемую группу технических компаний без ресурсов и лицензий. Цепочка создавала видимость приобретения металла ради вычетов НДС и расходов.",
+        court:"Три инстанции поддержали доначисления: документы не опровергли совокупность связей, отсутствие инфраструктуры и расхождения в учете запасов.",
+        lesson:"В регулируемой поставке проверяйте специальные ресурсы и разрешения. Обычного чек‑листа по ЕГРЮЛ недостаточно, если товар требует лицензий, хранилища и специальной перевозки. Важна также процессуальная добросовестность налогоплательщика: отказ содействовать проверке может сильно ухудшить позицию по НДС и налогу на прибыль.",
+        courtName:"Постановление АС Западно‑Сибирского округа от 18.02.2026 по делу № А45‑22303/2024", source:"https://kad.arbitr.ru/"
+      },
+      {
+        title:"Поставку не связали с продавцами",
+        story:"Компания покупает пиломатериалы и транспортные услуги у нескольких организаций. В документах есть поставки и перевозки, но маршруты, автомобили, водители и реальные заготовители не сходятся с данными контрагентов.",
+        facts:["У продавцов были счета.","Древесину использовали.","Нет связи поставщика и перевозки."], fact:2,
+        factNotes:["Расчетный счет подтверждает возможность принимать платежи, но не происхождение товара.","Использование древесины подтверждает наличие товара, но не его поставку заявленным продавцом.","Несовпадение источника, маршрута и транспорта разрывает связь товара с заявленным поставщиком."],
+        actions:["Проверить источник и маршрут.","Взять накладную и счет-фактуру.","Скачать выписку после сделки."], action:0,
+        actionNotes:["Проверка источника и маршрута связывает продавца, перевозку и фактическую приемку товара.","Накладная и счет-фактура нужны, но не устраняют противоречия в перевозке.","Поздняя выписка не доказывает, что контрагента проверили до выбора и заключения договора."],
+        taxpayer:"Компания утверждала, что товары и услуги были реальными, представлены договоры, счета‑фактуры, накладные и транспортные документы.",
+        tax:"Проверка выявила формальный документооборот: контрагенты не закупали товар, заявленные машины и водители не подтверждали доставку, а фактические источники были другими.",
+        court:"Суды отказали компании. Первичка не устранила противоречия в происхождении древесины и перевозках и не подтвердила исполнение заявленными лицами.",
+        lesson:"Для товара с физическим маршрутом проверяйте сквозную связь «источник — перевозчик — машина — водитель — приемка». Разрыв в любом звене делает формальную первичку уязвимой.",
+        courtName:"Постановление АС Центрального округа от 01.07.2025 по делу № А09‑3978/2024", source:"https://kad.arbitr.ru/"
+      },
+      {
+        title:"Бумажный объем без исполнения",
+        story:"Строительная компания заявляет вычеты по операциям с 73 поставщиками и подрядчиками. По 56 инспекция устанавливает отсутствие ресурсов; деньги проходят транзитом, обязательства не погашаются, кредиторская задолженность растет.",
+        facts:["Нет ресурсов и обычных расчетов.","У компании крупные объекты.","Контрагентов было много."], fact:0,
+        factNotes:["Отсутствие ресурсов вместе с транзитными расчетами указывает, что заявленные лица могли не исполнять сделки.","Масштаб объектов заказчика не подтверждает участие конкретных контрагентов.","Большое число контрагентов требует системы проверки, но само по себе не доказывает нарушение."],
+        actions:["Собрать акты после проверки.","Проверить всех по выписке.","Ранжировать риск и проверить ресурсы."], action:2,
+        actionNotes:["Акты фиксируют заявленный результат, но не заменяют проверку исполнителя и движения денег.","Одинаковая проверка по выписке не учитывает сумму, предмет сделки и способность исполнить договор.","Риск-ранжирование помогает усилить проверку там, где цена и вероятность претензий выше."],
+        taxpayer:"Компания ссылалась на первичные документы, наличие реальных строительных объектов и допустимость привлечения поставщиков и субподрядчиков.",
+        tax:"Контрагенты не могли исполнить сделки; документы и книги продаж создавали формальный НДС, источник вычетов отсутствовал, задолженность наращивалась без реального погашения.",
+        court:"Суды поддержали инспекцию и отказали компании. Масштаб документооборота не заменил доказательств ресурсов, расчетов и фактического исполнения.",
+        lesson:"При большом портфеле применяйте риск‑ориентированную проверку. Чем выше сумма и объем работ, тем важнее подтвердить ресурсы контрагента, проследить расчеты и исполнение. Устные переговоры без фиксации условий, порядка отбора и проверки партнера почти всегда работают против налогоплательщика.",
+        courtName:"Постановление АС Поволжского округа от 04.06.2025 по делу № А65‑11448/2024", source:"https://kad.arbitr.ru/"
+      },
+      {
+        title:"Налог пересчитали по поставщику",
+        story:"Мясная компания оформляет закупки через четыре технические организации. Инспекция устанавливает реального поставщика и считает номинальных посредников частью схемы. Возникает вопрос: снять все или учесть реальные параметры сделки.",
+        facts:["Посредники выдали счета-фактуры.","Известен реальный поставщик.","Товар поступил покупателю."], fact:1,
+        factNotes:["Счета-фактуры посредников не подтверждают их реальную функцию в цепочке.","Сведения о реальном поставщике позволяют восстановить фактические параметры сделки и налогов.","Поступление товара подтверждает операцию, но не обосновывает участие заявленных посредников."],
+        actions:["Выяснить источник и роль звеньев.","Хранить документы посредника.","Не работать через посредников."], action:0,
+        actionNotes:["Нужно заранее понимать источник товара и деловую функцию каждого участника цепочки.","Документы посредника не помогут, если они не объясняют его реальное участие.","Посредники допустимы; риск создает отсутствие у них понятной деловой функции."],
+        taxpayer:"Компания настаивала на реальности закупок и требовала учесть фактически понесенные расходы и налоговые параметры установленного реального поставщика.",
+        tax:"ФНС установила, что четыре прямых контрагента были техническими звеньями, а товар шел от другого поставщика. Вычеты и расходы по номинальным документам завышали налоговую экономию.",
+        court:"Суды признали технический характер спорных контрагентов, но проверили налоговую реконструкцию по установленному реальному поставщику и исправили отдельные арифметические ошибки расчета.",
+        lesson:"Реальность товара не защищает документы технического посредника. Но установленный реальный поставщик важен для корректного расчета налогов — его нужно выявлять и документировать еще до спора.",
+        courtName:"Постановление АС Московского округа от 21.07.2025 по делу № А41‑56636/2023", source:"https://kad.arbitr.ru/"
+      }
+    ];
+    let current=0;
+    let completed=false;
+    const answers=cases.map(()=>({fact:null,action:null,checked:false,flipped:false}));
+    const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+    function optionList(items,kind,idx){
+      return items.map((item,i)=>`<label class="option" data-kind="${kind}" data-value="${i}"><input type="radio" name="${kind}-${idx}" value="${i}" ${answers[idx][kind]===i?"checked":""}><span>${esc(item)}</span></label>`).join("");
+    }
+    function reviewItem(c,idx,kind,label){
+      const selected=answers[idx][kind];
+      if(selected===null)return `<div class="review-item"><div class="review-head"><span>${label}</span></div><p class="review-note">Ответ пока не выбран.</p></div>`;
+      const correct=selected===c[kind];
+      const items=kind==="fact"?c.facts:c.actions;
+      const notes=kind==="fact"?c.factNotes:c.actionNotes;
+      return `<div class="review-item ${correct?"correct":"wrong"}">
+        <div class="review-head"><span>${label}</span><span class="review-result">${correct?"Верно":"Нужно уточнить"}</span></div>
+        <p class="review-choice">${esc(items[selected])}</p>
+        <p class="review-note">${esc(notes[selected])}</p>
+      </div>`;
+    }
+    function slide(c,idx){
+      return `<article class="slide" data-index="${idx}">
+        <div class="card-inner">
+          <section class="face front"><div class="band"></div><div class="card-body">
+            <div class="front-content">
+              <div class="case-meta"><b>Ситуация ${idx+1}</b><span>лицевая сторона</span></div>
+              <h2>${esc(c.title)}</h2><p class="story">${esc(c.story)}</p>
+              <div class="question"><h3><span>1.</span> Какой факт влияет на оценку сделки?</h3><div class="options">${optionList(c.facts,"fact",idx)}</div></div>
+              <div class="question"><h3><span>2.</span> Что сделать до согласования сделки?</h3><div class="options">${optionList(c.actions,"action",idx)}</div></div>
+            </div>
+            <p class="feedback" id="feedback-${idx}"></p>
+            <div class="actions"><span class="hint">${answers[idx].fact===null||answers[idx].action===null?"Ответьте на оба вопроса":"Ответы выбраны — можно проверить"}</span><button class="primary check" data-index="${idx}" ${answers[idx].fact===null||answers[idx].action===null?"disabled":""}>Проверить и открыть разбор</button></div>
+          </div></section>
+          <section class="face back"><div class="band"></div><div class="card-body">
+            <div class="case-meta"><b>Почему взяли этот кейс</b><span>оборотная сторона</span></div>
+            <h2>${esc(c.title)}</h2>
+            <div class="answer-review" id="answer-review-${idx}" aria-label="Комментарий к выбранным ответам">
+              ${reviewItem(c,idx,"fact","Ваш выбор факта")}
+              ${reviewItem(c,idx,"action","Ваше действие")}
+            </div>
+            <div class="analysis-accordion">
+              <div class="position taxpayer"><button class="position-toggle" type="button" aria-expanded="false">Позиция налогоплательщика</button><div class="position-panel"><p>${esc(c.taxpayer)}</p></div></div>
+              <div class="position tax"><button class="position-toggle" type="button" aria-expanded="false">Позиция ФНС</button><div class="position-panel"><p>${esc(c.tax)}</p></div></div>
+              <div class="position court"><button class="position-toggle" type="button" aria-expanded="false">Позиция суда</button><div class="position-panel"><p>${esc(c.court)}</p></div></div>
+              <div class="position lesson"><button class="position-toggle" type="button" aria-expanded="false">Вывод для проверки</button><div class="position-panel"><p>${esc(c.lesson)}</p></div></div>
+            </div>
+            <p class="source"><strong>Судебный кейс:</strong> <a href="${c.source}" target="_blank" rel="noopener">${esc(c.courtName)}</a>.</p>
+            <div class="actions"><button class="flip-back" data-index="${idx}">↶ Вернуться к ситуации</button><button class="primary advance" data-index="${idx}">${idx===cases.length-1?"Перейти к выводу":"Следующий кейс →"}</button></div>
+          </div></section>
+        </div></article>`;
+    }
+    function finalSlide(){
+      return `<article class="slide final" data-index="${cases.length}"><section class="face final-face"><div class="band"></div><div class="final-content">
+        <p class="kicker">Итог шести судебных кейсов</p><h2>Критерий — это повод доуточнить сведения, а не готовый приговор.</h2>
+        <p>ФНС сопоставляет документы с фактическим исполнением. Чтобы защитить сделку, вычеты НДС и расходы, компания должна показать реальность операции и обосновать выбор контрагента.</p>
+        <div class="formula"><div><b>1</b>Найдите факт, который влияет на исполнение.</div><div><b>2</b>Запросите конкретные сведения и доказательства.</div><div><b>3</b>Сделайте вывод по совокупности фактов.</div></div>
+        <div class="final-actions">
+          <button class="final-action restart" type="button">Решить задачи заново</button>
+          <button class="final-action finish" type="button" ${completed?"disabled":""}>${completed?"Тренировка завершена":"Завершить тренировку"}</button>
+        </div>
+      </div></section></article>`;
+    }
+    function render(){
+      document.getElementById("carousel").innerHTML=cases.map(slide).join("")+finalSlide();
+      document.getElementById("dots").innerHTML=Array.from({length:cases.length+1},(_,i)=>`<button class="dot ${i===current?"active":""} ${i<cases.length&&answers[i].checked?"done":""}" data-go="${i}" aria-label="Карточка ${i+1}"></button>`).join("");
+      updateClasses();bind();
+    }
+    function updateClasses(){
+      document.querySelectorAll(".slide").forEach(el=>{
+        const i=Number(el.dataset.index);el.classList.remove("active","prev","next","flipped");
+        if(i===current)el.classList.add("active");if(i===current-1)el.classList.add("prev");if(i===current+1)el.classList.add("next");
+        if(i<cases.length&&answers[i].flipped)el.classList.add("flipped");
+      });
+      document.getElementById("prev").disabled=current===0;document.getElementById("next").disabled=current===cases.length;
+      document.getElementById("progressText").textContent=`${current+1} из ${cases.length+1}`;
+      document.getElementById("progressFill").style.width=`${((current+1)/(cases.length+1))*100}%`;
+    }
+    function bind(){
+      document.querySelectorAll("input[type=radio]").forEach(input=>input.addEventListener("change",e=>{
+        const label=e.target.closest(".option"),idx=Number(e.target.name.split("-").pop()),kind=label.dataset.kind;
+        answers[idx][kind]=Number(e.target.value);answers[idx].checked=false;answers[idx].flipped=false;
+        const slide=document.querySelector(`.slide[data-index="${idx}"]`);
+        const button=slide.querySelector(".check");
+        const hint=slide.querySelector(".hint");
+        const ready=answers[idx].fact!==null&&answers[idx].action!==null;
+        button.disabled=!ready;
+        hint.textContent=ready?"Ответы выбраны — можно проверить":"Ответьте на оба вопроса";
+        if(ready){button.classList.remove("ready");void button.offsetWidth;button.classList.add("ready");}
+      }));
+      document.querySelectorAll(".check").forEach(btn=>btn.addEventListener("click",()=>{
+        const i=Number(btn.dataset.index),a=answers[i],f=document.getElementById(`feedback-${i}`);
+        if(a.fact===null||a.action===null)return;
+        document.getElementById(`answer-review-${i}`).innerHTML=
+          reviewItem(cases[i],i,"fact","Ваш выбор факта")+
+          reviewItem(cases[i],i,"action","Ваше действие");
+        document.querySelectorAll(`.slide[data-index="${i}"] .front .option`).forEach(label=>{
+          const kind=label.dataset.kind,val=Number(label.dataset.value),correct=cases[i][kind];
+          if(val===correct)label.classList.add("correct");else if(answers[i][kind]===val)label.classList.add("wrong");
+        });
+        a.checked=true;
+        f.textContent=(a.fact===cases[i].fact&&a.action===cases[i].action)?"Верно. Открываем судебный разбор.":"В разборе сравните свою логику с позициями сторон и суда.";
+        a.flipped=true;
+        document.querySelector(`.slide[data-index="${i}"]`).classList.add("flipped");
+      }));
+      document.querySelectorAll(".flip-back").forEach(btn=>btn.addEventListener("click",()=>{const i=Number(btn.dataset.index);answers[i].flipped=false;document.querySelector(`.slide[data-index="${i}"]`).classList.remove("flipped")}));
+      document.querySelectorAll(".position-toggle").forEach(btn=>btn.addEventListener("click",()=>{
+        const item=btn.closest(".position"),accordion=btn.closest(".analysis-accordion"),willOpen=!item.classList.contains("open");
+        accordion.querySelectorAll(".position").forEach(position=>{
+          position.classList.remove("open");
+          position.querySelector(".position-toggle").setAttribute("aria-expanded","false");
+        });
+        if(willOpen){item.classList.add("open");btn.setAttribute("aria-expanded","true");}
+      }));
+      document.querySelectorAll(".advance").forEach(btn=>btn.addEventListener("click",()=>go(Math.min(cases.length,Number(btn.dataset.index)+1))));
+      document.querySelectorAll(".dot").forEach(btn=>btn.addEventListener("click",()=>go(Number(btn.dataset.go))));
+      document.querySelectorAll(".restart").forEach(btn=>btn.addEventListener("click",resetTraining));
+      document.querySelectorAll(".finish").forEach(btn=>btn.addEventListener("click",finishTraining));
+    }
+    function resetTraining(){
+      answers.forEach(answer=>{answer.fact=null;answer.action=null;answer.checked=false;answer.flipped=false});
+      completed=false;current=0;render();window.scrollTo({top:0,behavior:"smooth"});
+    }
+    function finishTraining(){
+      completed=true;
+      try{window.parent.postMessage({type:"trainer-complete",trainer:"kak-chitat-signaly"},"*")}catch(error){}
+      render();
+    }
+    function go(i){current=Math.max(0,Math.min(cases.length,i));render()}
+    document.getElementById("prev").addEventListener("click",()=>go(current-1));
+    document.getElementById("next").addEventListener("click",()=>go(current+1));
+    document.addEventListener("keydown",e=>{if(e.key==="ArrowLeft")go(current-1);if(e.key==="ArrowRight")go(current+1)});
+    render();
+  </script>
+</body>
+</html>
