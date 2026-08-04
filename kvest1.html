@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Квест-тренажер: Расхождения БУ и НУ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #eef2f5;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .game-board {
+            width: 650px;
+            height: 650px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .game-header {
+            background: #2a4058;
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .game-header .left {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .game-header .title-main {
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+        .game-header .title-sub {
+            font-weight: 500;
+            font-size: 0.65rem;
+            opacity: 0.8;
+        }
+        .score-box {
+            background: #7a8c9e;
+            padding: 4px 16px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+        }
+        .step-indicator {
+            background: #4a5b6e;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: white;
+        }
+        .path-track {
+            background: #f5f7fa;
+            padding: 10px 14px 6px 14px;
+            border-bottom: 2px solid #e2e6ea;
+            flex-shrink: 0;
+        }
+        .steps-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 3px;
+        }
+        .step-node {
+            flex: 1;
+            min-width: 32px;
+            text-align: center;
+            background: #eef2f5;
+            border-radius: 30px;
+            padding: 5px 0;
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: #6c7a8a;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+            position: relative;
+            border: 1px solid #dce2e8;
+        }
+        .step-node.active {
+            background: #7a8c9e;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: scale(1.05);
+            border-color: #7a8c9e;
+        }
+        .step-node.completed {
+            background: #5a7a6a;
+            color: white;
+            border-color: #4a6a5a;
+        }
+        .step-node.skipped {
+            background: #e8e0d8;
+            color: #6c7a8a;
+            border-color: #d0c8c0;
+        }
+        .step-node.locked {
+            background: #f0f2f4;
+            color: #aab0b8;
+            cursor: default;
+            border-color: #e2e6ea;
+        }
+        .step-node .diff-badge {
+            font-size: 0.5rem;
+            background: rgba(0,0,0,0.1);
+            border-radius: 30px;
+            padding: 0 6px;
+            margin-left: 2px;
+        }
+        .step-node .status-mark {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            font-size: 0.65rem;
+        }
+        .connector {
+            font-size: 0.7rem;
+            color: #b8c4d0;
+        }
+        .question-area {
+            padding: 16px 20px 14px 20px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .question-card {
+            background: #fafbfc;
+            border-radius: 16px;
+            padding: 20px 22px 16px 22px;
+            border: 1px solid #e2e6ea;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .question-meta {
+            font-size: 0.8rem;
+            color: #6c7a8a;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #2a4058;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            flex-shrink: 0;
+        }
+        .answers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex: 1;
+            min-height: 0;
+        }
+        .answer-option {
+            background: white;
+            border-radius: 30px;
+            padding: 12px 18px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid #dce2e8;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #4a5b6e;
+            flex-shrink: 0;
+        }
+        .answer-option:hover {
+            background: #f0f4f8;
+            transform: translateX(4px);
+            border-color: #b8c4d0;
+        }
+        .answer-option.selected {
+            background: #7a8c9e;
+            border-color: #6a7a8a;
+            color: white;
+        }
+        .answer-option.correct {
+            background: #5a8a7a;
+            border-color: #4a7a6a;
+            color: white;
+        }
+        .answer-option.wrong {
+            background: #b38b6b;
+            border-color: #9a7a5a;
+            color: white;
+        }
+        .answer-feedback {
+            background: #f5f7fa;
+            border-radius: 14px;
+            padding: 12px 18px;
+            margin-top: 4px;
+            font-size: 0.85rem;
+            border-left: 4px solid #7a8c9e;
+            flex-shrink: 0;
+            line-height: 1.5;
+            color: #4a5b6e;
+            max-height: 110px;
+            overflow-y: auto;
+        }
+        .answer-feedback strong {
+            font-weight: 700;
+            color: #2a4058;
+        }
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-shrink: 0;
+        }
+        .btn-next, .btn-skip {
+            border: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+            flex: 1;
+            text-align: center;
+        }
+        .btn-next {
+            background: #7a8c9e;
+            color: white;
+        }
+        .btn-next:disabled {
+            background: #b8c4d0;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .btn-next:hover:not(:disabled) {
+            background: #6a7a8a;
+        }
+        .btn-skip {
+            background: #eef2f5;
+            color: #4a5b6e;
+            border: 1px solid #dce2e8;
+            flex: 1;
+        }
+        .btn-skip:hover {
+            background: #e2e8ee;
+        }
+        .btn-skip:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .final-box {
+            text-align: center;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .final-box h2 {
+            font-size: 1.4rem;
+            margin: 8px 0;
+            color: #2a4058;
+        }
+        .final-box .big-score {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: #4a5b6e;
+        }
+        .restart-btn {
+            background: #7a8c9e;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: white;
+            margin-top: 14px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .restart-btn:hover {
+            background: #6a7a8a;
+        }
+        .norm-hint {
+            font-size: 0.65rem;
+            color: #6c7a8a;
+            margin-top: 12px;
+            text-align: center;
+            border-top: 1px dashed #dce2e8;
+            padding-top: 12px;
+        }
+        .champion-badge {
+            font-size: 3rem;
+            margin: 6px 0;
+        }
+        .question-area::-webkit-scrollbar {
+            width: 4px;
+        }
+        .question-area::-webkit-scrollbar-track {
+            background: #f5f7fa;
+        }
+        .question-area::-webkit-scrollbar-thumb {
+            background: #b8c4d0;
+            border-radius: 8px;
+        }
+        .task-data {
+            background: #f5f7fa;
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e6ea;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            flex-shrink: 0;
+            max-height: 170px;
+            overflow-y: auto;
+        }
+        .task-data .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            border-bottom: 1px dashed #e8ecef;
+        }
+        .task-data .row:last-child {
+            border-bottom: none;
+        }
+        .task-data .label {
+            font-weight: 500;
+            color: #6c7a8a;
+        }
+        .task-data .value {
+            font-weight: 600;
+            color: #2a4058;
+        }
+        .task-data .header {
+            font-weight: 700;
+            color: #2a4058;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            display: block;
+            border-bottom: 2px solid #e2e6ea;
+            padding-bottom: 4px;
+        }
+        .task-data .sub-header {
+            font-weight: 600;
+            color: #4a5b6e;
+            font-size: 0.8rem;
+            margin-top: 2px;
+            display: block;
+        }
+        @media (max-width: 680px) {
+            .game-board {
+                width: 100%;
+                height: 100vh;
+                max-height: 650px;
+                border-radius: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="game-board" id="gameApp">
+    <div class="game-header">
+        <div class="left">
+            <span class="title-main">⚖️ КВЕСТ</span>
+            <span class="title-sub">Расхождения БУ ↔ НУ</span>
+        </div>
+        <div class="score-box">Баллы: <span id="scoreValue">0</span></div>
+        <div class="step-indicator">📌 <span id="currentStepNum">1</span> / 10</div>
+    </div>
+
+    <div class="path-track">
+        <div class="steps-container" id="stepsContainer"></div>
+    </div>
+
+    <div class="question-area" id="questionArea"></div>
+</div>
+
+<script>
+    const questions = [
+        {
+            text: `Контрагент ООО «Склад» просрочил оплату на 79 дней. Долг — 150 000 рублей. Компания создала резерв в БУ и НУ. Возникнет ли разница между БУ и НУ?`,
+            options: [
+                "Да. Разница составит 75 000 руб.",
+                "Нет. В БУ и НУ резерв создают на всю сумму долга.",
+                "Да. Разница составит 150 000 руб."
+            ],
+            correct: 0,
+            points: 50,
+            difficulty: 'easy',
+            explanation: "В БУ резерв создан на 150 000 руб., в НУ — на 75 000 руб. При просрочке 79 дней в налоговом учете в резерв включают 50 процентов задолженности. Разница составит 75 000 руб."
+        },
+        {
+            text: `ООО «Альфа» применило к оборудованию амортизационную премию 30% в налоговом учете. В бухучете амортизация за I квартал — 25 000 руб., в налоговом — 17 500 руб. Какие документы приложить, если инспекция запросит пояснения по расхождению?`,
+            options: [
+                "Договор поставки оборудования и счет-фактуру.",
+                "Акт инвентаризации основных средств и инвентарную карточку.",
+                "Регистр налогового учета по амортизации с расчетом разницы и выдержку из учетной политики."
+            ],
+            correct: 2,
+            points: 50,
+            difficulty: 'easy',
+            explanation: "Разницу подтверждают регистром, в котором видны суммы амортизации в БУ и НУ и расчет отклонения. Учетная политика подтвердит, что компания применяет амортизационную премию в налоговом учете."
+        },
+        {
+            text: `Резерв на отпуска в БУ — 107 561 руб. за I квартал. В НУ резерв не формируется, расходы по факту — 75 000 руб. Возникнет ли разница между БУ и НУ?`,
+            options: [
+                "Нет. Расходы на отпуска в БУ и НУ совпадут.",
+                "Да. Разница составит 32 561 руб.",
+                "Да. Разница составит 107 561 руб."
+            ],
+            correct: 1,
+            points: 50,
+            difficulty: 'easy',
+            explanation: "В БУ компания признала 107 561 руб., в НУ — фактические расходы 75 000 руб. Разница составит 32 561 руб."
+        },
+        {
+            text: `ООО «Береза» заключило договор строительного подряда на срок 21 месяц. Поэтапной сдачи работ нет. Компания признает выручку в БУ по степени готовности работ, пропорционально расходам, в НУ — равномерно по периодам. В I квартале компания выполнила 20% работ на 200 000 руб. Какие документы приложить к пояснениям по расхождению выручки в БУ и НУ?`,
+            options: [
+                "Только выписку по расчетному счету, которая подтвердит оплату заказчика.",
+                "Только акты КС-2 и КС-3 за I квартал.",
+                "Договор, акты КС-2 и КС-3, регистры расчета выручки и выдержки из учетной политики с описанием методов признания выручки."
+            ],
+            correct: 2,
+            points: 50,
+            difficulty: 'easy',
+            explanation: "Документы должны показать не только сумму выручки, но и причину расхождения. Договор и акты подтверждают исполнение, регистры — расчет, учетная политика — разные методы признания выручки в БУ и НУ."
+        },
+        {
+            text: `ООО «Торг» отразило в БУ представительские расходы в сумме 200 000 руб., а в НУ — в размере 4% от ФОТ, 120 000 руб. Возникнет ли разница между БУ и НУ?`,
+            options: [
+                "Да. Разница составит 80 000 руб.",
+                "Нет. Все представительские расходы принимают в БУ и НУ в одинаковой сумме.",
+                "Да. Разница составит 120 000 руб."
+            ],
+            correct: 0,
+            points: 50,
+            difficulty: 'easy',
+            explanation: "В БУ компания признала 200 000 руб., а в НУ — только 120 000 руб. в пределах норматива. Разница составит 80 000 руб."
+        },
+        {
+            text: `ООО «Альфа» закрепило в учетной политике амортизационную премию 15%. В I квартале по основному средству возникла временная разница 21 250 руб. Какой документ представить в ФНС, чтобы подтвердить расчет разницы?`,
+            options: [
+                "Акт инвентаризации основного средства.",
+                "Регистр налогового учета по амортизации с детализацией разницы.",
+                "Копию договора поставки основного средства."
+            ],
+            correct: 1,
+            points: 50,
+            difficulty: 'easy',
+            explanation: "Регистр покажет первоначальную стоимость объекта, амортизационную премию, суммы амортизации и возникшую разницу. При необходимости к нему можно приложить выдержку из учетной политики."
+        },
+        {
+            text: `Резерв по гарантийному ремонту в БУ — 200 000 руб., в НУ резерв не создается, фактические расходы составили 50 000 руб. Какие документы приложить к пояснениям по расхождению расходов?`,
+            options: [
+                "Только документы на фактические расходы по ремонту в сумме 50 000 руб.",
+                "Только учетную политику компании.",
+                "Регистр с расчетом резерва и разницы, выдержку из учетной политики и документы на фактические расходы."
+            ],
+            correct: 2,
+            points: 50,
+            difficulty: 'easy',
+            explanation: "Регистр покажет, почему в БУ признано 200 000 руб., а в НУ — 50 000 руб. Учетная политика подтвердит способ учета резерва, а первичные документы — фактические расходы на гарантийный ремонт."
+        },
+        {
+            text: `Рассчитайте прибыль в бухучете:`,
+            options: [
+                "4 770 000 руб.",
+                "4 850 000 руб.",
+                "5 770 000 руб.",
+                "4 690 000 руб."
+            ],
+            correct: 0,
+            points: 100,
+            difficulty: 'hard',
+            explanation: "Прибыль в БУ = 9 000 000 – 570 000 – 280 000 – 3 300 000 – 80 000 = 4 770 000 руб."
+        },
+        {
+            text: `Рассчитайте разницу по амортизации:`,
+            options: [
+                "175 360 руб.",
+                "80 000 руб.",
+                "255 360 руб.",
+                "0 руб."
+            ],
+            correct: 0,
+            points: 100,
+            difficulty: 'hard',
+            explanation: "Разница = 255 360 – 80 000 = 175 360 руб."
+        },
+        {
+            text: `Рассчитайте общую разницу по расходам на рекламу и представительским расходам:`,
+            options: [
+                "628 000 руб.",
+                "480 000 руб.",
+                "148 000 руб.",
+                "250 000 руб."
+            ],
+            correct: 0,
+            points: 100,
+            difficulty: 'hard',
+            explanation: "Реклама: 570 000 – 90 000 = 480 000 руб. Представительские: 280 000 – 132 000 = 148 000 руб. Итого разница = 628 000 руб."
+        }
+    ];
+
+    let currentStep = 0;
+    let score = 0;
+    let questionStatus = new Array(10).fill(null);
+    let answerData = new Array(10).fill(null);
+    let gameCompleted = false;
+
+    const stepsContainer = document.getElementById('stepsContainer');
+    const questionArea = document.getElementById('questionArea');
+    const scoreSpan = document.getElementById('scoreValue');
+    const currentStepNumSpan = document.getElementById('currentStepNum');
+
+    function updateScoreUI() {
+        scoreSpan.innerText = score;
+    }
+
+    function updateStepIndicator() {
+        currentStepNumSpan.innerText = currentStep + 1;
+    }
+
+    function renderSteps() {
+        stepsContainer.innerHTML = '';
+        for (let i = 0; i < questions.length; i++) {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step-node';
+            const status = questionStatus[i];
+            if (gameCompleted) {
+                stepDiv.classList.add('completed');
+            } else {
+                if (status === 'answered') {
+                    stepDiv.classList.add('completed');
+                } else if (status === 'skipped') {
+                    stepDiv.classList.add('skipped');
+                } else if (i === currentStep) {
+                    stepDiv.classList.add('active');
+                } else if (i > currentStep) {
+                    stepDiv.classList.add('locked');
+                }
+            }
+            const diff = questions[i].difficulty;
+            const label = diff === 'hard' ? '★' : '·';
+            stepDiv.innerHTML = `${i+1} <span class="diff-badge">${label}</span>`;
+            if (status === 'answered' && answerData[i]) {
+                const mark = answerData[i].isCorrect ? '✅' : '❌';
+                stepDiv.innerHTML += ` <span class="status-mark">${mark}</span>`;
+            } else if (status === 'skipped') {
+                stepDiv.innerHTML += ` <span class="status-mark">⏭</span>`;
+            }
+            stepDiv.style.cursor = (i <= currentStep || gameCompleted) ? 'pointer' : 'default';
+            stepDiv.addEventListener('click', () => {
+                if (gameCompleted) return;
+                if (i <= currentStep) {
+                    currentStep = i;
+                    updateStepIndicator();
+                    renderCurrentQuestion();
+                    renderSteps();
+                }
+            });
+            stepsContainer.appendChild(stepDiv);
+            if (i !== questions.length - 1) {
+                const connector = document.createElement('span');
+                connector.className = 'connector';
+                connector.innerText = '›';
+                stepsContainer.appendChild(connector);
+            }
+        }
+    }
+
+    function renderTaskData() {
+        return `
+            <div class="task-data">
+                <span class="header">📊 Данные для расчета</span>
+                <div class="row"><span class="label">Выручка:</span><span class="value">9 000 000 руб.</span></div>
+                <div class="row"><span class="label">Расходы на призы в рекламе:</span><span class="value">570 000 руб.</span></div>
+                <div class="row"><span class="label">Представительские расходы:</span><span class="value">280 000 руб.</span></div>
+                <div class="row"><span class="label">Расходы на оплату труда:</span><span class="value">3 300 000 руб.</span></div>
+                <div class="row"><span class="label">ОС стоимостью:</span><span class="value">560 000 руб., СПИ = 7 лет</span></div>
+                <div class="row"><span class="label">Амортизация в БУ (линейный метод):</span><span class="value">80 000 руб.</span></div>
+                <div class="row"><span class="label">Амортизация в НУ (нелинейный метод):</span><span class="value">255 360 руб.</span></div>
+                <span class="sub-header">📌 Норматив рекламных расходов: 1% от выручки = 90 000 руб.</span>
+                <span class="sub-header">📌 Норматив представительских расходов: 4% от ФОТ = 132 000 руб.</span>
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        if (gameCompleted) {
+            questionArea.innerHTML = `
+                <div class="question-card final-box">
+                    <div class="champion-badge">🏆</div>
+                    <h2>Квест завершен!</h2>
+                    <p style="font-size:1rem; font-weight:600; margin:6px 0; color:#2a4058;">Поздравляем! Вы прошли первую часть квеста.</p>
+                    <div class="big-score">${score} баллов</div>
+                    <p style="font-size:0.9rem; color:#6c7a8a; margin:8px 0 0;">Запишите сумму баллов для следующей части квеста.</p>
+                    <button class="restart-btn" id="restartGameBtn">🔄 Пройти заново</button>
+                </div>
+            `;
+            const restartBtn = document.getElementById('restartGameBtn');
+            if (restartBtn) restartBtn.addEventListener('click', restartGame);
+            return;
+        }
+
+        const q = questions[currentStep];
+        const status = questionStatus[currentStep];
+        const saved = answerData[currentStep];
+        const selectedIdx = saved ? saved.selectedIdx : null;
+        const isAnswered = status === 'answered';
+        const isSkipped = status === 'skipped';
+
+        let feedbackHtml = '';
+        if (isAnswered && saved) {
+            const verdict = saved.isCorrect ? '✅ Верно!' : '❌ Неверно.';
+            feedbackHtml = `
+                <div class="answer-feedback">
+                    <strong>${verdict}</strong> ${q.explanation}
+                </div>
+            `;
+        } else if (isSkipped) {
+            feedbackHtml = `
+                <div class="answer-feedback" style="border-left-color: #b8c4d0;">
+                    ⏭ <strong>Вопрос пропущен.</strong> Вы можете вернуться к нему позже и ответить.
+                </div>
+            `;
+        }
+
+        const optionsHtml = q.options.map((opt, idx) => {
+            let additionalClass = '';
+            if (selectedIdx === idx && isAnswered) {
+                additionalClass = saved.isCorrect ? 'correct' : 'wrong';
+            }
+            return `<div class="answer-option ${additionalClass}" data-opt-index="${idx}">${String.fromCharCode(65+idx)}. ${opt}</div>`;
+        }).join('');
+
+        const nextDisabled = !isAnswered && !isSkipped;
+        const skipDisabled = isAnswered || isSkipped;
+
+        const diffLabel = q.difficulty === 'hard' ? 'Сложный' : 'Легкий';
+
+        let taskDataHtml = '';
+        let questionText = q.text;
+
+        if (currentStep >= 7 && currentStep <= 9) {
+            taskDataHtml = renderTaskData();
+        }
+
+        questionArea.innerHTML = `
+            <div class="question-card">
+                <div class="question-meta">
+                    <span class="diff-easy">${diffLabel} · ${q.points} баллов</span>
+                    <span>Шаг ${currentStep+1} из 10</span>
+                </div>
+                ${taskDataHtml}
+                <div class="question-text">${questionText}</div>
+                <div class="answers-list" id="answersList">
+                    ${optionsHtml}
+                </div>
+                ${feedbackHtml}
+                <div class="action-row">
+                    <button class="btn-skip" id="skipBtn" ${skipDisabled ? 'disabled' : ''}>⏭ Пропустить</button>
+                    <button class="btn-next" id="nextBtn" ${nextDisabled ? 'disabled' : ''}>
+                        ${currentStep === questions.length - 1 ? '🏁 Завершить' : '➡️ Далее'}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (!isAnswered) {
+            const answerDivs = document.querySelectorAll('.answer-option');
+            answerDivs.forEach(div => {
+                div.addEventListener('click', () => {
+                    if (questionStatus[currentStep] === 'answered') return;
+                    
+                    const idx = parseInt(div.dataset.optIndex);
+                    const isCorrect = (idx === q.correct);
+                    const earned = isCorrect ? q.points : 0;
+                    
+                    if (questionStatus[currentStep] === 'skipped') {
+                        questionStatus[currentStep] = null;
+                    }
+                    
+                    if (isCorrect) score += earned;
+                    answerData[currentStep] = {
+                        selectedIdx: idx,
+                        isCorrect: isCorrect,
+                        pointsEarned: earned
+                    };
+                    questionStatus[currentStep] = 'answered';
+                    updateScoreUI();
+                    renderCurrentQuestion();
+                    renderSteps();
+                });
+            });
+        }
+
+        const skipBtn = document.getElementById('skipBtn');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', () => {
+                if (questionStatus[currentStep] === 'answered') return;
+                if (questionStatus[currentStep] === 'skipped') return;
+                
+                questionStatus[currentStep] = 'skipped';
+                answerData[currentStep] = null;
+                renderCurrentQuestion();
+                renderSteps();
+            });
+        }
+
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (questionStatus[currentStep] !== 'answered' && questionStatus[currentStep] !== 'skipped') return;
+                
+                if (currentStep + 1 < questions.length) {
+                    currentStep++;
+                    updateStepIndicator();
+                    renderCurrentQuestion();
+                    renderSteps();
+                } else {
+                    gameCompleted = true;
+                    renderCurrentQuestion();
+                    renderSteps();
+                }
+            });
+        }
+    }
+
+    function restartGame() {
+        currentStep = 0;
+        score = 0;
+        questionStatus = new Array(10).fill(null);
+        answerData = new Array(10).fill(null);
+        gameCompleted = false;
+        updateScoreUI();
+        updateStepIndicator();
+        renderSteps();
+        renderCurrentQuestion();
+    }
+
+    function initGame() {
+        renderSteps();
+        renderCurrentQuestion();
+        updateScoreUI();
+        updateStepIndicator();
+    }
+
+    initGame();
+</script>
+</body>
+</html>
