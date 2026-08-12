@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Матрица проверки контрагентов по обороту</title>
+<style>
+  :root{
+    --ink:#202523;--muted:#5f6763;--line:#d7ddd5;--paper:#fffef9;--bg:#f4f2eb;
+    --graphite:#202523;--neutral:#f1f2f3;--neutral-2:#f7f7f5;
+    --success:#eaf4ed;--success-line:#bfd7c7;--warn:#9a3c2e;--warn-bg:#fff0ed;
+    --shadow:0 14px 32px rgba(32,37,35,.09)
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font:13px/1.34 Inter,Arial,sans-serif;color:var(--ink)}
+  .shell{max-width:650px;margin:0 auto;padding:8px}
+  .app{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+  .head{padding:14px 16px;border-bottom:1px solid var(--line);background:var(--paper)}
+  h1{margin:0 0 6px;font-size:22px;line-height:1.1}
+  .lead{margin:0;color:var(--muted)}
+  .period{margin-top:10px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:8px 10px}
+  .inline-field{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .inline-field label{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+  .inline-field input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:9px;padding:7px 9px;font:inherit}
+  .body{padding:10px 14px 14px}
+  .toolbar{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+  .btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:7px 11px;font:inherit;font-weight:800;cursor:pointer}
+  .btn.ready{background:var(--graphite);border-color:var(--graphite);color:#fff}
+  .btn.download{background:#fff;border-color:#bfc5c1;color:var(--ink)}
+  .btn.nav{padding:7px 10px;border-color:#bfc5c1}
+  .btn.nav:disabled{opacity:.38;cursor:not-allowed}
+  .btn:disabled{opacity:.48;cursor:not-allowed}
+  .status{display:none;margin:0 0 9px;padding:8px 10px;border-radius:10px;font-size:12px;font-weight:700}
+  .status.show{display:block}
+  .status.ok{background:var(--success);border:1px solid var(--success-line);color:var(--ink)}
+  .status.error{background:var(--warn-bg);color:var(--warn)}
+
+  .carousel{border:1px solid var(--line);border-radius:16px;background:#fff;overflow:hidden}
+  .carousel-head{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;border-bottom:1px solid var(--line);background:var(--neutral-2)}
+  .slide-arrow{appearance:none;border:none;background:transparent;color:var(--ink);font-size:24px;font-weight:700;cursor:pointer;height:100%}
+  .slide-arrow:disabled{opacity:.35;cursor:not-allowed}
+  .slide-meta{padding:10px 8px;text-align:center}
+  .slide-count{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:2px}
+  .slide-title{font-size:18px;font-weight:800;line-height:1.1}
+  .screens{position:relative}
+  .screen{display:none;padding:10px}
+  .screen.active{display:block}
+  .screen-note{margin:0 0 8px;font-size:11px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 1.45fr 1fr;gap:7px}
+  .cell{border:1px solid var(--line);border-radius:10px;background:#fffefc;padding:7px;min-width:0}
+  .cell-title{margin:0 0 6px;font-size:11px;font-weight:800;color:var(--muted);text-transform:none}
+  .range-wrap{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .range-wrap .mini-label{font-size:11px;color:var(--muted);font-weight:700}
+  .range-2{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .fld{display:flex;align-items:center;gap:5px}
+  .fld label{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+  .fld input,.periodicity-input{border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit;background:#fff}
+  .fld input{width:92px}
+  .periodicity-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .periodicity-inline label{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+  .periodicity-input{flex:1;min-width:160px;width:100%}
+  .picker{position:relative}
+  .pick-btn{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;background:#fff;text-align:left;display:flex;justify-content:space-between;gap:5px;align-items:center;font-weight:700;cursor:pointer}
+  .pick-btn small{font-weight:600;color:var(--muted);font-size:9px}
+  .menu{position:static;margin-top:5px;background:#fff;border:1px solid var(--line);border-radius:9px;display:none;overflow:hidden}
+  .picker.open .menu{display:block}
+  .menu-head{padding:7px 8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:6px}
+  .menu-head b{font-size:11px}
+  .close-mini{border:none;background:var(--neutral);color:var(--ink);border-radius:7px;padding:5px 8px;font-size:11px;font-weight:800;cursor:pointer}
+  .menu-list{max-height:250px;overflow:auto;padding:4px 7px}
+  .option{display:flex;gap:7px;align-items:flex-start;padding:5px 2px;border-bottom:1px solid #edf1ee;font-size:11px;line-height:1.22}
+  .option:last-child{border-bottom:none}
+  .option input{margin-top:2px}
+  .option.inherited{opacity:.78}
+  .option small{display:block;color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:var(--neutral);color:var(--ink);font-size:10px;font-weight:700}
+  .chip.inherited{background:var(--neutral-2);color:var(--muted)}
+  .chip button{border:none;background:transparent;color:var(--muted);font-size:14px;line-height:1;cursor:pointer;padding:0}
+  .hint{margin-top:4px;font-size:10px;color:var(--muted)}
+  .invalid{border-color:var(--warn)!important;box-shadow:0 0 0 2px rgba(154,60,46,.10)}
+  .invalid-block{border-color:var(--warn)!important;background:var(--warn-bg)!important}
+  .screen-nav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+  .screen-nav .btn{flex:1}
+  #pdfReport{position:fixed;left:-100000px;top:0;width:1000px;background:#fff;color:#202523;padding:0;z-index:-1}
+  @media(max-width:720px){
+    .grid{grid-template-columns:1fr}
+    .carousel-head{grid-template-columns:42px 1fr 42px}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="app">
+    <div class="head">
+      <h1>Матрица проверки контрагентов по обороту</h1>
+      <p class="lead">Заполните диапазоны оборота, выберите показатели и укажите периодичность проверки.</p>
+      <div class="period inline-field" id="periodBlock">
+        <label for="periodBase">Оборот с контрагентом за</label>
+        <input id="periodBase" type="text" placeholder="впишите период">
+      </div>
+    </div>
+    <div class="body">
+      <div class="toolbar">
+        <button class="btn ready" id="readyBtn" type="button">Матрица готова</button>
+        <button class="btn download" id="downloadBtn" type="button" disabled>Скачать матрицу в PDF</button>
+      </div>
+      <div class="status" id="statusBox" role="status" aria-live="polite"></div>
+      <div class="carousel">
+        <div class="carousel-head">
+          <button class="slide-arrow" id="prevSlide" type="button" aria-label="Предыдущий экран">‹</button>
+          <div class="slide-meta">
+            <div class="slide-count" id="slideCount">1 из 3</div>
+            <div class="slide-title" id="slideTitle">Незначительный оборот</div>
+          </div>
+          <button class="slide-arrow" id="nextSlide" type="button" aria-label="Следующий экран">›</button>
+        </div>
+        <div class="screens" id="accordion"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="pdfReport" aria-hidden="true"></div>
+<script>
+"use strict";
+const criteria = [
+  'Статус контрагента',
+  'Достоверность сведений в ЕГРЮЛ и адрес',
+  'Полномочия подписанта и представителя',
+  'Руководитель: дисквалификация и ограничения',
+  'Участники: ограничения на участие в юрлицах',
+  'Налоговая и бухгалтерская отчетность',
+  'Налоговые долги',
+  'Налоговые нарушения и блокировки счетов',
+  'Исполнительные производства',
+  'Выписка ФНС с результатами оценки',
+  'Налоговая нагрузка',
+  'Выручка, активы и финансовые показатели',
+  'Сотрудники и квалификация',
+  'Ресурсы: площадка, оборудование, сырье, мощности',
+  'Обычные расходы контрагента',
+  'Опыт, деловая история и присутствие на рынке',
+  'Причина выбора контрагента',
+  'Обязательные разрешения на деятельность и товар',
+  'Посредники и другие участники сделки',
+  'Платеж третьему лицу',
+  'Пояснения по крупному авансу, цене, бартеру и зачету',
+  'Возможность исполнить объем работ или поставки в срок',
+  'Фактические исполнители и доступ на объект',
+  'Источник происхождения товара',
+  'Право поставщика распоряжаться товаром',
+  'Место хранения и прямая отгрузка',
+  'Перевозчик и маршрут товара',
+  'Документы, даты и участники сделки',
+  'Результат работ или услуг',
+  'Реакция компании на нарушение договора',
+  'Плановое обновление проверки',
+  'Внеплановое обновление проверки'
+];
+const rows = [
+  {id:1,title:'Незначительный оборот',kind:'to'},
+  {id:2,title:'Средний оборот',kind:'fromto'},
+  {id:3,title:'Крупный оборот',kind:'from'}
+];
+const state = Object.fromEntries(rows.map(r=>[r.id,{ownCriteria:[],from:'',to:'',periodicity:''}]));
+let matrixReady=false;
+let currentSlide=0;
+const root=document.getElementById('accordion');
+const readyBtn=document.getElementById('readyBtn');
+const downloadBtn=document.getElementById('downloadBtn');
+const statusBox=document.getElementById('statusBox');
+const prevSlideBtn=document.getElementById('prevSlide');
+const nextSlideBtn=document.getElementById('nextSlide');
+const slideTitle=document.getElementById('slideTitle');
+const slideCount=document.getElementById('slideCount');
+
+function esc(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function rangeInputs(row){
+  if(row.kind==='to')return `<div class="range-wrap"><span class="mini-label">Оборот с контрагентом, руб.</span><div class="fld"><input type="text" data-role="to" data-input-row="${row.id}" placeholder="до" value="${esc(state[row.id].to)}"></div></div>`;
+  if(row.kind==='from')return `<div class="range-wrap"><span class="mini-label">Оборот с контрагентом, руб.</span><div class="fld"><input type="text" data-role="from" data-input-row="${row.id}" placeholder="свыше" value="${esc(state[row.id].from)}"></div></div>`;
+  return `<div class="range-wrap range-2"><span class="mini-label">Оборот с контрагентом, руб.</span><div class="fld"><label>от</label><input type="text" data-role="from" data-input-row="${row.id}" placeholder="сумма" value="${esc(state[row.id].from)}"></div><div class="fld"><label>до</label><input type="text" data-role="to" data-input-row="${row.id}" placeholder="сумма" value="${esc(state[row.id].to)}"></div></div>`;
+}
+function renderScreen(row,index){
+  return `<section class="screen${index===0?' active':''}" data-id="${row.id}">
+    <p class="screen-note">${index===0?'Для следующего оборота эти показатели будут включены автоматически.':'Показатели предыдущего оборота здесь уже включены. Добавьте только новые.'}</p>
+    <div class="grid">
+      <div class="cell range-cell">${rangeInputs(row)}</div>
+      <div class="cell criteria-cell">
+        <div class="cell-title">Какие показатели проверяем</div>
+        <div class="picker" data-picker="${row.id}">
+          <button type="button" class="pick-btn" data-open="${row.id}"><span>Выберите показатели</span><small>можно добавить новые</small></button>
+          <div class="menu">
+            <div class="menu-head"><b>Выберите показатели</b><button type="button" class="close-mini" data-close="${row.id}">Готово</button></div>
+            <div class="menu-list" id="menu-list-${row.id}"></div>
+          </div>
+        </div>
+        <div class="chips" id="chips-${row.id}"></div>
+      </div>
+      <div class="cell periodicity-cell">
+        <div class="cell-title">Периодичность проверки</div>
+        <div class="periodicity-inline"><input class="periodicity-input" data-periodicity-row="${row.id}" type="text" placeholder="впишите периодичность" value="${esc(state[row.id].periodicity)}"></div>
+      </div>
+    </div>
+    <div class="screen-nav">
+      <button class="btn nav" type="button" data-prev="${row.id}" ${index===0?'disabled':''}>Предыдущий экран</button>
+      <button class="btn nav" type="button" data-next="${row.id}" ${index===rows.length-1?'disabled':''}>Следующий экран</button>
+    </div>
+  </section>`;
+}
+root.innerHTML=rows.map(renderScreen).join('');
+
+function inheritedCriteria(rowId){
+  const set=[];
+  rows.filter(r=>r.id<rowId).forEach(r=>{
+    state[r.id].ownCriteria.forEach(item=>{if(!set.includes(item))set.push(item);});
+  });
+  return set;
+}
+function effectiveCriteria(rowId){
+  const set=inheritedCriteria(rowId).slice();
+  state[rowId].ownCriteria.forEach(item=>{if(!set.includes(item))set.push(item)});
+  return set;
+}
+function buildMenu(rowId){
+  const box=document.getElementById(`menu-list-${rowId}`); if(!box) return;
+  const inherited=new Set(inheritedCriteria(rowId));
+  const own=new Set(state[rowId].ownCriteria);
+  box.innerHTML=criteria.map(item=>{
+    const inh=inherited.has(item); const checked=inh || own.has(item);
+    return `<label class="option${inh?' inherited':''}"><input type="checkbox" data-row="${rowId}" value="${esc(item)}" ${checked?'checked':''} ${inh?'disabled':''}><span>${esc(item)}${inh?'<small>уже включено из предыдущего оборота</small>':''}</span></label>`;
+  }).join('');
+}
+function refreshChips(rowId){
+  const box=document.getElementById(`chips-${rowId}`); if(!box) return;
+  const inherited=new Set(inheritedCriteria(rowId));
+  const list=effectiveCriteria(rowId);
+  box.innerHTML=list.length?list.map(item=> inherited.has(item)
+    ? `<span class="chip inherited">${esc(item)}</span>`
+    : `<span class="chip">${esc(item)} <button type="button" data-remove="${rowId}" data-value="${esc(item)}">×</button></span>`
+  ).join(''):'<span class="hint">Пока ничего не выбрано</span>';
+  markChanged(); syncHeight();
+}
+function refreshFrom(rowId){
+  rows.filter(r=>r.id>=rowId).forEach(r=>{buildMenu(r.id); refreshChips(r.id);});
+}
+function closeAllMenus(exceptId=''){root.querySelectorAll('.picker').forEach(p=>{if(p.dataset.picker!==String(exceptId))p.classList.remove('open')});}
+function showStatus(text,type){statusBox.textContent=text;statusBox.className=`status show ${type}`;syncHeight();}
+function markChanged(){ if(!matrixReady) return; matrixReady=false; downloadBtn.disabled=true; showStatus('После изменений снова нажмите «Матрица готова».','error'); }
+function clearValidation(){document.querySelectorAll('.invalid,.invalid-block').forEach(el=>el.classList.remove('invalid','invalid-block'));}
+function screenById(rowId){return root.querySelector(`.screen[data-id="${rowId}"]`);}
+function rowData(rowId){
+  const row=rows.find(r=>r.id===rowId);
+  return {row,el:screenById(rowId),from:state[rowId].from.trim(),to:state[rowId].to.trim(),periodicity:state[rowId].periodicity.trim(),criteria:effectiveCriteria(rowId)};
+}
+function collectData(){return {period:document.getElementById('periodBase').value.trim(),rows:rows.map(r=>rowData(r.id))};}
+function validate(){
+  clearValidation(); const data=collectData(); const errors=[]; let firstRowId=null; let firstField=null;
+  if(!data.period){document.getElementById('periodBase').classList.add('invalid');document.getElementById('periodBlock').classList.add('invalid-block');errors.push('укажите период расчета оборота'); firstField=document.getElementById('periodBase');}
+  data.rows.forEach(item=>{
+    const missingRange=(item.row.kind==='to'&&!item.to)||(item.row.kind==='from'&&!item.from)||(item.row.kind==='fromto'&&(!item.from||!item.to));
+    if(missingRange){item.el.querySelector('.range-cell').classList.add('invalid-block'); item.el.querySelectorAll('.range-cell input').forEach(i=>{if(!i.value.trim())i.classList.add('invalid')}); if(!firstRowId) firstRowId=item.row.id; errors.push(`заполните диапазон для группы «${item.row.title}»`);}
+    if(!item.criteria.length){item.el.querySelector('.criteria-cell').classList.add('invalid-block'); if(!firstRowId) firstRowId=item.row.id; errors.push(`выберите показатели для группы «${item.row.title}»`);}
+    if(!item.periodicity){item.el.querySelector('.periodicity-cell').classList.add('invalid-block'); item.el.querySelector('.periodicity-input').classList.add('invalid'); if(!firstRowId) firstRowId=item.row.id; errors.push(`укажите периодичность для группы «${item.row.title}»`);}
+  });
+  if(errors.length){
+    if(firstRowId){showSlide(rows.findIndex(r=>r.id===firstRowId)); setTimeout(()=>screenById(firstRowId)?.scrollIntoView({behavior:'smooth',block:'center'}),50);} else if(firstField){setTimeout(()=>firstField.scrollIntoView({behavior:'smooth',block:'center'}),50);} 
+    showStatus(`Матрица пока не готова: ${errors[0]}.`,'error'); return null;
+  }
+  return data;
+}
+function showSlide(index){
+  currentSlide=Math.max(0,Math.min(index,rows.length-1));
+  root.querySelectorAll('.screen').forEach((screen,i)=>screen.classList.toggle('active',i===currentSlide));
+  slideTitle.textContent=rows[currentSlide].title;
+  slideCount.textContent=`${currentSlide+1} из ${rows.length}`;
+  prevSlideBtn.disabled=currentSlide===0;
+  nextSlideBtn.disabled=currentSlide===rows.length-1;
+  closeAllMenus();
+  syncHeight();
+}
+
+root.addEventListener('click',e=>{
+  const openBtn=e.target.closest('[data-open]');
+  if(openBtn){ const id=openBtn.dataset.open; const picker=root.querySelector(`.picker[data-picker="${id}"]`); const willOpen=!picker.classList.contains('open'); closeAllMenus(); if(willOpen){buildMenu(id); picker.classList.add('open');} syncHeight(); return; }
+  const closeBtn=e.target.closest('[data-close]');
+  if(closeBtn){ root.querySelector(`.picker[data-picker="${closeBtn.dataset.close}"]`).classList.remove('open'); syncHeight(); return; }
+  const rem=e.target.closest('[data-remove]');
+  if(rem){ const rowId=Number(rem.dataset.remove); state[rowId].ownCriteria=state[rowId].ownCriteria.filter(v=>v!==rem.dataset.value); refreshFrom(rowId); return; }
+  const prev=e.target.closest('[data-prev]'); if(prev){ showSlide(currentSlide-1); return; }
+  const next=e.target.closest('[data-next]'); if(next){ showSlide(currentSlide+1); return; }
+  if(!e.target.closest('.picker')) closeAllMenus();
+});
+root.addEventListener('change',e=>{
+  const cb=e.target.closest('input[type="checkbox"][data-row]');
+  if(cb){ const rowId=Number(cb.dataset.row); let list=state[rowId].ownCriteria.slice(); if(cb.checked){ if(!list.includes(cb.value)) list.push(cb.value); } else { list=list.filter(v=>v!==cb.value);} state[rowId].ownCriteria=list; refreshFrom(rowId); return; }
+});
+document.addEventListener('input',e=>{
+  const input=e.target;
+  if(input.id==='periodBase'){ input.classList.remove('invalid'); document.getElementById('periodBlock').classList.remove('invalid-block'); markChanged(); syncHeight(); return; }
+  if(input.matches('[data-input-row]')){ const rowId=Number(input.dataset.inputRow); state[rowId][input.dataset.role]=input.value; input.classList.remove('invalid'); input.closest('.invalid-block')?.classList.remove('invalid-block'); markChanged(); syncHeight(); return; }
+  if(input.matches('[data-periodicity-row]')){ const rowId=Number(input.dataset.periodicityRow); state[rowId].periodicity=input.value; input.classList.remove('invalid'); input.closest('.invalid-block')?.classList.remove('invalid-block'); markChanged(); syncHeight(); }
+});
+prevSlideBtn.addEventListener('click',()=>showSlide(currentSlide-1));
+nextSlideBtn.addEventListener('click',()=>showSlide(currentSlide+1));
+readyBtn.addEventListener('click',()=>{
+  closeAllMenus(); const data=validate(); if(!data) return;
+  matrixReady=true; downloadBtn.disabled=false; showStatus('Матрица готова. Теперь скачайте ее в PDF.','ok');
+});
+downloadBtn.addEventListener('click',async()=>{
+  if(!matrixReady){showStatus('Сначала нажмите «Матрица готова».','error');return;}
+  const data=validate(); if(!data){matrixReady=false; downloadBtn.disabled=true; return;}
+  downloadBtn.disabled=true; downloadBtn.textContent='Создаем PDF...';
+  try{ await createPdf(data); showStatus('PDF скачан.','ok'); }
+  catch(error){ console.error(error); showStatus('Не удалось создать PDF. Обновите страницу и попробуйте еще раз.','error'); }
+  finally{ downloadBtn.disabled=false; downloadBtn.textContent='Скачать матрицу в PDF'; }
+});
+
+function wrapText(ctx,text,maxWidth){const words=String(text).split(/\s+/);const lines=[];let line='';for(const word of words){const test=line?`${line} ${word}`:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);return lines;}
+function newPage(){const canvas=document.createElement('canvas');canvas.width=1240;canvas.height=1754;const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.textBaseline='top';return {canvas,ctx,y:70};}
+function drawWrapped(page,text,x,maxWidth,font,lineHeight,color='#202523'){page.ctx.font=font;page.ctx.fillStyle=color;const lines=wrapText(page.ctx,text,maxWidth);for(const line of lines){page.ctx.fillText(line,x,page.y);page.y+=lineHeight}return lines.length;}
+function ensureSpace(pages,page,needed){if(page.y+needed<=1680)return page;pages.push(page);return newPage();}
+function buildCanvasPages(data){
+  const pages=[]; let page=newPage(); const margin=72; const width=1096;
+  drawWrapped(page,'Матрица проверки контрагентов по обороту',margin,width,'bold 36px Arial',45,'#202523'); page.y+=8;
+  drawWrapped(page,`Оборот с контрагентом за период: ${data.period}`,margin,width,'24px Arial',31,'#5f6763'); page.y+=20;
+  data.rows.forEach((item,index)=>{
+    page=ensureSpace(pages,page,150); page.ctx.strokeStyle='#d7ddd5'; page.ctx.lineWidth=2; page.ctx.beginPath(); page.ctx.moveTo(margin,page.y); page.ctx.lineTo(margin+width,page.y); page.ctx.stroke(); page.y+=18;
+    const range=item.row.kind==='to'?`до ${item.to} руб.`:item.row.kind==='from'?`свыше ${item.from} руб.`:`от ${item.from} до ${item.to} руб.`;
+    drawWrapped(page,`${index+1}. ${item.row.title}`,margin,width,'bold 28px Arial',36,'#202523'); page.y+=2;
+    drawWrapped(page,`Диапазон: ${range}`,margin,width,'20px Arial',28,'#5f6763'); page.y+=8;
+    drawWrapped(page,'Какие показатели проверяем',margin,width,'bold 22px Arial',29,'#202523'); page.y+=4;
+    for(const criterion of item.criteria){ page=ensureSpace(pages,page,44); drawWrapped(page,`• ${criterion}`,margin+16,width-16,'21px Arial',28,'#202523'); }
+    page.y+=8; page=ensureSpace(pages,page,80); drawWrapped(page,'Периодичность проверки',margin,width,'bold 22px Arial',29,'#202523'); page.y+=4; drawWrapped(page,item.periodicity,margin+16,width-16,'21px Arial',28,'#202523'); page.y+=18;
+  });
+  pages.push(page); return pages.map(p=>p.canvas);
+}
+function dataUrlToBytes(dataUrl){const binary=atob(dataUrl.split(',')[1]);const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes;}
+function asciiBytes(str){return new TextEncoder().encode(str)}
+function concatBytes(parts){const total=parts.reduce((n,p)=>n+p.length,0);const out=new Uint8Array(total);let offset=0;for(const part of parts){out.set(part,offset);offset+=part.length}return out;}
+function buildPdfFromJpegs(images,width,height){
+  const pageW=595.28,pageH=841.89;const objectCount=2+images.length*3;const objects=new Array(objectCount+1);const kids=[];
+  images.forEach((img,i)=>{const pageObj=3+i*3,imageObj=pageObj+1,contentObj=pageObj+2;kids.push(`${pageObj} 0 R`);objects[pageObj]=asciiBytes(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im${i+1} ${imageObj} 0 R >> >> /Contents ${contentObj} 0 R >>`);objects[imageObj]=concatBytes([asciiBytes(`<< /Type /XObject /Subtype /Image /Width ${width} /Height ${height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.length} >>\nstream\n`),img,asciiBytes('\nendstream')]);const content=`q\n${pageW} 0 0 ${pageH} 0 0 cm\n/Im${i+1} Do\nQ`;objects[contentObj]=asciiBytes(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`)});
+  objects[1]=asciiBytes('<< /Type /Catalog /Pages 2 0 R >>');objects[2]=asciiBytes(`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${images.length} >>`);
+  const parts=[asciiBytes('%PDF-1.4\n%\xFF\xFF\xFF\xFF\n')];const offsets=new Array(objectCount+1).fill(0);let pos=parts[0].length;
+  for(let i=1;i<=objectCount;i++){offsets[i]=pos;const head=asciiBytes(`${i} 0 obj\n`),tail=asciiBytes('\nendobj\n');parts.push(head,objects[i],tail);pos+=head.length+objects[i].length+tail.length}
+  const xrefPos=pos;let xref=`xref\n0 ${objectCount+1}\n0000000000 65535 f \n`;for(let i=1;i<=objectCount;i++)xref+=`${String(offsets[i]).padStart(10,'0')} 00000 n \n`;xref+=`trailer\n<< /Size ${objectCount+1} /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;parts.push(asciiBytes(xref));return concatBytes(parts);
+}
+async function createPdf(data){const canvases=buildCanvasPages(data);const images=canvases.map(c=>dataUrlToBytes(c.toDataURL('image/jpeg',0.92)));const pdfBytes=buildPdfFromJpegs(images,1240,1754);const blob=new Blob([pdfBytes],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Матрица_проверки_контрагентов.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);}
+function syncHeight(){const h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);if(window.parent&&window.parent!==window)window.parent.postMessage({type:'setHeight',height:h},'*')}
+window.addEventListener('load',()=>{ refreshFrom(1); showSlide(0); syncHeight(); });
+window.addEventListener('resize',syncHeight);
+</script>
+</body>
+</html>
