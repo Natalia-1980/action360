@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Структура досье по группам оборота</title>
+<style>
+  :root{
+    --ink:#202523;
+    --text:#202523;
+    --muted:#5f6763;
+    --line:#d7ddd5;
+    --bg:#f4f2eb;
+    --soft:#f1f2f3;
+    --soft-2:#f7f7f5;
+    --accent:#202523;
+    --accent-dark:#202523;
+    --white:#fffef9;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,Helvetica,sans-serif}
+  body{padding:8px}
+  .trainer{width:100%;max-width:650px;margin:0 auto;background:var(--white);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 14px 32px rgba(32,37,35,.09)}
+  .head{padding:22px 24px 18px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  h1{font-size:21px;line-height:1.2;margin:0 0 10px;color:var(--ink)}
+  .intro{font-size:15px;line-height:1.45;margin:0;color:var(--muted)}
+  .progress{padding:14px 24px 0}
+  .progress-top{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;color:var(--muted);margin-bottom:8px}
+  .progress-track{height:5px;background:#dfe3e0;border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;width:25%;background:var(--accent);border-radius:999px;transition:width .25s ease}
+  .screen{display:none;padding:20px 24px 24px}
+  .screen.active{display:block}
+  .group-card{background:var(--soft-2);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;margin-bottom:14px}
+  .group-kicker{font-size:12px;color:var(--muted);margin-bottom:5px}
+  .group-title{font-size:20px;line-height:1.2;font-weight:700;color:var(--ink);margin:0 0 6px}
+  .group-task{font-size:14px;line-height:1.4;color:var(--muted);margin:0}
+  .range-row{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .range-row label{font-size:13px;color:var(--muted)}
+  .range-input{flex:1;min-width:210px;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font:inherit;font-size:14px;background:#fff;color:var(--text);outline:none}
+  .range-input:focus{border-color:#929a96;box-shadow:0 0 0 2px rgba(32,37,35,.10)}
+  .hint{font-size:13px;line-height:1.4;color:var(--muted);margin:0 0 12px}
+  .blocks{border-top:1px solid var(--line)}
+  details.block{border-bottom:1px solid var(--line)}
+  details.block summary{list-style:none;cursor:pointer;padding:14px 2px;display:flex;align-items:center;gap:10px;user-select:none}
+  details.block summary::-webkit-details-marker{display:none}
+  .chev{width:20px;height:20px;display:grid;place-items:center;border-radius:50%;background:var(--soft);color:var(--ink);font-size:13px;flex:0 0 auto;transition:transform .2s ease}
+  details[open] .chev{transform:rotate(90deg)}
+  .block-name{font-size:15px;font-weight:700;color:var(--ink);flex:1;min-width:0}
+  .block-count{font-size:12px;color:var(--muted);white-space:nowrap}
+  .choices{padding:0 0 12px 30px}
+  .choice{position:relative;display:block;border-radius:10px;padding:10px 10px 10px 36px;margin:3px 0;cursor:pointer}
+  .choice:hover{background:var(--soft-2)}
+  .choice.inherited{background:var(--soft-2);cursor:default}
+  .choice input{position:absolute;left:10px;top:12px;width:17px;height:17px;accent-color:var(--ink)}
+  .choice-title{display:block;font-size:14px;line-height:1.35;color:var(--text)}
+  .choice-docs{display:block;font-size:12.5px;line-height:1.35;color:var(--muted);margin-top:3px}
+  .block-actions{display:flex;justify-content:flex-end;padding:4px 0 14px 30px}
+  .done-btn{appearance:none;border:1px solid var(--line);border-radius:9px;background:var(--soft);color:var(--ink);font:inherit;font-size:13px;font-weight:700;padding:8px 14px;cursor:pointer}
+  .done-btn:hover{background:#e7e9e8}
+  .inherited-note{display:inline-block;margin-left:6px;font-size:11px;color:var(--muted);font-weight:400}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px}
+  .btn{appearance:none;border:1px solid var(--line);border-radius:10px;padding:11px 16px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.15s ease}
+  .btn:focus-visible{outline:3px solid rgba(32,37,35,.18);outline-offset:2px}
+  .btn.secondary{background:#fff;color:var(--ink)}
+  .btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+  .btn.primary:hover{background:#353c39;border-color:#353c39}
+  .btn[disabled]{opacity:.4;cursor:default}
+  .final-title{font-size:21px;line-height:1.2;margin:0 0 8px;color:var(--ink)}
+  .final-simple{min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 16px}
+  .final-simple .final-title{margin-bottom:22px}
+  .final-download{min-width:260px}
+  .final-text{font-size:14px;line-height:1.45;color:var(--muted);margin:0 0 16px}
+  .summary-carousel{position:relative;margin-top:4px}
+  .summary-viewport{overflow:hidden;border-radius:13px}
+  .summary-track{display:flex;transition:transform .28s ease;will-change:transform}
+  .summary-card{flex:0 0 100%;min-width:100%;border:1px solid var(--line);border-radius:13px;padding:14px;background:#fff}
+  .summary-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px}
+  .summary-name{font-size:16px;font-weight:700;color:var(--ink)}
+  .summary-count{font-size:12px;color:var(--muted);white-space:nowrap}
+  .summary-range{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+  .summary-block{font-size:13px;line-height:1.35;margin-top:6px}
+  .summary-block b{color:var(--ink)}
+  .carousel-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px}
+  .carousel-arrow{width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--ink);font-size:20px;line-height:1;cursor:pointer}
+  .carousel-arrow:hover{background:var(--soft)}
+  .carousel-arrow:disabled{opacity:.35;cursor:default}
+  .carousel-counter{min-width:54px;text-align:center;font-size:12.5px;color:var(--muted)}
+  .empty{font-size:13px;color:var(--muted);font-style:italic}
+  .download-box{margin-top:16px;padding:14px;background:var(--soft-2);border:1px solid var(--line);border-radius:13px}
+  .download-box p{margin:0 0 10px;font-size:13px;line-height:1.4;color:var(--muted)}
+  .download-row{display:flex;gap:10px;flex-wrap:wrap}
+  .download-row .btn{flex:1;min-width:220px}
+  .restart{display:block;margin:14px auto 0;border:0;background:none;color:var(--muted);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer}
+  @media (max-width:520px){
+    body{padding:0}.trainer{border-radius:0;border-left:0;border-right:0}
+    .head,.screen{padding-left:16px;padding-right:16px}.progress{padding-left:16px;padding-right:16px}
+    h1{font-size:22px}.choices{padding-left:18px}.choice{padding-left:34px}
+    .nav{align-items:stretch}.nav .btn{flex:1}
+  }
+  @media print{
+    body{padding:0}.trainer{box-shadow:none;border:0;max-width:none}.head,.progress,.screen{display:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="trainer" id="trainer">
+  <div class="head">
+    <div class="eyebrow">Итоговая практика</div>
+    <h1>Соберите структуру досье по группам оборота</h1>
+    <p class="intro">Внутри каждой группы отметьте доказательства, которые хотите включить в досье.</p>
+  </div>
+
+  <div class="progress" aria-hidden="true">
+    <div class="progress-top"><span id="progressLabel">Шаг 1 из 4</span><span id="progressName">Незначительный оборот</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <main id="screens"></main>
+</div>
+
+<script>
+(() => {
+  const blocks = [
+    {
+      id:'status', name:'Статус и полномочия', items:[
+        {id:'active', title:'Контрагент действует', docs:'выписка из ЕГРЮЛ/ЕГРИП с датой проверки'},
+        {id:'reliable', title:'Сведения в ЕГРЮЛ достоверны, адрес подтвержден', docs:'выписка ЕГРЮЛ; отчет или скриншот из «Прозрачного бизнеса»; при расхождении — документ на помещение и пояснение'},
+        {id:'authority', title:'Представитель вправе вести переговоры и подписывать документы', docs:'выписка ЕГРЮЛ о руководителе; решение или приказ; доверенность'},
+        {id:'director', title:'Руководитель вправе управлять компанией', docs:'справка или скриншот из реестра дисквалифицированных лиц'},
+        {id:'owners', title:'Участники не ограничены на участие в юридических лицах', docs:'отчет или скриншот из «Прозрачного бизнеса» с датой проверки'}
+      ]
+    },
+    {
+      id:'tax', name:'Налоги и финансы', items:[
+        {id:'reporting', title:'Контрагент сдает налоговую и бухгалтерскую отчетность', docs:'бухгалтерская отчетность из ГИР БО; отчет или скриншот из «Прозрачного бизнеса»'},
+        {id:'taxdebt', title:'Проверена налоговая задолженность', docs:'справка об исполнении обязанности по уплате налогов; «Прозрачный бизнес»; при риске — пояснения и документы об уплате или обжаловании'},
+        {id:'blocks', title:'Проверены налоговые нарушения и блокировки счетов', docs:'«Прозрачный бизнес»; «Банкинформ»; при риске — пояснение контрагента'},
+        {id:'enforcement', title:'Проверены исполнительные производства', docs:'карточки ФССП; расчет соотношения долга с выручкой и суммой сделки'},
+        {id:'fnsrating', title:'Получена оценка финансово-хозяйственной деятельности от ФНС', docs:'выписка из ЛК налогоплательщика с результатами оценки; при необходимости — пояснения и дополнительные документы'},
+        {id:'taxburden', title:'Налоговая нагрузка соответствует масштабу деятельности', docs:'«Прозрачный бизнес»; бухгалтерская отчетность; расчет налоговой нагрузки'},
+        {id:'finance', title:'Выручка, активы и финансовое состояние сопоставлены со сделкой', docs:'бухгалтерская отчетность из ГИР БО; «Прозрачный бизнес»; расчет сопоставления с параметрами сделки'}
+      ]
+    },
+    {
+      id:'resources', name:'Ресурсы и деловая история', items:[
+        {id:'employees', title:'Проверены сотрудники и их квалификация', docs:'«Прозрачный бизнес» о численности; штатное расписание или справка о составе персонала; при необходимости — документы о квалификации'},
+        {id:'assets', title:'Проверены площадка, оборудование, сырье и мощности', docs:'документы о собственности, ЕГРН, аренда или лизинг; перечень оборудования; сведения о запасах; расчет мощности'},
+        {id:'expenses', title:'Проверены обычные расходы, без которых исполнение невозможно', docs:'расчет затрат; договоры или банковские выписки по аренде, перевозке, сырью и другим ключевым расходам'},
+        {id:'experience', title:'Подтверждены опыт и реальное присутствие на рынке', docs:'сайт или сохраненные страницы; сведения о проектах; договоры и акты; отзывы и рекомендации'},
+        {id:'choice', title:'Обоснован выбор именно этого контрагента', docs:'коммерческие предложения; лист сравнения; результаты закупки; переписка; служебная записка; протоколы переговоров'},
+        {id:'record', title:'Зафиксировано, где, когда и как проверяли контрагента', docs:'лист проверки; запросы контрагенту и его ответы'},
+        {id:'permits', title:'Проверены обязательные разрешения на деятельность и товар', docs:'лицензия; профильный реестр; СРО; сертификаты или декларации соответствия'}
+      ]
+    },
+    {
+      id:'chain', name:'Цепочка и расчеты', items:[
+        {id:'participants', title:'Понятна роль посредников и других участников сделки', docs:'схема сделки; договоры с участниками; пояснения, подтверждающие функцию каждого звена'},
+        {id:'thirdparty', title:'Есть основание для платежа третьему лицу', docs:'письмо контрагента; уступка, агентский договор, поручение или трехстороннее соглашение'}
+      ]
+    },
+    {
+      id:'conditions', name:'Условия и исполнители', items:[
+        {id:'purpose', title:'Зафиксирована деловая цель сделки', docs:'внутренняя заявка; служебная записка или обоснование потребности; при необходимости — расчет экономического эффекта'},
+        {id:'unusual', title:'Необычные цена, аванс или способ расчетов объяснены', docs:'расчет цены; переписка; решение согласующего; документы об обеспечении или иных мерах защиты'},
+        {id:'capacity', title:'Подтверждено, что контрагент сможет исполнить нужный объем в срок', docs:'график исполнения; расчет мощности; расчет потребности в людях, технике, материалах и финансировании'},
+        {id:'performers', title:'Установлены фактические исполнители и их доступ на объект', docs:'список исполнителей; договор субподряда; квалификация и допуски; пропуска и журналы доступа'}
+      ]
+    },
+    {
+      id:'evidence', name:'Товар и доказательства исполнения', items:[
+        {id:'origin', title:'Установлен источник происхождения товара', docs:'сведения о производителе, импортере или предыдущем поставщике; документы по цепочке; сертификаты и разрешительная документация'},
+        {id:'right', title:'Поставщик вправе распоряжаться товаром', docs:'договоры и спецификации по цепочке; документы о переходе права; полномочия посредника'},
+        {id:'storage', title:'Понятно, где хранится товар или как устроена прямая отгрузка', docs:'документы на склад; договор хранения или аренды; схема прямой отгрузки с участниками и адресами'},
+        {id:'route', title:'Установлены перевозчик и маршрут товара', docs:'договор или заявка на перевозку; транспортные документы; сведения о машине и водителе; маршрут'},
+        {id:'events', title:'Документы совпадают с фактическими событиями сделки', docs:'договор и приложения; заявки; первичные и транспортные документы; приемка; при необходимости — хронология сделки'},
+        {id:'result', title:'Получен и использован результат работ или услуг', docs:'техническое задание; отчет и рабочие материалы; переписка; акт приемки; подтверждение использования результата'},
+        {id:'breach', title:'Компания зафиксировала реакцию на нарушение договора', docs:'претензия; дополнительное соглашение; переписка; решение изменить срок, цену либо не применять меры'}
+      ]
+    },
+    {
+      id:'finaldocs', name:'Итоговые документы досье', items:[
+        {id:'checkdecision', title:'Лист проверки и итоговое решение: зафиксированы ход проверки и решение по сделке', docs:'лист проверки контрагента и итоговое решение'},
+        {id:'registrydoc', title:'Реестр документов: понятно, что есть и где хранится', docs:'реестр документов досье'}
+      ]
+    },
+    {
+      id:'update', name:'Обновление проверки', items:[
+        {id:'planned', title:'Сведения о действующем контрагенте обновляются планово', docs:'график проверки; дата последней проверки; новые выписки и отчеты; обновленный лист проверки контрагента и итоговое решение'},
+        {id:'event', title:'Существенное изменение запускает внеплановую проверку', docs:'сообщение об изменении; новые выписки и отчеты; обновленный лист проверки контрагента и итоговое решение'}
+      ]
+    }
+  ];
+
+  const groups = [
+    {id:'low', name:'Незначительный оборот', task:'Соберите минимальное досье.', placeholder:'Например: до 500 000 руб.'},
+    {id:'mid', name:'Средний оборот', task:'Базовый комплект уже перенесен из предыдущей группы. Добавьте доказательства для более глубокой проверки.', placeholder:'Например: от 500 000 до 3 000 000 руб.'},
+    {id:'high', name:'Крупный оборот', task:'Все, что выбрали раньше, уже включено. Добавьте доказательства, которые нужны для расширенного досье.', placeholder:'Например: свыше 3 000 000 руб.'}
+  ];
+
+  const storageKey = 'dossier-turnover-v1';
+  let current = 0;
+  let additions = [new Set(), new Set(), new Set()];
+  let ranges = ['', '', ''];
+  let summaryIndex = 0;
+
+  const screens = document.getElementById('screens');
+  const progressLabel = document.getElementById('progressLabel');
+  const progressName = document.getElementById('progressName');
+  const progressFill = document.getElementById('progressFill');
+
+  function allItems(){ return blocks.flatMap(b => b.items.map(i => ({...i, blockId:b.id, blockName:b.name}))); }
+  const flatItems = allItems();
+  const itemById = Object.fromEntries(flatItems.map(i => [i.id, i]));
+
+  function effectiveSet(groupIndex){
+    const s = new Set();
+    for(let i=0;i<=groupIndex;i++) additions[i].forEach(id => s.add(id));
+    return s;
+  }
+  function inheritedSet(groupIndex){
+    const s = new Set();
+    for(let i=0;i<groupIndex;i++) additions[i].forEach(id => s.add(id));
+    return s;
+  }
+
+  function save(){
+    const data = { additions:additions.map(s=>Array.from(s)), ranges };
+    try{ localStorage.setItem(storageKey, JSON.stringify(data)); }catch(e){}
+  }
+  function load(){
+    try{
+      const raw = localStorage.getItem(storageKey);
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      if(Array.isArray(data.additions) && data.additions.length===3){
+        additions = data.additions.map(a=>new Set(a));
+        // Миграция с версии, где лист проверки и решение были двумя отдельными пунктами.
+        additions.forEach(set => {
+          if(set.has('checksheet') || set.has('decision')) set.add('checkdecision');
+          set.delete('checksheet');
+          set.delete('decision');
+        });
+      }
+      if(Array.isArray(data.ranges) && data.ranges.length===3) ranges = data.ranges;
+    }catch(e){}
+  }
+
+  function groupScreen(index){
+    const g = groups[index];
+    return `
+      <section class="screen" data-screen="${index}">
+        <div class="group-card">
+          <div class="group-kicker">Экран ${index+1} из 3</div>
+          <h2 class="group-title">${g.name}</h2>
+          <p class="group-task">${g.task}</p>
+          <div class="range-row">
+            <label for="range-${index}">Оборот с контрагентом, руб.</label>
+            <input class="range-input" id="range-${index}" data-range="${index}" value="${escapeHtml(ranges[index]||'')}" placeholder="${g.placeholder}">
+          </div>
+        </div>
+        <p class="hint">Нажмите на название блока, чтобы открыть его. Галочки из предыдущей группы переносятся автоматически.</p>
+        <div class="blocks" id="blocks-${index}"></div>
+        <div class="nav">
+          <button class="btn secondary" type="button" data-prev="${index}" ${index===0?'disabled':''}>← Назад</button>
+          <button class="btn primary" type="button" data-next="${index}">${index===2?'Завершить':'Дальше →'}</button>
+        </div>
+      </section>`;
+  }
+
+  function finalScreen(){
+    return `
+      <section class="screen" data-screen="3">
+        <div class="final-simple">
+          <h2 class="final-title">Структура досье готова</h2>
+          <button class="btn primary final-download" type="button" id="downloadBtn">Скачать структуру досье в Word</button>
+        </div>
+      </section>`;
+  }
+
+  function renderShell(){
+    screens.innerHTML = groups.map((_,i)=>groupScreen(i)).join('') + finalScreen();
+    groups.forEach((_,i)=>renderBlocks(i));
+    bindEvents();
+    showScreen(current);
+  }
+
+  function renderBlocks(groupIndex){
+    const wrap = document.getElementById(`blocks-${groupIndex}`);
+    if(!wrap) return;
+    const effective = effectiveSet(groupIndex);
+    const inherited = inheritedSet(groupIndex);
+    wrap.innerHTML = blocks.map((block, bi) => {
+      const count = block.items.filter(i => effective.has(i.id)).length;
+      const choices = block.items.map(item => {
+        const isInherited = inherited.has(item.id);
+        const isOwn = additions[groupIndex].has(item.id);
+        const checked = isInherited || isOwn;
+        return `<label class="choice ${isInherited?'inherited':''}">
+          <input type="checkbox" data-group="${groupIndex}" data-item="${item.id}" ${checked?'checked':''} ${isInherited?'disabled':''}>
+          <span class="choice-title">${item.title}${isInherited?'<span class="inherited-note">уже в комплекте</span>':''}</span>
+          <span class="choice-docs">${item.docs}</span>
+        </label>`;
+      }).join('');
+      return `<details class="block" data-block="${block.id}">
+        <summary><span class="chev">›</span><span class="block-name">${block.name}</span><span class="block-count" data-count-block="${block.id}">${count} из ${block.items.length}</span></summary>
+        <div class="choices">${choices}</div>
+        <div class="block-actions"><button class="done-btn" type="button" data-done-block>Готово</button></div>
+      </details>`;
+    }).join('');
+    bindBlockEvents(wrap, groupIndex);
+  }
+
+  function syncGroupUI(groupIndex){
+    const wrap = document.getElementById(`blocks-${groupIndex}`);
+    if(!wrap) return;
+    const effective = effectiveSet(groupIndex);
+    const inherited = inheritedSet(groupIndex);
+    wrap.querySelectorAll('[data-done-block]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const d = btn.closest('details.block');
+        if(!d) return;
+        d.open = false;
+        const summary = d.querySelector('summary');
+        if(summary) summary.focus({preventScroll:true});
+      });
+    });
+    wrap.querySelectorAll('input[type="checkbox"][data-item]').forEach(cb => {
+      const id = cb.dataset.item;
+      const isInherited = inherited.has(id);
+      cb.checked = isInherited || additions[groupIndex].has(id);
+      cb.disabled = isInherited;
+      const label = cb.closest('.choice');
+      if(label){
+        label.classList.toggle('inherited', isInherited);
+        const title = label.querySelector('.choice-title');
+        let note = title ? title.querySelector('.inherited-note') : null;
+        if(isInherited && title && !note){
+          note = document.createElement('span');
+          note.className='inherited-note';
+          note.textContent='уже в комплекте';
+          title.appendChild(note);
+        }else if(!isInherited && note){ note.remove(); }
+      }
+    });
+    blocks.forEach(block => {
+      const count = block.items.filter(i => effective.has(i.id)).length;
+      const el = wrap.querySelector(`[data-count-block="${block.id}"]`);
+      if(el) el.textContent = `${count} из ${block.items.length}`;
+    });
+  }
+
+  function bindBlockEvents(wrap, groupIndex){
+    wrap.querySelectorAll('details.block').forEach(d => {
+      d.addEventListener('toggle', () => {
+        if(d.open){
+          wrap.querySelectorAll('details.block').forEach(other => { if(other!==d) other.open=false; });
+        }
+      });
+    });
+    wrap.querySelectorAll('input[type="checkbox"][data-item]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const idx = Number(cb.dataset.group), id = cb.dataset.item;
+        if(cb.checked) additions[idx].add(id); else additions[idx].delete(id);
+        save();
+        // Не перерисовываем блоки: иначе раскрытый раздел закрывается и экран "скачет".
+        for(let j=idx;j<3;j++) syncGroupUI(j);
+      });
+    });
+  }
+
+  function bindEvents(){
+    document.querySelectorAll('[data-next]').forEach(btn => btn.addEventListener('click', () => {
+      const idx = Number(btn.dataset.next);
+      current = idx===2 ? 3 : idx+1;
+      showScreen(current);
+    }));
+    document.querySelectorAll('[data-prev]').forEach(btn => btn.addEventListener('click', () => {
+      const idx = Number(btn.dataset.prev);
+      if(idx>0){ current=idx-1; showScreen(current); }
+    }));
+    document.querySelectorAll('[data-range]').forEach(inp => inp.addEventListener('input', () => {
+      ranges[Number(inp.dataset.range)] = inp.value.trim(); save();
+    }));
+    document.getElementById('downloadBtn').addEventListener('click', downloadWord);
+  }
+
+  function showScreen(index){
+    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', Number(s.dataset.screen)===index));
+    const names = ['Незначительный оборот','Средний оборот','Крупный оборот','Итог'];
+    progressLabel.textContent = `Шаг ${index+1} из 4`;
+    progressName.textContent = names[index];
+    progressFill.style.width = `${(index+1)*25}%`;
+    document.getElementById('trainer').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  function renderSummary(){
+    const track = document.getElementById('summaryTrack');
+    track.innerHTML = groups.map((g,gi) => {
+      const eff = effectiveSet(gi);
+      const blockLines = blocks.map(block => {
+        const selected = block.items.filter(i => eff.has(i.id));
+        if(!selected.length) return '';
+        return `<div class="summary-block"><b>${block.name}:</b> ${selected.map(i=>i.title.toLowerCase()).join('; ')}.</div>`;
+      }).join('');
+      return `<article class="summary-card">
+        <div class="summary-head"><div class="summary-name">${g.name}</div><div class="summary-count">${eff.size} поз.</div></div>
+        <div class="summary-range">${ranges[gi] ? `Оборот с контрагентом, руб.: ${escapeHtml(ranges[gi])}` : 'Оборот с контрагентом, руб.: не указан'}</div>
+        ${blockLines || '<div class="empty">Пока ничего не выбрано.</div>'}
+      </article>`;
+    }).join('');
+    summaryIndex = Math.max(0, Math.min(summaryIndex, groups.length-1));
+    updateSummaryCarousel();
+  }
+
+  function moveSummary(delta){
+    summaryIndex = Math.max(0, Math.min(groups.length-1, summaryIndex + delta));
+    updateSummaryCarousel();
+  }
+
+  function updateSummaryCarousel(){
+    const track = document.getElementById('summaryTrack');
+    if(!track) return;
+    track.style.transform = `translateX(-${summaryIndex*100}%)`;
+    document.getElementById('summaryCounter').textContent = `${summaryIndex+1} из ${groups.length}`;
+    document.getElementById('summaryPrev').disabled = summaryIndex===0;
+    document.getElementById('summaryNext').disabled = summaryIndex===groups.length-1;
+  }
+
+  function downloadWord(){
+    const docsToBullets = (text) => {
+      const parts = String(text||'').split(';').map(x=>x.trim()).filter(Boolean);
+      return `<ul>${parts.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul>`;
+    };
+
+    const sections = groups.map((g,gi) => {
+      const eff = effectiveSet(gi);
+      const rows = [];
+      blocks.forEach(block => {
+        const selected = block.items.filter(i => eff.has(i.id));
+        selected.forEach((item,idx) => {
+          const blockCell = idx===0 ? `<td class="block-cell" rowspan="${selected.length}">${escapeHtml(block.name)}</td>` : '';
+          rows.push(`<tr>
+            ${blockCell}
+            <td>${escapeHtml(item.title)}</td>
+            <td>${docsToBullets(item.docs)}</td>
+          </tr>`);
+        });
+      });
+      const range = ranges[gi] ? escapeHtml(ranges[gi]) : 'не указан';
+      return `<div class="section-title">${escapeHtml(g.name)}</div>
+      <div class="range-line"><b>Оборот с контрагентом, руб.:</b> ${range}</div>
+      ${rows.length ? `<table><thead><tr><th>Блок</th><th>Что включаем в досье</th><th>Каким документом или материалом</th></tr></thead><tbody>${rows.join('')}</tbody></table>` : '<p>Состав не выбран.</p>'}`;
+    }).join('');
+
+    const html = `<!doctype html><html><head><meta charset="utf-8"><style>
+      @page{size:A4 landscape;margin:12mm 13mm 14mm 13mm}
+      body{font-family:Arial,sans-serif;color:#202523;font-size:10.5pt;line-height:1.22;margin:0}
+      .overline{font-size:9.5pt;margin:0 0 6px;color:#5f6763}
+      .title{font-size:15pt;font-weight:700;margin:0 0 5px}
+      .lead{font-size:10.5pt;font-weight:700;margin:0 0 16px}
+      .section-title{font-size:12pt;font-weight:700;margin:17px 0 3px}
+      .range-line{font-size:9.5pt;margin:0 0 8px;color:#5f6763}
+      table{border-collapse:collapse;width:100%;margin:0 0 13px;table-layout:fixed}
+      th{font-weight:700;text-align:left;border:1px solid #d7ddd5;padding:5px 6px;background:#f1f2f3;color:#202523}
+      td{vertical-align:top;border:1px solid #d7ddd5;padding:5px 6px}
+      th:first-child,td:first-child{width:18%}th:nth-child(2),td:nth-child(2){width:31%}th:nth-child(3),td:nth-child(3){width:51%}
+      td.block-cell{font-weight:700;background:#f1f2f3;color:#202523;vertical-align:top}
+      ul{margin:0;padding-left:18px}li{margin:0 0 2px}
+    </style></head><body>
+      <div class="overline">Структура досье контрагента</div>
+      <div class="title">Структура досье по группам оборота</div>
+      <p class="lead">Смотрите на связь: группа оборота → что включаем в досье → каким документом или материалом подтверждаем.</p>
+      ${sections}
+    </body></html>`;
+    const blob = new Blob(['\ufeff',html], {type:'application/msword;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download='Структура_досье_по_группам_оборота.doc';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
+  function escapeHtml(str){
+    return String(str ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  }
+
+  load();
+  renderShell();
+})();
+</script>
+</body>
+</html>

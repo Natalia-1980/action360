@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Диагностика проверки контрагентов</title>
+<style>
+:root{
+  --ink:#202523;
+  --muted:#68706c;
+  --line:#d9ddda;
+  --paper:#ffffff;
+  --bg:#f5f5f2;
+  --soft:#f1f2ef;
+  --soft-2:#e8ebe8;
+  --red:#a94235;
+  --red-bg:#fff0ed;
+  --green:#315f40;
+  --green-bg:#eaf4ed;
+  --gray:#555b60;
+  --gray-bg:#f1f2f3;
+  --cream:#f6f0dc;
+  --cream-line:#d8cda7;
+  --shadow:0 8px 24px rgba(32,37,35,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:transparent;color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif}
+body{padding:8px}
+button{font:inherit}
+.app{width:min(650px,100%);margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+.top{padding:20px 22px 16px;border-bottom:1px solid var(--line);background:#fff}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--green);margin-bottom:7px}
+h1{margin:0;font-size:26px;line-height:1.15;letter-spacing:-.02em}
+.lead{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.45;max-width:590px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:14px 18px 10px;background:var(--bg);border-bottom:1px solid var(--line)}
+.step{border:1px solid var(--line);background:#fff;border-radius:11px;padding:8px 5px;text-align:center;color:var(--muted);font-size:11px;line-height:1.2;font-weight:800;min-height:48px;cursor:pointer}
+.step.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.step.done{background:var(--green-bg);border-color:#b9d0bf;color:var(--green)}
+.viewport{overflow:hidden}
+.track{display:flex;transition:transform .28s ease;will-change:transform}
+.slide{min-width:100%;padding:20px 22px 18px}
+.slide-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:15px}
+.num{flex:0 0 auto;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--green-bg);border:1px solid #b9d0bf;color:var(--green);font-weight:800;font-size:13px}
+.slide-title{margin:0;font-size:20px;line-height:1.2}
+.slide-sub{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.4}
+.questions{display:grid;gap:10px}
+.q{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fff}
+.q-title{font-size:14px;line-height:1.4;font-weight:700;margin:0 0 10px}
+.answers{display:flex;flex-wrap:wrap;gap:7px}
+.answer{border:1px solid var(--line);background:var(--gray-bg);color:var(--ink);border-radius:999px;padding:8px 11px;cursor:pointer;font-size:12px;line-height:1.1;transition:.15s}
+.answer:hover{border-color:#aeb5b1}
+.answer.selected.yes{background:var(--green-bg);border-color:#8eae97;color:var(--green)}
+.answer.selected.no{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.answer.selected.unknown{background:#555b60;border-color:#555b60;color:#fff}
+.answer.selected.partial{background:var(--cream);border-color:var(--cream-line);color:#625b42}
+.answer:focus-visible,.nav-btn:focus-visible,.step:focus-visible{outline:3px solid rgba(49,95,64,.22);outline-offset:2px}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 18px 17px;border-top:1px solid var(--line);background:var(--bg)}
+.counter{font-size:12px;color:var(--muted);white-space:nowrap}
+.nav-actions{display:flex;gap:8px}
+.nav-btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:9px 13px;cursor:pointer;font-weight:800;font-size:12px}
+.nav-btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.nav-btn:disabled{opacity:.35;cursor:default}
+.helper{min-height:18px;padding:0 22px 12px;color:var(--red);font-size:12px;line-height:1.35;background:var(--bg)}
+.result{display:none;padding:20px 22px 22px;background:var(--bg)}
+.result.visible{display:block}
+.result-top{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.result-top h2{margin:0 0 6px;font-size:22px}
+.result-top p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.map{display:grid;gap:10px}
+.map-block{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.map-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.map-title{font-weight:800;font-size:14px}
+.map-link{font-size:11px;color:var(--muted);text-align:right}
+.map-list{display:grid}
+.map-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:10px 14px;border-top:1px solid #eef0ee}
+.map-row:first-child{border-top:0}
+.map-q{font-size:12.5px;line-height:1.35}
+.status{white-space:nowrap;border-radius:999px;padding:5px 8px;font-size:10.5px;font-weight:800;border:1px solid var(--line)}
+.status.yes{background:var(--green-bg);border-color:#8eae97;color:var(--green)}
+.status.no{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.status.unknown{background:#555b60;border-color:#555b60;color:#fff}
+.status.partial{background:var(--cream);border-color:var(--cream-line);color:#625b42}
+.result-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+
+.result-intro{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.result-intro h2{margin:0 0 6px;font-size:22px}
+.result-intro p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.result-carousel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px}
+.result-vp{overflow:hidden}
+.result-track{display:flex;transition:transform .28s ease;will-change:transform}
+.result-slide{min-width:100%}
+.result-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.result-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.result-counter{font-size:12px;color:var(--muted);white-space:nowrap}
+.result-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.result-tab{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:10px;padding:8px 6px;text-align:center;font-size:10.5px;line-height:1.15;font-weight:800;cursor:pointer;min-height:42px}
+.result-tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.result-tab.done{background:var(--green-bg);border-color:#b9d0bf;color:var(--green)}
+@media(max-width:520px){
+ body{padding:4px}
+ .app{border-radius:16px}
+ .top{padding:16px 15px 13px}
+ h1{font-size:21px}
+ .lead{font-size:12.5px}
+ .steps{padding:10px 10px 8px;gap:4px}
+ .step{font-size:9px;min-height:43px;padding:6px 3px;border-radius:8px}
+ .slide{padding:15px 13px 14px}
+ .slide-head{gap:9px;margin-bottom:11px}
+ .num{width:28px;height:28px;font-size:12px}
+ .slide-title{font-size:17px}
+ .slide-sub{font-size:11.5px}
+ .questions{gap:8px}
+ .q{padding:11px;border-radius:11px}
+ .q-title{font-size:12.5px;margin-bottom:8px}
+ .answer{font-size:11px;padding:7px 9px}
+ .nav{padding:10px}
+ .counter{font-size:10.5px}
+ .nav-btn{font-size:11px;padding:8px 10px}
+ .helper{padding:0 13px 9px;font-size:10.5px}
+ .result{padding:14px 11px 16px}
+ .result-intro{padding:13px}
+ .result-intro h2{font-size:19px}
+ .result-carousel{padding:10px 10px 9px;border-radius:13px}
+ .result-tab{font-size:9px;min-height:38px;padding:6px 4px;border-radius:8px}
+ .result-counter{font-size:10.5px}
+ .map-head{padding:10px 11px}
+ .map-title{font-size:12.5px}
+ .map-link{font-size:9.5px}
+ .map-row{grid-template-columns:1fr;gap:6px;padding:9px 11px}
+ .map-q{font-size:11.5px}
+ .status{justify-self:start;font-size:9.5px}
+}
+@media print{
+ body{padding:0;background:#fff}
+ .app{border:0;box-shadow:none;width:100%;max-width:none}
+ .top,.steps,.viewport,.nav,.helper{display:none!important}
+ .result{display:block!important;padding:0;background:#fff}
+ .result-intro{break-inside:avoid;box-shadow:none;margin-bottom:12px}
+ .result-carousel{border:0!important;padding:0!important;background:#fff!important}
+ .result-vp{height:auto!important;overflow:visible!important}
+ .result-track{display:block!important;transform:none!important;transition:none!important}
+ .result-slide{display:block!important;width:100%!important;min-width:0!important;margin:0 0 12px 0!important;break-inside:avoid}
+ .result-card,.map-block{break-inside:avoid;box-shadow:none}
+ .result-nav,.result-tabs,.result-actions{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <section class="top">
+    <div class="eyebrow">Стартовая диагностика</div>
+    <h1>Проведите аудит проверки контрагентов в своей компании</h1>
+    <p class="lead">Ответьте, как процесс устроен сейчас. Здесь нет правильных и неправильных ответов: тренажер соберет карту диагностики без рекомендаций.</p>
+  </section>
+
+  <div class="steps" id="steps">
+    <button class="step active" type="button" data-step="0">Что<br>проверяем</button>
+    <button class="step" type="button" data-step="1">Где<br>проверяем</button>
+    <button class="step" type="button" data-step="2">Как<br>фиксируем</button>
+    <button class="step" type="button" data-step="3">Кто<br>отвечает</button>
+  </div>
+
+  <div class="viewport" id="viewport">
+    <div class="track" id="track"></div>
+  </div>
+  <div class="helper" id="helper" aria-live="polite"></div>
+  <div class="nav" id="nav">
+    <div class="counter" id="counter">Экран 1 из 4</div>
+    <div class="nav-actions">
+      <button class="nav-btn" id="prev" type="button">Назад</button>
+      <button class="nav-btn primary" id="next" type="button">Далее</button>
+    </div>
+  </div>
+
+  <section class="result" id="result" aria-live="polite"></section>
+</div>
+
+<script>
+(() => {
+  const blocks = [
+    {
+      title: 'Что проверяете',
+      sub: 'Проверим, есть ли у компании правила: что проверять, насколько глубоко и когда обновлять сведения.',
+      lesson: 'Урок 1 · Матрица проверки',
+      questions: [
+        {q:'Компания установила перечень критериев, по которым проверяет контрагента?', a:[['Установила','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'Глубина проверки зависит от оборота с контрагентом?', a:[['Да, зависит','yes'],['Нет, не зависит','no'],['Не знаю','unknown']]},
+        {q:'При проверке оцениваете способность контрагента исполнить конкретную сделку?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'У вас в регламенте перечислены события, при которых вы обновляете проверку контрагента?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]}
+      ]
+    },
+    {
+      title: 'Где проверяете',
+      sub: 'Посмотрим, понятно ли сотруднику, в каких сервисах и источниках искать нужные сведения.',
+      lesson: 'Урок 2 · Перечень сервисов',
+      questions: [
+        {q:'Компания установила перечень сервисов и источников для проверки контрагентов?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'Для каждого критерия проверки понятно, в каком источнике искать сведения?', a:[['Да','yes'],['Частично','partial'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'Компания установила, какие сервисы использовать при разной глубине проверки?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'Сотруднику понятно, где искать сведения, если основного источника недостаточно?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]}
+      ]
+    },
+    {
+      title: 'Как фиксируете и храните',
+      sub: 'Проверим, что остается после проверки и можно ли потом восстановить ее ход.',
+      lesson: 'Урок 3 · Структура досье',
+      questions: [
+        {q:'Компания установила, какие документы и материалы нужно сохранять по результатам проверки?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'По итогам проверки остается документ, в котором видно, что проверили, что обнаружили и какое решение приняли?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'Компания установила, где хранить документы по проверке контрагента?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'Можно по реестру или другому навигатору быстро найти документы по конкретному контрагенту?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]}
+      ]
+    },
+    {
+      title: 'Кто проверяет и кто решает',
+      sub: 'Последний блок — распределение проверки между сотрудниками и подразделениями.',
+      lesson: 'Урок 4 · Карта ролей',
+      questions: [
+        {q:'Компания установила для каждого блока проверки исполнителя или подразделение?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'Компания установила, в каком виде исполнители передают результаты проверки?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'Есть сотрудник, который собирает результаты разных подразделений в одну картину?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]},
+        {q:'Компания установила, кто принимает итоговое решение по результатам проверки?', a:[['Да','yes'],['Нет','no'],['Не знаю','unknown']]}
+      ]
+    }
+  ];
+
+  const answers = blocks.map(b => Array(b.questions.length).fill(null));
+  const track = document.getElementById('track');
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const helper = document.getElementById('helper');
+  const counter = document.getElementById('counter');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const viewport = document.getElementById('viewport');
+  const nav = document.getElementById('nav');
+  const result = document.getElementById('result');
+  let current = 0;
+  let startX = null, startY = null;
+
+  function renderSlides(){
+    track.innerHTML = blocks.map((b, bi) => `
+      <section class="slide" data-slide="${bi}">
+        <div class="slide-head">
+          <div class="num">${bi+1}</div>
+          <div>
+            <h2 class="slide-title">${b.title}</h2>
+            <p class="slide-sub">${b.sub}</p>
+          </div>
+        </div>
+        <div class="questions">
+          ${b.questions.map((item, qi) => `
+            <div class="q" data-q="${qi}">
+              <p class="q-title">${qi+1}. ${item.q}</p>
+              <div class="answers">
+                ${item.a.map(([label,type]) => `<button type="button" class="answer" data-bi="${bi}" data-qi="${qi}" data-label="${label.replace(/"/g,'&quot;')}" data-type="${type}">${label}</button>`).join('')}
+              </div>
+            </div>`).join('')}
+        </div>
+      </section>`).join('');
+
+    track.querySelectorAll('.answer').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bi = +btn.dataset.bi;
+        const qi = +btn.dataset.qi;
+        answers[bi][qi] = {label:btn.dataset.label,type:btn.dataset.type};
+        const group = btn.closest('.answers');
+        group.querySelectorAll('.answer').forEach(x => x.className='answer');
+        btn.classList.add('selected',btn.dataset.type);
+        helper.textContent='';
+        updateSteps();
+      });
+    });
+  }
+
+  function blockComplete(i){ return answers[i].every(Boolean); }
+  function updateSteps(){
+    steps.forEach((s,i) => {
+      s.classList.toggle('active',i===current);
+      s.classList.toggle('done',i!==current && blockComplete(i));
+    });
+  }
+  function show(i){
+    current=Math.max(0,Math.min(i,blocks.length-1));
+    track.style.transform=`translateX(-${current*100}%)`;
+    counter.textContent=`Экран ${current+1} из ${blocks.length}`;
+    prev.disabled=current===0;
+    next.textContent=current===blocks.length-1?'Собрать карту':'Далее';
+    helper.textContent='';
+    updateSteps();
+    window.requestAnimationFrame(() => {
+      const slide=track.children[current];
+      viewport.style.height=slide.offsetHeight+'px';
+    });
+  }
+  function requireComplete(){
+    if(blockComplete(current)) return true;
+    helper.textContent='Ответьте на все вопросы этого экрана, чтобы продолжить.';
+    return false;
+  }
+  function buildResult(){
+    if(!requireComplete()) return;
+    result.innerHTML = `
+      <div class="result-intro">
+        <h2>Карта диагностики готова</h2>
+        <p>Вы зафиксировали, как проверка контрагентов устроена в компании сейчас. Карта не дает рекомендаций — она показывает исходное состояние перед четырьмя уроками программы.</p>
+      </div>
+      <div class="result-carousel">
+        <div class="result-vp" id="resultVp">
+          <div class="result-track" id="resultTrack">
+            ${blocks.map((b,bi)=>`
+              <section class="result-slide">
+                <div class="result-card map-block">
+                  <div class="map-head"><div class="map-title">${b.title}</div><div class="map-link">${b.lesson}</div></div>
+                  <div class="map-list">
+                    ${b.questions.map((item,qi)=>{
+                      const ans=answers[bi][qi];
+                      return `<div class="map-row"><div class="map-q">${item.q}</div><span class="status ${ans.type}">${ans.label}</span></div>`;
+                    }).join('')}
+                  </div>
+                </div>
+              </section>`).join('')}
+          </div>
+        </div>
+        <div class="result-nav">
+          <button class="nav-btn" type="button" id="resultPrev">Назад</button>
+          <div class="result-counter" id="resultCounter">1 из ${blocks.length}</div>
+          <button class="nav-btn" type="button" id="resultNext">Далее</button>
+        </div>
+        <div class="result-tabs" id="resultTabs">
+          ${blocks.map((b,bi)=>`<button class="result-tab ${bi===0?'active':''}" type="button" data-rstep="${bi}">${b.title.replace(' и ',' и<br>')}</button>`).join('')}
+        </div>
+      </div>
+      <div class="result-actions">
+        <button class="nav-btn primary" type="button" id="printMap">Сохранить карту в PDF</button>
+        <button class="nav-btn" type="button" id="restart">Пройти заново</button>
+      </div>`;
+    document.querySelector('.viewport').style.display='none';
+    document.getElementById('steps').style.display='none';
+    nav.style.display='none';
+    helper.style.display='none';
+    result.classList.add('visible');
+    document.getElementById('printMap').addEventListener('click',()=>window.print());
+    document.getElementById('restart').addEventListener('click',()=>location.reload());
+    initResultCarousel();
+  }
+
+  function initResultCarousel(){
+    const rTrack = document.getElementById('resultTrack');
+    const rVp = document.getElementById('resultVp');
+    const rPrev = document.getElementById('resultPrev');
+    const rNext = document.getElementById('resultNext');
+    const rCounter = document.getElementById('resultCounter');
+    const rTabs = Array.from(document.querySelectorAll('.result-tab'));
+    let rCurrent = 0;
+    let rx = null, ry = null;
+
+    function updateHeight(){
+      const slide = rTrack.children[rCurrent];
+      if(slide) rVp.style.height = slide.offsetHeight + 'px';
+    }
+    function showResult(i){
+      rCurrent = Math.max(0, Math.min(i, blocks.length-1));
+      rTrack.style.transform = `translateX(-${rCurrent*100}%)`;
+      rCounter.textContent = `${rCurrent+1} из ${blocks.length}`;
+      rPrev.disabled = rCurrent===0;
+      rNext.disabled = rCurrent===blocks.length-1;
+      rNext.textContent = rCurrent===blocks.length-1 ? 'Последний экран' : 'Далее';
+      rTabs.forEach((t,idx)=>t.classList.toggle('active', idx===rCurrent));
+      requestAnimationFrame(updateHeight);
+    }
+    rPrev.addEventListener('click',()=>showResult(rCurrent-1));
+    rNext.addEventListener('click',()=>showResult(rCurrent+1));
+    rTabs.forEach((t,idx)=>t.addEventListener('click',()=>showResult(idx)));
+    rVp.addEventListener('touchstart',e=>{ const t=e.changedTouches[0]; rx=t.clientX; ry=t.clientY; },{passive:true});
+    rVp.addEventListener('touchend',e=>{
+      if(rx===null) return;
+      const t=e.changedTouches[0], dx=t.clientX-rx, dy=t.clientY-ry;
+      if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)){
+        if(dx<0 && rCurrent<blocks.length-1) showResult(rCurrent+1);
+        if(dx>0 && rCurrent>0) showResult(rCurrent-1);
+      }
+      rx=ry=null;
+    },{passive:true});
+    window.addEventListener('resize', updateHeight);
+    showResult(0);
+  }
+
+  prev.addEventListener('click',()=>show(current-1));
+  next.addEventListener('click',()=>{
+    if(!requireComplete()) return;
+    if(current<blocks.length-1) show(current+1); else buildResult();
+  });
+  steps.forEach((s,i)=>s.addEventListener('click',()=>{
+    if(i<=current || blocks.slice(0,i).every((_,idx)=>blockComplete(idx))) show(i);
+  }));
+
+  viewport.addEventListener('touchstart',e=>{
+    const t=e.changedTouches[0]; startX=t.clientX; startY=t.clientY;
+  },{passive:true});
+  viewport.addEventListener('touchend',e=>{
+    if(startX===null) return;
+    const t=e.changedTouches[0], dx=t.clientX-startX, dy=t.clientY-startY;
+    if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)){
+      if(dx<0 && current<blocks.length-1 && blockComplete(current)) show(current+1);
+      if(dx>0 && current>0) show(current-1);
+    }
+    startX=startY=null;
+  },{passive:true});
+
+  window.addEventListener('resize',()=>show(current));
+  renderSlides();
+  show(0);
+})();
+</script>
+</body>
+</html>
