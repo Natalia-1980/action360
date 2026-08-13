@@ -48,9 +48,8 @@
             color: #000;
         }
 
-        /* Блок-обертка для фиксации одинаковой высоты вопросов */
         .content-container {
-            min-height: 360px; /* Фиксируем минимальную высоту контентной части, чтобы не прыгала */
+            min-height: 360px;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -99,11 +98,10 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            cursor: pointer;
             padding: 8px;
             border-radius: 4px;
         }
-        .answer-option:hover {
+        .answer-option:hover:not(.disabled-state) {
             background-color: #f9f9f9;
         }
         .answer-option input[type="radio"] {
@@ -112,6 +110,10 @@
             accent-color: #d32f2f;
             cursor: pointer;
             margin: 0;
+        }
+        .answer-option input[type="radio"]:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .submit-btn {
@@ -137,13 +139,17 @@
             border: 1px solid #e0e0e0;
             background: #fafafa;
             border-radius: 4px;
+            border-left-width: 4px;
         }
         .feedback-correct {
-            border-left: 4px solid #2e7d32;
+            border-left-color: #2e7d32;
+            background-color: #f0fdf4; 
         }
         .feedback-incorrect {
-            border-left: 4px solid #d32f2f;
+            border-left-color: #dc3545;
+            background-color: #fdf0f0; 
         }
+        
         .feedback-text {
             font-size: 15px;
             line-height: 1.5;
@@ -178,7 +184,7 @@
             width: 100%;
             background-color: #e0e0e0;
             border-radius: 10px;
-            margin-bottom: 20px; /* Отступ уменьшен, чтобы влезло в фиксированную высоту */
+            margin-bottom: 20px;
             overflow: hidden;
             height: 10px;
         }
@@ -193,21 +199,26 @@
         .results-screen {
             display: none;
         }
+        
+        /* НОВЫЙ ПОРЯДОК: Сначала баллы, потом текст */
+        .result-score {
+            font-size: 26px;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 15px;
+            text-align: center;
+        }
         .result-title {
             font-size: 22px;
             font-weight: bold;
             margin-bottom: 10px;
-        }
-        .result-score {
-            font-size: 18px;
-            font-weight: bold;
-            color: #d32f2f;
-            margin-bottom: 10px;
+            text-align: center;
         }
         .result-desc {
             font-size: 16px;
             line-height: 1.5;
             margin-bottom: 20px;
+            text-align: center;
         }
         
         .result-links {
@@ -247,9 +258,7 @@
 <div class="card">
     <div class="interactive-label">ИНТЕРАКТИВ</div>
 
-    <!-- Оборачиваем все в фиксированный по высоте контейнер -->
     <div class="content-container">
-
         <!-- Start Screen -->
         <div id="start-screen" class="start-screen">
             <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iNzAiIGhlaWdodD0iOTAiIHg9IjE1IiB5PSI1IiByeD0iNCIgZmlsbD0iI2ZmNTI1MiIvPjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSIxNSIgeD0iMzAiIHk9IjAiIHJ4PSIzIiBmaWxsPSIjMDBjODUzIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1NSIgcj0iMTgiIGZpbGw9IiNmZjUyNTIiLz48dGV4dCB4PSI1MCIgeT0iNjEiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PzwvdGV4dD48cmVjdCB3aWR0aD0iMjUiIGhlaWdodD0iNSIgeD0iMzcuNSIgeT0iNzgiIHJ4PSIyIiBmaWxsPSIjZmY1MjUyIi8+PHJlY3Qgd2lkdGg9IjE1IiBoZWlnaHQ9IjUiIHg9IjQyLjUiIHk9Ijg2IiByeD0iMiIgZmlsbD0iI2ZmNTI1MiIvPjwvc3ZnPg==" alt="Clipboard" class="clipboard-icon">
@@ -274,13 +283,12 @@
 
         <!-- Results Screen -->
         <div id="results-screen" class="results-screen">
-            <div id="result-title" class="result-title"></div>
             <div id="result-score" class="result-score"></div>
+            <div id="result-title" class="result-title"></div>
             <div id="result-desc" class="result-desc"></div>
             <div id="result-links" class="result-links"></div>
             <button class="restart-btn" onclick="location.reload()">Пройти заново</button>
         </div>
-
     </div>
 </div>
 
@@ -290,7 +298,7 @@
             question: "Покупатель приобретает товар на условиях самовывоза и привлекает транспортную компанию. Товар негабаритный, поэтому до погрузки нельзя определить его точное количество. Покупатель просит, чтобы поставщик сам подписал Титул 1 в ЭТрН. Можно ли так сделать?",
             options: ["А. Именно так и нужно делать, ведь поставщик в любом случае будет грузоотправителем", "Б. Титул может подписать сотрудник поставщика, ответственный за погрузку товара", "В. Так делать нельзя. При самовывозе грузоотправителем является покупатель, поэтому Титул 1 всегда подписывает он"],
             correct: 1,
-            comment: "Правила перевозки грузов автотранспортом предусматривают, что грузоотправителем является заказчик перевозки (постановление Правительства от 21.12.2020 № 2200). При самовывозе заказчиком будет покупатель. Но порядок направления ЭТрН допускает, что электронный документ может составлять как грузоотправитель, так и ответственный за погрузку (постановление Правительства от 21.05.2022 № 931). Подробности - в рекомендации <a href=\"https://1gl.ru/#/document/16/211207/\" target=\"_blank\">Электронная транспортная накладная (ЭТрН) с 1 сентября 2026 года</a>."
+            comment: "Грузоотправителем является заказчик перевозки. При самовывозе заказчиком будет покупатель. Но порядок направления ЭТрН допускает, что электронный документ может составлять как грузоотправитель, так и ответственный за погрузку. Подробности - в рекомендации <a href=\"https://1gl.ru/#/document/16/211207/\" target=\"_blank\">Электронная транспортная накладная (ЭТрН) с 1 сентября 2026 года</a>."
         },
         {
             question: "Компания в сентябре решила провести зачет сальдо своего ЕНС в пользу третьего лица – контрагента. По какой причине ей могут отказать в зачете?",
@@ -418,6 +426,10 @@
         }
         isAnswered = true;
         submitBtn.disabled = true;
+        
+        const allRadios = document.querySelectorAll('input[name="answer"]');
+        allRadios.forEach(radio => radio.disabled = true);
+
         const q = questions[currentIndex];
         const selectedIndex = parseInt(selected.value);
         const isCorrect = selectedIndex === q.correct;
@@ -459,18 +471,20 @@
         });
 
         if (score >= 9) {
-            title = "Вы Богиня бухгалтерии!";
-            desc = "Продолжайте дальше пользоваться Системой и вы станете Царицей.";
+            title = "Вы царица бухгалтерии!";
+            desc = "Ваши проводки безупречны, отчеты идеальны. Но даже царицы следят за указами — законы меняются каждый день. Продолжайте дальше пользоваться Системой главбух и станете Богиней бухгалтерии.";
         } else if (score >= 7) {
-            title = "Вы уже профи!";
-            desc = "Законы не стоят на месте. Обновите знания — и разрыв между вами и экспертом исчезнет.";
+            title = "Вы королева бухгалтерии!";
+            desc = "Вы правите уверенно, но законы не стоят на месте. Обновите знания по налогам, зарплате, ЭТРН и другим изменениям — и ваше королевство будет процветать. У вас есть верный помощник — Система главбух.";
         } else {
-            title = "Вы пока не готовы к изменениям.";
-            desc = "Но ваша сила — не в знании, а в готовности учиться. Начните изучать изменения прямо сейчас.";
+            title = "Вы принцесса бухгалтерии.";
+            desc = "Вы только учитесь управлять королевством цифр. Но ваша сила — не в знании, а в готовности учиться. Законы меняются быстрее, чем вы успеваете их читать, но у вас есть верный помощник — Система главбух.";
         }
 
-        document.getElementById('result-title').textContent = title;
+        // Сначала выводим БАЛЛЫ
         document.getElementById('result-score').textContent = `Вы набрали ${score} из ${totalQuestions} баллов`;
+        // Потом выводим остальное
+        document.getElementById('result-title').textContent = title;
         document.getElementById('result-desc').textContent = desc;
         document.getElementById('result-links').innerHTML = linksHTML;
     }
