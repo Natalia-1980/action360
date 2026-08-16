@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Итоговая практика — маршрут проверки</title>
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=-t6NtMcKmaLmxXpsMGKFCsK_aa9lOvKepgIr3TAy0AyuwIDQ8Bpx4JItIY8O35neFKhZhoboGKYPTURqhJs_ofnVIydgtpw0T0eQcM5NWu56ZbRd70JKOlBzcww182lN5UCgLiSSQJoR2NZ-A05V4Cf3ZNLTRTLlbSuv-hHole3V29s5xp3MWDCwwYlEX3CDGYdj5zp8Q6qYp9QfY-O0X2HnyWwClHoR2Uhwkv7nCjP9z2WPK648ixeglJo-PFm0lDf2FqyfnmUBKIc_-KnUmYMYlWjpZknkvZuyfp0KgrcHN1p0or7iX0_W4hxtd1FO65_sDcTYY2BQB3h5y4TBpxAgJ55sduCSR_dshgj1OwM" charset="UTF-8"></script><style>
+:root{
+  --ink:#202523;--muted:#5f6763;--line:#d7ddd5;--paper:#fffef9;--bg:#f4f2eb;
+  --graphite:#202523;--neutral:#f1f2f3;--neutral2:#f7f7f5;
+  --success:#eaf4ed;--success-line:#8eae97;--success-text:#315f40;
+  --warn:#9a3c2e;--warn-bg:#fff0ed;--warn-line:#d78175;
+  --shadow:0 14px 32px rgba(32,37,35,.09)
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;min-width:320px;background:var(--bg);color:var(--ink);font:14px/1.42 Inter,"Segoe UI",Arial,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid rgba(32,37,35,.2);outline-offset:2px}
+.shell{width:min(650px,calc(100% - 16px));margin:0 auto;padding:8px 0 24px}
+.app{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.head{padding:16px 18px 14px;border-bottom:1px solid var(--line)}
+.eyebrow{margin-bottom:5px;color:var(--muted);font-size:11px;font-weight:800}
+h1{margin:0 0 7px;font-size:19px;line-height:1.2;letter-spacing:-.01em}
+.lead{margin:0;color:var(--muted);font-size:13px}
+.progress{padding:10px 16px 0}
+.progress-top{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px;color:var(--muted);font-size:11px;font-weight:700}
+.track{height:5px;border-radius:99px;background:#e3e6e3;overflow:hidden}
+.fill{height:100%;width:25%;background:var(--graphite);transition:width .25s ease}
+.stage{padding:13px 14px 15px}
+.carousel{border:1px solid var(--line);border-radius:15px;background:#fff;overflow:hidden}
+.carousel-head{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;border-bottom:1px solid var(--line);background:var(--neutral2)}
+.arrow{height:52px;border:0;background:transparent;font-size:25px;font-weight:800}
+.arrow:hover:not(:disabled){background:var(--neutral)}
+.arrow:disabled{opacity:.3;cursor:default}
+.meta{text-align:center;padding:7px 8px}
+.steptitle{font-size:16px;font-weight:900;line-height:1.18}
+.viewport{position:relative;min-height:430px}
+.card{padding:15px 16px 14px}
+.case{margin:0 0 12px;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:var(--neutral2);font-size:13px;line-height:1.45}
+.case b{color:var(--ink)}
+.question{margin:0 0 9px;font-size:15px;font-weight:850;line-height:1.3}
+.options{display:grid;gap:7px}
+.option{width:100%;border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 11px;text-align:left;font-size:13px;line-height:1.35;transition:.15s}
+.option:hover:not(:disabled){border-color:#aeb5b1;background:var(--neutral2)}
+.option.selected:not(.checked){border-color:#929a96;background:var(--neutral);box-shadow:inset 0 0 0 1px #929a96}
+.option.correct{border-color:var(--success-line);background:var(--success);color:var(--success-text)}
+.option.wrong{border-color:var(--warn-line);background:var(--warn-bg);color:var(--warn)}
+.option:disabled{cursor:default}
+.feedback{display:none;margin-top:10px;padding:10px 11px;border-radius:10px;font-size:12.5px;line-height:1.4}
+.feedback.show{display:block}
+.feedback.good{background:var(--success);border:1px solid var(--success-line);color:var(--ink)}
+.feedback.bad{background:var(--warn-bg);border:1px solid #e5cbc3;color:var(--ink)}
+.actions{display:flex;justify-content:space-between;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.btn{min-height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 12px;font-weight:800}
+.btn:hover:not(:disabled){background:var(--neutral2);border-color:#aeb5b1}
+.btn.primary{background:var(--graphite);border-color:var(--graphite);color:#fff}
+.btn.primary:hover:not(:disabled){background:#353c39}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.final{display:none;padding:18px 16px 16px;text-align:center}
+.final.show{display:block}
+.final h2{margin:0 0 8px;font-size:21px}
+.final p{margin:0 auto 14px;max-width:520px;color:var(--muted);font-size:13px}
+.route{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0}
+.route div{padding:9px 6px;border:1px solid var(--line);border-radius:9px;background:var(--neutral2);font-size:11px;font-weight:800;line-height:1.25}
+.score{margin:12px 0;font-size:13px;font-weight:800}
+@media(max-width:520px){
+  .route{grid-template-columns:1fr 1fr}.viewport{min-height:500px}.actions{flex-direction:column}.btn{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="app">
+    <div class="head">
+      <div class="eyebrow">Итоговая практика</div>
+    </div>
+    <div class="progress" id="progressBox">
+      <div class="progress-top"><span id="progressText">Ситуация 1 из 4</span></div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+    </div>
+    <div class="stage">
+      <div class="carousel" id="carousel">
+        <div class="carousel-head">
+          <button class="arrow" id="prev" type="button" aria-label="Предыдущая ситуация">‹</button>
+          <div class="meta"><div class="steptitle" id="stepTitle">Распределяем проверку</div></div>
+          <button class="arrow" id="next" type="button" aria-label="Следующая ситуация">›</button>
+        </div>
+        <div class="viewport"><div class="card" id="card"></div></div>
+      </div>
+      <div class="final" id="final">
+        <h2>Вы собрали маршрут проверки</h2>
+        <p>Вы освоили, что перед тем, как распределять проверку между отделами, необходимо настроить в своей компании 4 параметра.</p>
+        <div class="route">
+          <div>Какие отделы проверяют</div><div>Что фиксируют в чек-листах</div><div>Кто ответственный</div><div>Кто принимает решение</div>
+        </div>
+        <div class="score" id="score"></div>
+        <button class="btn primary" type="button" id="restart">Пройти еще раз</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+const cases=[
+  {
+    title:'Распределяем проверку',
+    text:'Бухгалтер передал всю проверку службе безопасности: проверить компанию, налоги, финансовое состояние, поставку, наличие запчастей и условия сделки.',
+    q:'Какую ошибку допустил бухгалтер?',
+    answers:[
+      'Нужно распределить показатели между отделами по их компетенциям.',
+      'Ошибки нет: один отдел отвечает за весь результат.',
+      'Проверку должен полностью провести сам бухгалтер.'
+    ], correct:0,
+    feedback:'Например, налоги и финансовые показатели может проверить бухгалтерия, условия поставки — закупки, источник товара и цепочку — служба безопасности. Бухгалтер как ответственный собирает результаты проверки.'
+  },
+  {
+    title:'Работаем с риском из чек-листа',
+    text:'Закупки отметили в своем чек-листе: поставщик надежный, условия сделки приемлемые. Служба безопасности отметила риск по цепочке поставки, но не приложила пояснения и подтверждающие документы.',
+    q:'Что бухгалтер должен сделать?',
+    answers:[
+      'Оставить риск без уточнений: служба безопасности уже выполнила свою часть проверки.',
+      'Самостоятельно решить, что риск несущественный, и закрыть проверку.',
+      'Потребовать от службы безопасности разъяснения и документы по риску, который нашли.'
+    ], correct:2,
+    feedback:'Верно. Отделы фиксируют результаты в чек-листах из карты ролей. Если отдел отметил риск, бухгалтер как ответственный должен получить пояснение и подтверждающие документы, чтобы понять, закрыт риск или нужны дополнительные действия.'
+  },
+  {
+    title:'Собираем общую картину',
+    text:'Закупки сообщили: поставщик обещает доставить запчасти за 10 дней. Служба безопасности выяснила: собственного склада нет, товар пойдет напрямую от производителя. Бухгалтер просто сохранил документы от отделов в разных папках.',
+    q:'Что должен был сделать бухгалтер?',
+    answers:[
+      'Ничего: каждый отдел отвечает только за свой участок.',
+      'Сопоставить результаты и проверить, подтверждает ли цепочка поставки необычно короткий срок.',
+      'Передать документы поставщику и дозапросить пояснения.'
+    ], correct:1,
+    feedback:'Короткий срок может объясняться прямой отгрузкой от производителя. Но бухгалтеру как ответственному нужно сопоставить результаты отделов и проверить, подтверждены ли производитель, договорная цепочка, право поставщика распоряжаться товаром и возможность поставить нужный объем за 10 дней.'
+  },
+  {
+    title:'Разделяем ответственность и решение',
+    text:'Бухгалтер решил: «Риски закрыты, договор заключаем» — и сам утвердил поставщика, потому что он ответственный за проверку.',
+    q:'Где ошибка?',
+    answers:[
+      'Ответственный собирает результат, итоговое решение принимает руководитель.',
+      'Ошибки нет, ответственный принимает итоговое решение.',
+      'Итоговое решение должны принять все отделы голосованием.'
+    ], correct:0,
+    feedback:'Ответственный собирает результаты проверки, фиксирует выводы в итоговом отчете и передает их руководителю. Итоговое решение по сделке принимает руководитель.'
+  }
+]
+let current=0;
+const state=cases.map(()=>({selected:null,checked:false,correct:false}));
+const card=document.getElementById('card'),prev=document.getElementById('prev'),next=document.getElementById('next');
+const stepTitle=document.getElementById('stepTitle');
+const progressText=document.getElementById('progressText'),fill=document.getElementById('fill');
+function esc(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function render(){
+  const c=cases[current],s=state[current];
+  stepTitle.textContent=c.title;
+  progressText.textContent=`Ситуация ${current+1} из ${cases.length}`; fill.style.width=`${(current+1)/cases.length*100}%`;
+  card.innerHTML=`<div class="case">${esc(c.text)}</div><div class="question">${esc(c.q)}</div><div class="options">${c.answers.map((a,i)=>{
+    let cls='option'; if(s.selected===i) cls+=' selected'; if(s.checked){cls+=' checked'; if(i===c.correct) cls+=' correct'; else if(s.selected===i) cls+=' wrong';}
+    return `<button class="${cls}" type="button" data-answer="${i}" ${s.checked?'disabled':''}>${String.fromCharCode(1040+i)}. ${esc(a)}</button>`;
+  }).join('')}</div><div class="feedback ${s.checked?'show '+(s.correct?'good':'bad'):''}">${s.checked?(s.correct?'Верно. ':'Неверно. ')+esc(c.feedback):''}</div><div class="actions"><button class="btn" id="backBtn" type="button" ${current===0?'disabled':''}>Предыдущая ситуация</button><button class="btn primary" id="checkBtn" type="button" ${s.selected===null||s.checked?'disabled':''}>Проверить ответ</button><button class="btn primary" id="forwardBtn" type="button" ${!s.checked?'disabled':''}>${current===cases.length-1?'Завершить':'Следующая ситуация'}</button></div>`;
+  card.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>{if(s.checked)return;s.selected=Number(b.dataset.answer);render();});
+  document.getElementById('checkBtn').onclick=()=>{s.checked=true;s.correct=s.selected===c.correct;render();};
+  document.getElementById('backBtn').onclick=()=>go(current-1);
+  document.getElementById('forwardBtn').onclick=()=>{if(current===cases.length-1)showFinal();else go(current+1);};
+  prev.disabled=current===0; next.disabled=current===cases.length-1 || !s.checked;
+}
+function go(i){if(i<0||i>=cases.length)return;current=i;render();}
+function showFinal(){
+  document.getElementById('carousel').style.display='none';document.getElementById('progressBox').style.display='none';document.getElementById('final').classList.add('show');
+  const score=state.filter(s=>s.correct).length;document.getElementById('score').textContent=`Правильных ответов: ${score} из ${cases.length}`;
+}
+prev.onclick=()=>go(current-1);next.onclick=()=>{if(state[current].checked)go(current+1)};
+document.getElementById('restart').onclick=()=>{state.forEach(s=>{s.selected=null;s.checked=false;s.correct=false});current=0;document.getElementById('carousel').style.display='block';document.getElementById('progressBox').style.display='block';document.getElementById('final').classList.remove('show');render();};
+render();
+</script>
+</body>
+</html>
