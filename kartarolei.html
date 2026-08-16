@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Перераспределите проверку между отделами</title>
+<style>
+:root{
+  --ink:#17332f;--text:#1f2927;--muted:#65716f;--line:#d7dedb;--soft:#f3f6f4;--soft2:#eef3f0;
+  --accent:#0f6559;--accent-dark:#0a5148;--coral:#c75b4a;--coral-bg:#fff4f1;--white:#fff;--shadow:rgba(20,45,40,.06)
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:transparent;color:var(--text);font-family:Arial,Helvetica,sans-serif}
+body{padding:8px}
+button,input,select{font:inherit}
+button{touch-action:manipulation}
+.trainer{width:100%;max-width:650px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 8px 24px var(--shadow)}
+.head{padding:21px 24px 17px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.head-copy{min-width:0}.reset-top{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:6px 0;white-space:nowrap}.reset-top:hover{color:var(--coral);text-decoration:underline}.reset-top:focus-visible{outline:2px solid var(--coral);outline-offset:3px;border-radius:5px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:7px}
+h1{font-size:21px;line-height:1.2;margin:0;color:var(--ink)}
+.progress{padding:14px 24px 0}
+.progress-top{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;color:var(--muted);margin-bottom:7px}
+.progress-track{height:5px;background:#e8edeb;border-radius:999px;overflow:hidden}.progress-fill{height:100%;background:var(--accent);border-radius:999px;transition:width .2s ease}
+.screen{display:none;padding:20px 24px 24px}.screen.active{display:block}
+.group-card{background:var(--soft);border-radius:14px;padding:15px 16px;margin-bottom:14px}
+.group-kicker{font-size:12px;color:var(--muted);margin-bottom:4px}.group-title{font-size:19px;line-height:1.2;font-weight:700;color:var(--ink);margin:0 0 5px}.group-sub{font-size:13.5px;line-height:1.42;color:#46504e;margin:0}
+.setup-list{display:grid;gap:8px}.setup-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.setup-input{width:100%;border:0;outline:none;color:var(--text);background:transparent;font-size:14px}.icon-btn{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:5px 6px;border-radius:8px}.icon-btn:hover{background:var(--soft);color:var(--coral)}
+.add-row{display:none;grid-template-columns:1fr auto auto;gap:7px;margin-top:9px}.add-row.show{display:grid}.text-input,.select{width:100%;min-height:38px;border:1px solid #cfd8d4;border-radius:9px;background:#fff;padding:8px 9px;color:var(--text);outline:none}.text-input:focus,.select:focus{border-color:#8eb8ae;box-shadow:0 0 0 3px rgba(15,101,89,.08)}
+.link-btn{border:0;background:none;color:var(--accent);padding:7px 0;cursor:pointer;font-weight:700;font-size:13px;text-align:left}.link-btn:hover{text-decoration:underline}
+.top-actions{display:flex;justify-content:flex-end;margin:-3px 0 8px}.mini-link{border:0;background:none;color:var(--muted);font-size:12px;cursor:pointer;padding:4px 0}.mini-link:hover{color:var(--accent);text-decoration:underline}
+.notice{margin:0 0 12px;padding:9px 11px;background:#f8faf9;border-radius:10px;font-size:12.5px;line-height:1.38;color:var(--muted)}
+
+.departments{border-top:0}
+.dept-carousel{position:relative;margin-top:10px}
+.dept-slide{display:none;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+.dept-slide.active{display:block}
+.dept-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:13px 14px;background:#f8faf9;border-bottom:1px solid var(--line)}
+.dept-card-label{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.dept-card-title{font-size:16px;line-height:1.25;font-weight:700;color:var(--ink)}
+.dept-card-count{font-size:11.5px;line-height:1.35;color:var(--muted);text-align:right;white-space:nowrap;padding-top:2px}
+.dept-card-body{padding:10px 14px 12px}
+.dept-card-body .dept-note{margin-top:2px}
+.carousel-controls{display:grid;grid-template-columns:minmax(94px,auto) 1fr minmax(104px,auto);align-items:center;gap:10px;margin-top:10px}
+.carousel-dots{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0}
+.carousel-dot{width:8px;height:8px;border:0;border-radius:999px;background:#cbd6d2;padding:0;cursor:pointer;transition:.15s}
+.carousel-dot.active{width:20px;background:var(--accent)}
+.carousel-dot:focus-visible{outline:2px solid rgba(15,101,89,.3);outline-offset:2px}
+.carousel-prev{justify-self:start}
+.carousel-done{justify-self:end}
+.carousel-special .dept-card-head{background:#fbfcfb}
+.carousel-special.unassigned-slide{border-style:dashed}
+.carousel-special.excluded-slide{border-style:dashed}
+.carousel-helper{font-size:11.5px;line-height:1.4;color:var(--muted);margin:0 0 7px}
+@media(max-width:520px){.carousel-controls{grid-template-columns:auto 1fr auto;gap:7px}.carousel-controls .btn{min-width:0;padding-left:10px;padding-right:10px}.dept-card-head{padding:11px 12px}.dept-card-body{padding:9px 12px 11px}.dept-card-count{font-size:10.5px}}
+
+details.dept{border-bottom:1px solid var(--line)}details.dept summary{list-style:none;cursor:pointer;padding:12px 2px;display:flex;align-items:center;gap:10px;user-select:none}details.dept summary::-webkit-details-marker{display:none}
+.chev{width:20px;height:20px;display:grid;place-items:center;border-radius:50%;background:var(--soft2);color:var(--accent);font-size:13px;flex:0 0 auto;transition:transform .2s ease}details[open]>.dept-summary .chev{transform:rotate(90deg)}
+.dept-name{font-size:14.5px;font-weight:700;color:var(--ink);min-width:0;flex:1}.dept-count{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.dept-body{padding:0 0 10px 30px}.dept-note{font-size:12.5px;line-height:1.4;color:var(--muted);margin:0 0 8px}.inherited{font-size:12px;line-height:1.35;color:#596461;background:#f8faf9;border-radius:9px;padding:8px 9px;margin:0 0 9px}
+.task-section{margin:8px 0 10px}.section-head{padding:0 0 6px;border-bottom:1px solid #dfe6e3}.section-title{font-size:12px;font-weight:700;color:var(--accent);line-height:1.3}.section-count{font-size:11px;font-weight:400;color:var(--muted);margin-left:5px}.section-tasks{padding:0}.task{padding:8px 0;border-bottom:1px solid #e8ecea}.task:last-child{border-bottom:0}.task-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start}.task-block{display:inline-block;font-size:10.5px;font-weight:700;color:var(--accent);background:var(--soft2);border-radius:999px;padding:4px 7px;margin-bottom:6px}.task-title{font-size:13.5px;line-height:1.38;margin:0;color:var(--text)}
+.task-controls{display:flex;align-items:center;gap:7px;margin-top:6px}.transfer-select{flex:1;min-width:0;min-height:34px;border:1px solid #cfd8d4;border-radius:9px;background:#fff;padding:6px 8px;color:var(--text);font-size:12.5px}.remove-indicator{border:0;background:none;color:var(--muted);cursor:pointer;font-size:11.5px;padding:6px 2px;white-space:nowrap}.remove-indicator:hover{color:var(--coral);text-decoration:underline}
+.co-wrap{margin-top:4px}.co-trigger{border:0;background:none;padding:2px 0;color:var(--accent);font-size:11.5px;cursor:pointer}.co-box{display:none;margin-top:6px}.co-box.show{display:block}.co-select{width:100%;min-height:34px;border:1px solid #d5ddda;border-radius:8px;background:#fff;padding:6px 7px;font-size:12.5px}
+.custom-tag{font-size:10.5px;color:#7b5a52;background:#fff2ee;border-radius:999px;padding:3px 6px;margin-left:5px}.level-tag{display:inline-block;font-size:10px;font-weight:700;color:var(--accent);background:#eef5f2;border:1px solid #d8e6e1;border-radius:999px;padding:3px 6px;margin:0 0 5px 5px}.remove-task{border:0;background:none;color:var(--muted);cursor:pointer;font-size:11.5px;padding:4px}.remove-task:hover{color:var(--coral)}
+.add-task-box{margin-top:10px;padding:10px;background:var(--soft);border-radius:10px;display:none}.add-task-box.show{display:block}.form-grid{display:grid;gap:8px}.form-actions{display:flex;gap:7px;justify-content:flex-end;margin-top:8px}.picker-label{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:-3px}.add-hint{margin:0;font-size:11.5px;line-height:1.4;color:var(--muted)}.select:disabled,.btn:disabled{opacity:.5;cursor:default}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;min-height:40px}.btn.primary{background:var(--accent);color:#fff}.btn.primary:hover{background:var(--accent-dark)}.btn.secondary{background:var(--soft2);color:var(--ink)}.btn.secondary:hover{background:#e6ece9}.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink);font-size:12px;min-height:34px;padding:7px 10px}.btn:disabled{opacity:.45;cursor:default}
+.dept-actions{margin-top:6px}.add-indicator-link{font-size:12px;padding:5px 0}
+.special{margin-top:10px;border:1px dashed #cdd6d2;border-radius:12px;padding:0 10px}.special summary{padding:10px 0!important}.special .dept-body{padding-left:0}
+.alert{display:none;margin-top:13px;padding:10px 12px;border-radius:10px;background:var(--coral-bg);color:#8b4438;font-size:12.5px;line-height:1.4}.alert.show{display:block}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:14px}.screen>.nav{position:sticky;bottom:0;z-index:30;background:rgba(255,255,255,.97);padding:10px 0 4px;border-top:1px solid var(--line);box-shadow:0 -8px 16px rgba(20,45,40,.05)}.nav .btn{min-width:120px}
+.decision-grid{display:grid;gap:12px}.decision-card{border:1px solid var(--line);border-radius:12px;padding:13px}.decision-card label{display:block;font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:7px}.decision-hint{font-size:12px;line-height:1.4;color:var(--muted);margin:7px 0 0}
+.final-summary{display:grid;gap:8px;margin:12px 0 0}.final-dept{border:1px solid var(--line);border-radius:11px;overflow:hidden}.final-dept summary{list-style:none;padding:11px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:10px;font-size:13.5px;font-weight:700;color:var(--ink)}.final-dept summary::-webkit-details-marker{display:none}.final-list{margin:0;padding:0 24px 11px 30px;font-size:12.5px;line-height:1.45}.final-list li{margin:3px 0}.final-meta{font-size:12px;color:var(--muted);font-weight:400}
+.download-box{margin-top:15px;padding:14px;background:var(--soft);border-radius:12px}.download-box .btn{width:100%}.restart{display:block;margin:13px auto 0;border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(22,35,32,.42);display:none;align-items:center;justify-content:center;padding:18px;z-index:1000}.modal-backdrop.show{display:flex}.modal-card{width:min(430px,100%);background:#fff;border-radius:16px;box-shadow:0 18px 50px rgba(17,34,30,.25);padding:20px}.modal-card h3{margin:0 0 8px;font-size:18px;color:var(--ink)}.modal-card p{margin:0;font-size:13.5px;line-height:1.5;color:#4d5a57}.modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:17px;flex-wrap:wrap}.modal-actions .btn{min-width:110px}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(15px);background:#17332f;color:#fff;padding:10px 14px;border-radius:10px;font-size:12.5px;opacity:0;pointer-events:none;transition:.18s;z-index:1100;box-shadow:0 8px 24px rgba(17,34,30,.2)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.final-warning{margin:12px 0 0;padding:11px 12px;border-radius:10px;background:var(--coral-bg);color:#8b4438;font-size:12.5px;line-height:1.45}.final-task{margin:7px 0 0}.final-task b{font-weight:700}.final-docs{display:block;margin-top:2px;color:var(--muted);font-size:11.5px;line-height:1.4}.final-turnover{display:inline-block;margin-left:5px;font-size:10.5px;color:var(--accent);background:var(--soft);border-radius:999px;padding:2px 6px}
+
+@media(max-width:520px){body{padding:0}.trainer{border-radius:0;border-left:0;border-right:0}.head,.screen,.progress{padding-left:16px;padding-right:16px}h1{font-size:20px}.dept-body{padding-left:24px}.task-actions{grid-template-columns:1fr}.nav .btn{flex:1;min-width:0}.add-row{grid-template-columns:1fr}.add-row .btn{width:100%}.task-top{grid-template-columns:1fr}.remove-indicator{justify-self:start}.task-controls{align-items:stretch}.transfer-select{width:100%}}
+</style>
+</head>
+<body>
+<div class="trainer" id="trainer">
+  <div class="head"><div class="head-copy"><div class="eyebrow">Практика</div><h1>Перераспределите проверку между отделами</h1></div><button class="reset-top" type="button" id="resetTop" aria-label="Сбросить все изменения и начать заново">Сбросить изменения</button></div>
+  <div class="progress" id="progressBox"><div class="progress-top"><span id="progressLabel"></span><span id="progressName"></span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
+  <main id="screens"></main>
+</div>
+<div class="modal-backdrop" id="appModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-card"><h3 id="modalTitle"></h3><p id="modalText"></p><div class="modal-actions" id="modalActions"></div></div></div>
+<div class="toast" id="appToast" role="status" aria-live="polite"></div>
+<script>
+(()=>{
+'use strict';
+const LOGO='data:image/png;base64,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';
+const storageKey='counterparty-dept-checklists-published-v2-20260815';
+const blocks=['Статус и полномочия','Налоги и финансы','Суды, долги и связи','Выбор контрагента и условия сделки','Ресурсы и возможность исполнить договор','Лицензии и специальные требования','Цепочка исполнения','Деловая цель','Фиксация и обновление проверки'];
+const defaultDepartments=[
+  {id:'legal',name:'Юристы'},{id:'accounting',name:'Бухгалтерия'},{id:'finance',name:'Финансовая служба'},
+  {id:'procurement',name:'Закупки'},{id:'security',name:'Служба безопасности'},{id:'technical',name:'Техническая служба'}
+];
+const criteria=[
+{id:'status',level:0,dept:'legal',block:'Статус и полномочия',title:'Статус контрагента',docs:'выписка из ЕГРЮЛ/ЕГРИП с датой проверки'},
+{id:'egrul',level:0,dept:'legal',block:'Статус и полномочия',title:'Достоверность сведений в ЕГРЮЛ и адрес',docs:'выписка из ЕГРЮЛ с датой проверки; отчет или скриншот из сервиса «Прозрачный бизнес» с датой проверки; документ на помещение и пояснение контрагента — при расхождении'},
+{id:'authority',level:0,dept:'legal',block:'Статус и полномочия',title:'Полномочия подписанта и представителя',docs:'выписка из ЕГРЮЛ о руководителе с датой проверки; решение или приказ; доверенность; деловая переписка или протокол переговоров'},
+{id:'reporting',level:0,dept:'accounting',block:'Налоги и финансы',title:'Налоговая и бухгалтерская отчетность',docs:'бухгалтерская отчетность из ГИР БО за подписью ФНС; отчет или скриншот из сервиса «Прозрачный бизнес» с датой проверки'},
+{id:'taxDebt',level:0,dept:'accounting',block:'Налоги и финансы',title:'Налоговые долги',docs:'справка об исполнении обязанности по уплате налогов, сборов, страховых взносов, пеней, штрафов, процентов; отчет или скриншот из сервиса «Прозрачный бизнес» с датой проверки; при риске — пояснение контрагента, документы об уплате или обжаловании'},
+{id:'experience',level:0,dept:'procurement',block:'Выбор контрагента и условия сделки',title:'Опыт, деловая история и присутствие на рынке',docs:'сайт или сохраненные страницы; сведения о проектах; договоры, акты, отзывы, рекомендации или иные подтверждения опыта'},
+{id:'choice',level:0,dept:'procurement',block:'Выбор контрагента и условия сделки',title:'Причина выбора контрагента',docs:'коммерческие предложения; лист сравнения; результаты закупки; переписка; служебная записка о выборе'},
+{id:'permits',level:0,dept:'legal',block:'Лицензии и специальные требования',title:'Обязательные разрешения на деятельность и товар',docs:'лицензия; выписка из профильного реестра; сведения о членстве в СРО; сертификаты или декларации соответствия'},
+{id:'purpose',level:0,dept:'',block:'Деловая цель',title:'Деловая цель сделки',docs:'внутренняя заявка; служебная записка или обоснование потребности; при необходимости — расчет экономического эффекта'},
+{id:'fixation',level:0,dept:'accounting',block:'Фиксация и обновление проверки',title:'Фиксация проверки: где, когда и как проверяли контрагента',docs:'отчет по проверке; датированные выписки, отчеты и скриншоты; запросы контрагенту и его ответы'},
+
+{id:'directorRestrict',level:1,dept:'legal',block:'Статус и полномочия',title:'Руководитель: дисквалификация и ограничения',docs:'справка об отсутствии запрашиваемой информации или скриншот из реестра дисквалифицированных лиц с датой проверки'},
+{id:'participantRestrict',level:1,dept:'security',block:'Суды, долги и связи',title:'Участники: ограничения на участие в юрлицах',docs:'отчет или скриншот из сервиса «Прозрачный бизнес» с датой проверки'},
+{id:'taxSignals',level:1,dept:'accounting',block:'Налоги и финансы',title:'Налоговые нарушения и блокировки счетов',docs:'отчет или скриншот ФНС; сведения о приостановлении операций; пояснение контрагента'},
+{id:'enforcement',level:1,dept:'legal',block:'Суды, долги и связи',title:'Исполнительные производства',docs:'карточки исполнительных производств ФССП; расчет долга к выручке и сумме сделки'},
+{id:'taxLoad',level:1,dept:'accounting',block:'Налоги и финансы',title:'Налоговая нагрузка',docs:'сведения ФНС; бухгалтерская отчетность; расчет налоговой нагрузки'},
+{id:'financials',level:1,dept:'finance',block:'Налоги и финансы',title:'Выручка, активы и финансовые показатели',docs:'бухгалтерская отчетность; сведения о выручке и активах; расчет сопоставления с параметрами сделки'},
+{id:'people',level:1,dept:'technical',block:'Ресурсы и возможность исполнить договор',title:'Сотрудники и квалификация',docs:'сведения о численности; при необходимости — штатное расписание или справка о составе персонала; документы о квалификации'},
+{id:'resources',level:1,dept:'technical',block:'Ресурсы и возможность исполнить договор',title:'Ресурсы: площадка, оборудование, сырье, мощности',docs:'документы о собственности, аренде или лизинге; перечень оборудования; сведения о сырье; расчет мощности'},
+{id:'unusual',level:1,dept:'procurement',block:'Выбор контрагента и условия сделки',title:'Пояснения по крупному авансу, цене, бартеру и зачету',docs:'расчет цены; переписка; решение согласующего; документы об обеспечении или иных мерах защиты'},
+{id:'capacity',level:1,dept:'technical',block:'Ресурсы и возможность исполнить договор',title:'Возможность исполнить объем работ или поставки в срок',docs:'график исполнения; расчет мощности; расчет потребности в людях, технике, материалах и финансировании'},
+{id:'planned',level:1,dept:'accounting',block:'Фиксация и обновление проверки',title:'Плановое обновление проверки',docs:'график проверки; дата последней проверки; новые выписки и отчеты; обновленный отчет по проверке'},
+
+{id:'fnsScore',level:2,dept:'accounting',block:'Налоги и финансы',title:'Выписка ФНС с результатами оценки',docs:'выписка ФНС с результатами оценки; расшифровка показателей, по которым есть несоответствия'},
+{id:'ordinaryCosts',level:2,dept:'finance',block:'Ресурсы и возможность исполнить договор',title:'Обычные расходы контрагента',docs:'расчет затрат; договоры и документы по ключевым расходам: аренде, перевозке, сырью и другим ресурсам'},
+{id:'intermediaries',level:2,dept:'security',block:'Цепочка исполнения',title:'Посредники и другие участники сделки',docs:'схема сделки; договоры с участниками; документы и пояснения, которые подтверждают функцию каждого звена'},
+{id:'thirdPay',level:2,dept:'legal',block:'Цепочка исполнения',title:'Платеж третьему лицу',docs:'письмо контрагента; договор уступки, агентский договор, поручение или трехстороннее соглашение'},
+{id:'actualPerformers',level:2,dept:'security',block:'Цепочка исполнения',title:'Фактические исполнители и доступ на объект',docs:'список исполнителей; договор субподряда; документы о квалификации и допусках; пропуска и журналы доступа'},
+{id:'goodsOrigin',level:2,dept:'procurement',block:'Цепочка исполнения',title:'Источник происхождения товара',docs:'сведения о производителе, импортере или предыдущем поставщике; документы по цепочке поставки'},
+{id:'goodsRight',level:2,dept:'procurement',block:'Цепочка исполнения',title:'Право поставщика распоряжаться товаром',docs:'договоры и спецификации по цепочке; документы о переходе права; документы о полномочиях посредника'},
+{id:'storage',level:2,dept:'procurement',block:'Цепочка исполнения',title:'Место хранения и прямая отгрузка',docs:'документы на склад; договор хранения или аренды; схема прямой отгрузки с участниками и адресами'},
+{id:'carrier',level:2,dept:'procurement',block:'Цепочка исполнения',title:'Перевозчик и маршрут товара',docs:'договор или заявка на перевозку; транспортные документы; сведения о машине и водителе; маршрут'},
+{id:'dealDocs',level:2,dept:'legal',block:'Цепочка исполнения',title:'Документы, даты и участники сделки',docs:'договор и приложения; заявки; первичные и транспортные документы; документы приемки; при необходимости — хронология сделки'},
+{id:'workResult',level:2,dept:'technical',block:'Ресурсы и возможность исполнить договор',title:'Результат работ или услуг',docs:'техническое задание; отчет и рабочие материалы; переписка; акт приемки; подтверждение использования результата'},
+{id:'breachReaction',level:2,dept:'procurement',block:'Выбор контрагента и условия сделки',title:'Реакция компании на нарушение договора',docs:'претензия; дополнительное соглашение; переписка; решение изменить срок, цену либо не применять меры'},
+{id:'unplanned',level:2,dept:'security',block:'Фиксация и обновление проверки',title:'Внеплановое обновление проверки',docs:'сообщение об изменении; новые выписки и отчеты; обновленный отчет по проверке; новое решение по контрагенту'}
+];
+const groups=[
+{name:'Незначительный оборот',sub:'Распределите базовые проверки между участниками процесса.'},
+{name:'Средний оборот',sub:'Добавьте проверки, которые появляются при более глубоком анализе.'},
+{name:'Крупный оборот',sub:'Распределите расширенные проверки и участников цепочки исполнения.'}
+];
+const newState=()=>({departments:defaultDepartments.map(x=>({...x})),assignments:Object.fromEntries(criteria.map(c=>[c.id,c.dept])),co:{},customTasks:[],levelOverrides:{},owner:'',ownerCustom:'',decision:'',decisionCustom:''});
+const blankResetState=()=>({departments:defaultDepartments.map(x=>({...x})),assignments:{},co:{},customTasks:[],levelOverrides:{},owner:'',ownerCustom:'',decision:'',decisionCustom:''});
+let state=newState();
+let current=0;
+let setupReturn=null;
+const carouselFocus={0:'',1:'',2:''};
+const screens=document.getElementById('screens'), progressLabel=document.getElementById('progressLabel'), progressName=document.getElementById('progressName'), progressFill=document.getElementById('progressFill');
+const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const uid=prefix=>prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+
+let modalPrimary=null,modalSecondary=null;
+function showToast(text){const t=document.getElementById('appToast');if(!t)return;t.textContent=text;t.classList.add('show');clearTimeout(showToast._tm);showToast._tm=setTimeout(()=>t.classList.remove('show'),1800)}
+function closeModal(){const m=document.getElementById('appModal');if(m)m.classList.remove('show');modalPrimary=null;modalSecondary=null}
+function showModal({title,text,secondaryLabel='Отмена',primaryLabel='Продолжить',onSecondary=null,onPrimary=null,danger=false}){const m=document.getElementById('appModal'),mt=document.getElementById('modalTitle'),mp=document.getElementById('modalText'),ma=document.getElementById('modalActions');if(!m||!mt||!mp||!ma)return;mt.textContent=title;mp.textContent=text;ma.innerHTML=`<button class="btn secondary" type="button" id="modalSecondary">${esc(secondaryLabel)}</button><button class="btn primary" type="button" id="modalPrimary" ${danger?'style="background:#c95f4c"':''}>${esc(primaryLabel)}</button>`;modalSecondary=onSecondary;modalPrimary=onPrimary;m.classList.add('show');document.getElementById('modalPrimary')?.focus();document.getElementById('modalSecondary').onclick=()=>{const fn=modalSecondary;closeModal();if(fn)fn()};document.getElementById('modalPrimary').onclick=()=>{const fn=modalPrimary;closeModal();if(fn)fn()}}
+function resetEverything(){state=blankResetState();setupReturn=null;current=0;save();render();show(0);showToast('Все назначения сброшены. Показатели перенесены в «Не распределено»')}
+function unassignedTasks(level=2){return allTasks().filter(t=>applicable(t,level)&&!isExcluded(t.id)&&!state.assignments[t.id])}
+function focusUnassigned(level){carouselFocus[level]='unassigned';render();show(level+1);requestAnimationFrame(()=>{activateCarousel(level,'unassigned');document.querySelector(`[data-carousel-level="${level}"]`)?.scrollIntoView({behavior:'smooth',block:'start'})})}
+
+function load(){try{const raw=localStorage.getItem(storageKey);if(raw){const saved=JSON.parse(raw);state={...newState(),...saved}; if(!Array.isArray(state.departments)||!state.departments.length)state.departments=defaultDepartments.map(x=>({...x})); if(!Array.isArray(state.customTasks))state.customTasks=[]; if(!state.levelOverrides||typeof state.levelOverrides!=='object')state.levelOverrides={};}}catch(e){}}
+function save(){try{localStorage.setItem(storageKey,JSON.stringify(state))}catch(e){}}
+function deptName(id){return state.departments.find(d=>d.id===id)?.name||''}
+function allTasks(){return [...criteria,...state.customTasks]}
+function isExcluded(id){return state.assignments[id]==='excluded'}
+function effectiveLevel(t){const v=state.levelOverrides?.[t.id];return Number.isInteger(v)?v:Number(t.level)}
+function applicable(t,level){return effectiveLevel(t)<=level}
+function turnoverFrom(level){return level===0?'все группы в установленном объеме':level===1?'средний и крупный':'крупный'}
+function options(selected,exclude=''){
+  let out='<option value="">Не распределено</option>';
+  state.departments.forEach(d=>{if(d.id!==exclude)out+=`<option value="${esc(d.id)}" ${selected===d.id?'selected':''}>${esc(d.name)}</option>`});
+  out+=`<option value="excluded" ${selected==='excluded'?'selected':''}>Не включать в чек-листы</option>`;
+  return out;
+}
+function setupScreen(){
+  return `<section class="screen" data-screen="0"><div class="group-card"><h2 class="group-title">Кто участвует в проверке</h2><p class="group-sub">Оставьте только участников вашей проверки. Названия можно изменить, новые подразделения — добавить.</p></div>
+  <div class="setup-list" id="setupList">${state.departments.map(d=>`<div class="setup-row" data-dept-row="${esc(d.id)}"><input class="setup-input" data-dept-name="${esc(d.id)}" value="${esc(d.name)}" aria-label="Название подразделения"><button class="icon-btn" type="button" data-remove-dept="${esc(d.id)}" title="Убрать">✕</button></div>`).join('')}</div>
+  <button class="link-btn" type="button" id="showAddDept">+ Добавить подразделение</button>
+  <div class="add-row" id="addDeptRow"><input class="text-input" id="newDeptName" placeholder="Например, отдел качества"><button class="btn primary" type="button" id="saveDept">Добавить</button><button class="btn secondary" type="button" id="cancelDept">Отмена</button></div>
+  <div class="alert" id="setupAlert"></div><div class="nav"><span></span><button class="btn primary" type="button" id="setupNext">${setupReturn!==null?'Сохранить и вернуться':'Дальше →'}</button></div></section>`;
+}
+function taskRow(t,primary,currentLevel,showBlock=true){
+  const co=state.co[t.id]||''; const custom=t.custom===true;
+  const excluded=primary==='excluded';
+  return `<div class="task" data-task="${esc(t.id)}">
+    <div class="task-top"><div>${showBlock?`<span class="task-block">${esc(t.block)}</span>`:''}${custom?'<span class="custom-tag">добавлено вами</span>':''}${effectiveLevel(t)<currentLevel?'<span class="level-tag">с предыдущего уровня</span>':''}<p class="task-title">${esc(t.title)}</p></div>
+    ${excluded?'':`<button class="remove-indicator" type="button" data-exclude-task="${esc(t.id)}" title="Исключить показатель из чек-листов">Убрать из проверки</button>`}</div>
+    <div class="task-controls"><select class="transfer-select" data-transfer="${esc(t.id)}" aria-label="Исполнитель показателя">${options(primary)}</select>${custom?`<button class="remove-task" type="button" data-remove-task="${esc(t.id)}" title="Удалить добавленный показатель">Удалить</button>`:''}</div>
+    ${excluded?'':`<div class="co-wrap"><button class="co-trigger" type="button" data-toggle-co="${esc(t.id)}">${co?'Соисполнитель: '+esc(deptName(co)):'+ Добавить соисполнителя'}</button><div class="co-box ${co?'show':''}" data-co-box="${esc(t.id)}"><select class="co-select" data-co="${esc(t.id)}"><option value="">Без соисполнителя</option>${state.departments.filter(d=>d.id!==primary).map(d=>`<option value="${esc(d.id)}" ${co===d.id?'selected':''}>${esc(d.name)}</option>`).join('')}</select></div></div>`}
+  </div>`;
+}
+function sectionRows(fresh,d,level){
+  const grouped=new Map();
+  fresh.forEach(t=>{if(!grouped.has(t.block))grouped.set(t.block,[]);grouped.get(t.block).push(t)});
+  return [...grouped.entries()].map(([block,items])=>`<div class="task-section"><div class="section-head"><div class="section-title">${esc(block)}<span class="section-count">${items.length}</span></div></div><div class="section-tasks">${items.map(t=>taskRow(t,d.id,level,false)).join('')}</div></div>`).join('');
+}
+function deptSlide(d,level){
+  const tasks=allTasks().filter(t=>applicable(t,level)&&!isExcluded(t.id)&&state.assignments[t.id]===d.id);
+  const fresh=tasks.filter(t=>effectiveLevel(t)===level);
+  const secondary=allTasks().filter(t=>applicable(t,level)&&state.co[t.id]===d.id&&!isExcluded(t.id)).length;
+  const key='dept:'+d.id;
+  return `<div class="dept-slide" data-carousel-slide data-carousel-level="${level}" data-carousel-key="${esc(key)}"><div class="dept-card-head"><div><div class="dept-card-label">Подразделение</div><div class="dept-card-title">${esc(d.name)}</div></div><div class="dept-card-count">${tasks.length} показателей${fresh.length&&level>0?` · ${fresh.length} новых`:''}${secondary?` · ${secondary} соисп.`:''}</div></div><div class="dept-card-body">
+  ${tasks.length?sectionRows(tasks,d,level):'<p class="dept-note">Показателей пока нет. Добавьте нужный из готового списка.</p>'}
+  <div class="dept-actions"><button class="link-btn add-indicator-link" type="button" data-add-task="${esc(d.id)}">+ Добавить показатель</button></div>
+  <div class="add-task-box" data-add-box="${esc(d.id)}"><div class="form-grid"><label class="picker-label">Блок</label><select class="select" data-add-block="${esc(d.id)}" data-add-level="${level}"><option value="">Выберите блок</option>${blocks.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('')}</select><label class="picker-label">Показатель</label><select class="select" data-add-indicator="${esc(d.id)}" data-add-level="${level}" disabled><option value="">Сначала выберите блок</option></select><p class="add-hint">В списке — показатели из матрицы проверки. Уже включенные в эту группу не дублируются.</p></div><div class="form-actions"><button class="btn secondary" type="button" data-cancel-task="${esc(d.id)}">Отмена</button><button class="btn primary" type="button" data-save-task="${esc(d.id)}" data-save-level="${level}" disabled>Добавить показатель</button></div></div>
+  </div></div>`;
+}
+function unassignedSlide(level){
+  const list=allTasks().filter(t=>applicable(t,level)&&!isExcluded(t.id)&&!state.assignments[t.id]);
+  if(!list.length)return '';
+  return `<div class="dept-slide carousel-special unassigned-slide" data-carousel-slide data-carousel-level="${level}" data-carousel-key="unassigned"><div class="dept-card-head"><div><div class="dept-card-label">Требует назначения</div><div class="dept-card-title">Не распределено</div></div><div class="dept-card-count">${list.length} показателей</div></div><div class="dept-card-body"><p class="carousel-helper">Назначьте исполнителя, чтобы эти проверки попали в чек-листы отделов.</p>${list.map(t=>taskRow(t,'',level)).join('')}</div></div>`;
+}
+function excludedSlide(level){
+  const list=allTasks().filter(t=>applicable(t,level)&&isExcluded(t.id));
+  if(!list.length)return '';
+  return `<div class="dept-slide carousel-special excluded-slide" data-carousel-slide data-carousel-level="${level}" data-carousel-key="excluded"><div class="dept-card-head"><div><div class="dept-card-label">Отдельный список</div><div class="dept-card-title">Исключенные из проверки</div></div><div class="dept-card-count">${list.length} показателей</div></div><div class="dept-card-body"><p class="carousel-helper">Если показатель снова нужен, назначьте ему исполнителя.</p>${list.map(t=>taskRow(t,'excluded',level)).join('')}</div></div>`;
+}
+function carouselItems(level){
+  const items=[];
+  if(allTasks().some(t=>applicable(t,level)&&!isExcluded(t.id)&&!state.assignments[t.id]))items.push('unassigned');
+  state.departments.forEach(d=>items.push('dept:'+d.id));
+  if(allTasks().some(t=>applicable(t,level)&&isExcluded(t.id)))items.push('excluded');
+  return items;
+}
+function carouselDots(level,items,active){
+  return items.map((key,i)=>`<button class="carousel-dot ${key===active?'active':''}" type="button" data-carousel-go="${esc(key)}" data-carousel-level="${level}" aria-label="Перейти к карточке ${i+1}"></button>`).join('');
+}
+function groupScreen(level){
+  const items=carouselItems(level);
+  let active=carouselFocus[level];
+  if(!items.includes(active))active=items[0]||'';
+  carouselFocus[level]=active;
+  const slides=`${unassignedSlide(level)}${state.departments.map(d=>deptSlide(d,level)).join('')}${excludedSlide(level)}`;
+  return `<section class="screen" data-screen="${level+1}"><div class="group-card"><h2 class="group-title">${groups[level].name}</h2><p class="group-sub">${groups[level].sub}</p></div>
+  <div class="top-actions"><button class="mini-link" type="button" data-edit-depts="${level+1}">✎ Изменить подразделения</button></div>
+  ${level>0?`<p class="notice">Назначения предыдущей группы уже сохранены. Оставьте их как есть или при необходимости передайте другому отделу либо исключите показатель из проверки. Новые показатели отмечены внутри подразделений.</p>`:''}
+  <div class="dept-carousel" data-carousel-level="${level}">${slides}<div class="carousel-controls"><button class="btn secondary carousel-prev" type="button" data-carousel-prev="${level}">← Назад</button><div class="carousel-dots">${carouselDots(level,items,active)}</div><button class="btn primary carousel-done" type="button" data-carousel-done="${level}">Готово →</button></div></div>
+  <div class="alert" id="groupAlert-${level}"></div></section>`;
+}
+function ownerScreen(){
+  return `<section class="screen" data-screen="4"><div class="group-card"><h2 class="group-title">Кто отвечает за общий результат и кто принимает решение</h2><p class="group-sub">Укажите должности: кто собирает результаты проверки и кто принимает итоговое решение по контрагенту.</p></div><div class="decision-grid">
+  <div class="decision-card"><label for="ownerCustom">Ответственный за результаты проверки</label><input class="text-input" id="ownerCustom" value="${esc(state.ownerCustom)}" placeholder="Например, руководитель службы безопасности"><p class="decision-hint">Собирает результаты отделов, сопоставляет выводы и готовит общий отчет по проверке.</p></div>
+  <div class="decision-card"><label for="decisionCustom">Кто принимает итоговое решение</label><input class="text-input" id="decisionCustom" value="${esc(state.decisionCustom)}" placeholder="Например, финансовый директор"><p class="decision-hint">Укажите должность лица, которое решает: работать с контрагентом, работать с условиями или отказаться от сделки.</p></div></div>
+  <div class="alert" id="ownerAlert"></div><div class="nav"><button class="btn secondary" type="button" data-prev-screen="4">← Назад</button><button class="btn primary" type="button" id="buildMap">Собрать чек-листы</button></div></section>`;
+}
+function taskMapForDept(d){
+  return allTasks().filter(t=>!isExcluded(t.id)&&(state.assignments[t.id]===d.id||state.co[t.id]===d.id)).map(t=>({...t,secondary:state.assignments[t.id]!==d.id}));
+}
+function finalScreen(){
+  const used=state.departments.map(d=>({d,tasks:taskMapForDept(d)})).filter(x=>x.tasks.length);
+  const un=unassignedTasks(2);
+  const deptHtml=used.map(({d,tasks})=>{const min=Math.min(...tasks.map(t=>effectiveLevel(t)));return `<details class="final-dept"><summary><span>${esc(d.name)}</span><span class="final-meta">${tasks.length} · ${esc(turnoverFrom(min))}</span></summary><ul class="final-list">${tasks.map(t=>`<li class="final-task"><b>☐ ${esc(t.title)}</b>${t.secondary?' — соисполнитель':''}<span class="final-turnover">${esc(turnoverFrom(effectiveLevel(t)))}</span><span class="final-docs">Документы / материалы: ${esc(t.docs||'подтверждающие материалы по внутреннему регламенту')}</span></li>`).join('')}</ul></details>`}).join('');
+  const unHtml=un.length?`<details class="final-dept"><summary><span>Не распределено</span><span class="final-meta">${un.length}</span></summary><ul class="final-list">${un.map(t=>`<li class="final-task"><b>${esc(t.title)}</b><span class="final-turnover">${esc(turnoverFrom(effectiveLevel(t)))}</span><span class="final-docs">Документы / материалы: ${esc(t.docs||'подтверждающие материалы по внутреннему регламенту')}</span></li>`).join('')}</ul></details>`:'';
+  return `<section class="screen" data-screen="5"><div class="group-card"><div class="group-kicker">Готово</div><h2 class="group-title">Чек-листы для отделов готовы</h2><p class="group-sub">Для каждого выбранного отдела собран свой перечень проверок. В одном файле отделы получат только те показатели, за которые отвечают.</p></div>
+  <div class="decision-card" style="margin-bottom:12px"><div style="font-size:13px;line-height:1.55"><b>Ответственный за результаты проверки:</b> ${esc(state.ownerCustom.trim())}<br><b>Кто принимает итоговое решение:</b> ${esc(state.decisionCustom.trim())}</div></div>
+  ${un.length?`<div class="final-warning">Остались нераспределенные показатели: <b>${un.length}</b>. Они не попадут в чек-листы отделов, пока вы не назначите исполнителей.</div>`:''}<div class="final-summary">${deptHtml}${unHtml}</div>
+  <div class="download-box"><button class="btn primary" type="button" id="downloadBtn">Скачать чек-листы в Word</button></div><button class="restart" type="button" id="restartBtn">Начать заново</button></section>`;
+}
+function render(openKeys=[],scrollY=null){
+  screens.innerHTML=setupScreen()+groups.map((_,i)=>groupScreen(i)).join('')+ownerScreen()+finalScreen();bind();show(current);
+  requestAnimationFrame(()=>{[0,1,2].forEach(level=>activateCarousel(level,carouselFocus[level],false));if(scrollY!==null)window.scrollTo(0,scrollY)});
+}
+function show(idx){current=idx;document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',Number(s.dataset.screen)===idx));const names=['Подразделения','Незначительный оборот','Средний оборот','Крупный оборот','Ответственный и решение','Чек-листы'];progressLabel.textContent=`Шаг ${idx+1} из 6`;progressName.textContent=names[idx];progressFill.style.width=`${((idx+1)/6)*100}%`;window.scrollTo(0,0)}
+function preserve(extraOpen=''){return {open:[],y:window.scrollY}}
+function activateCarousel(level,key,scroll=false){
+  const wrap=document.querySelector(`.dept-carousel[data-carousel-level="${level}"]`);if(!wrap)return;
+  const slides=[...wrap.querySelectorAll('[data-carousel-slide]')];if(!slides.length)return;
+  let target=slides.find(s=>s.dataset.carouselKey===key)||slides[0];carouselFocus[level]=target.dataset.carouselKey;
+  slides.forEach(s=>s.classList.toggle('active',s===target));
+  wrap.querySelectorAll('[data-carousel-go]').forEach(dot=>dot.classList.toggle('active',dot.dataset.carouselGo===target.dataset.carouselKey));
+  if(scroll)wrap.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function currentCarouselInfo(level){
+  const wrap=document.querySelector(`.dept-carousel[data-carousel-level="${level}"]`);if(!wrap)return null;
+  const slides=[...wrap.querySelectorAll('[data-carousel-slide]')];const idx=slides.findIndex(s=>s.classList.contains('active'));return {wrap,slides,idx:idx<0?0:idx};
+}
+function validateDepartments(){
+  state.departments.forEach(d=>{const el=document.querySelector(`[data-dept-name="${CSS.escape(d.id)}"]`);if(el)d.name=el.value.trim()});
+  const alert=document.getElementById('setupAlert');
+  if(!state.departments.length){alert.textContent='Оставьте или добавьте хотя бы одно подразделение.';alert.classList.add('show');return false}
+  if(state.departments.some(d=>!d.name)){alert.textContent='Заполните названия подразделений.';alert.classList.add('show');return false}
+  const norm=state.departments.map(d=>d.name.toLowerCase());if(new Set(norm).size!==norm.length){alert.textContent='Названия подразделений должны различаться.';alert.classList.add('show');return false}
+  return true;
+}
+function validateGroup(level){return unassignedTasks(level)}
+function availableCriteria(block,level){
+  return criteria.filter(t=>t.block===block&&(isExcluded(t.id)||!state.assignments[t.id]||effectiveLevel(t)>level));
+}
+function indicatorOptions(block,level){
+  if(!block)return '<option value="">Сначала выберите блок</option>';
+  const list=availableCriteria(block,level);
+  if(!list.length)return '<option value="">Все показатели этого блока уже включены</option>';
+  return '<option value="">Выберите показатель</option>'+list.map(t=>`<option value="${esc(t.id)}">${esc(t.title)}</option>`).join('');
+}
+function addKnownCriterion(deptId,level){
+  const indicator=document.querySelector(`[data-add-indicator="${CSS.escape(deptId)}"]`);
+  const id=indicator?.value||''; const task=criteria.find(t=>t.id===id); if(!task)return;
+  carouselFocus[level]='dept:'+deptId;state.assignments[id]=deptId; state.levelOverrides[id]=Number(level); delete state.co[id]; save();
+  const y=window.scrollY;render([],y);
+}
+function bind(){
+  const resetTop=document.getElementById('resetTop');if(resetTop)resetTop.onclick=()=>showModal({title:'Сбросить изменения?',text:'Все назначения, изменения и добавленные подразделения будут удалены. Показатели останутся в конструкторе, но вернутся в «Не распределено», чтобы вы могли распределить их заново.',secondaryLabel:'Отмена',primaryLabel:'Сбросить изменения',danger:true,onPrimary:resetEverything});
+  document.querySelectorAll('[data-carousel-go]').forEach(b=>b.onclick=()=>activateCarousel(Number(b.dataset.carouselLevel),b.dataset.carouselGo,true));
+  document.querySelectorAll('[data-carousel-prev]').forEach(b=>b.onclick=()=>{const level=Number(b.dataset.carouselPrev),info=currentCarouselInfo(level);if(!info)return;if(info.idx>0){activateCarousel(level,info.slides[info.idx-1].dataset.carouselKey,true)}else{show(level)}});
+  document.querySelectorAll('[data-carousel-done]').forEach(b=>b.onclick=()=>{const level=Number(b.dataset.carouselDone),info=currentCarouselInfo(level);if(!info)return;if(info.idx<info.slides.length-1){activateCarousel(level,info.slides[info.idx+1].dataset.carouselKey,true);return}const un=validateGroup(level);if(un.length){showModal({title:'Остались нераспределенные показатели',text:`Не распределено: ${un.length}. Перейти дальше? Эти показатели сохранятся и будут показаны как нераспределенные.`,secondaryLabel:'Распределить',primaryLabel:'Перейти',onSecondary:()=>focusUnassigned(level),onPrimary:()=>{save();show(level+2)}});return}save();show(level+2)});
+  document.querySelectorAll('[data-dept-name]').forEach(inp=>inp.addEventListener('input',e=>{const d=state.departments.find(x=>x.id===e.target.dataset.deptName);if(d){d.name=e.target.value;save()}}));
+  document.querySelectorAll('[data-remove-dept]').forEach(btn=>btn.addEventListener('click',()=>{if(state.departments.length<=1){const a=document.getElementById('setupAlert');a.textContent='Нужно оставить хотя бы одно подразделение.';a.classList.add('show');return}const id=btn.dataset.removeDept;state.departments=state.departments.filter(d=>d.id!==id);Object.keys(state.assignments).forEach(k=>{if(state.assignments[k]===id)state.assignments[k]=''});Object.keys(state.co).forEach(k=>{if(state.co[k]===id)state.co[k]=''});if(state.owner===id)state.owner='';save();render()}));
+  const showAdd=document.getElementById('showAddDept'),addRow=document.getElementById('addDeptRow');if(showAdd)showAdd.onclick=()=>{addRow.classList.add('show');document.getElementById('newDeptName').focus()};
+  const cancel=document.getElementById('cancelDept');if(cancel)cancel.onclick=()=>{addRow.classList.remove('show');document.getElementById('newDeptName').value=''};
+  const saveDept=document.getElementById('saveDept');if(saveDept)saveDept.onclick=()=>{const n=document.getElementById('newDeptName').value.trim();if(!n)return;state.departments.push({id:uid('dept'),name:n});save();render()};
+  const setupNext=document.getElementById('setupNext');if(setupNext)setupNext.onclick=()=>{if(!validateDepartments())return;save();const target=setupReturn!==null?setupReturn:1;setupReturn=null;render();show(target)};
+  document.querySelectorAll('[data-edit-depts]').forEach(b=>b.onclick=()=>{setupReturn=Number(b.dataset.editDepts);show(0);render()});
+  document.querySelectorAll('[data-transfer]').forEach(sel=>sel.addEventListener('change',e=>{const slide=e.target.closest('[data-carousel-slide]');const level=Number(slide?.dataset.carouselLevel??0);if(slide)carouselFocus[level]=slide.dataset.carouselKey;const id=e.target.dataset.transfer;const target=e.target.value;state.assignments[id]=target;if(state.co[id]===target)state.co[id]='';save();const y=window.scrollY;render([],y)}));
+  document.querySelectorAll('[data-toggle-co]').forEach(b=>b.onclick=()=>{const box=document.querySelector(`[data-co-box="${CSS.escape(b.dataset.toggleCo)}"]`);if(box)box.classList.toggle('show')});
+  document.querySelectorAll('[data-co]').forEach(sel=>sel.addEventListener('change',e=>{const slide=e.target.closest('[data-carousel-slide]');const level=Number(slide?.dataset.carouselLevel??0);if(slide)carouselFocus[level]=slide.dataset.carouselKey;state.co[e.target.dataset.co]=e.target.value;save();const y=window.scrollY;render([],y)}));
+  document.querySelectorAll('[data-exclude-task]').forEach(b=>b.onclick=()=>{const slide=b.closest('[data-carousel-slide]');const level=Number(slide?.dataset.carouselLevel??0);if(slide)carouselFocus[level]=slide.dataset.carouselKey;const id=b.dataset.excludeTask;state.assignments[id]='excluded';delete state.co[id];save();const y=window.scrollY;render([],y)});
+  document.querySelectorAll('[data-add-task]').forEach(b=>b.onclick=()=>{const box=document.querySelector(`[data-add-box="${CSS.escape(b.dataset.addTask)}"]`);if(box){box.classList.add('show');box.querySelector('[data-add-block]')?.focus()}});
+  document.querySelectorAll('[data-cancel-task]').forEach(b=>b.onclick=()=>{const box=document.querySelector(`[data-add-box="${CSS.escape(b.dataset.cancelTask)}"]`);if(box)box.classList.remove('show')});
+  document.querySelectorAll('[data-add-block]').forEach(sel=>sel.onchange=()=>{const deptId=sel.dataset.addBlock;const level=Number(sel.dataset.addLevel);const indicator=document.querySelector(`[data-add-indicator="${CSS.escape(deptId)}"]`);const saveBtn=document.querySelector(`[data-save-task="${CSS.escape(deptId)}"]`);if(indicator){indicator.innerHTML=indicatorOptions(sel.value,level);indicator.disabled=!sel.value||availableCriteria(sel.value,level).length===0;}if(saveBtn)saveBtn.disabled=true;});
+  document.querySelectorAll('[data-add-indicator]').forEach(sel=>sel.onchange=()=>{const saveBtn=document.querySelector(`[data-save-task="${CSS.escape(sel.dataset.addIndicator)}"]`);if(saveBtn)saveBtn.disabled=!sel.value;});
+  document.querySelectorAll('[data-save-task]').forEach(b=>b.onclick=()=>addKnownCriterion(b.dataset.saveTask,Number(b.dataset.saveLevel)));
+  document.querySelectorAll('[data-remove-task]').forEach(b=>b.onclick=()=>{const slide=b.closest('[data-carousel-slide]');const level=Number(slide?.dataset.carouselLevel??0);if(slide)carouselFocus[level]=slide.dataset.carouselKey;const id=b.dataset.removeTask;state.customTasks=state.customTasks.filter(t=>t.id!==id);delete state.assignments[id];delete state.co[id];save();const y=window.scrollY;render([],y)});
+  document.querySelectorAll('[data-prev-screen]').forEach(b=>b.onclick=()=>show(Math.max(0,Number(b.dataset.prevScreen)-1)));
+  const ownerCustom=document.getElementById('ownerCustom');if(ownerCustom)ownerCustom.oninput=e=>{state.ownerCustom=e.target.value;save()};
+  const decisionCustom=document.getElementById('decisionCustom');if(decisionCustom)decisionCustom.oninput=e=>{state.decisionCustom=e.target.value;save()};
+  const build=document.getElementById('buildMap');if(build)build.onclick=()=>{const a=document.getElementById('ownerAlert');const owner=state.ownerCustom.trim();const dec=state.decisionCustom.trim();if(!owner||!dec){a.textContent='Укажите должность ответственного и должность руководителя, который принимает итоговое решение.';a.classList.add('show');return}const un=unassignedTasks(2);if(un.length){showModal({title:'Остались нераспределенные показатели',text:`Не распределено: ${un.length}. Они не попадут в чек-листы отделов, пока вы не назначите исполнителей. Можно вернуться к распределению или собрать чек-листы сейчас.`,secondaryLabel:'Распределить',primaryLabel:'Собрать чек-листы',onSecondary:()=>focusUnassigned(2),onPrimary:()=>{save();render();show(5)}});return}save();render();show(5)};
+  const dl=document.getElementById('downloadBtn');if(dl)dl.onclick=downloadWord;
+  const restart=document.getElementById('restartBtn');if(restart)restart.onclick=()=>showModal({title:'Начать заново?',text:'Все изменения и назначения будут удалены.',secondaryLabel:'Отмена',primaryLabel:'Начать заново',danger:true,onPrimary:resetEverything});
+}
+function downloadWord(){
+  const owner=state.ownerCustom.trim();
+  const decision=state.decisionCustom.trim();
+  const used=state.departments.map(d=>({d,tasks:taskMapForDept(d)})).filter(x=>x.tasks.length);
+  const un=unassignedTasks(2);
+
+  function groupTasksByBlock(tasks){
+    const grouped=new Map();
+    tasks.forEach(t=>{
+      const block=t.block||'Без блока';
+      if(!grouped.has(block))grouped.set(block,[]);
+      grouped.get(block).push(t);
+    });
+    const ordered=[...grouped.keys()].sort((a,b)=>{
+      const ai=blocks.indexOf(a), bi=blocks.indexOf(b);
+      if(ai!==-1&&bi!==-1)return ai-bi;
+      if(ai!==-1)return -1;
+      if(bi!==-1)return 1;
+      return a.localeCompare(b,'ru');
+    });
+    return ordered.map(block=>({
+      block,
+      tasks:grouped.get(block).slice().sort((a,b)=>{
+        const lv=effectiveLevel(a)-effectiveLevel(b);
+        if(lv!==0)return lv;
+        return String(a.title||'').localeCompare(String(b.title||''),'ru');
+      })
+    }));
+  }
+
+  function checklistTable(tasks){
+    const grouped=groupTasksByBlock(tasks);
+    const rows=grouped.map(group=>{
+      const rowspan=group.tasks.length;
+      return group.tasks.map((t,i)=>`<tr><td class="check">☐</td>${i===0?`<td class="block" rowspan="${rowspan}">${esc(group.block)}</td>`:''}<td class="what">${esc(t.title)}${t.secondary?' <i>(соисполнитель)</i>':''}</td><td class="turn">${esc(turnoverFrom(effectiveLevel(t)))}</td><td class="docs">${esc(t.docs||'подтверждающие материалы по внутреннему регламенту')}</td></tr>`).join('');
+    }).join('');
+    return `<table><thead><tr><th class="check">✓</th><th class="block">Блок</th><th class="what">Что проверить</th><th class="turn">При каком обороте</th><th class="docs">Документы / материалы</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function deptPage(deptName,tasks,index,isUnassigned=false){
+    const cls='dept-page'+(index>0?' pagebreak':'')+(isUnassigned?' unassigned':'');
+    return `<section class="${cls}"><div class="dept-label">${isUnassigned?'Не распределено':esc(deptName)}</div><p class="dept-lead">${isUnassigned?'Показатели без назначенного исполнителя':'Чек-лист отдела по проверке контрагентов'}</p>${checklistTable(tasks)}</section>`;
+  }
+
+  const sections=used.map(({d,tasks},idx)=>deptPage(d.name,tasks,idx,false)).join('');
+  const unSection=un.length?deptPage('Не распределено',un,used.length,true):'';
+
+  const doc=`<!doctype html><html><head><meta charset="utf-8"><style>
+  @page{size:landscape;margin:13mm}
+  body{font-family:Arial,sans-serif;color:#202523;font-size:9.3pt}
+  .cover{page-break-after:always}
+  .over{font-size:9pt;margin-bottom:4px;color:#5f6763}
+  .title{font-size:16pt;font-weight:700;color:#202523;margin:0 0 10px}
+  .roles{margin:0 0 14px;padding:9px 11px;background:#f1f2f3;border:1px solid #d7ddd5}
+  .roles p{margin:3px 0}
+  .dept-label{font-size:14pt;font-weight:700;margin:0 0 3px;color:#202523}
+  .dept-lead{margin:0 0 8px;color:#5f6763}
+  .dept-page{margin-top:0}
+  .pagebreak{page-break-before:always}
+  table{border-collapse:collapse;width:100%;table-layout:fixed;margin-bottom:10px;page-break-inside:auto}
+  thead{display:table-header-group}
+  tr{page-break-inside:avoid;page-break-after:auto}
+  th{background:#f1f2f3;color:#202523;text-align:left;font-weight:700;border:1px solid #d7ddd5;padding:5px 6px}
+  td{vertical-align:top;border:1px solid #d7ddd5;padding:5px 6px;line-height:1.25}
+  th.check,td.check{width:4%;text-align:center;font-size:13pt}
+  th.block,td.block{width:18%}
+  th.what,td.what{width:24%}
+  th.turn,td.turn{width:16%}
+  th.docs,td.docs{width:38%}
+  td.block{font-weight:700;background:#fafbfa;vertical-align:top}
+  .unassigned .dept-label,.unassigned .dept-lead{color:#9a3c2e}
+  </style></head><body>
+  <section class="cover"><div class="over">Приложение к регламенту проверки</div>
+  <div class="title">Чек-листы для отделов по проверке контрагентов</div>
+  <div class="roles"><p><b>Ответственный за результаты проверки:</b> ${esc(owner)}</p><p><b>Кто принимает итоговое решение:</b> ${esc(decision)}</p></div></section>
+  ${sections}${unSection}
+  </body></html>`;
+  const blob=new Blob(['\ufeff',doc],{type:'application/msword;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='Чек-листы_отделов_по_проверке_контрагентов.doc';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000)
+}
+document.getElementById('appModal')?.addEventListener('click',e=>{if(e.target.id==='appModal')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+load();render();
+})();
+</script>
+</body>
+</html>
