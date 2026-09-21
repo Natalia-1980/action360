@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Схемы продаж на маркетплейсах</title>
+    <style>
+        /* ------------------------------------------------
+           Стили в духе скриншота (крупные карточки, мягкие тона)
+        ------------------------------------------------ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #F2F6FC;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* -------- КАРТОЧКА (ширина 650px, фиксированная высота) -------- */
+        .card {
+            width: 650px;
+            max-width: 100%;
+            height: 560px; /* Фиксированная высота */
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 20, 50, 0.10);
+            padding: 32px 28px 28px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Чтобы содержимое не вылезало */
+        }
+
+        .card h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1A2A3A;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+            flex-shrink: 0;
+        }
+
+        .card .subhead {
+            font-size: 15px;
+            color: #5A6C7E;
+            border-bottom: 1px solid #E9EDF2;
+            padding-bottom: 18px;
+            margin-bottom: 24px;
+            line-height: 1.4;
+            flex-shrink: 0;
+        }
+
+        /* -------- ОБЛАСТЬ СОДЕРЖИМОГО (скролл при необходимости) -------- */
+        .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-right: -4px;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            width: 4px;
+        }
+        .scroll-area::-webkit-scrollbar-track {
+            background: #F0F2F5;
+            border-radius: 4px;
+        }
+        .scroll-area::-webkit-scrollbar-thumb {
+            background: #C0C8D4;
+            border-radius: 4px;
+        }
+
+        /* -------- ГЛАВНАЯ: СПИСОК МАРКЕТПЛЕЙСОВ (крупно) -------- */
+        .market-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 8px 0;
+        }
+
+        .market-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #F8FAFE;
+            border: 1.5px solid #E9EDF2;
+            border-radius: 14px;
+            padding: 18px 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .market-item:hover {
+            border-color: #B0C8E0;
+            background: #F0F5FC;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .market-item .logo {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .market-item .logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .market-item .name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1A2A3A;
+            letter-spacing: -0.3px;
+        }
+
+        .market-item .arrow {
+            margin-left: auto;
+            font-size: 24px;
+            color: #B0C8E0;
+        }
+
+        /* -------- ВТОРОЙ ЭКРАН: СПИСОК СХЕМ -------- */
+        .scheme-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 4px 0;
+        }
+
+        .scheme-card {
+            background: #F8FAFE;
+            border: 1.5px solid #E9EDF2;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .scheme-card:hover {
+            border-color: #B0C8E0;
+            background: #F0F5FC;
+            transform: translateY(-1px);
+        }
+
+        .scheme-card .name {
+            font-weight: 500;
+            font-size: 16px;
+            color: #1A2A3A;
+        }
+
+        .scheme-card .badge {
+            font-size: 13px;
+            background: #E9EDF2;
+            padding: 4px 16px;
+            border-radius: 30px;
+            color: #5A6C7E;
+            font-weight: 450;
+            white-space: nowrap;
+        }
+
+        /* -------- КНОПКА "НАЗАД" -------- */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #1A4B7A;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 6px 0 12px 0;
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover {
+            color: #0D2E4A;
+        }
+
+        /* -------- ВСПЛЫВАЮЩАЯ ПОДСКАЗКА (как на скриншоте) -------- */
+        .tooltip-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.30);
+            backdrop-filter: blur(2px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+            padding: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tooltip-box {
+            max-width: 520px;
+            width: 100%;
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.20);
+            padding: 28px 28px 24px;
+            position: relative;
+            animation: slideUp 0.25s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .tooltip-box .title {
+            font-size: 19px;
+            font-weight: 600;
+            color: #1A2A3A;
+            margin-bottom: 14px;
+            padding-right: 30px;
+            line-height: 1.3;
+        }
+
+        .tooltip-box .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 26px;
+            line-height: 1;
+            color: #8A9BAE;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: 0.2s ease;
+        }
+
+        .tooltip-box .close-btn:hover {
+            background: #F0F2F5;
+            color: #1A2A3A;
+        }
+
+        .tooltip-box .section {
+            margin-top: 16px;
+        }
+
+        .tooltip-box .section-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #5A6C7E;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        .tooltip-box .kkt-text {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #1A2A3A;
+            background: #F4F8FF;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border-left: 4px solid #F5A623;
+        }
+
+        .tooltip-box .doc-list {
+            list-style: none;
+            padding: 0;
+            margin: 4px 0 0;
+        }
+
+        .tooltip-box .doc-list li {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #1A2A3A;
+            padding: 6px 0 6px 24px;
+            position: relative;
+            border-bottom: 1px solid #F0F2F5;
+        }
+
+        .tooltip-box .doc-list li:last-child {
+            border-bottom: none;
+        }
+
+        .tooltip-box .doc-list li::before {
+            content: "•";
+            position: absolute;
+            left: 4px;
+            color: #1A4B7A;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .tooltip-box .note {
+            font-size: 13px;
+            color: #5A6C7E;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #E9EDF2;
+            font-style: normal;
+            background: #FAFBFD;
+            padding: 12px 14px;
+            border-radius: 8px;
+        }
+
+        /* -------- АДАПТИВНОСТЬ -------- */
+        @media (max-width: 700px) {
+            .card { 
+                padding: 24px 16px; 
+                height: 500px; /* Чуть меньше на телефонах */
+            }
+            .market-item { padding: 14px 16px; }
+            .market-item .name { font-size: 18px; }
+            .scheme-card { padding: 14px 16px; flex-wrap: wrap; gap: 6px; }
+            .tooltip-box { padding: 24px 20px; margin: 10px; }
+        }
+        @media (max-width: 450px) {
+            .market-item .logo { width: 36px; height: 36px; }
+            .market-item .name { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app" class="card">
+    <h1>📦 Схемы продаж</h1>
+    <div class="subhead" v-if="!currentMarket">Выберите маркетплейс, чтобы увидеть модели работы</div>
+    <div class="subhead" v-else>{{ getMarketLabel(currentMarket) }} — модели работы</div>
+
+    <!-- ОБЛАСТЬ СКРОЛЛА -->
+    <div class="scroll-area">
+        <!-- ГЛАВНЫЙ ЭКРАН: СПИСОК МАРКЕТПЛЕЙСОВ -->
+        <div v-if="!currentMarket" class="market-list">
+            <div class="market-item" v-for="mp in marketplaces" :key="mp.id" @click="selectMarket(mp.id)">
+                <div class="logo">
+                    <img :src="mp.logo" :alt="mp.label" loading="lazy">
+                </div>
+                <span class="name">{{ mp.label }}</span>
+                <span class="arrow">›</span>
+            </div>
+        </div>
+
+        <!-- ВТОРОЙ ЭКРАН: СПИСОК СХЕМ -->
+        <div v-else>
+            <button class="back-btn" @click="goBack">← Назад</button>
+            <div class="scheme-grid">
+                <div class="scheme-card" v-for="scheme in filteredSchemes"
+                     :key="scheme.id"
+                     @click="openTooltip(scheme)">
+                    <span class="name">{{ scheme.name }}</span>
+                    <span class="badge">{{ scheme.tag }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ВСПЛЫВАЮЩЕЕ ОКНО (стиль как на скриншоте) -->
+    <div class="tooltip-overlay" v-if="activeTooltip" @click.self="closeTooltip">
+        <div class="tooltip-box">
+            <button class="close-btn" @click="closeTooltip">✕</button>
+
+            <div class="title">{{ activeTooltip.title }}</div>
+
+            <div class="section">
+                <div class="section-label">🧾 Применение ККТ</div>
+                <div class="kkt-text">{{ activeTooltip.kkt }}</div>
+            </div>
+
+            <div class="section">
+                <div class="section-label">📄 Документы для продавца</div>
+                <ul class="doc-list">
+                    <li v-for="doc in activeTooltip.docs">{{ doc }}</li>
+                </ul>
+            </div>
+
+            <div class="note" v-if="activeTooltip.note">
+                ⓘ {{ activeTooltip.note }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ЛОГОТИПЫ В ОСНОВЕ base64 (для автономной работы) -->
+<!-- Логотип Wildberries (фиолетовый) -->
+<!-- Логотип Ozon (синий) -->
+<!-- Логотип Яндекс Маркет (жёлтый) -->
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            currentMarket: null, // null, 'wb', 'ozon', 'yandex'
+            activeTooltip: null,
+            marketplaces: [
+                { 
+                    id: 'wb', 
+                    label: 'Wildberries', 
+                    logo: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iIzYyMkU4NSIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI4IiBmaWxsPSIjRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj5XQjwvdGV4dD48L3N2Zz4='
+                },
+                { 
+                    id: 'ozon', 
+                    label: 'Ozon', 
+                    logo: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iIzAwNzBGRiIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI4IiBmaWxsPSIjRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj5PWjwvdGV4dD48L3N2Zz4='
+                },
+                { 
+                    id: 'yandex', 
+                    label: 'Яндекс Маркет', 
+                    logo: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iI0ZDRjMzMCIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj7Qr9CUPC90ZXh0Pjwvc3ZnPg=='
+                }
+            ],
+            // ----------------------------------------------------------
+            // ДАННЫЕ ПО СХЕМАМ (полные, из инструкций)
+            // ----------------------------------------------------------
+            schemes: {
+                wb: [
+                    {
+                        id: 'wb-fbw',
+                        name: 'Склад WB (FBW)',
+                        tag: 'Товар на складе WB',
+                        tooltip: {
+                            title: 'Склад WB (FBW) — полный фулфилмент',
+                            kkt: 'Wildberries. Продавец не применяет ККТ, так как всю работу по приёму оплаты и выдаче чека берёт на себя маркетплейс.',
+                            docs: [
+                                'Договор-оферта (комиссии)',
+                                'Отчёт комиссионера о продажах',
+                                'Акт на комиссионное вознаграждение и услуги (хранение, логистика)',
+                                'Отгрузочные документы на поставку товара на склад WB'
+                            ],
+                            note: 'ЭТрН не нужна, если вы доставляете товар на склад сами (без привлечения перевозчика). Оформите путевой лист.'
+                        }
+                    },
+                    {
+                        id: 'wb-fbs',
+                        name: 'Маркетплейс (FBS)',
+                        tag: 'Склад продавца, доставка WB',
+                        tooltip: {
+                            title: 'Маркетплейс (FBS) — вы храните, WB доставляет',
+                            kkt: 'Wildberries и/или Продавец. Если оплата онлайн — чек на аванс от WB. Продавец обязан пробить чек на полный расчет (с признаком «Зачет предоплаты») при передаче заказа.',
+                            docs: [
+                                'Договор-оферта (комиссии)',
+                                'Отчёт комиссионера о продажах',
+                                'Акт на услуги доставки',
+                                'Чеки ККТ (при участии в расчётах)'
+                            ]
+                        }
+                    },
+                    {
+                        id: 'wb-dbs',
+                        name: 'Витрина (DBS)',
+                        tag: 'Полная самостоятельная доставка',
+                        tooltip: {
+                            title: 'Витрина (DBS) — вы делаете всё сами',
+                            kkt: 'Wildberries пробивает чек на аванс (если оплата онлайн). Продавец обязан применить ККТ при получении окончательной оплаты от покупателя (наличные/карта при доставке).',
+                            docs: [
+                                'Договор-оферта (комиссии)',
+                                'Отчёт комиссионера о поступивших платежах',
+                                'Чеки ККТ (обязательно для всех расчётов с покупателем)',
+                                'Транспортная накладная (при необходимости)'
+                            ],
+                            note: 'За быструю доставку (до 24 часов) Wildberries снижает комиссию на 2%.'
+                        }
+                    },
+                    {
+                        id: 'wb-edbs',
+                        name: 'Витрина экспресс (EDBS)',
+                        tag: 'Экспресс-доставка 1–4 ч',
+                        tooltip: {
+                            title: 'Витрина экспресс (EDBS) — доставка за 1–4 часа',
+                            kkt: 'Аналогично DBS: WB пробивает чек на аванс, продавец — при получении оплаты на месте.',
+                            docs: [
+                                'Договор-оферта (комиссии)',
+                                'Отчёт комиссионера',
+                                'Чеки ККТ (при расчётах с покупателем)'
+                            ],
+                            note: 'Комиссия 3% (кроме автомобилей — 0,5%). Штрафы за задержку доставки > 15 минут.'
+                        }
+                    },
+                    {
+                        id: 'wb-dbw',
+                        name: 'Деливери WB (DBW)',
+                        tag: 'Курьер WB забирает со склада',
+                        tooltip: {
+                            title: 'Деливери WB (DBW) — курьер Wildberries забирает товар',
+                            kkt: 'Wildberries. Продавец ККТ не применяет, так как расчёт проходит через площадку.',
+                            docs: [
+                                'Договор-оферта (комиссии)',
+                                'Отчёт комиссионера о продажах',
+                                'Акт на услуги доставки',
+                                'Документы на передачу товара курьеру'
+                            ],
+                            note: 'Пока доступна только для сверхгабаритных товаров (СГТ). Стоимость доставки — 1800 ₽ за заказ.'
+                        }
+                    },
+                    {
+                        id: 'wb-cc',
+                        name: 'Самовывоз из магазина (С&C)',
+                        tag: 'Выдача в торговой точке',
+                        tooltip: {
+                            title: 'Самовывоз из магазина продавца (С&C)',
+                            kkt: 'Если оплата онлайн — WB пробивает чек. Если оплата при получении — продавец обязан применить ККТ.',
+                            docs: [
+                                'Договор-оферта (комиссии)',
+                                'Отчёт комиссионера',
+                                'Чеки ККТ (при оплате на месте)'
+                            ],
+                            note: 'Экономия на доставке и упаковке. Можно продавать товары, запрещённые для других моделей (алкоголь, лекарства по рецепту).'
+                        }
+                    }
+                ],
+                ozon: [
+                    {
+                        id: 'ozon-fbo',
+                        name: 'FBO',
+                        tag: 'Товар на складе Ozon',
+                        tooltip: {
+                            title: 'FBO — полный фулфилмент Ozon',
+                            kkt: 'Ozon. Продавец не применяет ККТ, так как Ozon является агентом и сам выдаёт чеки покупателям.',
+                            docs: [
+                                'Договор-оферта (агентский)',
+                                'Отчёт агента о продажах',
+                                'Акт на агентское вознаграждение и услуги (хранение, логистика)',
+                                'Отгрузочные документы на поставку'
+                            ],
+                            note: 'Ozon несёт ответственность за сохранность товара на складе и при доставке.'
+                        }
+                    },
+                    {
+                        id: 'ozon-fbs',
+                        name: 'FBS',
+                        tag: 'Склад продавца, доставка Ozon',
+                        tooltip: {
+                            title: 'FBS — вы храните, Ozon доставляет',
+                            kkt: 'Ozon и/или Продавец. При оплате онлайн — чек на аванс от Ozon. Продавец пробивает чек на полный расчёт (с признаком "Зачет предоплаты") при передаче заказа в сортировочный центр.',
+                            docs: [
+                                'Договор-оферта (агентский)',
+                                'Отчёт агента о продажах',
+                                'Акт на услуги доставки',
+                                'Чеки ККТ (при участии в расчётах)'
+                            ],
+                            note: 'Вы самостоятельно упаковываете заказ и привозите его в пункт приёма Ozon.'
+                        }
+                    },
+                    {
+                        id: 'ozon-dbs',
+                        name: 'DBS (Real FBS)',
+                        tag: 'Полная самостоятельная доставка',
+                        tooltip: {
+                            title: 'DBS — полная самостоятельная доставка',
+                            kkt: 'Ozon пробивает чек на аванс (если оплата онлайн). Продавец обязан применить ККТ при получении окончательной оплаты от покупателя.',
+                            docs: [
+                                'Договор-оферта (агентский)',
+                                'Отчёт агента о поступивших платежах',
+                                'Чеки ККТ (обязательно для всех расчётов с покупателем)'
+                            ],
+                            note: 'Подходит для товаров, которые требуют примерки, осмотра или имеют высокую цену.'
+                        }
+                    }
+                ],
+                yandex: [
+                    {
+                        id: 'yandex-fby',
+                        name: 'FBY',
+                        tag: 'Товар на складе Яндекса',
+                        tooltip: {
+                            title: 'FBY — хранение и доставка силами Маркета',
+                            kkt: 'Яндекс Маркет. Продавец не применяет ККТ, так как Маркет является платежным агентом и выдаёт чеки.',
+                            docs: [
+                                'Договор оказания услуг',
+                                'УПД на оказанные услуги (комиссия Маркета)',
+                                'Документы на поставку товара на склад',
+                                'Акт приёмки товаров на складе'
+                            ],
+                            note: 'Маркет несёт ответственность за товары на складе и при доставке. Модель подходит для быстрой распродажи.'
+                        }
+                    },
+                    {
+                        id: 'yandex-fbs',
+                        name: 'FBS',
+                        tag: 'Склад продавца, доставка Яндекса',
+                        tooltip: {
+                            title: 'FBS — доставка силами Маркета',
+                            kkt: 'Яндекс Маркет. Продавец не обязан применять ККТ, так как вся оплата проходит через Маркет.',
+                            docs: [
+                                'Договор оказания услуг',
+                                'УПД на услуги по доставке и вознаграждение Маркета',
+                                'Отчёт о переданных в доставку заказах'
+                            ],
+                            note: 'Вы храните товары, собираете заказы и передаёте их в сортировочный центр Маркета.'
+                        }
+                    },
+                    {
+                        id: 'yandex-express',
+                        name: 'Экспресс',
+                        tag: 'Доставка за 1–2 часа',
+                        tooltip: {
+                            title: 'Экспресс — быстрая доставка силами Маркета',
+                            kkt: 'Яндекс Маркет. Продавец не применяет ККТ.',
+                            docs: [
+                                'Договор оказания услуг',
+                                'УПД на услуги экспресс-доставки',
+                                'Отчёт о переданных заказах'
+                            ],
+                            note: 'Курьеры забирают заказы из вашей точки. Заказы застрахованы до 500 000 ₽. Комиссия — от 3%.'
+                        }
+                    },
+                    {
+                        id: 'yandex-dbs',
+                        name: 'DBS',
+                        tag: 'Полная самостоятельная доставка',
+                        tooltip: {
+                            title: 'DBS — самостоятельная доставка продавцом',
+                            kkt: 'Яндекс Маркет. Продавец не обязан применять ККТ, так как оплата проходит через Маркет.',
+                            docs: [
+                                'Договор оказания услуг',
+                                'УПД на вознаграждение Маркета за услуги'
+                            ],
+                            note: 'Вы сами храните, собираете и доставляете заказы покупателям. Маркет устанавливает единый тариф на доставку.'
+                        }
+                    }
+                ]
+            }
+        },
+        computed: {
+            filteredSchemes() {
+                return this.currentMarket ? (this.schemes[this.currentMarket] || []) : [];
+            }
+        },
+        methods: {
+            selectMarket(id) {
+                this.currentMarket = id;
+                this.closeTooltip();
+            },
+            goBack() {
+                this.currentMarket = null;
+                this.closeTooltip();
+            },
+            getMarketLabel(id) {
+                const found = this.marketplaces.find(m => m.id === id);
+                return found ? found.label : '';
+            },
+            openTooltip(scheme) {
+                this.activeTooltip = scheme.tooltip;
+            },
+            closeTooltip() {
+                this.activeTooltip = null;
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
