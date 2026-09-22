@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Иконки для договора — 3 колонки</title>
+<style>
+  .icon-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    padding: 20px;
+  }
+
+  /* Строка = 3 колонки */
+  .icon-row {
+    display: grid;
+    grid-template-columns: 60px 260px 1fr;  /* рисунок | название | описание */
+    align-items: center;
+    gap: 20px;
+    padding: 16px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+    transition: 0.2s;
+  }
+  .icon-row:hover {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transform: translateX(2px);
+  }
+
+  /* Колонка 1 — квадрат с иконкой */
+  .icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-box svg {
+    width: 30px;
+    height: 30px;
+    stroke: #2563eb;
+    stroke-width: 1.9;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Колонка 2 — название */
+  .icon-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.35;
+  }
+
+  /* Колонка 3 — подробное описание */
+  .icon-desc {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.5;
+  }
+
+  /* Адаптив: на узких экранах — в одну колонку */
+  @media (max-width: 640px) {
+    .icon-row {
+      grid-template-columns: 60px 1fr;
+      grid-template-areas:
+        "icon title"
+        "icon desc";
+    }
+    .icon-box { grid-area: icon; }
+    .icon-title { grid-area: title; }
+    .icon-desc { grid-area: desc; }
+  }
+</style>
+</head>
+<body>
+
+<div class="icon-list">
+
+  <!-- 1 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M16 11l2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="icon-title">Требования к партнеру</div>
+    <div class="icon-desc">Проверка надежности, деловой репутации и соответствия критериям оператора маркетплейса</div>
+  </div>
+
+  <!-- 2 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <circle cx="9" cy="21" r="1"/>
+        <circle cx="20" cy="21" r="1"/>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+      </svg>
+    </div>
+    <div class="icon-title">Порядок продажи товаров</div>
+    <div class="icon-desc">Этапы оформления заказа, передача товара покупателю и правила работы с витриной маркетплейса</div>
+  </div>
+
+  <!-- 3 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <circle cx="7" cy="7" r="3"/>
+        <circle cx="17" cy="17" r="3"/>
+        <line x1="19" y1="5" x2="5" y2="19"/>
+      </svg>
+    </div>
+    <div class="icon-title">Вознаграждение оператора</div>
+    <div class="icon-desc">Правила расчета комиссии платформы, ее размер и порядок удержания из выручки продавца</div>
+  </div>
+
+  <!-- 4 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+        <line x1="6" y1="15" x2="10" y2="15"/>
+      </svg>
+    </div>
+    <div class="icon-title">Взаиморасчеты и сроки</div>
+    <div class="icon-desc">Порядок перечисления денежных средств продавцу, сроки платежей и условия задержек выплат</div>
+  </div>
+
+  <!-- 5 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.59 11l9.58 9.59a2 2 0 0 0 2.83 0l4.59-4.59a2 2 0 0 0 0-2.59z"/>
+        <circle cx="7.5" cy="7.5" r="1.5"/>
+      </svg>
+    </div>
+    <div class="icon-title">Цены и скидки</div>
+    <div class="icon-desc">Условия установления и изменения цен на товары, а также применения скидок и акций</div>
+  </div>
+
+  <!-- 6 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 3v18"/>
+        <path d="M5 7h14"/>
+        <path d="M5 7l-3 6a3 3 0 0 0 6 0z"/>
+        <path d="M19 7l-3 6a3 3 0 0 0 6 0z"/>
+        <path d="M8 21h8"/>
+      </svg>
+    </div>
+    <div class="icon-title">Ответственность сторон</div>
+    <div class="icon-desc">Полный перечень мер ответственности к продавцу и оператору, основания и порядок их применения</div>
+  </div>
+
+  <!-- 7 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <path d="M4 4h16v16H4z"/>
+        <path d="M4 4l8 8 8-8"/>
+      </svg>
+    </div>
+    <div class="icon-title">Изменение договора</div>
+    <div class="icon-desc">Порядок уведомления об изменении условий договора в сроки, установленные законом</div>
+  </div>
+
+  <!-- 8 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    </div>
+    <div class="icon-title">Доступ к рейтингу</div>
+    <div class="icon-desc">Порядок предоставления партнеру доступа к информации о его рейтинге на платформе</div>
+  </div>
+
+  <!-- 9 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <div class="icon-title">Ранжирование в поиске</div>
+    <div class="icon-desc">Доступ к информации о ранжировании поиска и причинах изменения позиций карточки товара</div>
+  </div>
+
+  <!-- 10 -->
+  <div class="icon-row">
+    <div class="icon-box">
+      <svg viewBox="0 0 24 24">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="15" x2="12.01" y2="15"/>
+      </svg>
+    </div>
+    <div class="icon-title">Обжалование решений</div>
+    <div class="icon-desc">Порядок обжалования решений, действий или бездействия оператора маркетплейса</div>
+  </div>
+
+</div>
+
+</body>
+</html>
