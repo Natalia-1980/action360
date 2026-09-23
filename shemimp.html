@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Схемы продаж через маркетплейсы</title>
+<style>
+  .mp-wrap {
+    font-family: Arial, sans-serif;
+    width: 700px;
+    padding: 20px;
+    box-sizing: border-box;
+    background: #f9fafb;
+    border-radius: 12px;
+  }
+
+  .mp-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 20px 0;
+  }
+
+  /* Карточка-договор */
+  .mp-card {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 18px;
+    padding: 18px 20px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    margin-bottom: 14px;
+    transition: 0.2s;
+  }
+  .mp-card:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+    transform: translateY(-2px);
+  }
+  .mp-card:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Иконка в квадрате */
+  .mp-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 14px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .mp-icon svg {
+    width: 36px;
+    height: 36px;
+    stroke: #2563eb;
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Правый блок */
+  .mp-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Название модели */
+  .mp-model {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.3;
+  }
+
+  /* Строки характеристик */
+  .mp-rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 20px;
+  }
+  .mp-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mp-label {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .mp-value {
+    font-size: 13px;
+    color: #1f2937;
+    line-height: 1.4;
+  }
+
+  /* Разные цвета квадратов для разных моделей */
+  .mp-icon.blue   { background: #eff6ff; }
+  .mp-icon.blue svg   { stroke: #2563eb; }
+
+  .mp-icon.green  { background: #ecfdf5; }
+  .mp-icon.green svg  { stroke: #059669; }
+
+  .mp-icon.orange { background: #fff7ed; }
+  .mp-icon.orange svg { stroke: #ea580c; }
+
+  .mp-icon.purple { background: #f5f3ff; }
+  .mp-icon.purple svg { stroke: #7c3aed; }
+
+  .mp-icon.pink   { background: #fdf2f8; }
+  .mp-icon.pink svg   { stroke: #db2777; }
+
+  .mp-icon.teal   { background: #f0fdfa; }
+  .mp-icon.teal svg   { stroke: #0d9488; }
+</style>
+</head>
+<body>
+
+<div class="mp-wrap">
+
+  <h2 class="mp-title">Схемы продаж через маркетплейсы</h2>
+
+  <!-- FBO -->
+  <div class="mp-card">
+    <div class="mp-icon blue">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <path d="M3 9h18"/>
+        <path d="M9 21V9"/>
+      </svg>
+    </div>
+    <div class="mp-body">
+      <div class="mp-model">FBO / FBW / FBY</div>
+      <div class="mp-rows">
+        <div class="mp-row">
+          <span class="mp-label">Где хранится товар</span>
+          <span class="mp-value">Склад маркетплейса</span>
+        </div>
+        <div class="mp-row">
+          <span class="mp-label">Кто везет покупателю</span>
+          <span class="mp-value">Маркетплейс</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FBS -->
+  <div class="mp-card">
+    <div class="mp-icon green">
+      <svg viewBox="0 0 24 24">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <path d="M3.27 6.96L12 12l8.73-5.04"/>
+        <path d="M12 22V12"/>
+      </svg>
+    </div>
+    <div class="mp-body">
+      <div class="mp-model">FBS</div>
+      <div class="mp-rows">
+        <div class="mp-row">
+          <span class="mp-label">Где хранится товар</span>
+          <span class="mp-value">Склад продавца</span>
+        </div>
+        <div class="mp-row">
+          <span class="mp-label">Кто везет покупателю</span>
+          <span class="mp-value">Маркетплейс</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- realFBS Standard / DBS -->
+  <div class="mp-card">
+    <div class="mp-icon orange">
+      <svg viewBox="0 0 24 24">
+        <rect x="1" y="3" width="15" height="13" rx="1"/>
+        <path d="M16 8h4l3 3v5h-7z"/>
+        <circle cx="5.5" cy="18.5" r="2.5"/>
+        <circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+    </div>
+    <div class="mp-body">
+      <div class="mp-model">realFBS Standard / DBS</div>
+      <div class="mp-rows">
+        <div class="mp-row">
+          <span class="mp-label">Где хранится товар</span>
+          <span class="mp-value">Склад продавца</span>
+        </div>
+        <div class="mp-row">
+          <span class="mp-label">Кто везет покупателю</span>
+          <span class="mp-value">Продавец (свои курьеры / СДЭК)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- realFBS Express -->
+  <div class="mp-card">
+    <div class="mp-icon purple">
+      <svg viewBox="0 0 24 24">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+    <div class="mp-body">
+      <div class="mp-model">realFBS Express / Comfort / EDBS / Экспресс</div>
+      <div class="mp-rows">
+        <div class="mp-row">
+          <span class="mp-label">Где хранится товар</span>
+          <span class="mp-value">Склад продавца</span>
+        </div>
+        <div class="mp-row">
+          <span class="mp-label">Кто везет покупателю</span>
+          <span class="mp-value">Сверхбыстрая доставка продавца</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DBW -->
+  <div class="mp-card">
+    <div class="mp-icon pink">
+      <svg viewBox="0 0 24 24">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+    <div class="mp-body">
+      <div class="mp-model">DBW</div>
+      <div class="mp-rows">
+        <div class="mp-row">
+          <span class="mp-label">Где хранится товар</span>
+          <span class="mp-value">Склад продавца</span>
+        </div>
+        <div class="mp-row">
+          <span class="mp-label">Кто везет покупателю</span>
+          <span class="mp-value">Курьер маркетплейса забирает у вас</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C&C -->
+  <div class="mp-card">
+    <div class="mp-icon teal">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 9l1.5-5h15L21 9"/>
+        <path d="M3 9v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9"/>
+        <path d="M3 9h18"/>
+        <path d="M9 13h6"/>
+      </svg>
+    </div>
+    <div class="mp-body">
+      <div class="mp-model">C&amp;C</div>
+      <div class="mp-rows">
+        <div class="mp-row">
+          <span class="mp-label">Где хранится товар</span>
+          <span class="mp-value">Магазин продавца</span>
+        </div>
+        <div class="mp-row">
+          <span class="mp-label">Кто везет покупателю</span>
+          <span class="mp-value">Покупатель забирает сам</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
