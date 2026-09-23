@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Группа 3 — DBS (листалка)</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+        --red: #E53935;
+        --red-light: #FDECEA;
+        --gray-block: #6B7280;
+        --doc-border: #D1D5DB;
+        --ink: #1F2937;
+        --ink-soft: #4B5563;
+        --line: #9CA3AF;
+        --dash: #D1D5DB;
+        --bg: #F9FAFB;
+        --wb: #6B2E85;
+        --oz: #005BFF;
+        --ya: #FC3F1D;
+        --slide-h: 620px;
+    }
+
+    body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        padding: 32px 16px 60px;
+        color: var(--ink);
+        font-size: 13px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* ============================================
+       ЗАГОЛОВОК ГРУППЫ
+    ============================================ */
+    .group-header {
+        width: 760px;
+        max-width: 100%;
+        padding: 0 4px 8px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        border-bottom: 1.5px solid var(--ink);
+        margin-bottom: 16px;
+    }
+    .group-header .num {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--red);
+    }
+    .group-header h2 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+    }
+
+    /* ============================================
+       ЛИСТАЛКА
+    ============================================ */
+    .slider {
+        width: 760px;
+        max-width: 100%;
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .slider-viewport {
+        overflow: hidden;
+        height: var(--slide-h);
+        position: relative;
+    }
+
+    .slider-track {
+        display: flex;
+        height: 100%;
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
+    }
+
+    .slider-slide {
+        flex: 0 0 100%;
+        min-width: 100%;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .slider-slide::-webkit-scrollbar { width: 4px; }
+    .slider-slide::-webkit-scrollbar-track { background: #F3F4F6; }
+    .slider-slide::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 2px; }
+
+    /* Верхняя полоска */
+    .slide-topbar { height: 4px; }
+    .slide-topbar.wb { background: var(--wb); }
+    .slide-topbar.oz { background: var(--oz); }
+    .slide-topbar.ya { background: var(--ya); }
+
+    /* Шапка слайда */
+    .slide-header {
+        padding: 16px 24px 12px;
+        border-bottom: 1px solid #F3F4F6;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        padding: 4px 10px;
+        border-radius: 3px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    .badge.wb { background: var(--wb); }
+    .badge.oz { background: var(--oz); }
+    .badge.ya { background: var(--ya); }
+
+    .titles { flex: 1; }
+    .titles h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+    }
+    .titles .sub {
+        font-size: 11px;
+        color: #6B7280;
+        margin-top: 3px;
+        line-height: 1.45;
+        font-weight: 500;
+    }
+
+    /* Мета-строка */
+    .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 16px;
+        padding: 10px 24px;
+        background: #FAFBFC;
+        border-bottom: 1px solid #F3F4F6;
+        font-size: 10px;
+        line-height: 1.4;
+    }
+    .meta .item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--ink-soft);
+    }
+    .meta .item strong {
+        color: var(--ink);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 9px;
+        letter-spacing: 0.08em;
+    }
+    .meta .item .val {
+        font-weight: 600;
+        color: var(--red);
+    }
+
+    /* Суть / Особенность */
+    .about {
+        padding: 12px 24px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .about-row {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        gap: 12px;
+        align-items: baseline;
+    }
+    .about-row .label {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--red);
+        line-height: 1.4;
+    }
+    .about-row .text {
+        font-size: 11px;
+        line-height: 1.5;
+        color: var(--ink-soft);
+    }
+    .about-row .text strong { color: var(--ink); font-weight: 600; }
+
+    /* Тело слайда */
+    .body {
+        padding: 14px 24px 20px;
+    }
+
+    /* Дорожка */
+    .lane {
+        display: grid;
+        grid-template-columns: 76px 1fr;
+        gap: 0 14px;
+        padding: 10px 0;
+    }
+    .lane + .lane {
+        border-top: 1.5px dashed var(--dash);
+    }
+
+    .lane-role {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 4px;
+        padding-top: 2px;
+    }
+    .lane-role .icon {
+        width: 30px; height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .lane-role .icon svg {
+        width: 100%; height: 100%;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .lane-role .role-name {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        line-height: 1.2;
+    }
+
+    .lane-flow {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 6px 0;
+    }
+
+    .action-block {
+        background: var(--gray-block);
+        color: #FFFFFF;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        padding: 6px 11px;
+        border-radius: 3px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .flow-arrow {
+        flex: 0 0 24px;
+        height: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        align-self: center;
+    }
+    .flow-arrow svg {
+        width: 100%; height: 100%;
+        stroke: var(--line);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
+
+    .doc {
+        background: #FFFFFF;
+        border: 1.5px solid var(--doc-border);
+        border-radius: 3px;
+        padding: 5px 9px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--ink);
+        flex-shrink: 0;
+        white-space: nowrap;
+        position: relative;
+    }
+    .doc::before {
+        content: "";
+        position: absolute;
+        left: -1.5px; top: -1.5px; bottom: -1.5px;
+        width: 3px;
+        background: var(--red);
+        border-radius: 3px 0 0 3px;
+    }
+
+    .details {
+        flex-basis: 100%;
+        padding-left: 2px;
+        margin-top: 2px;
+    }
+    .details ul { list-style: none; padding: 0; }
+    .details li {
+        font-size: 10px;
+        line-height: 1.4;
+        color: var(--ink-soft);
+        padding: 1px 0 1px 13px;
+        position: relative;
+    }
+    .details li::before {
+        content: "";
+        position: absolute;
+        left: 1px;
+        top: 6px;
+        width: 0; height: 0;
+        border-left: 4px solid var(--red);
+        border-top: 3px solid transparent;
+        border-bottom: 3px solid transparent;
+    }
+    .details li strong { color: var(--ink); font-weight: 600; }
+
+    .footnote {
+        margin-top: 10px;
+        padding: 8px 11px;
+        background: var(--red-light);
+        border-left: 3px solid var(--red);
+        border-radius: 3px;
+        font-size: 10px;
+        line-height: 1.45;
+        color: var(--ink-soft);
+    }
+    .footnote strong { color: var(--ink); font-weight: 600; }
+    .footnote .deadline {
+        display: inline-block;
+        background: #FFFFFF;
+        color: var(--red);
+        font-weight: 600;
+        padding: 0 6px;
+        border-radius: 2px;
+        font-size: 9.5px;
+        border: 1px solid #F5C6C3;
+    }
+
+    /* Управление */
+    .slider-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 14px;
+        border-top: 1px solid #E5E7EB;
+        background: #FAFBFC;
+    }
+
+    .nav-btn {
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        border: 1px solid #E5E7EB;
+        background: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.18s;
+        flex-shrink: 0;
+        color: var(--ink-soft);
+    }
+    .nav-btn:hover:not(:disabled) {
+        background: var(--ink-soft);
+        color: #FFFFFF;
+        border-color: var(--ink-soft);
+    }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-btn svg {
+        width: 13px; height: 13px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 4px;
+        flex: 1;
+        justify-content: center;
+    }
+    .tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid #E5E7EB;
+        background: #FFFFFF;
+        color: var(--ink-soft);
+        cursor: pointer;
+        transition: all 0.18s;
+        white-space: nowrap;
+    }
+    .tab:hover { border-color: #9CA3AF; }
+    .tab.active { color: #FFFFFF; border-color: transparent; }
+    .tab.active.wb { background: var(--wb); }
+    .tab.active.oz { background: var(--oz); }
+    .tab.active.ya { background: var(--ya); }
+
+    .tab .dot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    .tab.wb .dot { background: var(--wb); }
+    .tab.oz .dot { background: var(--oz); }
+    .tab.ya .dot { background: var(--ya); }
+    .tab.active .dot { background: #FFFFFF; }
+
+    .counter {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--ink-soft);
+        min-width: 30px;
+        text-align: right;
+    }
+
+    @media (max-width: 800px) {
+        :root { --slide-h: 700px; }
+        .slide-header { padding: 14px 16px 10px; flex-wrap: wrap; }
+        .meta { padding: 10px 16px; }
+        .about { padding: 12px 16px 0; }
+        .about-row { grid-template-columns: 1fr; gap: 4px; }
+        .body { padding: 12px 16px 16px; }
+        .lane { grid-template-columns: 1fr; gap: 8px; }
+        .lane-role { flex-direction: row; justify-content: flex-start; }
+        .tab { padding: 5px 8px; font-size: 9px; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     ЗАГОЛОВОК ГРУППЫ
+============================================ -->
+<div class="group-header">
+    <span class="num">Группа 3</span>
+    <h2>Склад продавца, везёт продавец (DBS)</h2>
+</div>
+
+<!-- ============================================
+     ЛИСТАЛКА
+============================================ -->
+<div class="slider" id="slider">
+    <div class="slider-viewport">
+        <div class="slider-track" id="track">
+
+            <!-- ==========================================
+                 СЛАЙД 1 — WILDBERRIES
+            ========================================== -->
+            <div class="slider-slide">
+                <div class="slide-topbar wb"></div>
+                <div class="slide-header">
+                    <span class="badge wb">Wildberries · DBS</span>
+                    <div class="titles">
+                        <h3>DBS — Wildberries</h3>
+                        <div class="sub">DBS (Vitrina). Товар хранится у вас, вы сами доставляете его покупателю — своими курьерами или через сторонние службы.</div>
+                    </div>
+                </div>
+                <div class="meta">
+                    <span class="item"><strong>Кто хранит:</strong> <span class="val">продавец</span></span>
+                    <span class="item"><strong>Кто везёт:</strong> <span class="val">продавец</span></span>
+                </div>
+                <div class="about">
+                    <div class="about-row">
+                        <div class="label">Суть</div>
+                        <div class="text">Товар хранится у вас. Вы сами доставляете его покупателю — своими курьерами или через сторонние службы.</div>
+                    </div>
+                    <div class="about-row">
+                        <div class="label">Особенность</div>
+                        <div class="text">Полный контроль над логистикой, сроками и тарифами доставки. Маркетплейс выступает только витриной и принимает оплату.</div>
+                    </div>
+                </div>
+                <div class="body">
+                    <div class="lane">
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><circle cx="22" cy="14" r="7"/></svg></div><div class="role-name">Продавец</div></div>
+                        <div class="lane-flow">
+                            <div class="action-block">Сборка</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">Этикетка WB</div>
+                            <div class="details"><ul>
+                                <li>Печать этикетки WB со штрихкодом заказа</li>
+                                <li>Ввод КИЗ ЧЗ прямо в сборочное задание (до выдачи)</li>
+                            </ul></div>
+                        </div>
+                    </div>
+                    <div class="lane">
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><rect x="4" y="18" width="20" height="12" rx="2"/></svg></div><div class="role-name">Курьер / ТК</div></div>
+                        <div class="lane-flow">
+                            <div class="action-block">Доставка</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">Накладная ТК</div>
+                            <div class="details"><ul>
+                                <li>Через СДЭК/Boxberry — накладная приёма-передачи ТК</li>
+                                <li>Если курьер свой — бумажные документы не требуются</li>
+                            </ul></div>
+                        </div>
+                    </div>
+                    <div class="lane">
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><circle cx="22" cy="14" r="7"/></svg></div><div class="role-name">Покупатель</div></div>
+                        <div class="lane-flow">
+                            <div class="action-block">Вручение</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">СМС-код в ЛК</div>
+                            <div class="details"><ul>
+                                <li>Курьер отдаёт товар, покупатель называет СМС-код подтверждения</li>
+                                <li>Вы вводите код в ЛК WB — без него заказ не закроется, деньги не выплатят</li>
+                            </ul></div>
+                        </div>
+                    </div>
+                    <div class="footnote"><strong>Ответственность:</strong> за доставку и сроки отвечает продавец.</div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 СЛАЙД 2 — OZON
+            ========================================== -->
+            <div class="slider-slide">
+                <div class="slide-topbar oz"></div>
+                <div class="slide-header">
+                    <span class="badge oz">Ozon · realFBS Standard</span>
+                    <div class="titles">
+                        <h3>realFBS Standard — Ozon</h3>
+                        <div class="sub">Товар хранится у вас, вы сами доставляете его покупателю — своими курьерами или через сторонние службы.</div>
+                    </div>
+                </div>
+                <div class="meta">
+                    <span class="item"><strong>Кто хранит:</strong> <span class="val">продавец</span></span>
+                    <span class="item"><strong>Кто везёт:</strong> <span class="val">продавец</span></span>
+                </div>
+                <div class="about">
+                    <div class="about-row">
+                        <div class="label">Суть</div>
+                        <div class="text">Товар хранится у вас. Вы сами доставляете его покупателю — своими курьерами или через сторонние службы.</div>
+                    </div>
+                    <div class="about-row">
+                        <div class="label">Особенность</div>
+                        <div class="text">Полный контроль над логистикой, сроками и тарифами доставки. Маркетплейс выступает только витриной и принимает оплату.</div>
+                    </div>
+                </div>
+                <div class="body">
+                    <div class="lane">
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><circle cx="22" cy="14" r="7"/></svg></div><div class="role-name">Продавец</div></div>
+                        <div class="lane-flow">
+                            <div class="action-block">Сборка</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">Наклейка Ozon 12×7,5</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">УПД (для B2B)</div>
+                            <div class="details"><ul>
+                                <li>Печать транспортной наклейки Ozon (12 × 7,5 см)</li>
+                                <li>Ввод кодов ЧЗ на этапе сборки</li>
+                                <li>Для B2B: Ozon формирует электронный УПД — подписать в ЭДО <span class="deadline">за 3 раб. дня</span></li>
+                            </ul></div>
+                        </div>
+                    </div>
+                    <div class="lane">
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><rect x="4" y="18" width="20" height="12" rx="2"/></svg></div><div class="role-name">Курьер / ТК</div></div>
+                        <div class="lane-flow">
+                            <div class="action-block">Доставка</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">Трек + электронный акт</div>
+                            <div class="details"><ul>
+                                <li>Интегрированная ТК (СДЭК/Почта) — готовый трек-номер и электронный акт в ЛК</li>
+                                <li>Неинтегрированная ТК — трек-номер вписываете в ЛК Ozon вручную</li>
+                            </ul></div>
+                        </div>
+                    </div>
+                    <div class="lane">
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><circle cx="22" cy="14" r="7"/></svg></div><div class="role-name">Покупатель</div></div>
+                        <div class="lane-flow">
+                            <div class="action-block">Получение</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">Статус «Доставлен»</div>
+                            <div class="details"><ul>
+                                <li>При интеграции статус подтягивается из базы ТК</li>
+                                <li>При своём курьере — статус меняет продавец вручную</li>
+                            </ul></div>
+                        </div>
+                    </div>
+                    <div class="footnote"><strong>B2B:</strong> Ozon формирует электронный УПД — подписать в ЭДО <span class="deadline">за 3 раб. дня</span>.</div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 СЛАЙД 3 — ЯНДЕКС МАРКЕТ
+            ========================================== -->
+            <div class="slider-slide">
+                <div class="slide-topbar ya"></div>
+                <div class="slide-header">
+                    <span class="badge ya">Яндекс Маркет · DBS</span>
+                    <div class="titles">
+                        <h3>DBS — Яндекс Маркет</h3>
+                        <div class="sub">DBS (Delivery by Seller). Товар хранится у вас, вы сами доставляете его покупателю — своими курьерами или через сторонние службы.</div>
+                    </div>
+                </div>
+                <div class="meta">
+                    <span class="item"><strong>Кто хранит:</strong> <span class="val">продавец</span></span>
+                    <span class="item"><strong>Кто везёт:</strong> <span class="val">продавец</span></span>
+                </div>
+                <div class="about">
+                    <div class="about-row">
+                        <div class="label">Суть</div>
+                        <div class="text">Товар хранится у вас. Вы сами доставляете его покупателю — своими курьерами или через сторонние службы.</div>
+                    </div>
+                    <div class="about-row">
+                        <div class="label">Особенность</div>
+                        <div class="text">Полный контроль над логистикой, сроками и тарифами доставки. Маркетплейс выступает только витриной и принимает оплату.</div>
+                    </div>
+                </div>
+                <div class="body">
+                    <div class="lane">
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><circle cx="22" cy="14" r="7"/></svg></div><div class="role-name">Продавец</div></div>
+                        <div class="lane-flow">
+                            <div class="action-block">Сборка</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">Товарный чек / ТОРГ-12</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">УПД (для юрлиц)</div>
+                            <div class="details"><ul>
+                                <li>Перенос кодов ЧЗ в систему</li>
+                                <li>Обязательно распечатать и вложить в коробку Товарный чек / ТОРГ-12 (для физлиц)</li>
+                                <li>УПД через ЭДО — для юрлиц-покупателей</li>
+                            </ul></div>
+                        </div>
+                    </div>
+                    <div class="lane">
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><rect x="4" y="18" width="20" height="12" rx="2"/></svg></div><div class="role-name">Курьер / ТК</div></div>
+                        <div class="lane-flow">
+                            <div class="action-block">Доставка</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">Акт приёма-передачи</div>
+                            <div class="details"><ul>
+                                <li>Бумажный Акт приёма-передачи для вашей курьерской службы или ТК</li>
+                            </ul></div>
+                        </div>
+                    </div>
+                    <div class="lane">
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><circle cx="22" cy="14" r="7"/></svg></div><div class="role-name">Покупатель</div></div>
+                        <div class="lane-flow">
+                            <div class="action-block">Вручение</div>
+                            <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
+                            <div class="doc">Статус «Доставлен»</div>
+                            <div class="details"><ul>
+                                <li>Курьер вручает посылку</li>
+                                <li>Вы обязаны изменить статус в ЛК на «Доставлен» строго в день вручения</li>
+                                <li>Иначе Маркет посчитает это нарушением и снизит индекс качества</li>
+                            </ul></div>
+                        </div>
+                    </div>
+                    <div class="footnote"><strong>Важно:</strong> статус «Доставлен» — строго в день вручения.</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==========================================
+         УПРАВЛЕНИЕ
+    ========================================== -->
+    <div class="slider-controls">
+        <button class="nav-btn" id="prevBtn" aria-label="Назад">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="tabs">
+            <button class="tab wb active" data-tab="0"><span class="dot"></span>WB</button>
+            <button class="tab oz" data-tab="1"><span class="dot"></span>Ozon</button>
+            <button class="tab ya" data-tab="2"><span class="dot"></span>Яндекс</button>
+        </div>
+        <span class="counter" id="counter">1 / 3</span>
+        <button class="nav-btn" id="nextBtn" aria-label="Вперёд">
+            <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+    </div>
+</div>
+
+<script>
+(function() {
+    const track = document.getElementById('track');
+    const slides = track.querySelectorAll('.slider-slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const tabs = document.querySelectorAll('.tab');
+    const counter = document.getElementById('counter');
+    const total = slides.length;
+    let index = 0;
+
+    function update() {
+        track.style.transform = `translateX(-${index * 100}%)`;
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === total - 1;
+        tabs.forEach((t, i) => t.classList.toggle('active', i === index));
+        counter.textContent = `${index + 1} / ${total}`;
+        slides[index].scrollTop = 0;
+    }
+
+    function goTo(i) {
+        index = Math.max(0, Math.min(total - 1, i));
+        update();
+    }
+
+    prevBtn.addEventListener('click', () => goTo(index - 1));
+    nextBtn.addEventListener('click', () => goTo(index + 1));
+    tabs.forEach(tab => tab.addEventListener('click', () => goTo(parseInt(tab.dataset.tab, 10))));
+
+    // Клавиатура
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') goTo(index - 1);
+        if (e.key === 'ArrowRight') goTo(index + 1);
+    });
+
+    // Свайп
+    let startX = 0, startY = 0, isDown = false;
+    const viewport = document.querySelector('.slider-viewport');
+
+    viewport.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isDown = true;
+    }, { passive: true });
+
+    viewport.addEventListener('touchend', e => {
+        if (!isDown) return;
+        isDown = false;
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+            dx < 0 ? goTo(index + 1) : goTo(index - 1);
+        }
+    }, { passive: true });
+
+    update();
+})();
+</script>
+
+</body>
+</html>
