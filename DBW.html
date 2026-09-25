@@ -18,7 +18,7 @@
         --dash: #D1D5DB;
         --bg: #F9FAFB;
         --wb: #6B2E85;
-        --slide-h: 620px;
+        --slide-h: 700px;
     }
 
     body {
@@ -26,40 +26,28 @@
         background: var(--bg);
         padding: 32px 16px 60px;
         color: var(--ink);
-        font-size: 13px;
+        font-size: 16px;
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 
-    /* Заголовок */
     .group-header {
-        width: 760px;
+        width: 820px;
         max-width: 100%;
-        padding: 0 4px 8px;
-        display: flex;
-        align-items: baseline;
-        gap: 10px;
+        padding: 0 4px 12px;
         border-bottom: 1.5px solid var(--ink);
-        margin-bottom: 16px;
-    }
-    .group-header .num {
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--red);
+        margin-bottom: 18px;
     }
     .group-header h2 {
-        font-size: 16px;
+        font-size: 21px;
         font-weight: 700;
         color: var(--ink);
         letter-spacing: -0.01em;
     }
 
-    /* Листалка */
     .slider {
-        width: 760px;
+        width: 820px;
         max-width: 100%;
         background: #FFFFFF;
         border: 1px solid #E5E7EB;
@@ -93,116 +81,80 @@
         overflow-x: hidden;
     }
 
-    .slider-slide::-webkit-scrollbar { width: 4px; }
+    .slider-slide::-webkit-scrollbar { width: 5px; }
     .slider-slide::-webkit-scrollbar-track { background: #F3F4F6; }
-    .slider-slide::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 2px; }
+    .slider-slide::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
 
-    .slide-topbar { height: 4px; background: var(--wb); }
+    .slide-topbar { height: 5px; background: var(--wb); }
 
     .slide-header {
-        padding: 16px 24px 12px;
-        border-bottom: 1px solid #F3F4F6;
+        padding: 18px 28px 14px;
         display: flex;
         align-items: flex-start;
-        gap: 12px;
+        gap: 14px;
     }
 
     .badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        font-size: 10px;
+        font-size: 12.5px;
         font-weight: 700;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: #FFFFFF;
         background: var(--wb);
-        padding: 4px 10px;
+        padding: 6px 13px;
         border-radius: 3px;
         flex-shrink: 0;
-        margin-top: 2px;
+        margin-top: 3px;
     }
 
     .titles { flex: 1; }
     .titles h3 {
-        font-size: 15px;
+        font-size: 20px;
         font-weight: 700;
         color: var(--ink);
         letter-spacing: -0.01em;
         line-height: 1.25;
     }
-    .titles .sub {
-        font-size: 11px;
-        color: #6B7280;
-        margin-top: 3px;
-        line-height: 1.45;
-        font-weight: 500;
-    }
 
     .meta {
         display: flex;
         flex-wrap: wrap;
-        gap: 6px 16px;
-        padding: 10px 24px;
+        gap: 10px 28px;
+        padding: 12px 28px 14px;
         background: #FAFBFC;
+        border-top: 1px solid #F3F4F6;
         border-bottom: 1px solid #F3F4F6;
-        font-size: 10px;
-        line-height: 1.4;
+        font-size: 14.5px;
+        line-height: 1.5;
     }
     .meta .item {
         display: inline-flex;
-        align-items: center;
-        gap: 6px;
+        align-items: baseline;
+        gap: 8px;
         color: var(--ink-soft);
     }
     .meta .item strong {
         color: var(--ink);
         font-weight: 600;
-        text-transform: uppercase;
-        font-size: 9px;
-        letter-spacing: 0.08em;
+        font-size: 14px;
     }
     .meta .item .val {
-        font-weight: 600;
-        color: var(--red);
-    }
-
-    .about {
-        padding: 12px 24px 0;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-    .about-row {
-        display: grid;
-        grid-template-columns: 90px 1fr;
-        gap: 12px;
-        align-items: baseline;
-    }
-    .about-row .label {
-        font-size: 9px;
         font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
         color: var(--red);
-        line-height: 1.4;
     }
-    .about-row .text {
-        font-size: 11px;
-        line-height: 1.5;
-        color: var(--ink-soft);
-    }
-    .about-row .text strong { color: var(--ink); font-weight: 600; }
 
     .body {
-        padding: 14px 24px 20px;
+        padding: 12px 28px 20px;
     }
 
     .lane {
         display: grid;
-        grid-template-columns: 76px 1fr;
-        gap: 0 14px;
-        padding: 10px 0;
+        grid-template-columns: 96px 1fr;
+        gap: 0 18px;
+        padding: 12px 0;
     }
     .lane + .lane {
         border-top: 1.5px dashed var(--dash);
@@ -213,11 +165,11 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 4px;
+        gap: 5px;
         padding-top: 2px;
     }
     .lane-role .icon {
-        width: 30px; height: 30px;
+        width: 34px; height: 34px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -231,36 +183,36 @@
         stroke-linejoin: round;
     }
     .lane-role .role-name {
-        font-size: 9px;
+        font-size: 11.5px;
         font-weight: 700;
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: var(--ink-soft);
-        line-height: 1.2;
+        line-height: 1.25;
     }
 
     .lane-flow {
         display: flex;
         align-items: flex-start;
         flex-wrap: wrap;
-        gap: 6px 0;
+        gap: 7px 0;
     }
 
     .action-block {
         background: var(--gray-block);
         color: #FFFFFF;
-        font-size: 10px;
+        font-size: 13.5px;
         font-weight: 600;
         letter-spacing: 0.03em;
-        padding: 6px 11px;
+        padding: 7px 14px;
         border-radius: 3px;
         white-space: nowrap;
         flex-shrink: 0;
     }
 
     .flow-arrow {
-        flex: 0 0 24px;
-        height: 11px;
+        flex: 0 0 26px;
+        height: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -278,8 +230,8 @@
         background: #FFFFFF;
         border: 1.5px solid var(--doc-border);
         border-radius: 3px;
-        padding: 5px 9px;
-        font-size: 10px;
+        padding: 6px 12px;
+        font-size: 13.5px;
         font-weight: 700;
         color: var(--ink);
         flex-shrink: 0;
@@ -298,36 +250,36 @@
     .details {
         flex-basis: 100%;
         padding-left: 2px;
-        margin-top: 2px;
+        margin-top: 4px;
     }
     .details ul { list-style: none; padding: 0; }
     .details li {
-        font-size: 10px;
-        line-height: 1.4;
+        font-size: 13.5px;
+        line-height: 1.5;
         color: var(--ink-soft);
-        padding: 1px 0 1px 13px;
+        padding: 2px 0 2px 16px;
         position: relative;
     }
     .details li::before {
         content: "";
         position: absolute;
         left: 1px;
-        top: 6px;
+        top: 9px;
         width: 0; height: 0;
-        border-left: 4px solid var(--red);
-        border-top: 3px solid transparent;
-        border-bottom: 3px solid transparent;
+        border-left: 5px solid var(--red);
+        border-top: 3.5px solid transparent;
+        border-bottom: 3.5px solid transparent;
     }
     .details li strong { color: var(--ink); font-weight: 600; }
 
     .footnote {
-        margin-top: 10px;
-        padding: 8px 11px;
+        margin-top: 12px;
+        padding: 12px 15px;
         background: var(--red-light);
         border-left: 3px solid var(--red);
         border-radius: 3px;
-        font-size: 10px;
-        line-height: 1.45;
+        font-size: 13.5px;
+        line-height: 1.55;
         color: var(--ink-soft);
     }
     .footnote strong { color: var(--ink); font-weight: 600; }
@@ -337,13 +289,13 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        padding: 10px 14px;
+        padding: 14px 18px;
         border-top: 1px solid #E5E7EB;
         background: #FAFBFC;
     }
 
     .nav-btn {
-        width: 30px; height: 30px;
+        width: 36px; height: 36px;
         border-radius: 50%;
         border: 1px solid #E5E7EB;
         background: #FFFFFF;
@@ -362,7 +314,7 @@
     }
     .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
     .nav-btn svg {
-        width: 13px; height: 13px;
+        width: 16px; height: 16px;
         stroke: currentColor;
         fill: none;
         stroke-width: 2.2;
@@ -372,17 +324,17 @@
 
     .tabs {
         display: flex;
-        gap: 4px;
+        gap: 6px;
         flex: 1;
         justify-content: center;
     }
     .tab {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        font-size: 10px;
+        gap: 7px;
+        font-size: 13px;
         font-weight: 600;
-        padding: 5px 14px;
+        padding: 7px 16px;
         border-radius: 20px;
         border: 1px solid #E5E7EB;
         background: #FFFFFF;
@@ -399,7 +351,7 @@
     }
 
     .tab .dot {
-        width: 7px; height: 7px;
+        width: 9px; height: 9px;
         border-radius: 50%;
         background: var(--wb);
         flex-shrink: 0;
@@ -407,30 +359,27 @@
     .tab.active .dot { background: #FFFFFF; }
 
     .counter {
-        font-size: 10px;
+        font-size: 13px;
         font-weight: 600;
         color: var(--ink-soft);
-        min-width: 30px;
+        min-width: 38px;
         text-align: right;
     }
 
-    @media (max-width: 800px) {
-        :root { --slide-h: 700px; }
-        .slide-header { padding: 14px 16px 10px; flex-wrap: wrap; }
-        .meta { padding: 10px 16px; }
-        .about { padding: 12px 16px 0; }
-        .about-row { grid-template-columns: 1fr; gap: 4px; }
-        .body { padding: 12px 16px 16px; }
-        .lane { grid-template-columns: 1fr; gap: 8px; }
+    @media (max-width: 860px) {
+        :root { --slide-h: 780px; }
+        .slide-header { padding: 16px 18px 12px; flex-wrap: wrap; }
+        .meta { padding: 12px 18px; }
+        .body { padding: 12px 18px 18px; }
+        .lane { grid-template-columns: 1fr; gap: 10px; }
         .lane-role { flex-direction: row; justify-content: flex-start; }
-        .tab { padding: 5px 10px; font-size: 9px; }
+        .tab { padding: 7px 11px; font-size: 12px; }
     }
 </style>
 </head>
 <body>
 
 <div class="group-header">
-    <span class="num">Группы 5 и 6</span>
     <h2>Wildberries — DBW и C&C</h2>
 </div>
 
@@ -444,23 +393,12 @@
                 <div class="slide-header">
                     <span class="badge">Wildberries · DBW</span>
                     <div class="titles">
-                        <h3>DBW — Wildberries</h3>
-                        <div class="sub">DBW (Delivery WB). Товар хранится у вас, курьер маркетплейса приезжает к вам, забирает заказ и везёт его покупателю.</div>
+                        <h3>Доставка курьером WB — Wildberries</h3>
                     </div>
                 </div>
                 <div class="meta">
                     <span class="item"><strong>Кто хранит:</strong> <span class="val">продавец</span></span>
-                    <span class="item"><strong>Кто везёт:</strong> <span class="val">курьер маркетплейса</span></span>
-                </div>
-                <div class="about">
-                    <div class="about-row">
-                        <div class="label">Суть</div>
-                        <div class="text">Товар хранится у вас. Курьер маркетплейса приезжает к вам, забирает заказ и везёт его покупателю.</div>
-                    </div>
-                    <div class="about-row">
-                        <div class="label">Особенность</div>
-                        <div class="text">Вы экономите на своей логистике, но должны обеспечить готовность заказа к приезду курьера площадки в точное время. Есть только у Wildberries.</div>
-                    </div>
+                    <span class="item"><strong>Кто везёт:</strong> <span class="val">курьер WB</span></span>
                 </div>
                 <div class="body">
                     <div class="lane">
@@ -482,23 +420,30 @@
                         <div class="lane-flow">
                             <div class="action-block">Забирает груз</div>
                             <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
-                            <div class="doc">Подписанный Акт</div>
+                            <div class="doc">Подписанный акт</div>
                             <div class="details"><ul>
                                 <li>Курьер сканирует ШКП поставки или отдельные коробки</li>
                                 <li>Подписывается бумажный Акт приёма-передачи</li>
                                 <li>Ответственность за груз переходит на WB</li>
+                                <li>Стоимость доставки удерживается из выручки продавца</li>
                             </ul></div>
                         </div>
                     </div>
                     <div class="lane">
-                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><rect x="8" y="10" width="28" height="20" rx="3"/></svg></div><div class="role-name">WB</div></div>
+                        <div class="lane-role"><div class="icon"><svg viewBox="0 0 44 44"><circle cx="22" cy="14" r="7"/></svg></div><div class="role-name">Покупатель</div></div>
                         <div class="lane-flow">
-                            <div class="action-block">Доставляет</div>
+                            <div class="action-block">Получает заказ</div>
                             <div class="flow-arrow"><svg viewBox="0 0 36 16"><path d="M2 8h28M24 3l8 5-8 5"/></svg></div>
-                            <div class="doc">Чек ККТ + КИЗ</div>
+                            <div class="doc">Чек ККТ</div>
+                            <div class="details"><ul>
+                                <li>WB принимает оплату и пробивает чек (платёжный агент)</li>
+                                <li><strong>ККТ:</strong> при оплате на сайте WB чек пробивает маркетплейс</li>
+                            </ul></div>
                         </div>
                     </div>
-                    <div class="footnote"><strong>Важно:</strong> у Ozon и Яндекс Маркета отдельной DBW нет — функционал зашит в стандартный FBS (пункт «Курьер маркетплейса»).</div>
+                    <div class="footnote">
+                        <strong>Закрывающие документы:</strong> отчёт о продажах и УПД-2 на комиссию, логистику и приём платежей — раз в неделю в ЛК. Доставку выполняет курьер WB, но расходы на неё удерживаются из выручки продавца — в отчёте это строка «Логистика» с пометкой DBW.
+                    </div>
                 </div>
             </div>
 
@@ -508,23 +453,12 @@
                 <div class="slide-header">
                     <span class="badge">Wildberries · C&C</span>
                     <div class="titles">
-                        <h3>C&C — Wildberries</h3>
-                        <div class="sub">C&C (Click & Collect). Покупатель заказывает товар онлайн, а забирает его сам из вашего физического магазина.</div>
+                        <h3>Самовывоз из магазина продавца — Wildberries</h3>
                     </div>
                 </div>
                 <div class="meta">
                     <span class="item"><strong>Кто хранит:</strong> <span class="val">магазин продавца</span></span>
                     <span class="item"><strong>Кто везёт:</strong> <span class="val">покупатель сам</span></span>
-                </div>
-                <div class="about">
-                    <div class="about-row">
-                        <div class="label">Суть</div>
-                        <div class="text">Покупатель заказывает товар онлайн, а забирает его сам из вашего физического магазина.</div>
-                    </div>
-                    <div class="about-row">
-                        <div class="label">Особенность</div>
-                        <div class="text">Нулевая стоимость доставки для вас и удобство для клиента. Отлично работает для гибридных магазинов (онлайн + офлайн). Есть только у Wildberries.</div>
-                    </div>
                 </div>
                 <div class="body">
                     <div class="lane">
@@ -553,11 +487,14 @@
                             <div class="details"><ul>
                                 <li>Покупатель называет СМС-код — менеджер вносит в ЛК WB</li>
                                 <li>Проверка паспорта при товарах 18+</li>
-                                <li>Чек ККТ пробивает сам WB (платёжный агент)</li>
+                                <li><strong>ККТ:</strong> чек пробивает продавец — WB с октября 2025 не формирует чеки в C&C</li>
+                                <li>Возвратный чек при предоплате также формирует магазин</li>
                             </ul></div>
                         </div>
                     </div>
-                    <div class="footnote"><strong>Важно:</strong> у Ozon и Яндекс Маркета классическая C&C из магазина продавца отсутствует — заменена на доставку в ПВЗ по FBS.</div>
+                    <div class="footnote">
+                        <strong>Закрывающие документы:</strong> отчёт о продажах и УПД-2 на комиссию и приём платежей — раз в неделю в ЛК. Чек ККТ пробивает продавец — WB с октября 2025 не формирует чеки в C&C. Возвратный чек при предоплате также обязан формировать магазин.
+                    </div>
                 </div>
             </div>
 
@@ -624,7 +561,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'ArrowRight') goTo(index + 1);
     });
 
-    // Свайп
     var startX = 0, startY = 0, isDown = false;
     var viewport = document.querySelector('.slider-viewport');
 
