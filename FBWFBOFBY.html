@@ -134,7 +134,7 @@
     }
 
     /* ============================================
-       МЕТА-СТРОКА (сразу под шапкой)
+       МЕТА-СТРОКА
     ============================================ */
     .meta {
         display: flex;
@@ -332,14 +332,17 @@
     }
     .details li strong { color: var(--ink); font-weight: 600; }
 
+    /* ============================================
+       РОЗОВЫЙ БЛОК ВНИЗУ (закрывающие документы)
+    ============================================ */
     .footnote {
         margin-top: 12px;
-        padding: 11px 14px;
+        padding: 12px 15px;
         background: var(--red-light);
         border-left: 3px solid var(--red);
         border-radius: 3px;
         font-size: 13.5px;
-        line-height: 1.5;
+        line-height: 1.55;
         color: var(--ink-soft);
     }
     .footnote strong { color: var(--ink); font-weight: 600; }
@@ -627,7 +630,7 @@
                         </div>
                     </div>
                     <div class="footnote">
-                        <strong>Закрывающие документы:</strong> отчёт о реализации и акт выполненных работ — ежемесячно через ЭДО.
+                        <strong>Закрывающие документы:</strong> отчёт о реализации и акт выполненных работ — в течение первых 5 рабочих дней следующего месяца, но не позднее 8 числа, через ЭДО.
                     </div>
                 </div>
             </div>
@@ -699,7 +702,7 @@
                         </div>
                     </div>
                     <div class="footnote">
-                        <strong>Закрывающие документы:</strong> отчёт об исполнении поручения и счета-фактуры — ежемесячно.
+                        <strong>Закрывающие документы:</strong> УПД со статусом «1» и отчёт об исполнении поручения — в течение первых 5–7 рабочих дней следующего месяца.
                     </div>
                 </div>
             </div>
@@ -755,13 +758,11 @@
     nextBtn.addEventListener('click', () => goTo(index + 1));
     tabs.forEach(tab => tab.addEventListener('click', () => goTo(parseInt(tab.dataset.tab, 10))));
 
-    // Клавиатура
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') goTo(index - 1);
         if (e.key === 'ArrowRight') goTo(index + 1);
     });
 
-    // Свайп
     let startX = 0, startY = 0, isDown = false;
     const viewport = document.querySelector('.slider-viewport');
 
