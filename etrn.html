@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Электронный документооборот транспортных накладных</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background: #eef2f5;
@@ -57,9 +53,7 @@
             align-items: center;
             gap: 0.3rem;
         }
-        .tab-btn .emoji {
-            font-size: 1.5rem;
-        }
+        .tab-btn .emoji { font-size: 1.5rem; }
         .tab-btn.active {
             background: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
@@ -67,12 +61,8 @@
             font-weight: 600;
         }
 
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
         .section-title {
             font-weight: 600;
@@ -125,10 +115,6 @@
             display: inline;
         }
 
-        .badge {
-            display: none;
-        }
-
         .footer-note {
             font-size: 0.7rem;
             color: #5e7290;
@@ -167,8 +153,10 @@
         <div class="section-title">⚡ Обязательное оформление ЭТрН в электронном виде</div>
         <div class="situation-card" style="background:#eefaee; border-left-color:#2b8c4a;">
             <div class="situation-title">Общее правило:</div>
-            <div class="situation-reason"> С 1 сентября 2026 года транспортная накладная оформляется <strong>только в электронном виде (ЭТрН)</strong>, за исключением случаев, предусмотренных Приказом Минтранса № 262 (см. вкладку «Бумажная»).<br>
-            <strong>Кому обязательно?</strong> Юридическим лицам, ИП при коммерческой перевозке грузов. ЭТрН формируется в ГИС ЭПД.<br>
+            <div class="situation-reason">
+                С 1 сентября 2026 года транспортная накладная оформляется <strong>только в электронном виде (ЭТрН)</strong>, за исключением случаев, предусмотренных Приказом Минтранса № 262 (см. вкладку «Бумажная»).<br>
+                <strong>Кому обязательно?</strong> Юридическим лицам, ИП при коммерческой перевозке грузов. ЭТрН формируется в ГИС ЭПД.<br>
+            </div>
         </div>
         <div class="footer-note" style="margin-top:0.5rem;">
             📌 Основание: Федеральный закон от 30.06.2003 № 87-ФЗ «О транспортно-экспедиционной деятельности», Устав автомобильного транспорта (Федеральный закон от 08.11.2007 № 259-ФЗ)
@@ -196,8 +184,8 @@
     <!-- Не нужна (без основания) -->
     <div id="tab1" class="tab-content">
         <div class="section-title">📌 Когда транспортная накладная не нужна</div>
-        
-         <div class="situation-card">
+
+        <div class="situation-card">
             <span class="situation-title">Самовывоз транспортом покупателя (своим или арендованным без экипажа).</span>
             <span class="situation-reason"> Продавец только передает товар по УПД. Договора перевозки нет. Транспортная накладная не нужна.</span>
         </div>
@@ -211,8 +199,6 @@
             <span class="situation-title">Внутрихозяйственная перевозка.</span>
             <span class="situation-reason"> Свой товар на своем транспорте. Технологическая перевозка без коммерческой составляющей. Оформляется путевой лист.</span>
         </div>
-
-       
     </div>
 </div>
 
