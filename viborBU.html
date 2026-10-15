@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Без увольнения: выбор способа, как сократить расходы</title>
+<style>
+:root{--white:#fff;--black:#111;--g900:#1f1f1f;--g700:#4b4b4b;--g500:#8a8a8a;--g300:#d9d9d9;--g200:#e6e6e6;--g100:#f2f2f2;--glight:#f7f7f7;--red:#E21F27;--red-dark:#b8171e;--red-light:#fff5f5;--green:#80BA28;--green-bg:#f2f9e8;--sand:#fdf6e3;--sand-text:#8a6d1f;--radius:16px;--shadow:0 8px 24px rgba(17,17,17,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--white);color:var(--g900);line-height:1.6;padding:24px 20px}
+.srv{max-width:700px;margin:0 auto;background:var(--white);border:1px solid var(--g200);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.srv-title{padding:20px 26px;background:var(--white);border-bottom:1px solid var(--g200)}
+.srv-title h1{font-size:17px;font-weight:800;color:var(--red);line-height:1.35;margin:0}
+.srv-step{display:none}
+.srv-step.active{display:block}
+.srv-head{padding:22px 26px 16px;background:var(--g100);border-bottom:2px solid var(--red)}
+.srv-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.srv-count{font-size:11px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.06em}
+.srv-bar{display:flex;gap:6px;flex:1;max-width:280px}
+.srv-bar span{flex:1;height:4px;background:var(--g300);border-radius:2px;transition:background .25s}
+.srv-bar span.on{background:var(--red)}
+.srv-q{font-size:20px;font-weight:800;color:var(--black);line-height:1.3}
+.srv-sub{font-size:13px;color:var(--g700);margin-top:6px;line-height:1.45}
+.srv-body{padding:18px 22px 22px}
+.opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:var(--glight);border:1px solid var(--g300);border-radius:12px;padding:14px 16px;margin-bottom:10px;font-family:inherit;cursor:pointer;transition:all .15s}
+.opt:hover{border-color:var(--red);background:var(--red-light)}
+.opt .opt-txt{flex:1;display:flex;flex-direction:column}
+.opt .opt-title{display:block;font-size:14.5px;font-weight:700;color:var(--black);line-height:1.4}
+.opt .opt-desc{display:block;font-size:12.5px;color:var(--g700);line-height:1.4;margin-top:4px}
+.opt .opt-arrow{color:var(--red);font-weight:800;font-size:16px;flex-shrink:0;margin-top:1px}
+.srv-nav{margin-top:8px;display:flex;justify-content:flex-start}
+.back-link{background:none;border:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--g500);cursor:pointer;padding:6px 0;transition:color .15s}
+.back-link:hover{color:var(--red)}
+.res-head{padding:22px 26px 16px;background:var(--g100);border-bottom:2px solid var(--red)}
+.res-label{font-size:11px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.06em}
+.res-title{font-size:20px;font-weight:800;color:var(--black);line-height:1.3;margin-top:6px}
+.res-stats{display:flex;gap:24px;flex-wrap:wrap;align-items:baseline;padding:18px 26px 4px}
+.res-stat{text-align:left}
+.res-stat .n{font-size:26px;font-weight:800;color:var(--red);line-height:1.1}
+.res-stat .l{font-size:11.5px;color:var(--g700);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.res-actions{padding:12px 26px 0;display:flex;justify-content:flex-end}
+.reset-btn{display:inline-flex;align-items:center;gap:6px;background:var(--white);color:var(--red);border:2px solid var(--red);border-radius:10px;padding:9px 18px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s}
+.reset-btn:hover{background:var(--red);color:var(--white)}
+.res-hint{font-size:12px;color:var(--g500);font-style:italic;padding:12px 26px 6px}
+.res-list{padding:8px 22px 22px}
+.measure{display:flex;gap:14px;background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .15s}
+.measure:hover{border-color:var(--red);box-shadow:var(--shadow)}
+.measure .m-num{font-size:15px;font-weight:800;color:var(--g500);flex-shrink:0;min-width:22px}
+.measure .m-body{flex:1}
+.measure .m-title{font-size:14.5px;font-weight:800;color:var(--black);line-height:1.35;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.measure .m-desc{font-size:12.5px;color:var(--g700);line-height:1.45;margin-top:3px}
+.measure .m-meta{font-size:11.5px;color:var(--g500);line-height:1.5;margin-top:6px}
+.measure .m-meta b{color:var(--g700);font-weight:700}
+.measure .m-warn{font-size:11.5px;color:var(--red);font-weight:700;line-height:1.45;margin-top:6px}
+.measure .m-link{display:inline-block;font-size:12.5px;font-weight:700;color:var(--red);text-decoration:none;margin-top:8px;transition:color .15s}
+.measure .m-link:hover{color:var(--red-dark);text-decoration:underline}
+.badge{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:6px;background:var(--sand);color:var(--sand-text);white-space:nowrap}
+.badge.ok{background:var(--green-bg);color:#5c8a17}
+.overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(17,17,17,.55);z-index:9999;overflow-y:auto;padding:24px 16px}
+.overlay.show{display:block}
+.modal{background:var(--white);max-width:640px;margin:0 auto;border-radius:var(--radius);padding:24px 24px 28px;position:relative}
+.modal-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:24px;line-height:1;color:var(--g500);cursor:pointer;padding:4px 8px;transition:color .15s}
+.modal-close:hover{color:var(--red)}
+.modal-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.modal-badge{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:3px 9px;border-radius:6px;background:var(--g100);color:var(--g700)}
+.modal-title{font-size:18px;font-weight:800;color:var(--black);line-height:1.3;margin-bottom:6px;padding-right:28px}
+.modal-sub{font-size:13px;color:var(--g700);line-height:1.5;margin-bottom:16px}
+.modal-link-wrap{margin-top:16px}
+.modal-link-wrap .m-link{display:inline-block;font-size:12.5px;font-weight:700;color:var(--red);text-decoration:none;transition:color .15s}
+.modal-link-wrap .m-link:hover{color:var(--red-dark);text-decoration:underline}
+.prop{border-top:1px solid var(--g200);padding:10px 0;display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:start}
+.prop .p-l{font-size:11.5px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
+.prop .p-v{font-size:13px;color:var(--g900);line-height:1.5}
+.prop .p-v.warn{color:var(--red);font-weight:700}
+.prop .p-v.ok{color:#5c8a17;font-weight:700}
+@media (max-width:560px){
+.srv-q{font-size:17px}
+.res-stat .n{font-size:22px}
+.prop{grid-template-columns:1fr;gap:4px}
+.prop .p-l{padding-top:0}
+.modal{padding:20px 18px 24px}
+}
+</style>
+</head>
+<body>
+<div class="srv" id="srv">
+
+<div class="srv-title">
+<h1>Без увольнения: выбор способа, как сократить расходы</h1>
+</div>
+
+<div class="srv-step active" data-step="1">
+<div class="srv-head">
+<div class="srv-top">
+<span class="srv-count">Вопрос 1 из 4</span>
+<div class="srv-bar"><span class="on"></span><span></span><span></span><span></span></div>
+</div>
+<div class="srv-q">За счет чего планируете сокращение расходов?</div>
+<div class="srv-sub">От этого зависит, какие меры вообще рассматривать</div>
+</div>
+<div class="srv-body">
+<button class="opt" data-q="1" data-v="time"><span class="opt-txt"><span class="opt-title">Сотрудники работают меньше часов</span></span><span class="opt-arrow">→</span></button>
+<button class="opt" data-q="1" data-v="pay"><span class="opt-txt"><span class="opt-title">Сотрудники работают столько же, но за меньшие деньги</span></span><span class="opt-arrow">→</span></button>
+<button class="opt" data-q="1" data-v="stop"><span class="opt-txt"><span class="opt-title">Сотрудники временно не работают</span></span><span class="opt-arrow">→</span></button>
+</div>
+</div>
+
+<div class="srv-step" data-step="2">
+<div class="srv-head">
+<div class="srv-top">
+<span class="srv-count">Вопрос 2 из 4</span>
+<div class="srv-bar"><span class="on"></span><span class="on"></span><span></span><span></span></div>
+</div>
+<div class="srv-q">Работники готовы договариваться?</div>
+<div class="srv-sub">Многие меры можно ввести только с согласия работника</div>
+</div>
+<div class="srv-body">
+<button class="opt" data-q="2" data-v="yes"><span class="opt-txt"><span class="opt-title">Да, договоримся</span><span class="opt-desc">Можно заключить соглашение или получить заявление</span></span><span class="opt-arrow">→</span></button>
+<button class="opt" data-q="2" data-v="no"><span class="opt-txt"><span class="opt-title">Нет или не уверены</span><span class="opt-desc">Нужны варианты, которые работодатель вводит сам</span></span><span class="opt-arrow">→</span></button>
+<div class="srv-nav"><button class="back-link" data-back="1">← Назад</button></div>
+</div>
+</div>
+
+<div class="srv-step" data-step="3">
+<div class="srv-head">
+<div class="srv-top">
+<span class="srv-count">Вопрос 3 из 4</span>
+<div class="srv-bar"><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div>
+</div>
+<div class="srv-q">Когда мера должна заработать?</div>
+<div class="srv-sub">Часть мер требует предупреждения минимум за 2 месяца</div>
+</div>
+<div class="srv-body">
+<button class="opt" data-q="3" data-v="now"><span class="opt-txt"><span class="opt-title">Сразу</span><span class="opt-desc">Нет двух месяцев на предупреждение</span></span><span class="opt-arrow">→</span></button>
+<button class="opt" data-q="3" data-v="later"><span class="opt-txt"><span class="opt-title">Есть запас 2 месяца</span><span class="opt-desc">Можно подождать 2 месяца и больше</span></span><span class="opt-arrow">→</span></button>
+<div class="srv-nav"><button class="back-link" data-back="2">← Назад</button></div>
+</div>
+</div>
+
+<div class="srv-step" data-step="4">
+<div class="srv-head">
+<div class="srv-top">
+<span class="srv-count">Вопрос 4 из 4</span>
+<div class="srv-bar"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div>
+</div>
+<div class="srv-q">Есть ли в компании организационные или технологические изменения?</div>
+<div class="srv-sub">Без них нельзя ввести меры по инициативе работодателя (ст. 74 ТК)</div>
+</div>
+<div class="srv-body">
+<button class="opt" data-q="4" data-v="yes"><span class="opt-txt"><span class="opt-title">Да, есть</span><span class="opt-desc">Реорганизация, новые технологии, изменение норм труда</span></span><span class="opt-arrow">→</span></button>
+<button class="opt" data-q="4" data-v="no"><span class="opt-txt"><span class="opt-title">Нет, только финансовые трудности</span><span class="opt-desc">Кризис, падение спроса, нет заказов</span></span><span class="opt-arrow">→</span></button>
+<div class="srv-nav"><button class="back-link" data-back="3">← Назад</button></div>
+</div>
+</div>
+
+<div class="srv-step" data-step="5">
+<div class="res-head">
+<div class="res-label">Результат подбора</div>
+<div class="res-title">Меры, которые подходят вашей ситуации</div>
+</div>
+<div class="res-stats" id="resStats"></div>
+<div class="res-actions"><button class="reset-btn" id="resetBtn">↻ Пройти заново</button></div>
+<div class="res-hint">Нажмите на меру, чтобы увидеть все условия применения.</div>
+<div class="res-list" id="resList"></div>
+</div>
+
+</div>
+
+<div class="overlay" id="overlay">
+<div class="modal" id="modal">
+<button class="modal-close" id="modalClose" aria-label="Закрыть">×</button>
+<div id="modalContent"></div>
+</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var MEASURES = [
+{
+id:"m1", num:"01", anchor:"#part-1-1-soglashenie",
+title:"Неполное рабочее время по соглашению",
+desc:"Работник и работодатель договариваются о неполном дне или неделе",
+task:"time", needAgree:true,
+meta:"Предупреждение: не нужно · Госорганы: нет · Профсоюз: нет · ст. 93 ТК РФ",
+warn:"",
+props:{
+"Работники":"Сохраняются",
+"ФОТ":"Да, оплата пропорционально отработанному времени",
+"Предупреждение":"Не нужно",
+"Срок меры":"Нет ограничений",
+"Госорганы":"Уведомлять не нужно",
+"Профсоюз":"Нет",
+"Отказ работника":"Да. Тогда установить такой режим можно только в связи с изменением организационных или технологических условий труда",
+"Ограничения":"Оплата пропорционально отработанному времени"
+}
+},
+{
+id:"m2", num:"02", anchor:"#part-1-1-iniciativa",
+title:"Неполное рабочее время по инициативе работодателя",
+desc:"Режим вводится в одностороннем порядке при угрозе массовых увольнений",
+task:"time", needAgree:false,
+meta:"Предупреждение: минимум за 2 месяца · Госорганы: да · Профсоюз: да · ст. 74 ТК РФ",
+warn:"Работник может отказаться — тогда увольнение по сокращению",
+props:{
+"Работники":"Сохраняются",
+"ФОТ":"Да, оплата пропорционально отработанному времени",
+"Предупреждение":"Минимум за 2 месяца",
+"Срок меры":"До 6 месяцев",
+"Госорганы":"Да, службу занятости — в течение 3 рабочих дней с даты приказа",
+"Профсоюз":"Да, нужно учесть мнение профсоюза",
+"Отказ работника":"Да. Тогда работника придется уволить по сокращению (п. 2 ч. 1 ст. 81 ТК)",
+"Ограничения":"Придется подтвердить изменение организационных или технологических условий труда. Придется подтвердить угрозу массовых увольнений"
+}
+},
+{
+id:"m3", num:"03", anchor:"#part-1-2-soglashenie",
+title:"Снижение оклада по соглашению",
+desc:"С работником заключается соглашение об уменьшении размера оклада",
+task:"pay", needAgree:true,
+meta:"Предупреждение: не нужно · Госорганы: нет · Профсоюз: нет · ст. 72 ТК РФ",
+warn:"",
+props:{
+"Работники":"Сохраняются",
+"ФОТ":"Да, оплата в соответствии с новым размером оклада",
+"Предупреждение":"Не нужно",
+"Срок меры":"Нет ограничений",
+"Госорганы":"Уведомлять не нужно",
+"Профсоюз":"Нет",
+"Отказ работника":"Да. Тогда уменьшить оклад можно только в связи с изменением организационных или технологических условий труда",
+"Ограничения":"Размер зарплаты не может быть меньше МРОТ или минимального размера зарплаты в регионе"
+}
+},
+{
+id:"m4", num:"04", anchor:"#part-1-2-iniciativa",
+title:"Снижение оклада по инициативе работодателя",
+desc:"Оклад снижается в одностороннем порядке при изменении условий труда",
+task:"pay", needAgree:false,
+meta:"Предупреждение: минимум за 2 месяца · Госорганы: нет · Профсоюз: нет · ст. 74 ТК РФ",
+warn:"Работник может отказаться — тогда увольнение по п. 7 ч. 1 ст. 77 ТК",
+props:{
+"Работники":"Сохраняются",
+"ФОТ":"Да, оплата в соответствии с новым размером оклада",
+"Предупреждение":"Минимум за 2 месяца",
+"Срок меры":"Нет ограничений",
+"Госорганы":"Уведомлять не нужно",
+"Профсоюз":"Нет",
+"Отказ работника":"Да. Тогда работника можно уволить по п. 7 ч. 1 ст. 77 ТК, если нет другой работы или он от нее отказался",
+"Ограничения":"Придется подтвердить изменение организационных или технологических условий труда. Размер зарплаты не может быть меньше МРОТ"
+}
+},
+{
+id:"m5", num:"05", anchor:"#part-1-3",
+title:"Отмена или снижение премий",
+desc:"Премия — самый гибкий элемент зарплаты: ее можно уменьшить или отменить",
+task:"pay", needAgree:null,
+meta:"Зависит от оформления · Госорганы: нет · Профсоюз: нет · ст. 74 ТК РФ",
+warn:"Зависит от того, как оформлена премия: если только приказом — отменяется приказом; если гарантированная — нужно согласие или ст. 74 ТК",
+props:{
+"Работники":"Сохраняются",
+"ФОТ":"Да, премия уменьшается или не выплачивается",
+"Предупреждение":"Зависит от оформления: приказом — не нужно; по ст. 74 ТК — минимум за 2 месяца",
+"Срок меры":"Нет ограничений",
+"Госорганы":"Уведомлять не нужно",
+"Профсоюз":"Нет",
+"Отказ работника":"Зависит от оформления. Если премия гарантированная — только по согласию или по ст. 74 ТК",
+"Ограничения":"Оставшаяся часть зарплаты не может быть меньше МРОТ или минимального размера зарплаты в регионе"
+}
+},
+{
+id:"m6", num:"06", anchor:"#part-1-4",
+title:"Отмена или снижение доплат",
+desc:"Снижение или отмена необязательных доплат и надбавок",
+task:"pay", needAgree:null,
+meta:"Зависит от оформления · Госорганы: нет · Профсоюз: нет · ст. 74 ТК РФ",
+warn:"Обязательные доплаты (вредность, ночные, сверхурочные, районный коэффициент) отменить нельзя",
+props:{
+"Работники":"Сохраняются",
+"ФОТ":"Да, доплата уменьшается или не выплачивается",
+"Предупреждение":"Зависит от оформления: приказом — не нужно; по ст. 74 ТК — минимум за 2 месяца",
+"Срок меры":"Нет ограничений",
+"Госорганы":"Уведомлять не нужно",
+"Профсоюз":"Нет",
+"Отказ работника":"Зависит от оформления. Если доплата гарантированная — только по согласию или по ст. 74 ТК",
+"Ограничения":"Обязательные доплаты (за работу в выходной, ночью, сверхурочно, районный коэффициент, процентная надбавка) отменить нельзя. Зарплата не может быть меньше МРОТ"
+}
+},
+{
+id:"m7", num:"07", anchor:"#part-1-5",
+title:"Отпуск без сохранения зарплаты",
+desc:"Работник по своему заявлению уходит в неоплачиваемый отпуск",
+task:"stop", needAgree:true,
+meta:"Предупреждение: не нужно · Госорганы: нет · Профсоюз: нет · ст. 128 ТК РФ",
+warn:"Работник может отказаться — тогда мера не сработает",
+props:{
+"Работники":"Сохраняются",
+"ФОТ":"Да, зарплата за дни отпуска не начисляется",
+"Предупреждение":"Не нужно",
+"Срок меры":"Нет ограничений, но злоупотреблять не стоит",
+"Госорганы":"Уведомлять не нужно",
+"Профсоюз":"Нет",
+"Отказ работника":"Да. Заставить работника уйти в отпуск за свой счет нельзя — штраф до 50 000 руб. по ст. 5.27 КоАП",
+"Ограничения":"Только по письменному заявлению работника. Нельзя оформлять одновременно всем — риск претензий ГИТ"
+}
+},
+{
+id:"m8", num:"08", anchor:"#part-1-6-vina-rabotodatelya",
+title:"Простой по вине работодателя",
+desc:"Временная приостановка работы по причинам экономического, технологического или организационного характера",
+task:"stop", needAgree:false,
+meta:"Предупреждение: не нужно · Госорганы: только если приостановка производства · ст. 157 ТК РФ",
+warn:"Нужна доказанная причина простоя",
+props:{
+"Работники":"Сохраняются",
+"ФОТ":"Да, оплата не менее 2/3 среднего заработка",
+"Предупреждение":"Не нужно",
+"Срок меры":"Нет ограничений, но простой — временная мера",
+"Госорганы":"Службу занятости — только если простой связан с приостановкой производства, в течение 3 рабочих дней",
+"Профсоюз":"Нет",
+"Отказ работника":"Простой вводит работодатель, согласие работника не нужно",
+"Ограничения":"Нужна доказанная причина: экономическая, технологическая, техническая или организационная. Оплата — не менее 2/3 среднего заработка"
+}
+},
+{
+id:"m9", num:"09", anchor:"#part-1-6-nezavisimye",
+title:"Простой по независящим причинам",
+desc:"Временная приостановка работы из-за внешних обстоятельств, на которые никто не может повлиять",
+task:"stop", needAgree:false,
+meta:"Предупреждение: не нужно · Госорганы: только если приостановка производства · ст. 157 ТК РФ",
+warn:"Нужны доказательства форс-мажора",
+props:{
+"Работники":"Сохраняются",
+"ФОТ":"Да, оплата не менее 2/3 тарифной ставки или оклада",
+"Предупреждение":"Не нужно",
+"Срок меры":"Нет ограничений, но простой — временная мера",
+"Госорганы":"Службу занятости — только если простой связан с приостановкой производства, в течение 3 рабочих дней",
+"Профсоюз":"Нет",
+"Отказ работника":"Простой вводит работодатель, согласие работника не нужно",
+"Ограничения":"Нужны доказательства форс-мажора. Просто сослаться на санкции или кризис нельзя. Оплата — не менее 2/3 оклада"
+}
+}
+];
+
+var answers = {q1:null, q2:null, q3:null, q4:null};
+
+function matchMeasure(m){
+if(m.task !== answers.q1) return null;
+
+if(m.needAgree === false && (m.id === "m2" || m.id === "m4")){
+if(answers.q3 === "now") return null;
+if(answers.q4 === "no") return null;
+if(answers.q2 === "yes") return null;
+return "warn";
+}
+
+if(m.needAgree === true){
+if(answers.q2 === "no") return null;
+return "ok";
+}
+
+if(m.id === "m5" || m.id === "m6"){
+return "warn";
+}
+
+if(m.id === "m8" || m.id === "m9"){
+return "warn";
+}
+
+return "ok";
+}
+
+function renderResult(){
+var ok = [], warn = [];
+MEASURES.forEach(function(m){
+var st = matchMeasure(m);
+if(st === "ok") ok.push(m);
+else if(st === "warn") warn.push(m);
+});
+var total = ok.length + warn.length;
+
+document.getElementById("resStats").innerHTML =
+'<div class="res-stat"><div class="n">'+total+'</div><div class="l">Всего мер</div></div>'+
+'<div class="res-stat"><div class="n">'+ok.length+'</div><div class="l">Подходящих</div></div>'+
+'<div class="res-stat"><div class="n">'+warn.length+'</div><div class="l">С оговорками</div></div>';
+
+var listEl = document.getElementById("resList");
+var html = "";
+var idx = 1;
+
+ok.forEach(function(m){ html += measureCard(m, idx++, "ok"); });
+warn.forEach(function(m){ html += measureCard(m, idx++, "warn"); });
+
+if(!html){
+html = '<div style="padding:20px 0;text-align:center;color:#8a8a8a;font-size:14px">По вашим ответам подходящих мер не нашлось. Попробуйте изменить ответы.</div>';
+}
+listEl.innerHTML = html;
+}
+
+function measureCard(m, idx, status){
+var badgeHtml = status === "warn"
+? '<span class="badge">⚠ С оговорками</span>'
+: '<span class="badge ok">✓ Подходит</span>';
+var warnHtml = m.warn ? '<div class="m-warn">⚠ '+m.warn+'</div>' : '';
+return '<div class="measure" data-id="'+m.id+'">'+
+'<div class="m-num">'+String(idx).padStart(2,"0")+'</div>'+
+'<div class="m-body">'+
+'<div class="m-title">'+m.title+' '+badgeHtml+'</div>'+
+'<div class="m-desc">'+m.desc+'</div>'+
+'<div class="m-meta">'+m.meta+'</div>'+
+warnHtml+
+'<a class="m-link" href="'+m.anchor+'">Перейти в рекомендацию с оценкой выгоды и рисков →</a>'+
+'</div>'+
+'</div>';
+}
+
+var overlay = document.getElementById("overlay");
+var modalContent = document.getElementById("modalContent");
+
+function openModal(measure){
+var propsHtml = "";
+for(var key in measure.props){
+if(!measure.props.hasOwnProperty(key)) continue;
+var val = measure.props[key];
+var cls = "";
+if(val.indexOf("Да.") === 0 || val.indexOf("Придется") === 0 || val.indexOf("Нужна") === 0) cls = "warn";
+if(val === "Нет" || val === "Не нужно" || val.indexOf("Сохраняются") === 0 || val === "Уведомлять не нужно") cls = "ok";
+propsHtml += '<div class="prop"><div class="p-l">'+key+'</div><div class="p-v '+cls+'">'+val+'</div></div>';
+}
+modalContent.innerHTML =
+'<div class="modal-badges">'+
+'<span class="modal-badge">'+measure.title+'</span>'+
+'</div>'+
+'<div class="modal-title">'+measure.title+'</div>'+
+'<div class="modal-sub">'+measure.desc+'</div>'+
+propsHtml+
+'<div class="modal-link-wrap"><a class="m-link" href="'+measure.anchor+'">Перейти в рекомендацию с оценкой выгоды и рисков →</a></div>';
+overlay.classList.add("show");
+document.body.style.overflow = "hidden";
+}
+
+function closeModal(){
+overlay.classList.remove("show");
+document.body.style.overflow = "";
+}
+
+document.getElementById("modalClose").addEventListener("click", closeModal);
+overlay.addEventListener("click", function(e){ if(e.target === overlay) closeModal(); });
+document.addEventListener("keydown", function(e){ if(e.key === "Escape" && overlay.classList.contains("show")) closeModal(); });
+
+function showStep(n){
+document.querySelectorAll(".srv-step").forEach(function(el){
+el.classList.toggle("active", parseInt(el.dataset.step,10) === n);
+});
+document.getElementById("srv").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+document.querySelectorAll(".opt").forEach(function(btn){
+btn.addEventListener("click", function(){
+var q = "q" + btn.dataset.q;
+answers[q] = btn.dataset.v;
+var cur = parseInt(btn.closest(".srv-step").dataset.step,10);
+if(cur === 4){
+renderResult();
+showStep(5);
+} else {
+showStep(cur + 1);
+}
+});
+});
+
+document.querySelectorAll(".back-link").forEach(function(btn){
+btn.addEventListener("click", function(){
+showStep(parseInt(btn.dataset.back,10));
+});
+});
+
+document.getElementById("resetBtn").addEventListener("click", function(){
+answers = {q1:null, q2:null, q3:null, q4:null};
+showStep(1);
+});
+
+document.getElementById("resList").addEventListener("click", function(e){
+if(e.target.closest(".m-link")) return;
+var card = e.target.closest(".measure");
+if(!card) return;
+var id = card.dataset.id;
+var m = MEASURES.filter(function(x){return x.id === id})[0];
+if(m) openModal(m);
+});
+
+})();
+</script>
+</body>
+</html>
