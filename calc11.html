@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Калькулятор экономии и рисков при простое работников</title>
+<style>
+:root{--white:#fff;--black:#111;--g900:#1f1f1f;--g700:#4b4b4b;--g500:#8a8a8a;--g300:#d9d9d9;--g200:#e6e6e6;--g100:#f2f2f2;--glight:#f7f7f7;--red:#E21F27;--red-dark:#b8171e;--green:#80BA28;--green-bg:#f2f9e8;--radius:16px;--shadow:0 8px 24px rgba(17,17,17,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--white);color:var(--g900);line-height:1.6;min-height:100vh;padding:32px 20px 60px}
+.wrap{max-width:700px;margin:0 auto}
+.calc{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.calc-head{background:var(--g100);padding:18px 24px;border-bottom:2px solid var(--red)}
+.calc-head h1{font-size:18px;font-weight:800;color:var(--black);line-height:1.3}
+.calc-head p{font-size:13px;color:var(--g700);margin-top:4px}
+.calc-body{padding:24px}
+.section-title{font-size:12px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:.05em;margin:0 0 10px}
+.section-title.mt{margin-top:22px}
+.section-note{font-size:11.5px;color:var(--g500);font-style:italic;line-height:1.4;margin:-4px 0 10px}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:20px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11.5px;color:var(--g700);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.field .wrap-inp{position:relative;display:flex;align-items:center;gap:8px}
+.field input[type="number"],.field select{width:100%;padding:11px 14px;font-size:16px;font-weight:700;color:var(--black);background:var(--white);border:2px solid var(--g300);border-radius:10px;font-family:inherit;outline:none;transition:border-color .2s}
+.field input[type="number"]{padding-right:44px}
+.field input::placeholder{color:var(--g500);font-weight:600;font-size:13px}
+.field input:focus,.field select:focus{border-color:var(--red)}
+.field .suffix{position:absolute;right:14px;font-size:14px;font-weight:700;color:var(--g500);pointer-events:none}
+.period-hint{font-size:11.5px;color:var(--g500);font-weight:600;margin-top:2px}
+.hint-note{font-size:11px;color:var(--g500);font-style:italic;font-weight:500;line-height:1.35;margin-top:3px}
+.mode-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+@media (max-width:640px){.mode-row{grid-template-columns:1fr}}
+.mode-card{border:2px solid var(--g300);border-radius:12px;padding:12px 14px;transition:border-color .2s;cursor:pointer;background:var(--white)}
+.mode-card:hover{border-color:var(--red)}
+.mode-card.active{border-color:var(--red);background:var(--white)}
+.mode-card .mode-head{display:flex;align-items:flex-start;gap:8px;user-select:none}
+.mode-card .mode-head input[type="radio"]{margin-top:3px;width:17px;height:17px;accent-color:var(--red);flex-shrink:0;cursor:pointer}
+.mode-card .m-title{display:block;font-size:13.5px;font-weight:800;color:var(--black);line-height:1.3}
+.mode-card .m-desc{display:block;font-size:11.5px;color:var(--g700);line-height:1.35;margin-top:4px}
+.tariff-block,.ns-block{background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:16px 18px;margin-bottom:20px}
+.tariff-block h3,.ns-block h3{font-size:13px;font-weight:800;color:var(--black);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+.tariff-option{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px dashed var(--g300);cursor:pointer}
+.tariff-option:last-of-type{border-bottom:none;padding-bottom:0}
+.tariff-option:first-of-type{padding-top:0}
+.tariff-option input[type="radio"]{margin-top:4px;width:16px;height:16px;accent-color:var(--red);flex-shrink:0;cursor:pointer}
+.tariff-option .t-info{display:flex;flex-direction:column;gap:2px;flex:1}
+.tariff-option .t-title{font-size:14px;font-weight:700;color:var(--black);line-height:1.35}
+.tariff-option .t-desc{font-size:12.5px;color:var(--g700);line-height:1.4}
+.ns-block .field{max-width:260px}
+.emp-row{background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.emp-top{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+.emp-second{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.emp-second{grid-template-columns:1fr}}
+.emp-row .field{margin-bottom:0}
+.del-btn{background:var(--white);color:var(--red);border:2px solid var(--red);border-radius:10px;padding:11px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;height:46px}
+.del-btn:hover{background:var(--red);color:var(--white)}
+.del-btn:disabled{opacity:.35;cursor:not-allowed;background:var(--white);color:var(--red)}
+.add-btn{display:inline-flex;align-items:center;gap:8px;background:var(--white);color:var(--red);border:2px dashed var(--red);border-radius:10px;padding:10px 16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.add-btn:hover{background:var(--glight)}
+.emp-hint{font-size:11.5px;color:var(--g500);font-style:italic;line-height:1.4;margin-bottom:12px}
+.calc-btn{display:block;width:100%;background:var(--white);color:var(--red);border:2px solid var(--red);border-radius:10px;padding:11px 16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;margin:6px 0 0;text-align:center}
+.calc-btn:hover:not(:disabled){background:var(--red);color:var(--white)}
+.calc-btn:disabled{background:var(--white);color:var(--g500);border-color:var(--g300);cursor:not-allowed;opacity:.7}
+.form-msg{display:none;margin-top:10px;font-size:12.5px;color:var(--red);font-weight:700;text-align:center}
+.form-msg.show{display:block}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--white);z-index:9999;overflow-y:auto}
+.modal-overlay.show{display:block}
+.modal{background:var(--white);width:100%;max-width:700px;margin:0 auto;padding:28px 20px 40px;position:relative}
+.modal-close{position:absolute;top:18px;right:22px;background:none;border:none;font-size:24px;line-height:1;color:var(--g500);cursor:pointer;padding:4px 8px;transition:color .2s}
+.modal-close:hover{color:var(--red)}
+.modal-title{font-size:18px;font-weight:800;color:var(--black);line-height:1.3;margin-bottom:20px;padding-right:30px}
+.modal-results{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+@media (max-width:520px){.modal-results{grid-template-columns:1fr}}
+.result-cell{background:var(--white);border:1px solid var(--g300);border-radius:12px;padding:16px;text-align:center}
+.result-cell .lbl{font-size:11.5px;color:var(--g700);text-transform:uppercase;letter-spacing:.05em;font-weight:800}
+.result-cell .val{font-size:22px;font-weight:800;color:var(--green);margin-top:4px;line-height:1.2}
+.result-cell .sub{font-size:11px;color:var(--g500);margin-top:4px;font-weight:600}
+.result-cell.total{border:2px solid var(--green);background:var(--green-bg);grid-column:1/-1}
+.result-cell.total .lbl{color:#5c8a17}
+.result-cell.total .val{color:var(--green);font-size:26px}
+.risk-section{margin-bottom:18px}
+.risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media (max-width:640px){.risk-grid{grid-template-columns:1fr}}
+.risk-card{border:1px solid var(--g300);border-radius:12px;padding:14px 16px;background:var(--white)}
+.risk-card h4{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;color:var(--black)}
+.risk-card .rc-val{font-size:20px;font-weight:800;line-height:1.2;color:var(--black)}
+.risk-card .rc-note{font-size:12px;color:var(--g700);line-height:1.5;margin-top:6px}
+.total-risk{background:var(--white);border:2px solid var(--red);border-radius:12px;padding:16px 18px;text-align:center;margin-bottom:14px}
+.total-risk .tr-lbl{font-size:12px;font-weight:800;color:var(--black);text-transform:uppercase;letter-spacing:.05em}
+.total-risk .tr-val{font-size:28px;font-weight:800;color:var(--red);margin-top:4px;line-height:1.2}
+.total-risk .tr-note{font-size:11.5px;color:var(--g700);margin-top:6px;line-height:1.5}
+.timing{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.timing-card{background:var(--white);border:1px solid var(--g300);border-left:4px solid var(--g500);border-radius:12px;padding:14px 16px}
+.timing-card .timing-label{font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--black)}
+.timing-card .timing-value{font-size:14px;font-weight:700;color:var(--g900);line-height:1.45;margin-top:4px}
+@media (max-width:760px){.timing{grid-template-columns:1fr}}
+.download-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.download-btn{display:inline-flex;align-items:center;gap:8px;background:var(--red);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.download-btn:hover{background:var(--red-dark)}
+.download-btn.gray{background:var(--g700)}
+.download-btn.gray:hover{background:var(--black)}
+.modal-footer{margin-top:20px;padding-top:18px;border-top:1px solid var(--g200);text-align:center}
+.new-calc-btn{display:inline-block;background:var(--white);color:var(--red);border:2px solid var(--red);border-radius:10px;padding:11px 24px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.new-calc-btn:hover{background:var(--red);color:var(--white)}
+.memo-hidden{display:none}
+@media (max-width:520px){.calc-body{padding:18px}.calc-head{padding:16px 18px}.calc-head h1{font-size:16px}.emp-top{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="calc">
+<div class="calc-head">
+<div>
+<h1>Калькулятор экономии и рисков при простое работников</h1>
+<p>Расчет экономии и налоговых рисков с учетом тарифов 2026–2027 годов</p>
+</div>
+</div>
+<div class="calc-body">
+<div class="section-title">Вид простоя</div>
+<div class="section-note">Отметьте, по какой причине вводите простой.</div>
+<div class="mode-row">
+<div class="mode-card active" id="modeVinaBlock">
+<label class="mode-head"><input type="radio" name="mode" value="vina" checked><span><span class="m-title">По вине работодателя</span><span class="m-desc">Экономические, технологические, технические или организационные причины. Оплата — 2/3 среднего заработка.</span></span></label>
+</div>
+<div class="mode-card" id="modeNezavBlock">
+<label class="mode-head"><input type="radio" name="mode" value="nezavisimye"><span><span class="m-title">По независящим причинам</span><span class="m-desc">Форс-мажор, санкции, аварии. Оплата — 2/3 тарифной ставки или оклада.</span></span></label>
+</div>
+</div>
+<div class="section-title mt">Период для расчета</div>
+<div class="fields">
+<div class="field" style="grid-column:1/-1">
+<div class="wrap-inp">
+<select id="monthFrom" style="flex:2"><option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option><option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option><option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option><option value="10">Октябрь</option><option value="11" selected>Ноябрь</option><option value="12">Декабрь</option></select>
+<select id="yearFrom" style="flex:1"><option value="2026" selected>2026</option><option value="2027">2027</option></select>
+<span style="font-weight:800;color:var(--g500);font-size:14px">—</span>
+<select id="monthTo" style="flex:2"><option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option><option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option><option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option><option value="10" selected>Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option></select>
+<select id="yearTo" style="flex:1"><option value="2026">2026</option><option value="2027" selected>2027</option></select>
+</div>
+<div class="period-hint" id="periodHint"></div>
+</div>
+</div>
+<div class="section-title mt">Сотрудники и дни простоя</div>
+<div class="emp-hint">Если у сотрудников одинаковые условия — введите их одной строкой, указав общее количество.</div>
+<div id="employees"></div>
+<button type="button" class="add-btn" id="addEmpBtn">+ Добавить еще сотрудников</button>
+<div class="tariff-block">
+<h3>Тариф страховых взносов на ОПС, ВНиМ, ОМС</h3>
+<label class="tariff-option"><input type="radio" name="tariff" value="general" checked><span class="t-info"><span class="t-title">Общий тариф — 30% / 15,1%</span><span class="t-desc">30% до предельной базы, 15,1% — свыше (2026: 2 979 000 ₽; 2027: 3 311 000 ₽)</span></span></label>
+<label class="tariff-option"><input type="radio" name="tariff" value="sme15"><span class="t-info"><span class="t-title">МСП приоритетных отраслей — 15%</span><span class="t-desc">30% с выплат до 1,5 МРОТ, 15% — свыше; порог 1,5 МРОТ: 2026 — 40 639,50 ₽; 2027 — 43 402,50 ₽</span></span></label>
+<label class="tariff-option"><input type="radio" name="tariff" value="sme76"><span class="t-info"><span class="t-title">Обрабатывающие МСП — 7,6%</span><span class="t-desc">30% с выплат до 1,5 МРОТ, 7,6% — свыше; порог 1,5 МРОТ: 2026 — 40 639,50 ₽; 2027 — 43 402,50 ₽</span></span></label>
+</div>
+<div class="ns-block">
+<h3>Тариф страховых взносов НС и ПЗ</h3>
+<div class="field">
+<label for="nsRate">Размер тарифа НС и ПЗ, %</label>
+<div class="wrap-inp"><input type="number" id="nsRate" placeholder="Например, 0,2" min="0" max="100" step="0.01" value="0.2"><span class="suffix">%</span></div>
+<div class="hint-note">Введите свой тариф, по умолчанию указан минимальный — 0,2</div>
+</div>
+</div>
+<button type="button" class="calc-btn" id="calcBtn" disabled>Рассчитать</button>
+<div class="form-msg" id="formMsg"></div>
+</div>
+</div></div>
+<div class="modal-overlay" id="modalOverlay">
+<div class="modal" id="modal">
+<button type="button" class="modal-close" id="modalClose" aria-label="Закрыть">×</button>
+<div class="modal-title">Результаты расчета: экономия и риски</div>
+<div class="modal-results" id="modalResults"></div>
+<div class="risk-section" id="riskSection"></div>
+<div class="download-row" id="downloadRow">
+<button type="button" class="download-btn" id="dlMemo">⬇ Скачать памятку для руководителя (.doc)</button>
+<button type="button" class="download-btn gray" id="dlRef">⬇ Скачать справку по расчетам (.doc)</button>
+</div>
+<div class="modal-footer">
+<button type="button" class="new-calc-btn" id="resetBtn">Рассчитать заново</button>
+</div>
+</div>
+</div>
+<div class="memo-hidden" id="memo" aria-hidden="true"></div>
+<div class="memo-hidden" id="refBook" aria-hidden="true"></div><script>
+(function(){
+"use strict";
+function fmt(n){if(!isFinite(n))n=0;var r=Math.round(n*100)/100;var p=r.toString().split('.');p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,' ');return p.join(',')}
+function money(n){return fmt(n)+' ₽'}
+function pct(n){return fmt(n)+'%'}
+var LIMIT_BY_YEAR={2026:2979000,2027:3311000};
+function getLimitForYear(y){return LIMIT_BY_YEAR[y]||LIMIT_BY_YEAR[2027]}
+var MROT_BY_YEAR={2026:27093,2027:28935};
+function getMrotForYear(y){return MROT_BY_YEAR[y]||MROT_BY_YEAR[2027]}
+var CB_RATE=0.14;
+var WORKDAYS={
+2026:[[9,12,13,14,15,16,19,20,21,22,23,26,27,28,29,30],[2,3,4,5,6,9,10,11,12,13,16,17,18,19,20,24,25,26,27],[2,3,4,5,6,9,10,11,12,13,16,17,18,19,20,23,24,25,26,27,30,31],[1,2,3,6,7,8,9,10,13,14,15,16,17,20,21,22,23,24,27,28,29,30],[4,5,6,7,8,12,13,14,15,18,19,20,21,22,25,26,27,28,29],[1,2,3,4,5,8,9,10,11,15,16,17,18,19,22,23,24,25,26,29,30],[1,2,3,6,7,8,9,10,13,14,15,16,17,20,21,22,23,24,27,28,29,30,31],[3,4,5,6,7,10,11,12,13,14,17,18,19,20,21,24,25,26,27,28,31],[1,2,3,4,7,8,9,10,11,14,15,16,17,18,21,22,23,24,25,28,29,30],[1,2,5,6,7,8,9,12,13,14,15,16,19,20,21,22,23,26,27,28,29,30],[2,3,5,6,9,10,11,12,13,16,17,18,19,20,23,24,25,26,27,30],[1,2,3,4,7,8,9,10,11,14,15,16,17,18,21,22,23,24,25,28,29,30,31]],
+2027:[[11,12,13,14,15,18,19,20,21,22,25,26,27,28,29],[1,2,3,4,5,8,9,10,11,12,15,16,17,18,19,20,24,25,26],[1,2,3,4,5,9,10,11,12,15,16,17,18,19,22,23,24,25,26,29,30,31],[1,2,5,6,7,8,9,12,13,14,15,16,19,20,21,22,23,26,27,28,29,30],[4,5,6,7,11,12,13,14,17,18,19,20,21,24,25,26,27,28,31],[1,2,3,4,7,8,9,10,11,15,16,17,18,21,22,23,24,25,28,29,30],[1,2,5,6,7,8,9,12,13,14,15,16,19,20,21,22,23,26,27,28,29,30],[2,3,4,5,6,9,10,11,12,13,16,17,18,19,20,23,24,25,26,27,30,31],[1,2,3,6,7,8,9,10,13,14,15,16,17,20,21,22,23,24,27,28,29,30],[1,4,5,6,7,8,11,12,13,14,15,18,19,20,21,22,25,26,27,28,29],[2,3,4,5,9,10,11,12,15,16,17,18,19,22,23,24,25,26,29,30],[1,2,3,6,7,8,9,10,13,14,15,16,17,20,21,22,23,24,27,28,29,30,31]]};
+var MONTH_NAMES=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+var MONTH_NAMES_GEN=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+var NDFL_STEPS=[{limit:2400000,rate:0.13},{limit:5000000,rate:0.15},{limit:20000000,rate:0.18},{limit:50000000,rate:0.20},{limit:Infinity,rate:0.22}];
+function ndflCumulative(income){if(income<=0)return 0;var tax=0,prev=0;for(var i=0;i<NDFL_STEPS.length;i++){var s=NDFL_STEPS[i];var upper=Math.min(income,s.limit);if(upper>prev){tax+=(upper-prev)*s.rate;prev=upper}if(income<=s.limit)break}return tax}
+var monthFromEl=document.getElementById('monthFrom');
+var yearFromEl=document.getElementById('yearFrom');
+var monthToEl=document.getElementById('monthTo');
+var yearToEl=document.getElementById('yearTo');
+var periodHintEl=document.getElementById('periodHint');
+var memoEl=document.getElementById('memo');
+var refBookEl=document.getElementById('refBook');
+var riskSectionEl=document.getElementById('riskSection');
+var modalResultsEl=document.getElementById('modalResults');
+var modalOverlay=document.getElementById('modalOverlay');
+var modalCloseBtn=document.getElementById('modalClose');
+var resetBtn=document.getElementById('resetBtn');
+var dlMemoBtn=document.getElementById('dlMemo');
+var dlRefBtn=document.getElementById('dlRef');
+var calcBtn=document.getElementById('calcBtn');
+var formMsg=document.getElementById('formMsg');
+var modeVinaBlock=document.getElementById('modeVinaBlock');
+var modeNezavBlock=document.getElementById('modeNezavBlock');
+var employeesEl=document.getElementById('employees');
+var addEmpBtn=document.getElementById('addEmpBtn');
+var nsRateEl=document.getElementById('nsRate');
+var empSeq=0;
+function makeEmpRow(salary,count,idleDays){
+empSeq++;
+var row=document.createElement('div');
+row.className='emp-row';
+row.dataset.id=empSeq;
+row.innerHTML='<div class="emp-top">'+
+'<div class="field"><label>Зарплата одного сотрудника, ₽</label><div class="wrap-inp"><input type="number" class="emp-salary" placeholder="Введите зарплату" min="0" step="1000" value="'+(salary!=null?salary:'')+'"><span class="suffix">₽</span></div></div>'+
+'<div class="field"><label>Количество таких сотрудников</label><div class="wrap-inp"><input type="number" class="emp-count" placeholder="Например, 1" min="0" step="1" value="'+(count!=null?count:'')+'"><span class="suffix">чел.</span></div></div>'+
+'<button type="button" class="del-btn" title="Удалить">✕</button>'+
+'</div>'+
+'<div class="emp-second">'+
+'<div class="field"><label>Количество рабочих дней простоя в месяц</label><div class="wrap-inp"><input type="number" class="emp-idle" placeholder="Например, 10" min="0" max="31" step="1" value="'+(idleDays!=null?idleDays:'')+'"><span class="suffix">дн.</span></div></div>'+
+'</div>'+
+'<div class="hint-note">Оплата простоя — 2/3 зарплаты. Если дней больше, чем рабочих в месяце — расчет ограничивается рабочими днями</div>'+
+'<div class="warn-note"></div>';
+var delBtn=row.querySelector('.del-btn');
+delBtn.addEventListener('click',function(){
+if(employeesEl.querySelectorAll('.emp-row').length<=1)return;
+row.remove();updateDelButtons();updateCalcBtnState();
+});
+row.querySelectorAll('input').forEach(function(inp){
+inp.addEventListener('input',updateCalcBtnState);
+inp.addEventListener('change',updateCalcBtnState);
+});
+employeesEl.appendChild(row);
+updateDelButtons();
+}
+function updateDelButtons(){
+var rows=employeesEl.querySelectorAll('.emp-row');
+rows.forEach(function(r){r.querySelector('.del-btn').disabled=(rows.length<=1)});
+}
+function getEmployees(){
+var out=[];
+employeesEl.querySelectorAll('.emp-row').forEach(function(row){
+var s=parseFloat(row.querySelector('.emp-salary').value);
+var c=parseFloat(row.querySelector('.emp-count').value);
+var d=parseFloat(row.querySelector('.emp-idle').value);
+if(isNaN(s)||s<0)s=0;
+if(isNaN(c)||c<0)c=0;
+if(isNaN(d)||d<0)d=0;
+out.push({salary:s,count:c,idleDays:d});
+});
+if(out.length===0)out.push({salary:0,count:0,idleDays:0});
+return out;
+}
+function getMode(){var c=document.querySelector('input[name="mode"]:checked');return c?c.value:'vina'}
+function getTariffMode(){var c=document.querySelector('input[name="tariff"]:checked');return c?c.value:'general'}
+function getNsRate(){var v=parseFloat(nsRateEl.value);if(isNaN(v)||v<0)v=0;return v/100}
+function getPeriod(){
+var mFrom=parseInt(monthFromEl.value,10),yFrom=parseInt(yearFromEl.value,10);
+var mTo=parseInt(monthToEl.value,10),yTo=parseInt(yearToEl.value,10);
+var list=[],cy=yFrom,cm=mFrom,guard=0;
+while(guard++<60){
+list.push({year:cy,month:cm});
+if(cy===yTo&&cm===mTo)break;
+cm++;if(cm>12){cm=1;cy++}
+if(cy>2027)break;
+}
+return {list:list,mFrom:mFrom,yFrom:yFrom,mTo:mTo,yTo:yTo};
+}
+function applyModeState(){
+var mode=getMode();
+modeVinaBlock.classList.toggle('active',mode==='vina');
+modeNezavBlock.classList.toggle('active',mode==='nezavisimye');
+}function computeMonthly(base,cumulativeBefore,tariff,limit,mrot){
+var halfMrot=mrot*1.5,total=0;
+if(tariff==='general'){
+var remaining=Math.max(0,limit-cumulativeBefore);
+var within=Math.min(base,remaining);
+var over=Math.max(0,base-remaining);
+total+=within*0.30;total+=over*0.151;
+}else if(tariff==='sme15'||tariff==='sme76'){
+var reducedRate=(tariff==='sme15')?0.15:0.076;
+var below=Math.min(base,halfMrot);
+var above=Math.max(0,base-halfMrot);
+var remaining2=Math.max(0,limit-cumulativeBefore);
+var within2=Math.min(below,remaining2);
+var over2=Math.max(0,below-remaining2);
+total+=within2*0.30;total+=over2*0.151;total+=above*reducedRate;
+}
+return total;
+}
+function calcPenalty(base,days,rate){
+if(base<=0||days<=0)return 0;
+var d1=Math.min(days,30);
+var d2=Math.max(0,Math.min(days,90)-30);
+var d3=Math.max(0,days-90);
+return base*rate/300*d1+base*rate/150*d2+base*rate/300*d3;
+}
+function isFormReady(){
+var employees=getEmployees();
+var hasAny=employees.some(function(e){return e.salary>0&&e.count>0&&e.idleDays>0});
+return hasAny;
+}
+function updateCalcBtnState(){
+if(isFormReady()){
+calcBtn.disabled=false;
+formMsg.classList.remove('show');
+formMsg.textContent='';
+}else{
+calcBtn.disabled=true;
+}
+}
+function updatePeriodHint(){
+var p=getPeriod();
+periodHintEl.textContent='Месяцев в периоде: '+p.list.length+' ('+MONTH_NAMES[p.mFrom-1]+' '+p.yFrom+' — '+MONTH_NAMES[p.mTo-1]+' '+p.yTo+')';
+}
+function addEmpRow(){
+makeEmpRow('',1,'');
+updateCalcBtnState();
+}
+function downloadDoc(filename,title,bodyHtml){
+var styles=''
++'@page{size:A4;margin:1.2cm 1.5cm}'
++'body{font-family:"Times New Roman",serif;font-size:10.5pt;color:#000;line-height:1.35;margin:0}'
++'h1{font-size:14pt;font-weight:bold;margin:0 0 10pt;border-bottom:1.2pt solid #E21F27;padding-bottom:5pt}'
++'h2{font-size:12pt;font-weight:bold;margin:10pt 0 5pt;color:#E21F27}'
++'.memo-lead{margin:4pt 0 8pt;font-size:10.5pt}'
++'.memo-table{width:100%;border-collapse:collapse;margin:4pt 0 8pt}'
++'.memo-table td{padding:2pt 0;border-bottom:0.5pt dashed #999;vertical-align:top;font-size:10.5pt}'
++'.memo-table td:last-child{text-align:right;font-weight:bold;white-space:nowrap}'
++'.memo-table tr.highlight td{font-size:11pt;font-weight:bold;padding-top:4pt}'
++'.memo-subtitle{font-size:9.5pt;font-weight:bold;color:#E21F27;margin:10pt 0 4pt;text-transform:uppercase;letter-spacing:0.5pt;border-top:0.5pt solid #E21F27;padding-top:5pt}'
++'.ref-block{border:0.5pt solid #ccc;padding:8pt 10pt;margin-bottom:6pt}'
++'.ref-block h4{border-bottom:0.5pt solid #ccc;padding-bottom:3pt;margin:0 0 5pt;color:#E21F27}'
++'.ref-block table.ref-row{width:100%;border-collapse:collapse;margin:0}'
++'.ref-block table.ref-row td{padding:2pt 0;border-bottom:0.5pt dashed #ccc;vertical-align:top;font-size:10.5pt}'
++'.ref-block table.ref-row td.rl{color:#333;width:70%}'
++'.ref-block table.ref-row td.rv{text-align:right;font-weight:bold;white-space:nowrap;width:30%}'
++'.ref-block table.ref-row tr.total td{border-top:1pt solid #999;border-bottom:none;padding-top:4pt;font-weight:bold}'
++'.ref-block table.ref-row tr.sub td{padding-left:10pt;font-size:9.5pt;color:#666;border-bottom:none;font-style:italic}'
++'.ref-formula{font-family:"Courier New",monospace;font-size:9.5pt;background:#f5f5f5;border-left:2pt solid #E21F27;padding:6pt 8pt;margin-top:5pt;line-height:1.4}'
++'.ref-month-table{width:100%;border-collapse:collapse;margin:0}'
++'.ref-month-table th,.ref-month-table td{padding:2pt 4pt;border-bottom:0.5pt dashed #ccc;font-size:9.5pt;text-align:right}'
++'.ref-month-table th{font-weight:bold;color:#333;text-align:right;border-bottom:0.5pt solid #999}'
++'.ref-month-table th:first-child,.ref-month-table td:first-child{text-align:left}';
+var html=''
++'<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
++'<head><meta charset="utf-8"><title>'+title+'</title>'
++'<style>'+styles+'</style></head><body>'
++'<h1>'+title+'</h1>'
++bodyHtml
++'<p style="margin-top:12pt;font-size:8.5pt;color:#666;font-style:italic;border-top:0.5pt solid #ccc;padding-top:5pt">Сформировано калькулятором экономии и рисков. Расчет носит справочный характер.</p>'
++'</body></html>';
+var blob=new Blob(['\ufeff'+html],{type:'application/msword'});
+var url=URL.createObjectURL(blob);
+var a=document.createElement('a');
+a.href=url;a.download=filename;
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+URL.revokeObjectURL(url);
+}function run(){
+var employees=getEmployees();
+var mode=getMode();
+var tariff=getTariffMode();
+var nsRate=getNsRate();
+var p=getPeriod();
+var period=p.list;
+var totalSalaryBase=0,totalSalaryNew=0;
+var totalContribBase=0,totalContribNew=0;
+var totalNsBase=0,totalNsNew=0;
+var monthlyDetail=[];
+var totalNdflFull=0,totalNdflCut=0;
+var totalDays=0;
+var empCumBase=employees.map(function(){return 0});
+var empCumNew=employees.map(function(){return 0});
+var empNdflFull=employees.map(function(){return 0});
+var empNdflCut=employees.map(function(){return 0});
+for(var k=0;k<period.length;k++){
+var py=period[k].year;
+var pm=period[k].month-1;
+var yearLimit=getLimitForYear(py);
+var yearMrot=getMrotForYear(py);
+totalDays+=new Date(py,pm+1,0).getDate();
+var workdaysThisMonth=WORKDAYS[py][pm].length;
+var monthSalaryBase=0,monthSalaryNew=0;
+var monthContribBase=0,monthContribNew=0;
+var monthNsBase=0,monthNsNew=0;
+for(var i=0;i<employees.length;i++){
+var emp=employees[i];
+var cnt=emp.count;
+if(emp.salary<=0||cnt<=0)continue;
+var baseCumThis=empCumBase[i];
+var cBase=computeMonthly(emp.salary,baseCumThis,tariff,yearLimit,yearMrot);
+empCumBase[i]=baseCumThis+emp.salary;
+var nsBase=emp.salary*nsRate;
+var idleDaysActual=Math.min(emp.idleDays,workdaysThisMonth);
+var dailySalary=emp.salary/workdaysThisMonth;
+var lostFull=dailySalary*idleDaysActual;
+var paidForIdle=lostFull*(2/3);
+var newSalary=emp.salary-lostFull+paidForIdle;
+if(newSalary<0)newSalary=0;
+var newCumThis=empCumNew[i];
+var cNew=computeMonthly(newSalary,newCumThis,tariff,yearLimit,yearMrot);
+empCumNew[i]=newCumThis+newSalary;
+var nsNew=newSalary*nsRate;
+monthSalaryBase+=emp.salary*cnt;
+monthSalaryNew+=newSalary*cnt;
+monthContribBase+=cBase*cnt;
+monthContribNew+=cNew*cnt;
+monthNsBase+=nsBase*cnt;
+monthNsNew+=nsNew*cnt;
+var prevFull=empNdflFull[i];
+var prevCut=empNdflCut[i];
+var cumFullNew=prevFull+emp.salary;
+var cumCutNew=prevCut+newSalary;
+totalNdflFull+=(ndflCumulative(cumFullNew)-ndflCumulative(prevFull))*cnt;
+totalNdflCut+=(ndflCumulative(cumCutNew)-ndflCumulative(prevCut))*cnt;
+empNdflFull[i]=cumFullNew;
+empNdflCut[i]=cumCutNew;
+}
+totalSalaryBase+=monthSalaryBase;
+totalSalaryNew+=monthSalaryNew;
+totalContribBase+=monthContribBase;
+totalContribNew+=monthContribNew;
+totalNsBase+=monthNsBase;
+totalNsNew+=monthNsNew;
+var monthContribBaseAll=monthContribBase+monthNsBase;
+var monthContribNewAll=monthContribNew+monthNsNew;
+monthlyDetail.push({
+m:MONTH_NAMES[pm]+' '+py,
+workdays:workdaysThisMonth,
+salaryBase:monthSalaryBase,
+salaryNew:monthSalaryNew,
+contribBase:monthContribBaseAll,
+contribNew:monthContribNewAll
+});
+}
+var monthsCount=period.length;
+var contribBaseAll=totalContribBase+totalNsBase;
+var contribNewAll=totalContribNew+totalNsNew;
+var saveSalary=totalSalaryBase-totalSalaryNew;
+var saveContrib=contribBaseAll-contribNewAll;
+var saveTotal=saveSalary+saveContrib;
+var totalBaseAll=totalSalaryBase+contribBaseAll;
+var savePctPeriod=totalBaseAll?saveTotal/totalBaseAll*100:0;
+var periodText=MONTH_NAMES[p.mFrom-1]+' '+p.yFrom+' — '+MONTH_NAMES[p.mTo-1]+' '+p.yTo;
+var periodSubText='с '+MONTH_NAMES_GEN[p.mFrom-1]+' '+p.yFrom+' по '+MONTH_NAMES[p.mTo-1].toLowerCase()+' '+p.yTo;
+var modeText=(mode==='vina')?'простой по вине работодателя':'простой по независящим причинам';
+var tariffText={general:'общий тариф 30% / 15,1%',sme15:'МСП приоритетных отраслей 15%',sme76:'обрабатывающие МСП 7,6%'}[tariff];
+var totalStaff=0;
+employees.forEach(function(e){if(e.salary>0&&e.count>0)totalStaff+=e.count});
+var ndflUnder=Math.max(0,totalNdflFull-totalNdflCut);
+var contribUnder=Math.max(0,(totalContribBase+totalNsBase)-(totalContribNew+totalNsNew));
+var ndflPenalty=calcPenalty(ndflUnder,totalDays,CB_RATE);
+var ndflFine=ndflUnder*0.40;
+var ndflTotal=ndflUnder+ndflPenalty+ndflFine;
+var contribPenalty=calcPenalty(contribUnder,totalDays,CB_RATE);
+var contribFine=contribUnder*0.40;
+var contribTotal=contribUnder+contribPenalty+contribFine;
+var taxTotal=ndflTotal+contribTotal;
+var hrFine=100000;
+var underpayment=saveSalary;
+var interest236=saveSalary*CB_RATE/300*totalDays;
+var hrTotal=hrFine+underpayment+interest236;
+var grandTotal=taxTotal+hrTotal;
+renderModalResults({saveSalary:saveSalary,saveContrib:saveContrib,saveTotal:saveTotal,periodSubText:periodSubText});
+renderRisks({taxTotal:taxTotal,hrFine:hrFine,hrTotal:hrTotal,underpayment:underpayment,interest236:interest236,grandTotal:grandTotal,mode:mode});
+renderMemo({totalStaff:totalStaff,modeText:modeText,periodText:periodText,totalSalaryBase:totalSalaryBase,totalSalaryNew:totalSalaryNew,contribBaseAll:contribBaseAll,contribNewAll:contribNewAll,saveSalary:saveSalary,saveContrib:saveContrib,saveTotal:saveTotal,savePctPeriod:savePctPeriod,monthsCount:monthsCount,taxTotal:taxTotal,hrFine:hrFine,hrTotal:hrTotal,underpayment:underpayment,interest236:interest236,grandTotal:grandTotal});
+renderRefBook({employees:employees,totalStaff:totalStaff,mode:mode,modeText:modeText,periodText:periodText,monthsCount:monthsCount,totalDays:totalDays,tariff:tariff,tariffText:tariffText,nsRate:nsRate,monthlyDetail:monthlyDetail,totalSalaryBase:totalSalaryBase,totalSalaryNew:totalSalaryNew,contribBaseAll:contribBaseAll,contribNewAll:contribNewAll,saveSalary:saveSalary,saveContrib:saveContrib,saveTotal:saveTotal,savePctPeriod:savePctPeriod,ndflUnder:ndflUnder,ndflPenalty:ndflPenalty,ndflFine:ndflFine,ndflTotal:ndflTotal,contribUnder:contribUnder,contribPenalty:contribPenalty,contribFine:contribFine,contribTotal:contribTotal,taxTotal:taxTotal,hrFine:hrFine,hrTotal:hrTotal,underpayment:underpayment,interest236:interest236,grandTotal:grandTotal});
+}
+function renderModalResults(d){
+modalResultsEl.innerHTML=
+'<div class="result-cell"><div class="lbl">Экономия на зарплате</div><div class="val">'+money(d.saveSalary)+'</div></div>'+
+'<div class="result-cell"><div class="lbl">Экономия на взносах</div><div class="val">'+money(d.saveContrib)+'</div></div>'+
+'<div class="result-cell total"><div class="lbl">Общая экономия (ЗП + взносы)</div><div class="val">'+money(d.saveTotal)+'</div><div class="sub">'+d.periodSubText+'</div></div>';
+}
+function renderRisks(d){
+var timingHtml=
+'<div class="section-title">Сроки</div>'+
+'<div class="timing">'+
+'<div class="timing-card"><div class="timing-label">Минимальный срок ввода</div><div class="timing-value">1 рабочий день. Простой вводится приказом работодателя, согласие работника не требуется.</div></div>'+
+'<div class="timing-card"><div class="timing-label">Срок, когда ожидать эффект</div><div class="timing-value">С месяца, в котором издан приказ о простое.</div></div>'+
+'</div>';
+var riskHtml=
+'<div class="section-title">Оценка рисков</div>'+
+'<div class="risk-grid">'+
+'<div class="risk-card"><h4>Налоговые риски</h4><div class="rc-val">'+money(d.taxTotal)+'</div><div class="rc-note">Если ФНС докажет фиктивность простоя и выплату зарплаты в конверте. Расшифровка — в справке по расчетам ниже.</div></div>'+
+'<div class="risk-card"><h4>Кадровые риски</h4><div class="rc-val">'+money(d.hrTotal)+'</div><div class="rc-note">Административный штраф по ст. 5.27 КоАП — до 100 000 ₽, если ГИТ признает простой необоснованным. Оплата вынужденного прогула (ст. 234 ТК), проценты за просрочку по ст. 236 ТК.</div></div>'+
+'</div>'+
+'<div class="total-risk">'+
+'<div class="tr-lbl">Общая сумма рисков</div>'+
+'<div class="tr-val">'+money(d.grandTotal)+'</div>'+
+'<div class="tr-note">Налоговые риски '+money(d.taxTotal)+' + кадровые риски '+money(d.hrTotal)+'.<br>Кадровые риски: штраф '+money(d.hrFine)+' + оплата вынужденного прогула '+money(d.underpayment)+' + проценты по ст. 236 ТК '+money(d.interest236)+'.<br>Расчет справочный. Пени — по условной ключевой ставке ЦБ 14%.<br>Штраф 40% — размер штрафа при умышленном сокрытии НДФЛ и взносов (п. 3 ст. 122 НК РФ, п. 3 ст. 123 НК РФ).</div>'+
+'</div>';
+riskSectionEl.innerHTML=timingHtml+riskHtml;
+}function renderMemo(d){
+var memoHtml=
+'<p class="memo-lead">При оформлении простоя (всего <b>'+fmt(d.totalStaff)+' чел.</b>, '+d.modeText+') за период: '+d.periodText+'.</p>'+
+'<table class="memo-table">'+
+'<tr><td>Зарплата до простоя</td><td>'+money(d.totalSalaryBase)+'</td></tr>'+
+'<tr><td>Оплата простоя</td><td>'+money(d.totalSalaryNew)+'</td></tr>'+
+'<tr><td>Взносы до простоя</td><td>'+money(d.contribBaseAll)+'</td></tr>'+
+'<tr><td>Взносы в период простоя</td><td>'+money(d.contribNewAll)+'</td></tr>'+
+'<tr><td>Экономия на зарплате</td><td>'+money(d.saveSalary)+'</td></tr>'+
+'<tr><td>Экономия на взносах</td><td>'+money(d.saveContrib)+'</td></tr>'+
+'<tr class="highlight"><td>Общая экономия за период ('+d.monthsCount+' мес.)</td><td>'+money(d.saveTotal)+'</td></tr>'+
+'<tr><td>Экономия в % за период</td><td>'+pct(d.savePctPeriod)+'</td></tr>'+
+'</table>'+
+'<div class="memo-subtitle">Оценка рисков</div>'+
+'<table cellspacing="6" cellpadding="0" border="0" style="width:100%;border-collapse:separate"><tr>'+
+'<td width="50%" valign="top" style="border:1pt solid #E21F27;background:#FFF5F5;padding:6pt 8pt"><div style="font-size:9pt;font-weight:bold;text-transform:uppercase;color:#E21F27;margin-bottom:3pt">Налоговые риски</div><div style="font-size:13pt;font-weight:bold;color:#E21F27">'+money(d.taxTotal)+'</div></td>'+
+'<td width="50%" valign="top" style="border:1pt solid #E21F27;background:#FFF5F5;padding:6pt 8pt"><div style="font-size:9pt;font-weight:bold;text-transform:uppercase;color:#E21F27;margin-bottom:3pt">Кадровые риски</div><div style="font-size:13pt;font-weight:bold;color:#E21F27">'+money(d.hrTotal)+'</div><div style="font-size:8pt;color:#666;margin-top:2pt">штраф '+money(d.hrFine)+' + прогул '+money(d.underpayment)+' + % '+money(d.interest236)+'</div></td>'+
+'</tr></table>'+
+'<table cellspacing="0" cellpadding="0" border="0" style="width:100%;margin:8pt 0 10pt"><tr><td style="border:1.5pt solid #E21F27;padding:8pt;text-align:center">'+
+'<div style="font-size:9.5pt;font-weight:bold;color:#E21F27;text-transform:uppercase">Общая сумма рисков</div>'+
+'<div style="font-size:16pt;font-weight:bold;color:#E21F27;margin-top:3pt">'+money(d.grandTotal)+'</div>'+
+'</td></tr></table>'+
+'<p style="font-size:10pt;line-height:1.45;margin:0 0 6pt">Простой вводится приказом работодателя (ст. 157 ТК). Согласие работника не требуется. Однако если ГИТ или суд признает простой необоснованным, работодатель может быть обязан оплатить вынужденный прогул (ст. 234 ТК), компенсировать проценты (ст. 236 ТК) и моральный вред.</p>'+
+'<div class="memo-subtitle">Сроки</div>'+
+'<table cellspacing="6" cellpadding="0" border="0" style="width:100%;border-collapse:separate"><tr>'+
+'<td width="50%" valign="top" style="border:0.5pt solid #999;padding:8pt 10pt"><div style="font-size:9pt;font-weight:bold;color:#E21F27;text-transform:uppercase;margin-bottom:4pt">Минимальный срок ввода</div><div style="font-size:10pt;line-height:1.4">1 рабочий день. Простой вводится приказом работодателя, согласие работника не требуется.</div></td>'+
+'<td width="50%" valign="top" style="border:0.5pt solid #999;padding:8pt 10pt"><div style="font-size:9pt;font-weight:bold;color:#E21F27;text-transform:uppercase;margin-bottom:4pt">Срок, когда ожидать эффект</div><div style="font-size:10pt;line-height:1.4">С месяца, в котором издан приказ о простое.</div></td>'+
+'</tr></table>';
+memoEl.innerHTML=memoHtml;
+}
+function renderRefBook(d){
+var rows=[];
+var r1='<table class="ref-row">';
+r1+='<tr><td class="rl">Численность штата</td><td class="rv">'+fmt(d.totalStaff)+' чел.</td></tr>';
+r1+='<tr><td class="rl">Период расчета</td><td class="rv">'+d.periodText+' ('+d.monthsCount+' мес., '+fmt(d.totalDays)+' дн.)</td></tr>';
+r1+='<tr><td class="rl">Вид простоя</td><td class="rv">'+d.modeText+'</td></tr>';
+r1+='<tr><td class="rl">Тариф на ОПС, ВНиМ, ОМС</td><td class="rv">'+d.tariffText+'</td></tr>';
+r1+='<tr><td class="rl">Тариф НС и ПЗ</td><td class="rv">'+fmt(d.nsRate*100)+'%</td></tr>';
+r1+='<tr><td class="rl">Предельная база 2026</td><td class="rv">'+money(LIMIT_BY_YEAR[2026])+'</td></tr>';
+r1+='<tr><td class="rl">Предельная база 2027</td><td class="rv">'+money(LIMIT_BY_YEAR[2027])+'</td></tr>';
+r1+='<tr><td class="rl">МРОТ 2026 / 1,5 МРОТ</td><td class="rv">'+money(MROT_BY_YEAR[2026])+' / '+money(MROT_BY_YEAR[2026]*1.5)+'</td></tr>';
+r1+='<tr><td class="rl">МРОТ 2027 / 1,5 МРОТ</td><td class="rv">'+money(MROT_BY_YEAR[2027])+' / '+money(MROT_BY_YEAR[2027]*1.5)+'</td></tr>';
+r1+='</table>';
+rows.push('<div class="ref-block"><h4>1. Исходные данные</h4>'+r1+'</div>');
+var empRows='';
+d.employees.forEach(function(e,idx){
+if(e.salary>0&&e.count>0){
+empRows+='<tr><td class="rl">Позиция '+(idx+1)+'</td><td class="rv">'+money(e.salary)+' × '+fmt(e.count)+' чел., '+fmt(e.idleDays)+' дн./мес.</td></tr>';
+}
+});
+if(empRows){rows.push('<div class="ref-block"><h4>2. Сотрудники и простой</h4><table class="ref-row">'+empRows+'</table></div>')}
+var monthRows='<table class="ref-month-table"><thead><tr><th>Месяц</th><th>Раб. дней</th><th>ЗП до</th><th>ЗП после</th><th>Взносы до</th><th>Взносы после</th></tr></thead><tbody>';
+d.monthlyDetail.forEach(function(md){
+monthRows+='<tr><td>'+md.m+'</td><td>'+md.workdays+'</td><td>'+money(md.salaryBase)+'</td><td>'+money(md.salaryNew)+'</td><td>'+money(md.contribBase)+'</td><td>'+money(md.contribNew)+'</td></tr>';
+});
+monthRows+='</tbody></table>';
+monthRows+='<table class="ref-row" style="margin-top:8pt">';
+monthRows+='<tr class="total"><td class="rl">Зарплата до простоя</td><td class="rv">'+money(d.totalSalaryBase)+'</td></tr>';
+monthRows+='<tr class="total"><td class="rl">Оплата простоя</td><td class="rv">'+money(d.totalSalaryNew)+'</td></tr>';
+monthRows+='<tr class="total"><td class="rl">Взносы до простоя</td><td class="rv">'+money(d.contribBaseAll)+'</td></tr>';
+monthRows+='<tr class="total"><td class="rl">Взносы в период простоя</td><td class="rv">'+money(d.contribNewAll)+'</td></tr>';
+monthRows+='<tr class="total"><td class="rl">Экономия на зарплате</td><td class="rv">'+money(d.saveSalary)+'</td></tr>';
+monthRows+='<tr class="total"><td class="rl">Экономия на взносах</td><td class="rv">'+money(d.saveContrib)+'</td></tr>';
+monthRows+='<tr class="total"><td class="rl">Общая экономия за период</td><td class="rv">'+money(d.saveTotal)+'</td></tr>';
+monthRows+='<tr class="sub"><td class="rl">Экономия в % за период</td><td class="rv">'+pct(d.savePctPeriod)+'</td></tr>';
+monthRows+='</table>';
+rows.push('<div class="ref-block"><h4 class="green">3. Затраты по месяцам (ЗП, в т.ч. оплата простоя + взносы, весь штат)</h4>'+monthRows+'</div>');
+var r4='<table class="ref-row">';
+r4+='<tr><td class="rl">Доначисление НДФЛ</td><td class="rv">'+money(d.ndflUnder)+'</td></tr>';
+r4+='<tr><td class="rl">Пени по ст. 75 НК (условно 14%, период '+fmt(d.totalDays)+' дн.)</td><td class="rv">'+money(d.ndflPenalty)+'</td></tr>';
+r4+='<tr><td class="rl">Штраф 40% по ст. 123 НК</td><td class="rv">'+money(d.ndflFine)+'</td></tr>';
+r4+='<tr class="total"><td class="rl">Итого по НДФЛ</td><td class="rv">'+money(d.ndflTotal)+'</td></tr>';
+r4+='</table>';
+rows.push('<div class="ref-block"><h4 class="red">4. НДФЛ — если ФНС докажет фиктивность простоя</h4>'+r4+'</div>');
+var r5='<table class="ref-row">';
+r5+='<tr><td class="rl">Доначисление взносов</td><td class="rv">'+money(d.contribUnder)+'</td></tr>';
+r5+='<tr><td class="rl">Пени по ст. 75 НК</td><td class="rv">'+money(d.contribPenalty)+'</td></tr>';
+r5+='<tr><td class="rl">Штраф 40% по ст. 122 НК</td><td class="rv">'+money(d.contribFine)+'</td></tr>';
+r5+='<tr class="total"><td class="rl">Итого по взносам</td><td class="rv">'+money(d.contribTotal)+'</td></tr>';
+r5+='</table>';
+rows.push('<div class="ref-block"><h4 class="red">5. Страховые взносы — если ФНС докажет фиктивность простоя</h4>'+r5+'</div>');
+var r6='<table class="ref-row">';
+r6+='<tr><td class="rl">НДФЛ (доначисление + пени + штраф)</td><td class="rv">'+money(d.ndflTotal)+'</td></tr>';
+r6+='<tr><td class="rl">Взносы (доначисление + пени + штраф)</td><td class="rv">'+money(d.contribTotal)+'</td></tr>';
+r6+='<tr class="total"><td class="rl">Налоговые риски, всего</td><td class="rv">'+money(d.taxTotal)+'</td></tr>';
+r6+='<tr><td class="rl">Кадровый штраф по ст. 5.27 КоАП</td><td class="rv">'+money(d.hrFine)+'</td></tr>';
+r6+='<tr><td class="rl">Оплата вынужденного прогула (ст. 234 ТК)</td><td class="rv">'+money(d.underpayment)+'</td></tr>';
+r6+='<tr><td class="rl">Проценты за просрочку (ст. 236 ТК)</td><td class="rv">'+money(d.interest236)+'</td></tr>';
+r6+='<tr class="total"><td class="rl">Кадровые риски, всего</td><td class="rv">'+money(d.hrTotal)+'</td></tr>';
+r6+='<tr class="total"><td class="rl">Общая сумма рисков</td><td class="rv">'+money(d.grandTotal)+'</td></tr>';
+r6+='</table>';
+rows.push('<div class="ref-block"><h4>6. Сводка рисков</h4>'+r6+'</div>');
+rows.push('<div class="ref-block"><h4>7. Обязательные условия применения</h4><div class="ref-formula">Простой вводится приказом работодателя (ст. 157 ТК). Обязательно указать причину: экономическую, технологическую, техническую или организационную. Оплата — не менее 2/3 среднего заработка (по вине работодателя) или 2/3 тарифной ставки/оклада (по независящим причинам).<br><br>В случае спора суд проверит, действительно ли были основания для приостановки работы.</div></div>');
+rows.push('<div class="ref-block"><h4>8. Если ИФНС запросит пояснения</h4><div class="ref-formula">Объясните, что база уменьшилась в связи с введением простоя. Процедура проведена с учетом требований трудового законодательства.</div></div>');
+rows.push('<div class="ref-block"><h4>9. Методика и допущения</h4><div class="ref-formula"><b>Расчет дневного заработка:</b> зарплата / рабочие дни в месяце (по производственному календарю пятидневной рабочей недели).<br><b>Оплата простоя:</b> упрощенно — 2/3 зарплаты за каждый день простоя.<br><b>Ограничение:</b> если дней простоя больше, чем рабочих дней в месяце, расчет ведется по фактическому количеству рабочих дней.<br><br><b>Кадровые риски:</b> штраф до 100 000 ₽ по ст. 5.27 КоАП + оплата вынужденного прогула (средний заработок за все время простоя, признанного незаконным, — ст. 234 ТК) + проценты по ст. 236 ТК (1/300 ключевой ставки за каждый день задержки).<br><br><b>Пени по ст. 75 НК РФ:</b> 1/300 ключевой ставки за первые 30 дней просрочки, 1/150 — с 31 по 90 день, 1/300 — с 91 дня. Условная ставка — 14%.<br><b>Штраф 40%</b> — при умышленном сокрытии НДФЛ и взносов (п. 3 ст. 122, п. 3 ст. 123 НК РФ).<br><br>Расчет носит справочный характер.</div></div>');
+refBookEl.innerHTML=rows.join('');
+}
+function openModal(){
+if(!isFormReady()){
+formMsg.textContent='Проверьте данные: заполните все обязательные поля';
+formMsg.classList.add('show');
+return;
+}
+run();
+modalOverlay.classList.add('show');
+document.body.style.overflow='hidden';
+}
+function closeModal(){
+modalOverlay.classList.remove('show');
+document.body.style.overflow='';
+}
+calcBtn.addEventListener('click',openModal);
+modalCloseBtn.addEventListener('click',closeModal);
+modalOverlay.addEventListener('click',function(e){if(e.target===modalOverlay)closeModal()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modalOverlay.classList.contains('show'))closeModal()});
+[monthFromEl,yearFromEl,monthToEl,yearToEl,nsRateEl].forEach(function(el){
+el.addEventListener('input',function(){updatePeriodHint();updateCalcBtnState()});
+el.addEventListener('change',function(){updatePeriodHint();updateCalcBtnState()});
+});
+document.querySelectorAll('input[name="mode"]').forEach(function(r){
+r.addEventListener('change',function(){applyModeState();updateCalcBtnState()});
+});
+document.querySelectorAll('input[name="tariff"]').forEach(function(r){
+r.addEventListener('change',updateCalcBtnState);
+});
+addEmpBtn.addEventListener('click',addEmpRow);
+dlMemoBtn.addEventListener('click',function(){downloadDoc('Памятка_руководителю.doc','Памятка для руководителя',memoEl.innerHTML)});
+dlRefBtn.addEventListener('click',function(){downloadDoc('Справка_по_расчетам.doc','Справка по расчетам',refBookEl.innerHTML)});
+resetBtn.addEventListener('click',function(){
+closeModal();
+employeesEl.innerHTML='';
+empSeq=0;
+makeEmpRow('',1,'');
+nsRateEl.value='0.2';
+monthFromEl.value='11';
+yearFromEl.value='2026';
+monthToEl.value='10';
+yearToEl.value='2027';
+document.querySelector('input[name="mode"][value="vina"]').checked=true;
+document.querySelector('input[name="tariff"][value="general"]').checked=true;
+applyModeState();
+updatePeriodHint();
+updateCalcBtnState();
+});
+makeEmpRow('',1,'');
+applyModeState();
+updatePeriodHint();
+updateCalcBtnState();
+})();
+</script>
+</body>
+</html>
