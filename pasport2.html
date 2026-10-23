@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ФСБУ 9/2025: семь изменений, которые меняют учет выручки</title>
+<style>
+  :root{
+    --red:#E21F27;
+    --red-dark:#b8161d;
+    --red-soft:#fdeaea;
+    --red-line:#f5c6c8;
+
+    --green:#80BA28;
+    --green-dark:#5e8c1a;
+    --green-soft:#f0f7e6;
+    --green-line:#d3e6b3;
+
+    --ink:#1f1f1f;
+    --ink-2:#333333;
+    --muted:#6b6b6b;
+    --muted-light:#8c8c8c;
+
+    --bg:#ffffff;
+    --bg-soft:#f7f7f7;
+    --line:#e3e3e3;
+    --line-strong:#cfcfcf;
+
+    --radius:10px;
+    --shadow:0 2px 8px rgba(0,0,0,.06);
+    --shadow-hover:0 8px 24px rgba(0,0,0,.10);
+
+    --mono: "Courier New", Courier, monospace;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+
+  html{scroll-behavior:smooth}
+
+  body{
+    margin:0;
+    font-family:"Proxima Nova", Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  /* ---------- PROGRESS ---------- */
+  .progress-track{
+    position:fixed; top:0; left:0; right:0; height:3px;
+    background:#ececec; z-index:100;
+  }
+  .progress-bar{
+    height:100%; width:0%;
+    background:var(--red);
+    transition:width .35s ease;
+    border-radius:0 3px 3px 0;
+  }
+
+  /* ---------- LAYOUT ---------- */
+  .app{
+    max-width:650px;
+    margin:0 auto;
+    padding:0 20px 48px;
+  }
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:14px;
+    padding:26px 2px 20px;
+    border-bottom:1px solid var(--line);
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand-mark{
+    width:6px; height:24px; border-radius:2px;
+    background:var(--red);
+    flex:none;
+  }
+  .counter{
+    font-family:var(--mono);
+    font-size:13px; font-weight:700; color:var(--muted);
+    letter-spacing:.04em;
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    padding:5px 12px; border-radius:6px;
+  }
+
+  /* ---------- SLIDES ---------- */
+  .slide{display:none}
+  .slide.active{display:block}
+
+  @keyframes riseIn{
+    from{opacity:0; transform:translateY(14px)}
+    to{opacity:1; transform:translateY(0)}
+  }
+
+  .anim{
+    animation:riseIn .5s ease both;
+    animation-delay:calc(var(--i, 0) * 60ms);
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:40px 0 32px;
+  }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:11.5px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase;
+    color:var(--red);
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:""; width:24px; height:2px;
+    background:var(--red); border-radius:2px;
+  }
+
+  .hero h1{
+    margin:0 0 16px;
+    font-size:clamp(24px, 4.4vw, 32px);
+    line-height:1.18;
+    font-weight:800;
+    letter-spacing:-.02em;
+    color:var(--ink);
+  }
+  .hero h1 .accent{color:var(--red)}
+
+  .hero p{
+    margin:0 0 24px;
+    max-width:600px;
+    font-size:15px;
+    line-height:1.65;
+    color:var(--muted);
+  }
+
+  .hero-actions{
+    display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  }
+  .hero-note{
+    font-size:12.5px; color:var(--muted-light);
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:9px;
+    border:none; cursor:pointer;
+    font:inherit; font-weight:700; font-size:15px;
+    padding:13px 28px; border-radius:8px;
+    background:var(--red); color:#fff;
+    box-shadow:0 4px 14px rgba(226,31,39,.25);
+    transition:transform .2s, box-shadow .2s, background .2s;
+  }
+  .btn:hover{
+    transform:translateY(-2px);
+    background:var(--red-dark);
+    box-shadow:0 8px 22px rgba(226,31,39,.32);
+  }
+  .btn:active{transform:translateY(0)}
+  .btn .arrow-ico{transition:transform .2s}
+  .btn:hover .arrow-ico{transform:translateX(3px)}
+
+  /* ---------- CARDS ---------- */
+  .cards{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:8px;
+  }
+
+  .card{
+    position:relative;
+    display:flex; flex-direction:column;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 20px 18px;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+    transition:transform .22s, box-shadow .22s, border-color .22s;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:3px;
+    background:var(--red);
+    transform:scaleY(0); transform-origin:top;
+    transition:transform .28s ease;
+  }
+  .card:hover{
+    transform:translateY(-3px);
+    border-color:var(--line-strong);
+    box-shadow:var(--shadow-hover);
+  }
+  .card:hover::before{transform:scaleY(1)}
+  .card:focus-visible{outline:2px solid var(--red); outline-offset:3px}
+
+  .card-featured{
+    grid-column:1 / -1;
+    background:var(--bg-soft);
+    border-color:var(--line-strong);
+    padding:24px 24px 20px;
+  }
+
+  .card-num{
+    font-family:var(--mono);
+    font-size:11px; font-weight:700;
+    letter-spacing:.08em;
+    color:var(--red);
+    margin-bottom:8px;
+  }
+  .card h3{
+    margin:0 0 8px;
+    font-size:16px; font-weight:700;
+    line-height:1.3;
+    color:var(--ink);
+  }
+  .card-featured h3{font-size:clamp(18px, 2.4vw, 21px)}
+  .card p{
+    margin:0 0 14px;
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--muted);
+  }
+
+  .card-changes{
+    margin-top:auto;
+    padding-top:13px;
+    border-top:1px dashed var(--line-strong);
+    display:grid; gap:7px;
+  }
+  .chg{display:flex; gap:8px; align-items:flex-start; font-size:12.5px; line-height:1.45}
+  .tag{
+    flex:none;
+    display:inline-flex; align-items:center; justify-content:center;
+    height:18px; padding:0 7px;
+    border-radius:4px;
+    font-size:9.5px; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase;
+    margin-top:1px;
+  }
+  .chg-old .tag{background:var(--red-soft); color:var(--red-dark)}
+  .chg-old .txt{
+    color:var(--muted);
+    text-decoration:line-through;
+    text-decoration-color:rgba(226,31,39,.35);
+    text-decoration-thickness:1px;
+  }
+  .chg-new .tag{background:var(--green-soft); color:var(--green-dark)}
+  .chg-new .txt{color:var(--ink-2); font-weight:600}
+
+  /* ---------- DETAIL SLIDE ---------- */
+  .slide-head{padding-top:6px}
+
+  .slide h2{
+    margin:0 0 14px;
+    font-size:clamp(19px, 3.2vw, 24px);
+    line-height:1.25;
+    font-weight:800;
+    letter-spacing:-.02em;
+    color:var(--ink);
+  }
+  .slide h2 .old{
+    color:var(--red);
+    text-decoration:line-through;
+    text-decoration-color:rgba(226,31,39,.4);
+    text-decoration-thickness:2px;
+    font-weight:700;
+  }
+  .slide h2 .arrow{
+    color:var(--line-strong);
+    font-weight:400;
+    padding:0 2px;
+  }
+  .slide h2 .new{color:var(--green-dark)}
+
+  .lead{
+    margin:0 0 4px;
+    max-width:72ch;
+    font-size:15px;
+    line-height:1.65;
+    color:var(--muted);
+  }
+
+  /* ---------- SEGMENTED ---------- */
+  .segmented{
+    display:inline-flex;
+    gap:2px;
+    margin:22px 0 16px;
+    padding:3px;
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:8px;
+  }
+  .segmented button{
+    display:inline-flex; align-items:center; gap:7px;
+    border:none; background:transparent;
+    font:inherit; font-weight:700; font-size:14px;
+    color:var(--muted);
+    padding:9px 24px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:color .2s, background .2s, box-shadow .2s;
+  }
+  .segmented button::before{
+    content:"";
+    width:7px; height:7px; border-radius:50%;
+    background:currentColor; opacity:.3;
+    transition:opacity .2s;
+  }
+  .segmented button.active[data-mode="old"]{
+    background:#fff; color:var(--red-dark);
+    box-shadow:0 1px 3px rgba(0,0,0,.10);
+  }
+  .segmented button.active[data-mode="new"]{
+    background:#fff; color:var(--green-dark);
+    box-shadow:0 1px 3px rgba(0,0,0,.10);
+  }
+  .segmented button.active::before{opacity:1}
+
+  /* ---------- PANELS ---------- */
+  @keyframes panelIn{
+    from{opacity:0; transform:translateY(8px)}
+    to{opacity:1; transform:translateY(0)}
+  }
+
+  .panel{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    box-shadow:var(--shadow);
+  }
+  .panel-old{border-left:4px solid var(--red)}
+  .panel-new{border-left:4px solid var(--green)}
+  .panel.is-visible{
+    animation:panelIn .4s ease both;
+    animation-delay:.06s;
+  }
+
+  .panel h4{
+    display:flex; align-items:center; gap:10px;
+    margin:0 0 12px;
+    font-size:15px; font-weight:700;
+    color:var(--ink);
+  }
+  .pico{
+    flex:none;
+    width:26px; height:26px;
+    border-radius:6px;
+    display:grid; place-items:center;
+    font-size:13px; font-weight:700;
+  }
+  .panel-old .pico{background:var(--red-soft); color:var(--red-dark)}
+  .panel-new .pico{background:var(--green-soft); color:var(--green-dark)}
+  .panel-new h4{color:var(--green-dark)}
+
+  .badge{
+    margin-left:auto;
+    font-size:11px; font-weight:600;
+    color:var(--muted);
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    padding:3px 10px;
+    border-radius:4px;
+    white-space:nowrap;
+  }
+
+  .panel p{
+    margin:0;
+    font-size:14.5px;
+    line-height:1.62;
+    color:var(--ink-2);
+  }
+
+  .panel ul{
+    margin:12px 0 0;
+    padding:0;
+    list-style:none;
+    display:grid; gap:8px;
+  }
+  .panel li{
+    position:relative;
+    padding-left:20px;
+    font-size:14px;
+    line-height:1.55;
+    color:var(--ink-2);
+  }
+  .panel li::before{
+    content:"";
+    position:absolute; left:4px; top:9px;
+    width:6px; height:6px; border-radius:50%;
+    background:var(--line-strong);
+  }
+  .panel-new li::before{background:var(--green); opacity:.6}
+  .panel li b{color:var(--ink)}
+
+  /* ---------- EXAMPLE / ENTRIES ---------- */
+  .example{
+    margin-top:16px;
+    padding:16px;
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--ink-2);
+  }
+  .panel-new .example{background:var(--green-soft); border-color:var(--green-line)}
+
+  .ex-title{
+    font-size:10.5px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:9px;
+  }
+  .example b{color:var(--ink)}
+
+  .entry{
+    font-family:var(--mono);
+    font-size:12.5px;
+    line-height:1.5;
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:3px solid var(--red);
+    border-radius:6px;
+    padding:8px 12px;
+    margin-top:8px;
+    color:var(--ink);
+    overflow-wrap:anywhere;
+  }
+  .panel-new .entry{border-left-color:var(--green)}
+  .entry.rev{
+    border-left-color:var(--green-dark);
+    color:var(--green-dark);
+    background:#fbfdf7;
+  }
+  .example .note{
+    margin-top:10px;
+    font-size:12.5px;
+    color:var(--muted);
+  }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:14px;
+    margin-top:28px;
+    padding:12px 14px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+  }
+
+  .nbtn{
+    display:inline-flex; align-items:center; gap:7px;
+    border:1px solid var(--line-strong);
+    background:#fff;
+    color:var(--ink-2);
+    font:inherit; font-weight:700; font-size:14px;
+    padding:10px 18px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:transform .18s, border-color .18s, color .18s, background .18s, box-shadow .18s;
+    white-space:nowrap;
+  }
+  .nbtn:hover:not(:disabled){
+    border-color:var(--red);
+    color:var(--red);
+    transform:translateY(-1px);
+    box-shadow:0 4px 12px rgba(226,31,39,.12);
+  }
+  .nbtn:disabled{opacity:.35; cursor:not-allowed}
+  .nbtn.primary{
+    background:var(--red); border-color:var(--red); color:#fff;
+    box-shadow:0 4px 14px rgba(226,31,39,.25);
+  }
+  .nbtn.primary:hover:not(:disabled){
+    background:var(--red-dark); border-color:var(--red-dark); color:#fff;
+    box-shadow:0 8px 20px rgba(226,31,39,.32);
+  }
+  .nbtn.primary .arrow-ico{transition:transform .18s}
+  .nbtn.primary:hover .arrow-ico{transform:translateX(3px)}
+
+  .dots{display:flex; align-items:center; gap:7px}
+  .dot{
+    width:8px; height:8px;
+    padding:0; border:none; border-radius:50%;
+    background:#d4d4d4;
+    cursor:pointer;
+    transition:width .25s ease, background .25s;
+  }
+  .dot:hover{background:#b0b0b0}
+  .dot.active{width:24px; border-radius:4px; background:var(--red)}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 680px){
+    .app{padding:0 14px 40px}
+    .topbar{padding:20px 0 16px}
+    .hero{padding:30px 0 24px}
+    .hero h1{font-size:clamp(22px, 5.5vw, 28px)}
+    .hero p{font-size:14.5px}
+    .cards{grid-template-columns:1fr; gap:12px}
+    .card-featured{padding:20px}
+    .panel{padding:18px}
+    .segmented{width:100%}
+    .segmented button{flex:1; justify-content:center; padding:10px 12px}
+    .nav{padding:10px; gap:8px; flex-wrap:wrap; justify-content:center}
+    .nbtn{padding:9px 14px; font-size:13.5px}
+    .dots{order:3; width:100%; justify-content:center; padding-top:4px}
+    .badge{display:none}
+  }
+
+  @media (max-width: 380px){
+    .nbtn .label{display:none}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+      animation-duration:.001ms !important;
+      animation-delay:0ms !important;
+      transition-duration:.001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span></div>
+    <div class="counter" id="counter">01 / 08</div>
+  </header>
+
+  <!-- ================= СЛАЙД 0: ТИТУЛ ================= -->
+  <section class="slide active" data-slide="0">
+
+    <div class="hero anim" style="--i:0">
+      <div class="eyebrow">С 01.01.2027 · обязательный стандарт</div>
+      <h1>ФСБУ 9/2025: <span class="accent">семь изменений</span>,<br>которые меняют учет выручки</h1>
+      <p>
+        Разбор «было / стало» по ключевым новациям стандарта. Переключайте режимы
+        и смотрите, где ваш учет может дать сбой уже с 01.01.2027.
+      </p>
+      <div class="hero-actions">
+        <button class="btn" type="button" data-goto="1">
+          Начать разбор <span class="arrow-ico">→</span>
+        </button>
+        <span class="hero-note">7 изменений · 8 слайдов · 5 минут</span>
+      </div>
+    </div>
+
+    <div class="cards">
+
+      <article class="card card-featured anim" style="--i:1" tabindex="0" data-goto="1">
+        <div class="card-num">01</div>
+        <h3>Цена по договору ≠ выручка</h3>
+        <p>Отсрочка и рассрочка содержат компонент финансирования. Выручка — по приведенной стоимости, разница — процентный доход.</p>
+        <div class="card-changes">
+          <div class="chg chg-old"><span class="tag">Было</span><span class="txt">вся цена по договору — выручка</span></div>
+          <div class="chg chg-new"><span class="tag">Стало</span><span class="txt">выручка по приведенной стоимости, разница — проценты</span></div>
+        </div>
+      </article>
+
+      <article class="card anim" style="--i:2" tabindex="0" data-goto="2">
+        <div class="card-num">02</div>
+        <h3>Несколько обещаний в одном договоре</h3>
+        <p>Если предмет содержит несколько обещаний — продукцию, работы, услуги — с общей ценой, цена распределяется между ними.</p>
+        <div class="card-changes">
+          <div class="chg chg-old"><span class="tag">Было</span><span class="txt">договор целиком, выручка по факту передачи</span></div>
+          <div class="chg chg-new"><span class="tag">Стало</span><span class="txt">цена по каждому обещанию, выручка отдельно</span></div>
+        </div>
+      </article>
+
+      <article class="card anim" style="--i:3" tabindex="0" data-goto="3">
+        <div class="card-num">03</div>
+        <h3>Оценка вероятности будущей скидки</h3>
+        <p>Выручка признается за вычетом вероятной скидки уже на дату признания, а не в полной цене по договору. Нужно оценить вероятность её получения.</p>
+        <div class="card-changes">
+          <div class="chg chg-old"><span class="tag">Было</span><span class="txt">скидка постфактум — прочий расход</span></div>
+          <div class="chg chg-new"><span class="tag">Стало</span><span class="txt">выручка за вычетом вероятной скидки на дату признания</span></div>
+        </div>
+      </article>
+
+      <article class="card anim" style="--i:4" tabindex="0" data-goto="4">
+        <div class="card-num">04</div>
+        <h3>Возвраты продукции</h3>
+        <p>Если покупатель с высокой вероятностью вернет часть продукции, цена по договору уменьшается на потенциальную стоимость возвратов.</p>
+        <div class="card-changes">
+          <div class="chg chg-old"><span class="tag">Было</span><span class="txt">возвраты по факту</span></div>
+          <div class="chg chg-new"><span class="tag">Стало</span><span class="txt">уменьшение выручки на потенциальную сумму возвратов</span></div>
+        </div>
+      </article>
+
+      <article class="card anim" style="--i:5" tabindex="0" data-goto="5">
+        <div class="card-num">05</div>
+        <h3>Справедливая стоимость полученного</h3>
+        <p>При неденежной оплате — строгая иерархия оценки. Сначала полученное, потом переданное.</p>
+        <div class="card-changes">
+          <div class="chg chg-old"><span class="tag">Было</span><span class="txt">оценка по стоимости переданного</span></div>
+          <div class="chg chg-new"><span class="tag">Стало</span><span class="txt">сначала справедливая стоимость полученного</span></div>
+        </div>
+      </article>
+
+      <article class="card anim" style="--i:6" tabindex="0" data-goto="6">
+        <div class="card-num">06</div>
+        <h3>Степень готовности — для всех</h3>
+        <p>Принцип ПБУ 2/2008 распространен на любые длящиеся договоры. Само ПБУ 2/2008 отменяется.</p>
+        <div class="card-changes">
+          <div class="chg chg-old"><span class="tag">Было</span><span class="txt">степень готовности — только в стройке</span></div>
+          <div class="chg chg-new"><span class="tag">Стало</span><span class="txt">степень готовности — для всех длящихся договоров</span></div>
+        </div>
+      </article>
+
+      <article class="card anim" style="--i:7" tabindex="0" data-goto="7">
+        <div class="card-num">07</div>
+        <h3>Объединение договоров</h3>
+        <p>Взаимосвязанные договоры с одним контрагентом учитываются как единая сделка.</p>
+        <div class="card-changes">
+          <div class="chg chg-old"><span class="tag">Было</span><span class="txt">каждый договор — отдельно</span></div>
+          <div class="chg chg-new"><span class="tag">Стало</span><span class="txt">связанные договоры — единая выручка</span></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ================= СЛАЙД 1: ДИСКОНТИРОВАНИЕ ================= -->
+  <section class="slide" data-slide="1">
+    <div class="slide-head anim" style="--i:0">
+      <div class="eyebrow">Изменение 01</div>
+      <h2><span class="old">Цена по договору</span> <span class="arrow">→</span> <span class="new">Приведенная стоимость</span></h2>
+      <p class="lead">
+        Если договор содержит отсрочку или рассрочку, вся цена по договору — уже не выручка.
+        Часть суммы — плата за финансирование покупателя. ФСБУ 9/2025 (пп. 30–31) требует
+        разделять эти компоненты.
+      </p>
+    </div>
+
+    <div class="segmented anim" style="--i:1" data-panel="1">
+      <button type="button" class="active" data-mode="old">Было</button>
+      <button type="button" data-mode="new">Стало</button>
+    </div>
+
+    <div class="panel panel-old is-visible" id="panel-1-old">
+      <h4><span class="pico">✕</span> ПБУ 9/99 <span class="badge">до 2027 года</span></h4>
+      <p>Выручка признается в полной цене по договору. Вся сумма к получению — выручка от продажи.
+         Временная стоимость денег не учитывается.</p>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        Станок продан с оплатой через два года. Цена по договору — 1 200 000 руб.
+        <div class="entry">Д 62 К 90 — 1 200 000 руб. (вся сумма — выручка)</div>
+      </div>
+    </div>
+
+    <div class="panel panel-new" id="panel-1-new" style="display:none">
+      <h4><span class="pico">✓</span> ФСБУ 9/2025, пп. 30–31</h4>
+      <p>Приоритетный способ — сумма, которая была бы получена при отсутствии отсрочки
+         (приведенная стоимость). Разница — процентный доход, начисляется отдельно.
+         Оценка по полной цене допустима, если период отсрочки или рассрочки не превышает 12 месяцев.</p>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        Станок. Цена при оплате сразу — 1 000 000 руб. По договору — 1 200 000 руб.
+        с оплатой через два года. Ставка дисконтирования — 9,54%.
+        <div class="entry">Д 62 К 90 — 1 000 000 руб. (выручка)</div>
+        <div class="entry rev">Д 62 К 91 — 95 400 руб. (проценты за 1-й год: 1 000 000 × 9,54%)</div>
+        <div class="entry rev">Д 62 К 91 — 104 600 руб. (проценты за 2-й год: 1 095 400 × 9,54%)</div>
+        <div class="entry">Д 51 К 62 — 1 200 000 руб. (оплата по договору)</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn ghost" onclick="goTo(0)">← Назад</button>
+      <button class="btn" onclick="goTo(2)">Следующее изменение →</button>
+    </div>
+  </section>
+
+  <!-- ================= СЛАЙД 2: НЕСКОЛЬКО ОБЕЩАНИЙ ================= -->
+  <section class="slide" data-slide="2">
+    <div class="slide-head anim" style="--i:0">
+      <div class="eyebrow">Изменение 02</div>
+      <h2><span class="old">Договор целиком</span> <span class="arrow">→</span> <span class="new">Каждое обещание отдельно</span></h2>
+      <p class="lead">
+        Если предмет договора содержит несколько обещаний — продукцию, работы, услуги — с общей ценой,
+        цена распределяется между ними. Выручка по каждому обещанию признается отдельно, когда к покупателю
+        переходит контроль над соответствующим обещанием (пп. 18–20, 26 ФСБУ 9/2025).
+      </p>
+    </div>
+
+    <div class="segmented anim" style="--i:1" data-panel="2">
+      <button type="button" class="active" data-mode="old">Было</button>
+      <button type="button" data-mode="new">Стало</button>
+    </div>
+
+    <div class="panel panel-old is-visible" id="panel-2-old">
+      <h4><span class="pico">✕</span> ПБУ 9/99 <span class="badge">до 2027 года</span></h4>
+      <p>Договор учитывался как единое целое. Выручка признавалась по факту передачи всей продукции
+         или подписания акта, без выделения отдельных обещаний внутри предмета договора.</p>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        Договор на станок и его монтаж на общую сумму 1 000 000 руб. Выручка — 1 000 000 руб. после
+        подписания акта по всему договору.
+        <div class="entry">Д 62 К 90 — 1 000 000 руб. (вся сумма — выручка)</div>
+      </div>
+    </div>
+
+    <div class="panel panel-new" id="panel-2-new" style="display:none">
+      <h4><span class="pico">✓</span> ФСБУ 9/2025, пп. 18–20, 26</h4>
+      <p>Предмет договора разбивается на отдельные обещания. Цена договора распределяется между ними
+         пропорционально цене обособленной продажи каждого обещания.
+         Выручка по каждому обещанию признается по своим правилам: единовременно или по мере
+         передачи контроля.</p>
+      <ul>
+        <li>выделить в предмете каждое обещание передать продукцию, работу или услугу;</li>
+        <li>распределить общую цену договора между обещаниями;</li>
+        <li>признавать выручку по каждому обещанию отдельно — по мере перехода контроля.</li>
+      </ul>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        Договор на 1 000 000 руб. — станок и монтаж. Два обещания: станок (80%) — 800 000 руб.,
+        монтаж (20%) — 200 000 руб.
+        <div class="note">Станок: контроль перешел единовременно при отгрузке.</div>
+        <div class="entry">Д 62 К 90 — 800 000 руб.</div>
+        <div class="note">Монтаж: контроль переходит по степени готовности, 3 месяца.</div>
+        <div class="entry rev">Д 46 К 90 — 66 667 руб. (1-й месяц, 200 000 / 3)</div>
+        <div class="entry rev">Д 46 К 90 — 66 667 руб. (2-й месяц)</div>
+        <div class="entry rev">Д 62 К 90 — 66 666 руб. (3-й месяц, завершение)</div>
+        <div class="entry">Д 62 К 46 — 133 334 руб. (реклассификация)</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn ghost" onclick="goTo(1)">← Назад</button>
+      <button class="btn" onclick="goTo(3)">Следующее изменение →</button>
+    </div>
+  </section>
+
+  <!-- ================= СЛАЙД 3: ДИСКОНТИРОВАНИЕ ИЗ-ЗА СКИДКИ ================= -->
+  <section class="slide" data-slide="3">
+    <div class="slide-head anim" style="--i:0">
+      <div class="eyebrow">Изменение 03</div>
+      <h2><span class="old">Скидка по факту</span> <span class="arrow">→</span> <span class="new">Оценка вероятности будущей скидки</span></h2>
+      <p class="lead">
+        ФСБУ 9/2025 (п. 27) требует оценивать скидку уже при признании выручки: выручка
+        признается за вычетом вероятной скидки, а не в полной цене по договору. Независимо
+        от формы скидки — процент, фиксированная сумма, дополнительная поставка — нужно
+        оценить вероятность того, что покупатель выполнит условия договора.
+      </p>
+    </div>
+
+    <div class="segmented anim" style="--i:1" data-panel="3">
+      <button type="button" class="active" data-mode="old">Было</button>
+      <button type="button" data-mode="new">Стало</button>
+    </div>
+
+    <div class="panel panel-old is-visible" id="panel-3-old">
+      <h4><span class="pico">✕</span> ПБУ 9/99 <span class="badge">до 2027 года</span></h4>
+      <p>Будущие скидки учитывались только по мере их предоставления.</p>
+    </div>
+
+    <div class="panel panel-new" id="panel-3-new" style="display:none">
+      <h4><span class="pico">✓</span> ФСБУ 9/2025, пп. 27–28</h4>
+      <p>Если вариантов скидки несколько, п. 28 предлагает два способа: средневзвешенное значение по сравнимым сделкам или единственное наиболее вероятное значение из набора.</p>
+      <div class="example">
+        <div class="ex-title">В периоде отгрузки</div>
+        <div class="entry rev">[Д 62 К 90] — −80 000 руб. сторно выручку на сумму вероятной скидки</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn ghost" onclick="goTo(2)">← Назад</button>
+      <button class="btn" onclick="goTo(4)">Следующее изменение →</button>
+    </div>
+  </section>
+
+  <!-- ================= СЛАЙД 4: ВОЗВРАТЫ ================= -->
+  <section class="slide" data-slide="4">
+    <div class="slide-head anim" style="--i:0">
+      <div class="eyebrow">Изменение 04</div>
+      <h2><span class="old">Возвраты по факту</span> <span class="arrow">→</span> <span class="new">Уменьшение выручки на потенциальную сумму возвратов</span></h2>
+      <p class="lead">
+        Если покупатель с высокой вероятностью вернет часть продукции, цена по договору уменьшается на потенциальную стоимость возвратов.
+      </p>
+    </div>
+
+    <div class="segmented anim" style="--i:1" data-panel="4">
+      <button type="button" class="active" data-mode="old">Было</button>
+      <button type="button" data-mode="new">Стало</button>
+    </div>
+
+    <div class="panel panel-old is-visible" id="panel-4-old">
+      <h4><span class="pico">✕</span> ПБУ 9/99 <span class="badge">до 2027 года</span></h4>
+      <p>Выручка признавалась при отгрузке в полной сумме договора. Вероятность возврата не оценивалась. Возвраты отражались только по факту их осуществления.</p>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        Отгружено продукции на 1 000 000 руб., при этом высока вероятность, что покупатель вернет часть продукции на 100 000 руб.<br>
+        Выручка при отгрузке признается в полной сумме:
+        <div class="entry">Д 62 К 90 — 1 000 000 руб. (вся сумма — выручка)</div>
+        <div class="entry rev">При фактическом возврате: [Д 62 К 90] — 100 000 руб. (сторно выручки)</div>
+      </div>
+    </div>
+
+    <div class="panel panel-new" id="panel-4-new" style="display:none">
+      <h4><span class="pico">✓</span> ФСБУ 9/2025</h4>
+      <p>При отгрузке выручка признается за вычетом потенциальной суммы возвратов. На сумму ожидаемого возврата признается обязательство.</p>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        Отгружено продукции на 1 000 000 руб., при этом высока вероятность, что покупатель вернет часть продукции на 100 000 руб.<br>
+        Выручка при отгрузке уменьшается на сумму потенциального возврата:
+        <div class="entry">Д 62 К 90 — 900 000 руб. (выручка за вычетом возвратов)</div>
+        <div class="entry rev">Д 62 К 76 — 100 000 руб. (обязательство по возврату)</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn ghost" onclick="goTo(3)">← Назад</button>
+      <button class="btn" onclick="goTo(5)">Следующее изменение →</button>
+    </div>
+  </section>
+
+  <!-- ================= СЛАЙД 5: НЕДЕНЕЖНАЯ ОПЛАТА ================= -->
+  <section class="slide" data-slide="5">
+    <div class="slide-head anim" style="--i:0">
+      <div class="eyebrow">Изменение 05</div>
+      <h2><span class="old">По стоимости переданного</span> <span class="arrow">→</span> <span class="new">По справедливой стоимости полученного</span></h2>
+      <p class="lead">
+        При оплате неденьгами ФСБУ 9/2025 (п. 29) устанавливает строгую иерархию оценки.
+        Свободы выбора больше нет: способы применяются последовательно.
+      </p>
+    </div>
+
+    <div class="segmented anim" style="--i:1" data-panel="5">
+      <button type="button" class="active" data-mode="old">Было</button>
+      <button type="button" data-mode="new">Стало</button>
+    </div>
+
+    <div class="panel panel-old is-visible" id="panel-5-old">
+      <h4><span class="pico">✕</span> ПБУ 9/99 <span class="badge">до 2027 года</span></h4>
+      <p>Выручка оценивалась исходя из стоимости переданного актива. Иерархия способов
+         не была жестко прописана, справедливая стоимость использовалась ограниченно.</p>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        В обмен на станок покупатель передает патент на технологию.
+        Оценка — по стоимости переданного станка.
+        <div class="entry">Д 62 К 90 — по стоимости переданного станка</div>
+      </div>
+    </div>
+
+    <div class="panel panel-new" id="panel-5-new" style="display:none">
+      <h4><span class="pico">✓</span> ФСБУ 9/2025, п. 29</h4>
+      <p>Три способа строго по порядку:</p>
+      <ul>
+        <li>справедливая стоимость <b>полученного</b> актива;</li>
+        <li>справедливая стоимость <b>переданной</b> продукции;</li>
+        <li>обычная цена продажи аналогичной продукции в сравнимых обстоятельствах.</li>
+      </ul>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        В обмен на станок покупатель передает патент на технологию. Активного рынка патента
+        нет — справедливую стоимость полученного определить нельзя. Переходим ко второму
+        способу: справедливая стоимость станка равна 1 000 000 руб.
+        <div class="entry">Д 62 К 90 — 1 000 000 руб. (выручка)</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn ghost" onclick="goTo(4)">← Назад</button>
+      <button class="btn" onclick="goTo(6)">Следующее изменение →</button>
+    </div>
+  </section>
+
+  <!-- ================= СЛАЙД 6: СТЕПЕНЬ ГОТОВНОСТИ ================= -->
+  <section class="slide" data-slide="6">
+    <div class="slide-head anim" style="--i:0">
+      <div class="eyebrow">Изменение 06</div>
+      <h2><span class="old">Только строительный подряд</span> <span class="arrow">→</span> <span class="new">Любые длящиеся договоры</span></h2>
+      <p class="lead">
+        Принцип признания выручки по степени готовности распространен на другие договоры, исполнение которых выходит за пределы одного отчетного периода. Условие: заказчик может получить выгоду от частичного исполнения заказа или заказ настолько уникален, что подходит только для него и он обязан оплатить уже выполненную часть. ПБУ 2/2008 с 01.01.2027 отменяется.
+      </p>
+    </div>
+
+    <div class="segmented anim" style="--i:1" data-panel="6">
+      <button type="button" class="active" data-mode="old">Было</button>
+      <button type="button" data-mode="new">Стало</button>
+    </div>
+
+    <div class="panel panel-old is-visible" id="panel-6-old">
+      <h4><span class="pico">✕</span> ПБУ 9/99 + ПБУ 2/2008 <span class="badge">до 2027 года</span></h4>
+      <p>Выручка — по факту (акт, переход права собственности). Признание по степени
+         готовности — только для строительного подряда по ПБУ 2/2008.</p>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        Договор на разработку проекта станка и его изготовление на общую сумму 1 000 000 руб.
+        Проект разработан, но станок еще не готов. Выручка по всему договору признается только после подписания финального акта.
+        <div class="entry rev">Д 20 К 10, 70, 69 — затраты по проекту и изготовлению</div>
+        <div class="entry rev">Д 43 К 20 — станок передан на склад готовой продукции</div>
+        <div class="entry">Д 62 К 90 — 1 000 000 руб. (выручка признана после подписания акта)</div>
+      </div>
+    </div>
+
+    <div class="panel panel-new" id="panel-6-new" style="display:none">
+      <h4><span class="pico">✓</span> ФСБУ 9/2025, пп. 18–21</h4>
+      <p>Выручка признается по степени готовности, если (п. 19):</p>
+      <ul>
+        <li>контрагент одновременно получает и потребляет выгоды;</li>
+        <li>создается или улучшается актив, контроль над которым получает контрагент;</li>
+        <li>продукция может быть использована только для этого контрагента и есть безусловное право на оплату исполненной части.</li>
+      </ul>
+      <p style="margin-top:12px">Способы определения степени готовности (п. 20): по доле объема
+         продукции или по доле понесенных расходов.</p>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        Договор на разработку проекта станка (300 000 руб.) и его изготовление (700 000 руб.). Заказ уникален.
+        <div class="note">Этап 1 — разработка проекта завершена:</div>
+        <div class="entry rev">Д 46 К 90 — 300 000 руб. (признана выручка за проект)</div>
+        <div class="note">Этап 2 — станок изготовлен и передан:</div>
+        <div class="entry">Д 62 К 90 — 700 000 руб. (признана выручка за станок)</div>
+        <div class="entry">Д 62 К 46 — 300 000 руб. (реклассификация выручки по проекту)</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn ghost" onclick="goTo(5)">← Назад</button>
+      <button class="btn" onclick="goTo(7)">Следующее изменение →</button>
+    </div>
+  </section>
+
+  <!-- ================= СЛАЙД 7: ОБЪЕДИНЕНИЕ ДОГОВОРОВ ================= -->
+  <section class="slide" data-slide="7">
+    <div class="slide-head anim" style="--i:0">
+      <div class="eyebrow">Изменение 07</div>
+      <h2><span class="old">Несколько договоров</span> <span class="arrow">→</span> <span class="new">Одна сделка</span></h2>
+      <p class="lead">
+        ФСБУ 9/2025 (п. 17) требует объединять договоры с одним контрагентом, если они
+        взаимосвязаны и образуют единую обязанность. Выручку по связанным договорам
+        придется объединить.
+      </p>
+    </div>
+
+    <div class="segmented anim" style="--i:1" data-panel="7">
+      <button type="button" class="active" data-mode="old">Было</button>
+      <button type="button" data-mode="new">Стало</button>
+    </div>
+
+    <div class="panel panel-old is-visible" id="panel-7-old">
+      <h4><span class="pico">✕</span> ПБУ 9/99 <span class="badge">до 2027 года</span></h4>
+      <p>Каждый договор учитывается отдельно. Выручка по каждому признается независимо,
+         в своем периоде.</p>
+      <div class="example">
+        <div class="ex-title">Пример</div>
+        Договор 1 — станок 100 000 руб.<br>
+        Договор 2 — монтаж 3 000 руб. (со скидкой 27 000 руб.).
+        <div class="entry rev">Д 62 К 90 — 100 000 руб. (выручка по станку)</div>
+        <div class="entry rev">Д 62 К 90 — 3 000 руб. (выручка по монтажу)</div>
+      </div>
+    </div>
+
+    <div class="panel panel-new" id="panel-7-new" style="display:none">
+      <h4><span class="pico">✓</span> ФСБУ 9/2025, п. 17</h4>
+      <p>Два и более договора с одним контрагентом объединяются, если исполнение одного договора зависит от исполнения другого. Общая сумма выручки по сделке — 103 000 руб. (100 000 руб. + 3 000 руб.) — распределяется между обещаниями пропорционально цене их обособленной продажи без учета скидок. То есть для расчета доли выручка по монтажу берется без скидки — в размере 30 000 руб. Итого выручка: за станок (100 000 руб. / 130 000 руб.) и за монтаж (30 000 руб. / 130 000 руб.).</p>
+      <div class="example">
+        <div class="ex-title">Распределение выручки</div>
+        Цена обособленной продажи: станок 100 000 + монтаж 30 000 = 130 000 руб.<br>
+        Общая выручка: 103 000 руб.<br><br>
+        Станок: 103 000 × (100 / 130) = <b>79 231 руб.</b><br>
+        Монтаж: 103 000 × (30 / 130) = <b>23 769 руб.</b>
+        <div class="entry">Д 62 К 90 — 79 231 руб. (выручка по станку)</div>
+        <div class="entry">Д 62 К 90 — 23 769 руб. (выручка по монтажу)</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn ghost" onclick="goTo(6)">← Назад</button>
+      <button class="btn" onclick="goTo(0)">В начало →</button>
+    </div>
+  </section>
+
+  <!-- ================= NAV ================= -->
+  <nav class="nav" aria-label="Навигация по презентации">
+    <button class="nbtn" type="button" id="prevBtn">
+      <span aria-hidden="true">←</span> <span class="label">Назад</span>
+    </button>
+    <div class="dots" id="dots"></div>
+    <button class="nbtn primary" type="button" id="nextBtn">
+      <span class="label">Далее</span> <span class="arrow-ico" aria-hidden="true">→</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var slides   = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total    = slides.length;
+  var current  = 0;
+
+  var dotsWrap = document.getElementById('dots');
+  var counter  = document.getElementById('counter');
+  var bar      = document.getElementById('progressBar');
+  var prevBtn  = document.getElementById('prevBtn');
+  var nextBtn  = document.getElementById('nextBtn');
+
+  /* --- dots --- */
+  slides.forEach(function (_, i) {
+    var d = document.createElement('button');
+    d.type = 'button';
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Слайд ' + (i + 1));
+    d.dataset.goto = i;
+    dotsWrap.appendChild(d);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  /* --- render --- */
+  function render() {
+    dots.forEach(function (d, i) { d.classList.toggle('active', i === current); });
+
+    counter.textContent =
+      String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+
+    bar.style.width = (total > 1 ? (current / (total - 1)) * 100 : 100) + '%';
+
+    prevBtn.disabled = current === 0;
+    nextBtn.querySelector('.label').textContent =
+      current === total - 1 ? 'В начало' : 'Далее';
+  }
+
+  /* --- navigation --- */
+  function goTo(n) {
+    if (n < 0 || n >= total || n === current) return;
+    slides[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  prevBtn.addEventListener('click', function () { goTo(current - 1); });
+
+  nextBtn.addEventListener('click', function () {
+    goTo(current === total - 1 ? 0 : current + 1);
+  });
+
+  /* клики по карточкам и точкам */
+  document.addEventListener('click', function (e) {
+    var target = e.target.closest('[data-goto]');
+    if (target) goTo(Number(target.dataset.goto));
+  });
+
+  /* клавиатура */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' && current < total - 1) { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft'  && current > 0)         { e.preventDefault(); goTo(current - 1); }
+  });
+
+  /* свайпы */
+  var sx = 0, sy = 0, tracking = false;
+  document.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 1) return;
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+    tracking = true;
+  }, { passive: true });
+
+  document.addEventListener('touchend', function (e) {
+    if (!tracking) return;
+    tracking = false;
+    var t  = e.changedTouches[0];
+    var dx = t.clientX - sx;
+    var dy = t.clientY - sy;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0 && current < total - 1) goTo(current + 1);
+      if (dx > 0 && current > 0)         goTo(current - 1);
+    }
+  }, { passive: true });
+
+  /* --- переключатель «Было / Стало» --- */
+  function setMode(seg, mode) {
+    var id    = seg.dataset.panel;
+    var oldP  = document.getElementById('panel-' + id + '-old');
+    var newP  = document.getElementById('panel-' + id + '-new');
+    if (!oldP || !newP) return;
+
+    var showP = (mode === 'old') ? oldP : newP;
+    var hideP = (mode === 'old') ? newP : oldP;
+
+    seg.querySelectorAll('button').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.mode === mode);
+    });
+
+    hideP.style.display = 'none';
+    hideP.classList.remove('is-visible');
+
+    showP.style.display = 'block';
+    showP.classList.remove('is-visible');
+    void showP.offsetWidth;
+    showP.classList.add('is-visible');
+  }
+
+  document.querySelectorAll('.segmented').forEach(function (seg) {
+    seg.addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-mode]');
+      if (btn) setMode(seg, btn.dataset.mode);
+    });
+  });
+
+  /* --- init --- */
+  render();
+})();
+</script>
+
+<script src="https://artservice.glavbukh.ru/lib/iframeResizer.contentWindow.min.js"></script>
+
+</body>
+</html>
