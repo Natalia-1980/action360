@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Расчет платежей и рисков, если в компании нет работников</title>
+<style>
+:root{--white:#fff;--black:#111;--g900:#1f1f1f;--g700:#4b4b4b;--g500:#8a8a8a;--g300:#d9d9d9;--g200:#e6e6e6;--g100:#f2f2f2;--glight:#f7f7f7;--red:#E21F27;--red-dark:#b8171e;--green:#80BA28;--green-dark:#5c8a17;--green-bg:#f2f9e8;--radius:16px;--shadow:0 8px 24px rgba(17,17,17,.06);--font:"Proxima Nova","Proxima Nova Regular",Arial,Helvetica,sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:auto!important;overflow-x:hidden}
+body{font-family:var(--font);background:var(--white);color:var(--g900);line-height:1.6}
+.site-embed{max-width:700px;margin:0 auto;padding:20px 0;position:relative}
+.calc{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;width:100%;max-width:700px;position:relative;z-index:1}
+.calc::after{content:"";display:table;clear:both}
+.calc-head{background:var(--g100);padding:18px 24px;border-bottom:2px solid var(--red)}
+.calc-head h1{font-size:18px;font-weight:800;color:var(--black);line-height:1.3}
+.calc-body{padding:24px}
+.calc-btn{display:block;width:100%;background:var(--white);color:var(--red);border:2px solid var(--red);border-radius:10px;padding:11px 16px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin:6px 0 0;text-align:center}
+.calc-btn:hover:not(:disabled){background:var(--red);color:var(--white)}
+.q-block{background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:16px 18px;margin-bottom:20px}
+.q-block h3{font-size:13px;font-weight:800;color:var(--black);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.q-option{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px dashed var(--g300);cursor:pointer}
+.q-option:last-of-type{border-bottom:none;padding-bottom:0}
+.q-option:first-of-type{padding-top:0}
+.q-option input[type="radio"]{margin-top:4px;width:16px;height:16px;accent-color:var(--red);flex-shrink:0;cursor:pointer}
+.q-option .q-info{display:flex;flex-direction:column;gap:2px;flex:1}
+.q-option .q-title{font-size:14px;font-weight:700;color:var(--black);line-height:1.35}
+
+.rk-block{border:1px solid var(--g300);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.marker-summary{font-size:12px;font-weight:700;color:var(--g500);margin-left:8px}
+.marker-summary.has{color:var(--red)}
+.markers-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.markers-list label{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;cursor:pointer;line-height:1.4;color:var(--g900);padding:6px 4px;border-radius:6px}
+.markers-list label:hover{background:var(--glight)}
+.markers-list input[type="checkbox"]{width:16px;height:16px;accent-color:var(--red);margin-top:2px;flex-shrink:0;cursor:pointer}
+details.rk-block{padding:0;overflow:hidden}
+details.rk-block summary{list-style:none;cursor:pointer;padding:16px;font-size:14px;font-weight:800;color:var(--black);display:flex;justify-content:space-between;align-items:center;user-select:none;background:var(--white);border-radius:12px}
+details.rk-block summary::-webkit-details-marker{display:none}
+details.rk-block summary::after{content:'›';font-size:20px;color:var(--g500);transition:transform 0.2s;line-height:1;display:inline-block}
+details.rk-block[open] summary::after{transform:rotate(90deg)}
+details.rk-block[open] summary{border-bottom:1px solid var(--g200);border-radius:12px 12px 0 0}
+.rk-content{padding:16px}
+
+/* Стили для модального окна (попапа) */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(17,17,17,0.6);z-index:9999;display:none;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s ease}
+.modal-overlay.show{display:flex;opacity:1}
+.modal-content{background:var(--white);border-radius:var(--radius);width:90%;max-width:650px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,0.2);position:relative;transform:translateY(20px);transition:transform 0.3s ease}
+.modal-overlay.show .modal-content{transform:translateY(0)}
+.modal-body{padding:24px;overflow-y:auto;outline:none;}
+.modal-body::-webkit-scrollbar{width:6px}
+.modal-body::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
+
+/* Результаты */
+.risk-card{background:var(--white);border:2px solid var(--red);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.risk-card.ok{border-color:var(--green);background:var(--green-bg)}
+.risk-card h4{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--black);margin-bottom:8px}
+.risk-card.ok h4{color:var(--green-dark)}
+.risk-card p{font-size:13.5px;color:var(--g900);line-height:1.5;margin-bottom:6px}
+.risk-card p:last-child{margin-bottom:0}
+.risk-highlight{font-size:22px;font-weight:800;color:var(--red);margin:4px 0 8px;line-height:1.2}
+.risk-card.ok .risk-highlight{color:var(--green-dark)}
+.npd-note{background:var(--glight);border-left:3px solid var(--red);border-radius:6px;padding:10px 12px;margin-top:12px;font-size:13px;color:var(--g900);line-height:1.5}
+.npd-note b{color:var(--red)}
+
+@media (max-width:520px){
+  .calc-body{padding:18px}
+  .calc-head{padding:16px 18px}
+  .calc-head h1{font-size:16px}
+  .modal-content{width:95%;max-height:95vh}
+  .modal-body{padding:18px}
+}
+</style>
+</head>
+<body>
+<div class="site-embed">
+<div class="calc">
+<div class="calc-head" id="calcStart">
+<div>
+<h1>Расчет платежей и рисков, если в компании нет работников</h1>
+</div>
+</div>
+<div class="calc-body">
+
+<!-- Вопрос 1: Кто остался -->
+<div class="q-block">
+<h3>1. Кто остался в компании после увольнения сотрудников?</h3>
+<label class="q-option"><input type="radio" name="hasDirector" value="yes" checked><span class="q-info"><span class="q-title">Остался директор</span></span></label>
+<label class="q-option"><input type="radio" name="hasDirector" value="no"><span class="q-info"><span class="q-title">Директора нет, управление передано управляющей компании или управляющему-ИП</span></span></label>
+</div>
+
+<!-- Вопрос 2: Ведет ли компания деятельность -->
+<div class="q-block">
+<h3>2. Компания ведет деятельность?</h3>
+<label class="q-option"><input type="radio" name="isActive" value="yes" checked><span class="q-info"><span class="q-title">Да, ведет</span></span></label>
+<label class="q-option"><input type="radio" name="isActive" value="no"><span class="q-info"><span class="q-title">Нет, не ведет</span></span></label>
+</div>
+
+<!-- Вопрос 3: Кто выполняет работу -->
+<div class="q-block" id="workModeBlock">
+<h3>3. Кто выполняет работу?</h3>
+<label class="q-option"><input type="radio" name="workMode" value="self" checked><span class="q-info"><span class="q-title">Самозанятые</span></span></label>
+<label class="q-option"><input type="radio" name="workMode" value="ip"><span class="q-info"><span class="q-title">ИП</span></span></label>
+<label class="q-option"><input type="radio" name="workMode" value="both"><span class="q-info"><span class="q-title">И те, и другие</span></span></label>
+</div>
+
+<!-- Блок рисков (маркеры) -->
+<div id="contractorsBlock" style="margin-bottom:20px; display:none;">
+<div class="section-title" style="font-size:13px;font-weight:800;color:var(--black);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">4. Отметьте признаки, если они есть в работе с исполнителями</div>
+
+<details class="rk-block marker-group" data-group="1">
+<summary>Кто решает, как и когда работать? <span class="marker-summary" data-count="1">0 из 3</span></summary>
+<div class="rk-content">
+<div class="markers-list">
+<label><input type="checkbox" class="repl-risk" data-marker="m1"> Требовали от физлица зарегистрироваться самозанятым или ИП как условие договора, или он зарегистрировался непосредственно перед сделкой</label>
+<label><input type="checkbox" class="repl-risk" data-marker="m2"> Сами распределяем исполнителей по объектам или маршрутам по производственной необходимости</label>
+<label><input type="checkbox" class="repl-risk" data-marker="m3"> Определяем режим работы: продолжительность дня или смены, время отдыха</label>
+<!-- УДАЛЕН m4 -->
+</div>
+</div>
+</details>
+
+<details class="rk-block marker-group" data-group="2">
+<summary>Чье оборудование и чья территория? <span class="marker-summary" data-count="2">0 из 3</span></summary>
+<div class="rk-content">
+<div class="markers-list">
+<label><input type="checkbox" class="repl-risk" data-marker="m5"> Работают на нашей территории или в офисе</label>
+<label><input type="checkbox" class="repl-risk" data-marker="m6"> Используют наши материалы, инструменты, технику, оборудование; оплачиваем расходы на поездки</label>
+<label><input type="checkbox" class="repl-risk" data-marker="m7"> Выполняют постоянную трудовую функцию по должности (водитель, швея, курьер), а не разовое задание</label>
+</div>
+</div>
+</details>
+
+<details class="rk-block marker-group" data-group="3">
+<summary>Как устроены выплаты? <span class="marker-summary" data-count="3">0 из 2</span></summary>
+<div class="rk-content">
+<div class="markers-list">
+<label><input type="checkbox" class="repl-risk" data-marker="m8"> Платим дважды в месяц в определенные даты</label>
+<!-- УДАЛЕН m9 -->
+<label><input type="checkbox" class="repl-risk" data-marker="m10"> Оплата фиксированная и не зависит от объема работ</label>
+</div>
+</div>
+</details>
+</div>
+
+<button type="button" class="calc-btn" id="calcBtn">Показать результат</button>
+
+</div>
+</div>
+</div>
+
+<!-- Модальное окно результатов -->
+<div class="modal-overlay" id="resultModal">
+  <div class="modal-content">
+    <div class="modal-body" id="modalBody" tabindex="-1">
+      <div id="directorResult"></div>
+      <div id="contractorsResult"></div>
+      <button type="button" class="calc-btn" id="resetBtn" style="margin-top:14px;color:var(--g700);border-color:var(--g300)">Рассчитать заново</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://artservice.glavbukh.ru/lib/iframeResizer.contentWindow.min.js"></script>
+<script defer>(function(){
+"use strict";
+function money(n){var r=Math.round(n);return r.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' ₽'}
+var MROT=28935;
+
+var calcBtn=document.getElementById('calcBtn');
+var resetBtn=document.getElementById('resetBtn');
+var resultModal=document.getElementById('resultModal');
+var modalBody=document.getElementById('modalBody');
+var directorResult=document.getElementById('directorResult');
+var contractorsResult=document.getElementById('contractorsResult');
+var contractorsBlock=document.getElementById('contractorsBlock');
+var workModeBlock=document.getElementById('workModeBlock');
+var calcStart=document.getElementById('calcStart');
+
+function getHasDirector(){return document.querySelector('input[name="hasDirector"]:checked').value==='yes'}
+function getIsActive(){return document.querySelector('input[name="isActive"]:checked').value==='yes'}
+function getWorkMode(){return document.querySelector('input[name="workMode"]:checked').value}
+
+function updateUI(){
+var active=getIsActive();
+
+workModeBlock.style.display=active?'block':'none';
+var showMarkers = active;
+contractorsBlock.style.display=showMarkers?'block':'none';
+
+document.querySelectorAll('.marker-group').forEach(function(g){
+var checked=g.querySelectorAll('input.repl-risk:checked').length;
+var total=g.querySelectorAll('input.repl-risk').length;
+var span=g.querySelector('.marker-summary');
+span.textContent=checked+' из '+total;
+if(checked>0){span.classList.add('has')}else{span.classList.remove('has')}
+});
+
+if(typeof parentIFrame!=='undefined')parentIFrame.size();
+}
+
+document.querySelectorAll('input[name="hasDirector"], input[name="isActive"], input[name="workMode"]').forEach(function(r){r.addEventListener('change',updateUI)});
+document.querySelectorAll('input.repl-risk').forEach(function(cb){cb.addEventListener('change',updateUI)});
+
+function renderResults(){
+var hasDir=getHasDirector();
+var active=getIsActive();
+var work=getWorkMode();
+
+// 1. Блок про директора
+if(hasDir){
+var yearBase=MROT*12;
+var yearContrib=yearBase*0.30;
+var text = 'МРОТ 2027 — ' + money(MROT) + '. Годовая база: ' + money(yearBase) + ' (12 × МРОТ). Взносы 30% начисляются даже в том случае, если зарплата директору не выплачивается. Обнулить их нельзя.';
+if(!active){
+  text += ' Даже если компания не ведет деятельность, взносы за директора сохраняются.';
+}
+text += ' Но в случае применения АУСН взносы за директора не платят.';
+
+directorResult.innerHTML='<div class="risk-card">'+
+'<h4>Обязательные взносы за директора</h4>'+
+'<div class="risk-highlight">'+money(yearContrib)+' в год</div>'+
+'<p>'+text+'</p>'+
+'</div>';
+}else{
+directorResult.innerHTML='<div class="risk-card ok">'+
+'<h4>Обязательные взносы за директора</h4>'+
+'<div class="risk-highlight">0 ₽</div>'+
+'<p>В этой компании страховых взносов за директора нет, так как управление передано управляющей компании или управляющему-ИП. У управляющей стороны свои обязательства по договору управления.</p>'+
+'</div>';
+}
+
+// 2. Блок про самозанятых/ИП
+if(!active){
+contractorsResult.innerHTML='<div class="risk-card">'+
+'<h4>Риск: с вашей компанией могут не захотеть работать контрагенты</h4>'+
+'<p>Компания без сотрудников и без хозяйственной деятельности воспринимается как техническая. Контрагенты проверяют это перед сделкой, а при возобновлении деятельности внимание налоговой будет выше.</p>'+
+'<p>Если позже привлечете самозанятых или ИП для задач уволенных — возникнет риск переквалификации договоров в трудовые (с доначислением НДФЛ, взносов, пеней и штрафа).</p>'+
+'</div>';
+}else{
+var peopleText='самозанятые';
+if(work==='ip')peopleText='ИП';
+if(work==='both')peopleText='самозанятые и ИП';
+
+var checkedMarkers=document.querySelectorAll('input.repl-risk:checked').length;
+var riskText='';
+var cardClass='ok';
+
+// Общее количество маркеров теперь 8. Пороги скорректированы: >=3 высокий, >=2 средний.
+if(work==='ip'){
+  riskText='<b>Риск переквалификации есть, но он ниже, чем с самозанятыми.</b> ИП изначально ведут предпринимательскую деятельность, однако если они работают на одном объекте, подчиняются графику и получают фиксированную оплату, налоговая может переквалифицировать и эти отношения.';
+  if(checkedMarkers>=3){riskText='<b>Высокий риск переквалификации.</b> Несмотря на статус ИП, отмечено много признаков трудовых отношений. Суды и налоговая с высокой вероятностью признают такие договоры трудовыми.';cardClass='';}
+  else if(checkedMarkers>=2){riskText='<b>Средний риск переквалификации.</b> Есть отдельные признаки трудовых отношений. Рекомендуем пересмотреть условия договоров и снизить уровень контроля.';cardClass='';}
+  else if(checkedMarkers===1){riskText='<b>Низкий риск переквалификации.</b> Отмечен только один признак. Позиция компании выглядит достаточно безопасной.';cardClass='ok';}
+  else {riskText='<b>Явных рисков не выявлено.</b> Отмеченных признаков трудовых отношений нет.';cardClass='ok';}
+} else {
+  if(checkedMarkers>=3){
+    riskText='<b>Высокий риск переквалификации.</b> Отмечено много признаков трудовых отношений. Суды и налоговая с высокой вероятностью признают такие договоры трудовыми.';
+    cardClass='';
+  }else if(checkedMarkers>=2){
+    riskText='<b>Средний риск переквалификации.</b> Есть отдельные признаки трудовых отношений. Рекомендуем пересмотреть условия договоров и снизить уровень контроля.';
+    cardClass='';
+  }else if(checkedMarkers===1){
+    riskText='<b>Низкий риск переквалификации.</b> Отмечен только один признак. Позиция компании выглядит достаточно безопасной.';
+    cardClass='ok';
+  }else{
+    riskText='<b>Рисков не выявлено.</b> Отмеченных признаков трудовых отношений нет. Позиция компании безопасна.';
+    cardClass='ok';
+  }
+}
+
+var npdNote='';
+if(work==='self' || work==='both'){
+  // Удалено предложение про контроль дохода
+  npdNote='<div class="npd-note"><b>Лимит НПД — 2,4 млн ₽ за календарный год.</b> Если доход самозанятого превысит эту сумму, он теряет право на спецрежим. Тогда доход облагается НДФЛ и страховыми взносами, а у компании возрастает риск доначислений при проверке.</div>';
+}
+
+contractorsResult.innerHTML='<div class="risk-card '+cardClass+'">'+
+'<h4>Оценка рисков переквалификации</h4>'+
+'<p>Вы указали, что работу выполняют <b>'+peopleText+'</b>.</p>'+
+'<p>'+riskText+'</p>'+
+'<p><b>Последствия при переквалификации:</b> доначисление НДФЛ (13–22%), страховых взносов (до 30%), пеней и штрафов (20–40%). Кроме того, штраф за сокрытие трудовых отношений — до 100 000 ₽ по ч. 4 ст. 5.27 КоАП.</p>'+
+'<p>В споре важно доказать самостоятельность исполнителей: свои инструменты, свободный график, другие заказчики, риск неоплаты за некачественный результат.</p>'+
+npdNote+
+'</div>';
+}
+}
+
+calcBtn.addEventListener('click',function(){
+renderResults();
+resultModal.classList.add('show');
+setTimeout(function(){
+  modalBody.scrollTop = 0;
+  modalBody.focus();
+}, 50);
+
+setTimeout(function(){if(typeof parentIFrame!=='undefined')parentIFrame.size()},100);
+});
+
+resetBtn.addEventListener('click',function(){
+resultModal.classList.remove('show');
+setTimeout(function(){
+  window.scrollTo(0, 0);
+  calcStart.scrollIntoView({behavior:'smooth', block:'start'});
+  var firstInput = document.querySelector('input[name="hasDirector"][value="yes"]');
+  if(firstInput) firstInput.focus({preventScroll:true});
+}, 100);
+});
+
+resultModal.addEventListener('click', function(e) {
+  if(e.target === resultModal) {
+    resultModal.classList.remove('show');
+  }
+});
+
+updateUI();
+})();
+</script>
+</body>
+</html>
